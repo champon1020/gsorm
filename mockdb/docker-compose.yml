@@ -1,0 +1,11 @@
+version: '3'
+services:
+  test:
+    image: genschsa/mysql-employees:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: employees
+      TZ: "Asia/Tokyo"
+    ports:
+      - "33306:3306"
