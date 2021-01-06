@@ -5,6 +5,10 @@ const (
 	ErrInvalid = iota
 	ErrInvalidType
 	ErrInvalidLen
+	ErrQueryFailed
+	ErrExecFailed
+	ErrScanFailed
+	ErrUnknown
 )
 
 // Error struct.

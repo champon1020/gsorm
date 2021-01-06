@@ -5,20 +5,6 @@ import (
 	"strings"
 )
 
-// SQL string.
-type SQL string
-
-func (s *SQL) write(str string) {
-	if len(*s) != 0 && str != ")" {
-		*s += " "
-	}
-	*s += SQL(str)
-}
-
-func (s *SQL) do() error {
-	return nil
-}
-
 // Stmt keeps the sql statement.
 type Stmt struct {
 	DB        *sql.DB
@@ -38,7 +24,7 @@ func (s *Stmt) Query(model interface{}) error {
 	if err != nil {
 		return err
 	}
-	if err := sql.do(); err != nil {
+	if err := sql.doQuery(s.DB, model); err != nil {
 		return err
 	}
 	return nil
@@ -91,7 +77,7 @@ func (s *Stmt) Exec() error {
 	if err != nil {
 		return err
 	}
-	if err := sql.do(); err != nil {
+	if err := sql.doExec(s.DB); err != nil {
 		return err
 	}
 	return nil
