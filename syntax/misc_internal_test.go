@@ -59,3 +59,6 @@ func TestToString_Fail(t *testing.T) {
 		assert.Equal(t, testCase.ErrorCode, err.(Error).Code)
 	}
 }
+
+func TestConvertToSnakeCase(t *testing.T) {
+}

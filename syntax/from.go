@@ -28,10 +28,10 @@ func (f *From) Build() (*StmtSet, error) {
 }
 
 // NewFrom make new from object.
-func NewFrom(cols []string) *From {
+func NewFrom(tables []string) *From {
 	f := new(From)
-	for _, c := range cols {
-		f.addTable(c)
+	for _, t := range tables {
+		f.addTable(t)
 	}
 	return f
 }

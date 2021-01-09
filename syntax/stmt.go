@@ -1,27 +1,8 @@
 package syntax
 
-import (
-	"database/sql"
-	"strings"
-)
-
-// SQL string.
-type SQL string
-
-func (s *SQL) write(str string) {
-	if len(*s) != 0 && str != ")" {
-		*s += " "
-	}
-	*s += SQL(str)
-}
-
-func (s *SQL) do() error {
-	return nil
-}
-
 // Stmt keeps the sql statement.
 type Stmt struct {
-	DB        *sql.DB
+	DB        DbIface
 	Mode      uint
 	Cmd       Cmd
 	From      Expr
@@ -38,7 +19,7 @@ func (s *Stmt) Query(model interface{}) error {
 	if err != nil {
 		return err
 	}
-	if err := sql.do(); err != nil {
+	if err := sql.doQuery(s.DB, model); err != nil {
 		return err
 	}
 	return nil
@@ -91,7 +72,7 @@ func (s *Stmt) Exec() error {
 	if err != nil {
 		return err
 	}
-	if err := sql.do(); err != nil {
+	if err := sql.doExec(s.DB); err != nil {
 		return err
 	}
 	return nil
@@ -154,7 +135,7 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 }
 
 // AddError append error to stmt.
-func (s *Stmt) AddError(err error) {
+func (s *Stmt) addError(err error) {
 	s.Errors = append(s.Errors, err)
 }
 
@@ -176,44 +157,5 @@ func (s *Stmt) And(expr string, vals ...interface{}) *Stmt {
 func (s *Stmt) Or(expr string, vals ...interface{}) *Stmt {
 	w := NewOr(expr, vals...)
 	s.AndOr = append(s.AndOr, w)
-	return s
-}
-
-// StmtSet is the statement set.
-type StmtSet struct {
-	Clause string
-	Value  string
-	Parens bool
-}
-
-// WriteClause write caluse to StmtSet.
-func (ss *StmtSet) WriteClause(clause string) {
-	if ss.Clause != "" {
-		ss.Clause += " "
-	}
-	ss.Clause += clause
-}
-
-// WriteValue write value to StmtSet.
-func (ss *StmtSet) WriteValue(value string) {
-	if ss.Value != "" && value != "," && value != ")" && !strings.HasSuffix(ss.Value, "(") {
-		ss.Value += " "
-	}
-	ss.Value += value
-}
-
-// Build make sql string.
-func (ss *StmtSet) Build() string {
-	s := ss.Clause
-	if ss.Parens || ss.Value != "" {
-		s += " "
-	}
-	if ss.Parens {
-		s += "("
-	}
-	s += ss.Value
-	if ss.Parens {
-		s += ")"
-	}
 	return s
 }

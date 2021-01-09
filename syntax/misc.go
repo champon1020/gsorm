@@ -2,7 +2,9 @@ package syntax
 
 import (
 	"reflect"
+	"regexp"
 	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -28,4 +30,17 @@ func toString(v interface{}) (string, error) {
 // PrintTestDiff prints the difference between expected and actual.
 func PrintTestDiff(t *testing.T, diff string) {
 	t.Errorf("Differs: (-got +want)\n%s", diff)
+}
+
+var (
+	matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
+	matchAllCap   = regexp.MustCompile("([a-z0-9])([A-Z])")
+)
+
+func convertToSnakeCase(str string) (snake string) {
+	str = strings.Split(str, "#")[0]
+	snake = matchFirstCap.ReplaceAllString(str, "${1}_${2}")
+	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
+	snake = strings.ToLower(snake)
+	return
 }

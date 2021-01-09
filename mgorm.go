@@ -38,9 +38,10 @@ func (p *Pool) Test() {
 }
 
 // SetToStmt assigns Pool properties to Stmt.
-func (p *Pool) SetToStmt(stmt *syntax.Stmt) {
+func (p *Pool) setToStmt(stmt *syntax.Stmt, err ...error) {
 	stmt.DB = p.db
 	stmt.Mode = p.mode
+	stmt.Errors = append(stmt.Errors, err...)
 }
 
 // Select statement api.
@@ -48,7 +49,7 @@ func (p *Pool) Select(cols []string, table []string) *syntax.Stmt {
 	stmt := new(syntax.Stmt)
 	stmt.Cmd = syntax.NewSelect(cols)
 	stmt.From = syntax.NewFrom(table)
-	p.SetToStmt(stmt)
+	p.setToStmt(stmt)
 	return stmt
 }
 
@@ -57,7 +58,7 @@ func (p *Pool) Insert(table string, cols []string, vals []interface{}) *syntax.S
 	stmt := new(syntax.Stmt)
 	stmt.Cmd = syntax.NewInsert(table, cols)
 	stmt.Values = syntax.NewValues(vals)
-	p.SetToStmt(stmt)
+	p.setToStmt(stmt)
 	return stmt
 }
 
@@ -66,11 +67,8 @@ func (p *Pool) Update(table string, cols []string, vals []interface{}) *syntax.S
 	stmt := new(syntax.Stmt)
 	stmt.Cmd = syntax.NewUpdate(table)
 	set, err := syntax.NewSet(cols, vals)
-	if err != nil {
-		stmt.AddError(err)
-	}
 	stmt.Set = set
-	p.SetToStmt(stmt)
+	p.setToStmt(stmt, err)
 	return stmt
 }
 
@@ -79,6 +77,6 @@ func (p *Pool) Delete(table []string) *syntax.Stmt {
 	stmt := new(syntax.Stmt)
 	stmt.Cmd = syntax.NewDelete()
 	stmt.From = syntax.NewFrom(table)
-	p.SetToStmt(stmt)
+	p.setToStmt(stmt)
 	return stmt
 }
