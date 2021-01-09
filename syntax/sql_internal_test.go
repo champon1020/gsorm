@@ -2,6 +2,7 @@ package syntax
 
 import (
 	"database/sql"
+	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -54,14 +55,15 @@ func (db *MockDb) Exec(query string, args ...interface{}) (sql.Result, error) {
 }
 
 type MockRows struct {
-	Max      int
-	Count    int
-	ScanFunc func(...interface{}) error
+	Max         int
+	Count       int
+	ColumnsFunc func() ([]string, error)
+	ScanFunc    func(...interface{}) error
 }
 
 func (r *MockRows) Close() error { return nil }
 func (r *MockRows) Columns() ([]string, error) {
-	return []string{"id", "name"}, nil
+	return r.ColumnsFunc()
 }
 func (r *MockRows) Next() bool {
 	if r.Count >= r.Max {
@@ -92,6 +94,7 @@ func TestSQL_DoQuery(t *testing.T) {
 		car := new([]Car)
 		mockRows := new(MockRows)
 		mockRows.Max = len(*testCase.Rows)
+		mockRows.ColumnsFunc = func() ([]string, error) { return []string{"id", "name"}, nil }
 		mockRows.ScanFunc = func(dest ...interface{}) error {
 			ptrID := dest[0].(*interface{})
 			ptrName := dest[1].(*interface{})
@@ -99,15 +102,72 @@ func TestSQL_DoQuery(t *testing.T) {
 			*ptrName = (*testCase.Rows)[mockRows.Count-1].Name
 			return nil
 		}
-		mockdb := &MockDb{QueryFunc: func(string, ...interface{}) (RowsIface, error) {
-			return mockRows, nil
-		}}
+		mockdb := &MockDb{QueryFunc: func(string, ...interface{}) (RowsIface, error) { return mockRows, nil }}
 		if err := s.doQuery(mockdb, car); err != nil {
 			t.Error(err)
 		}
 		if diff := cmp.Diff(car, testCase.Rows); diff != "" {
 			PrintTestDiff(t, diff)
 		}
+	}
+}
+
+func TestSQL_DoQuery_Fail(t *testing.T) {
+	type Model struct{}
+
+	testCases := []struct {
+		Model     interface{}
+		QueryFunc func(string, ...interface{}) (RowsIface, error)
+		ErrorCode int
+	}{
+		{
+			&[]Model{},
+			func(string, ...interface{}) (RowsIface, error) { return nil, errors.New("") },
+			ErrQueryFailed,
+		},
+		{
+			&[]Model{},
+			func(string, ...interface{}) (RowsIface, error) {
+				return &MockRows{
+					Max:         1,
+					ColumnsFunc: func() ([]string, error) { return []string{}, errors.New("") },
+					ScanFunc:    func(...interface{}) error { return nil },
+				}, nil
+			},
+			ErrUnknown,
+		},
+		{
+			&Model{},
+			func(string, ...interface{}) (RowsIface, error) {
+				return &MockRows{
+					Max:         1,
+					ColumnsFunc: func() ([]string, error) { return []string{}, nil },
+					ScanFunc:    func(...interface{}) error { return nil },
+				}, nil
+			},
+			ErrInvalidType,
+		},
+		{
+			&[]Model{},
+			func(string, ...interface{}) (RowsIface, error) {
+				return &MockRows{
+					Max:         1,
+					ColumnsFunc: func() ([]string, error) { return []string{}, nil },
+					ScanFunc:    func(...interface{}) error { return errors.New("") },
+				}, nil
+			},
+			ErrScanFailed,
+		},
+	}
+
+	s := new(SQL)
+	for _, testCase := range testCases {
+		mockdb := &MockDb{QueryFunc: testCase.QueryFunc}
+		err := s.doQuery(mockdb, testCase.Model)
+		if err == nil {
+			t.Errorf("error is nil, %v", testCase)
+		}
+		assert.Equal(t, testCase.ErrorCode, err.(Error).Code)
 	}
 }
 
@@ -122,6 +182,30 @@ func TestSQL_DoExec(t *testing.T) {
 		t.Error(err)
 	}
 	assert.Equal(t, true, flg)
+}
+
+func TestSQL_DoExec_Fail(t *testing.T) {
+	type Model struct{}
+
+	testCases := []struct {
+		ExecFunc  func(string, ...interface{}) (sql.Result, error)
+		ErrorCode int
+	}{
+		{
+			func(string, ...interface{}) (sql.Result, error) { return nil, errors.New("") },
+			ErrExecFailed,
+		},
+	}
+
+	s := new(SQL)
+	for _, testCase := range testCases {
+		mockdb := &MockDb{ExecFunc: testCase.ExecFunc}
+		err := s.doExec(mockdb)
+		if err == nil {
+			t.Errorf("error is nil, %v", testCase)
+		}
+		assert.Equal(t, testCase.ErrorCode, err.(Error).Code)
+	}
 }
 
 func TestColumnName(t *testing.T) {
