@@ -1,7 +1,6 @@
 package syntax
 
 import (
-	"database/sql"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -22,7 +21,7 @@ func (s *SQL) write(str string) {
 	*s += SQL(str)
 }
 
-func (s *SQL) doQuery(db *sql.DB, model interface{}) error {
+func (s *SQL) doQuery(db DbIface, model interface{}) error {
 	rows, err := db.Query(s.string())
 	if err != nil || rows == nil {
 		return newError(ErrQueryFailed, "database query failed")
@@ -40,7 +39,7 @@ func (s *SQL) doQuery(db *sql.DB, model interface{}) error {
 	}
 
 	mt := reflect.TypeOf(model).Elem()
-	mv := reflect.New(mt)
+	mv := reflect.New(mt).Elem()
 
 	// Model type must be slice or array.
 	if mt == nil || (mt.Kind() != reflect.Slice && mt.Kind() != reflect.Array) {
@@ -52,10 +51,12 @@ func (s *SQL) doQuery(db *sql.DB, model interface{}) error {
 			return newError(ErrScanFailed, "database scan failed")
 		}
 
-		if err := setToModel(mv, mt, cols, rowVal); err != nil {
+		if err := setToModel(&mv, mt, cols, rowVal); err != nil {
 			return err
 		}
 	}
+
+	rows.Close()
 
 	modelRef := reflect.ValueOf(model).Elem()
 	modelRef.Set(mv)
@@ -63,7 +64,7 @@ func (s *SQL) doQuery(db *sql.DB, model interface{}) error {
 	return nil
 }
 
-func (s *SQL) doExec(db *sql.DB) error {
+func (s *SQL) doExec(db DbIface) error {
 	_, err := db.Exec(s.string())
 	if err != nil {
 		return newError(ErrExecFailed, "database exec failed")
@@ -71,7 +72,7 @@ func (s *SQL) doExec(db *sql.DB) error {
 	return nil
 }
 
-func setToModel(mv reflect.Value, mt reflect.Type, cols []string, rowVal []interface{}) error {
+func setToModel(mv *reflect.Value, mt reflect.Type, cols []string, rowVal []interface{}) error {
 	// Generate reflect type and value for model struct.
 	t := mt.Elem()
 	v := reflect.New(t)
@@ -93,7 +94,7 @@ func setToModel(mv reflect.Value, mt reflect.Type, cols []string, rowVal []inter
 	}
 
 	// Append struct to slice (or array).
-	mv = reflect.Append(mv, v.Elem())
+	*mv = reflect.Append(*mv, v.Elem())
 	return nil
 }
 

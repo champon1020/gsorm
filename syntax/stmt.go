@@ -1,13 +1,12 @@
 package syntax
 
 import (
-	"database/sql"
 	"strings"
 )
 
 // Stmt keeps the sql statement.
 type Stmt struct {
-	DB        *sql.DB
+	DB        DbIface
 	Mode      uint
 	Cmd       Cmd
 	From      Expr

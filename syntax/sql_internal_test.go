@@ -1,52 +1,158 @@
 package syntax
 
 import (
+	"database/sql"
 	"reflect"
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSQL_String(t *testing.T) {
+	testCases := []struct {
+		SQL    SQL
+		Result reflect.Kind
+	}{
+		{"Test", reflect.String},
+	}
+
+	for _, testCase := range testCases {
+		sql := testCase.SQL.string()
+		assert.Equal(t, testCase.Result, reflect.TypeOf(sql).Kind())
+	}
 }
 
 func TestSQL_Write(t *testing.T) {
+	testCases := []struct {
+		SQL    SQL
+		Str    string
+		Result SQL
+	}{
+		{"test", "add", "test add"},
+		{"", "add", "add"},
+		{"(test", ")", "(test)"},
+	}
+
+	for _, testCase := range testCases {
+		testCase.SQL.write(testCase.Str)
+		assert.Equal(t, testCase.Result, testCase.SQL)
+	}
+}
+
+type MockDb struct {
+	QueryFunc func(string, ...interface{}) (RowsIface, error)
+	ExecFunc  func(string, ...interface{}) (sql.Result, error)
+}
+
+func (db *MockDb) Query(query string, args ...interface{}) (RowsIface, error) {
+	return db.QueryFunc(query, args...)
+}
+func (db *MockDb) Exec(query string, args ...interface{}) (sql.Result, error) {
+	return db.ExecFunc(query, args...)
+}
+
+type MockRows struct {
+	Max      int
+	Count    int
+	ScanFunc func(...interface{}) error
+}
+
+func (r *MockRows) Close() error { return nil }
+func (r *MockRows) Columns() ([]string, error) {
+	return []string{"id", "name"}, nil
+}
+func (r *MockRows) Next() bool {
+	if r.Count >= r.Max {
+		return false
+	}
+	r.Count++
+	return true
+}
+func (r *MockRows) Scan(dest ...interface{}) error {
+	return r.ScanFunc(dest...)
 }
 
 func TestSQL_DoQuery(t *testing.T) {
-}
-
-func TestSQL_DoExec(t *testing.T) {
-}
-
-func TestSetRowsToModel(t *testing.T) {
 	type Car struct {
-		Id   int
+		ID   int `mgorm:id`
 		Name string
 	}
 
-	c := new([]Car)
 	testCases := []struct {
-		Mv     reflect.Value
-		Mt     reflect.Type
-		cols   []string
-		rowVal []interface{}
+		Rows *[]Car
 	}{
-		{
-			reflect.New(reflect.TypeOf(c)),
-			reflect.TypeOf(c),
-			[]string{"Id", "Name"},
-			[]interface{}{1, "test"},
-		},
+		{&[]Car{{ID: 100, Name: "test"}}},
+		{&[]Car{{ID: 100, Name: "test"}, {ID: 200, Name: "test2"}}},
 	}
 
-	for testCase := range testCases {
-
+	s := new(SQL)
+	for _, testCase := range testCases {
+		car := new([]Car)
+		mockRows := new(MockRows)
+		mockRows.Max = len(*testCase.Rows)
+		mockRows.ScanFunc = func(dest ...interface{}) error {
+			ptrID := dest[0].(*interface{})
+			ptrName := dest[1].(*interface{})
+			*ptrID = (*testCase.Rows)[mockRows.Count-1].ID
+			*ptrName = (*testCase.Rows)[mockRows.Count-1].Name
+			return nil
+		}
+		mockdb := &MockDb{QueryFunc: func(string, ...interface{}) (RowsIface, error) {
+			return mockRows, nil
+		}}
+		if err := s.doQuery(mockdb, car); err != nil {
+			t.Error(err)
+		}
+		if diff := cmp.Diff(car, testCase.Rows); diff != "" {
+			PrintTestDiff(t, diff)
+		}
 	}
 }
 
+func TestSQL_DoExec(t *testing.T) {
+	s := new(SQL)
+	flg := false
+	mockdb := &MockDb{ExecFunc: func(string, ...interface{}) (sql.Result, error) {
+		flg = true
+		return nil, nil
+	}}
+	if err := s.doExec(mockdb); err != nil {
+		t.Error(err)
+	}
+	assert.Equal(t, true, flg)
+}
+
 func TestColumnName(t *testing.T) {
+	type Model1 struct {
+		UID int `mgorm:"id"`
+	}
+	m1 := new(Model1)
+
+	type Model2 struct {
+		UID int
+	}
+	m2 := new(Model2)
+
+	type Model3 struct {
+		StudentName string
+	}
+	m3 := new(Model3)
+
+	testCases := []struct {
+		Struct reflect.StructField
+		Result string
+	}{
+		{reflect.TypeOf(m1).Elem().Field(0), "id"},
+		{reflect.TypeOf(m2).Elem().Field(0), "uid"},
+		{reflect.TypeOf(m3).Elem().Field(0), "student_name"},
+	}
+
+	for _, testCase := range testCases {
+		cn := columnName(testCase.Struct)
+		assert.Equal(t, testCase.Result, cn)
+	}
 }
 
 func TestSetField(t *testing.T) {
