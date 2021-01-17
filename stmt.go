@@ -1,6 +1,17 @@
 package mgorm
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"errors"
+
+	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
+)
+
+// Op values for error handling.
+const (
+	OpStmtProcessQuerySQL internal.Op = "mgorm.Stmt.processQuerySQL"
+	OpStmtProcessExecSQL  internal.Op = "mgorm.Stmt.processExecSQL"
+)
 
 // Stmt keeps the sql statement.
 type Stmt struct {
@@ -34,9 +45,10 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 	var sql SQL
 
 	// Build SELECT.
-	sel, ok := s.Cmd.(*Select)
+	sel, ok := s.Cmd.(*syntax.Select)
 	if !ok {
-		return "", newError(ErrInvalidType, "command must be SELECT")
+		err := errors.New("command must be SELECT")
+		return "", internal.NewError(OpStmtProcessQuerySQL, internal.KindBasic, err)
 	}
 	sql.write(sel.Build().Build())
 
@@ -86,7 +98,7 @@ func (s *Stmt) Exec() error {
 func (s *Stmt) processExecSQL() (SQL, error) {
 	var sql SQL
 	switch cmd := s.Cmd.(type) {
-	case *Insert:
+	case *syntax.Insert:
 		sql.write(cmd.Build().Build())
 		if s.ValuesExpr != nil {
 			values, err := s.ValuesExpr.Build()
@@ -95,7 +107,7 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 			}
 			sql.write(values.Build())
 		}
-	case *Update:
+	case *syntax.Update:
 		sql.write(cmd.Build().Build())
 		if s.SetExpr != nil {
 			set, err := s.SetExpr.Build()
@@ -104,7 +116,7 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 			}
 			sql.write(set.Build())
 		}
-	case *Delete:
+	case *syntax.Delete:
 		sql.write(cmd.Build().Build())
 		if s.FromExpr != nil {
 			from, err := s.FromExpr.Build()
@@ -114,7 +126,9 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 			sql.write(from.Build())
 		}
 	default:
-		return "", newError(ErrInvalidType, "command must be INSERT, UPDATE or DELETE")
+		err := errors.New("command must be INSERT, UPDATE or DELETE")
+		return "", internal.NewError(OpStmtProcessExecSQL, internal.KindType, err)
+
 	}
 
 	// Build WHERE.
@@ -141,23 +155,23 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 
 // From calls FROM statement.
 func (s *Stmt) From(tables ...string) *Stmt {
-	s.FromExpr = NewFrom(tables)
+	s.FromExpr = syntax.NewFrom(tables)
 	return s
 }
 
 // Values calls VALUES statement.
 func (s *Stmt) Values(vals ...interface{}) *Stmt {
-	s.ValuesExpr = NewValues(vals)
+	s.ValuesExpr = syntax.NewValues(vals)
 	return s
 }
 
 // Set calls SET statement.
 func (s *Stmt) Set(vals ...interface{}) *Stmt {
-	u, ok := s.Cmd.(*Update)
+	u, ok := s.Cmd.(*syntax.Update)
 	if !ok {
 		/* handle error */
 	}
-	set, err := NewSet(u.Columns, vals)
+	set, err := syntax.NewSet(u.Columns, vals)
 	if err != nil {
 		s.addError(err)
 		return s
@@ -168,21 +182,21 @@ func (s *Stmt) Set(vals ...interface{}) *Stmt {
 
 // Where calls WHERE statement.
 func (s *Stmt) Where(expr string, vals ...interface{}) *Stmt {
-	w := NewWhere(expr, vals...)
+	w := syntax.NewWhere(expr, vals...)
 	s.WhereExpr = w
 	return s
 }
 
 // And calls AND statement.
 func (s *Stmt) And(expr string, vals ...interface{}) *Stmt {
-	w := NewAnd(expr, vals...)
+	w := syntax.NewAnd(expr, vals...)
 	s.AndOr = append(s.AndOr, w)
 	return s
 }
 
 // Or calls OR statement.
 func (s *Stmt) Or(expr string, vals ...interface{}) *Stmt {
-	w := NewOr(expr, vals...)
+	w := syntax.NewOr(expr, vals...)
 	s.AndOr = append(s.AndOr, w)
 	return s
 }

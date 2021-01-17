@@ -115,7 +115,7 @@ func setToModel(mv *reflect.Value, mt reflect.Type, cols []string, rowVal []inte
 
 func columnName(sf reflect.StructField) string {
 	if sf.Tag.Get("mgorm") == "" {
-		return convertToSnakeCase(sf.Name)
+		return internal.ConvertToSnakeCase(sf.Name)
 	}
 	return sf.Tag.Get("mgorm")
 }

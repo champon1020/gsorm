@@ -7,28 +7,32 @@ import (
 	"testing"
 	"time"
 
+	"github.com/champon1020/mgorm"
+	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSQL_String(t *testing.T) {
 	testCases := []struct {
-		SQL    *SQL
+		SQL    mgorm.SQL
 		Result reflect.Kind
 	}{
 		{"Test", reflect.String},
 	}
 
 	for _, testCase := range testCases {
-		sql := SQLString(testCase.SQL)
+		sql := mgorm.SQLString(&testCase.SQL)
 		assert.Equal(t, testCase.Result, reflect.TypeOf(sql).Kind())
 	}
 }
 
 func TestSQL_Write(t *testing.T) {
 	testCases := []struct {
-		SQL    *SQL
+		SQL    mgorm.SQL
 		Str    string
-		Result SQL
+		Result mgorm.SQL
 	}{
 		{"test", "add", "test add"},
 		{"", "add", "add"},
@@ -36,19 +40,162 @@ func TestSQL_Write(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		SQLWrite(testCase.SQL, testCase.Str)
+		mgorm.SQLWrite(&testCase.SQL, testCase.Str)
 		assert.Equal(t, testCase.Result, testCase.SQL)
 	}
 }
 
+type MockDb struct {
+	QueryFunc func(string, ...interface{}) (syntax.Rows, error)
+	ExecFunc  func(string, ...interface{}) (sql.Result, error)
+}
+
+func (db *MockDb) Query(query string, args ...interface{}) (syntax.Rows, error) {
+	return db.QueryFunc(query, args...)
+}
+func (db *MockDb) Exec(query string, args ...interface{}) (sql.Result, error) {
+	return db.ExecFunc(query, args...)
+}
+
+type MockRows struct {
+	Max         int
+	Count       int
+	ColumnsFunc func() ([]string, error)
+	ScanFunc    func(...interface{}) error
+}
+
+func (r *MockRows) Close() error { return nil }
+func (r *MockRows) Columns() ([]string, error) {
+	return r.ColumnsFunc()
+}
+func (r *MockRows) Next() bool {
+	if r.Count >= r.Max {
+		return false
+	}
+	r.Count++
+	return true
+}
+func (r *MockRows) Scan(dest ...interface{}) error {
+	return r.ScanFunc(dest...)
+}
+
+func TestSQL_DoQuery(t *testing.T) {
+	type Car struct {
+		ID   int `mgorm:id`
+		Name string
+	}
+
+	testCases := []struct {
+		Rows *[]Car
+	}{
+		{&[]Car{{ID: 100, Name: "test"}}},
+		{&[]Car{{ID: 100, Name: "test"}, {ID: 200, Name: "test2"}}},
+	}
+
+	s := new(mgorm.SQL)
+	for _, testCase := range testCases {
+		car := new([]Car)
+		mockRows := new(MockRows)
+		mockRows.Max = len(*testCase.Rows)
+		mockRows.ColumnsFunc = func() ([]string, error) { return []string{"id", "name"}, nil }
+		mockRows.ScanFunc = func(dest ...interface{}) error {
+			ptrID := dest[0].(*interface{})
+			ptrName := dest[1].(*interface{})
+			*ptrID = (*testCase.Rows)[mockRows.Count-1].ID
+			*ptrName = (*testCase.Rows)[mockRows.Count-1].Name
+			return nil
+		}
+		mockdb := &MockDb{QueryFunc: func(string, ...interface{}) (syntax.Rows, error) { return mockRows, nil }}
+		if err := mgorm.SQLDoQuery(s, mockdb, car); err != nil {
+			t.Error(err)
+		}
+		if diff := cmp.Diff(car, testCase.Rows); diff != "" {
+			internal.PrintTestDiff(t, diff)
+		}
+	}
+}
+
+func TestSQL_DoQuery_Fail(t *testing.T) {
+	type Model struct{}
+
+	testCases := []struct {
+		Model     interface{}
+		QueryFunc func(string, ...interface{}) (syntax.Rows, error)
+		Error     error
+	}{
+		{
+			&[]Model{},
+			func(string, ...interface{}) (syntax.Rows, error) { return nil, errors.New("test1") },
+			internal.NewError(mgorm.OpSQLDoQuery, internal.KindDatabase, errors.New("test1")),
+		},
+		{
+			&[]Model{},
+			func(string, ...interface{}) (syntax.Rows, error) {
+				return &MockRows{
+					Max:         1,
+					ColumnsFunc: func() ([]string, error) { return []string{}, errors.New("test2") },
+					ScanFunc:    func(...interface{}) error { return nil },
+				}, nil
+			},
+			internal.NewError(mgorm.OpSQLDoQuery, internal.KindDatabase, errors.New("test2")),
+		},
+		{
+			&Model{},
+			func(string, ...interface{}) (syntax.Rows, error) {
+				return &MockRows{
+					Max:         1,
+					ColumnsFunc: func() ([]string, error) { return []string{}, nil },
+					ScanFunc:    func(...interface{}) error { return nil },
+				}, nil
+			},
+			internal.NewError(
+				mgorm.OpSQLDoQuery,
+				internal.KindType,
+				errors.New("model type must be slice or array"),
+			),
+		},
+		{
+			&[]Model{},
+			func(string, ...interface{}) (syntax.Rows, error) {
+				return &MockRows{
+					Max:         1,
+					ColumnsFunc: func() ([]string, error) { return []string{}, nil },
+					ScanFunc:    func(...interface{}) error { return errors.New("test3") },
+				}, nil
+			},
+			internal.NewError(mgorm.OpSQLDoQuery, internal.KindDatabase, errors.New("test3")),
+		},
+	}
+
+	s := new(mgorm.SQL)
+	for _, testCase := range testCases {
+		mockdb := &MockDb{QueryFunc: testCase.QueryFunc}
+		err := mgorm.SQLDoQuery(s, mockdb, testCase.Model)
+		if err == nil {
+			t.Errorf("Error is not occurred")
+			continue
+		}
+
+		e, ok := err.(*internal.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			continue
+		}
+
+		if diff := internal.CmpError(*e, *testCase.Error.(*internal.Error)); diff != "" {
+			t.Errorf(diff)
+		}
+	}
+}
+
 func TestSQL_DoExec(t *testing.T) {
-	s := new(SQL)
+	s := new(mgorm.SQL)
 	flg := false
 	mockdb := &MockDb{ExecFunc: func(string, ...interface{}) (sql.Result, error) {
 		flg = true
 		return nil, nil
 	}}
-	if err := SQLDoExec(s, mockdb); err != nil {
+	if err := mgorm.SQLDoExec(s, mockdb); err != nil {
 		t.Error(err)
 	}
 	assert.Equal(t, true, flg)
@@ -58,23 +205,33 @@ func TestSQL_DoExec_Fail(t *testing.T) {
 	type Model struct{}
 
 	testCases := []struct {
-		ExecFunc  func(string, ...interface{}) (sql.Result, error)
-		ErrorCode int
+		ExecFunc func(string, ...interface{}) (sql.Result, error)
+		Error    error
 	}{
 		{
-			func(string, ...interface{}) (sql.Result, error) { return nil, errors.New("") },
-			ErrExecFailed,
+			func(string, ...interface{}) (sql.Result, error) { return nil, errors.New("test") },
+			internal.NewError(mgorm.OpSQLDoExec, internal.KindDatabase, errors.New("test")),
 		},
 	}
 
-	s := new(SQL)
+	s := new(mgorm.SQL)
 	for _, testCase := range testCases {
 		mockdb := &MockDb{ExecFunc: testCase.ExecFunc}
-		err := SQLDoExec(s, mockdb)
+		err := mgorm.SQLDoExec(s, mockdb)
 		if err == nil {
-			t.Errorf("error is nil, %v", testCase)
+			t.Errorf("Error is not occurred")
+			continue
 		}
-		assert.Equal(t, testCase.ErrorCode, err.(Error).Code)
+
+		e, ok := err.(*internal.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			continue
+		}
+
+		if diff := internal.CmpError(*e, *testCase.Error.(*internal.Error)); diff != "" {
+			t.Errorf(diff)
+		}
 	}
 }
 
@@ -104,7 +261,7 @@ func TestColumnName(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		cn := ColumnName(testCase.Struct)
+		cn := mgorm.ColumnName(testCase.Struct)
 		assert.Equal(t, testCase.Result, cn)
 	}
 }
@@ -212,7 +369,7 @@ func TestSetField(t *testing.T) {
 
 	for _, testCase := range testCases {
 		v := reflect.ValueOf(new(Car))
-		if err := SetField(reflect.Indirect(v).Field(testCase.FieldNum), testCase.Value); err != nil {
+		if err := mgorm.SetField(reflect.Indirect(v).Field(testCase.FieldNum), testCase.Value); err != nil {
 			t.Error(err)
 		}
 		assert.Equal(t, testCase.Result.Interface(), v.Interface())

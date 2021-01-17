@@ -1,6 +1,8 @@
 package mgorm
 
 import (
+	"database/sql"
+
 	"github.com/champon1020/mgorm/integration"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -12,29 +14,29 @@ func NewMock() *integration.MockDb {
 }
 
 // Select statement api.
-func Select(db syntax.DB, cols ...string) *Stmt {
-	stmt := &Stmt{DB: db}
+func Select(db *sql.DB, cols ...string) *Stmt {
+	stmt := &Stmt{DB: wrapDB(db)}
 	stmt.Cmd = syntax.NewSelect(cols)
 	return stmt
 }
 
 // Insert statement api.
-func Insert(db syntax.DB, table string, cols ...string) *Stmt {
-	stmt := &Stmt{DB: db}
+func Insert(db *sql.DB, table string, cols ...string) *Stmt {
+	stmt := &Stmt{DB: wrapDB(db)}
 	stmt.Cmd = syntax.NewInsert(table, cols)
 	return stmt
 }
 
 // Update statement api.
-func Update(db syntax.DB, table string, cols ...string) *Stmt {
-	stmt := &Stmt{DB: db}
+func Update(db *sql.DB, table string, cols ...string) *Stmt {
+	stmt := &Stmt{DB: wrapDB(db)}
 	stmt.Cmd = syntax.NewUpdate(table, cols)
 	return stmt
 }
 
 // Delete statement api.
-func Delete(db syntax.DB) *Stmt {
-	stmt := &Stmt{DB: db}
+func Delete(db *sql.DB) *Stmt {
+	stmt := &Stmt{DB: wrapDB(db)}
 	stmt.Cmd = syntax.NewDelete()
 	return stmt
 }
