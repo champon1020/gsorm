@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -45,8 +44,8 @@ func CmpError(actual Error, expected Error) string {
 	if actual.Kind != expected.Kind {
 		diff += fmt.Sprintf("\nKind:\n  got : %d\n  want: %d", actual.Kind, expected.Kind)
 	}
-	if errors.Is(actual.Err, expected.Err) {
-		diff += fmt.Sprintf("\nErr:\n  got : %s\n  want: %s", actual.Err, expected.Err)
+	if actual.Err.Error() != expected.Err.Error() {
+		diff += fmt.Sprintf("\nErr:\n  got : %s\n  want: %s", actual.Err.Error(), expected.Err.Error())
 	}
 	return diff
 }

@@ -4,39 +4,45 @@ import (
 	"database/sql"
 
 	"github.com/champon1020/mgorm/integration"
+	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// NewMock generate MockDb object.
-func NewMock() *integration.MockDb {
-	mock := &integration.MockDb{Actual: []integration.QueryArgs{}}
+// New generate database object.
+func New(db *sql.DB) *internal.Database {
+	return &internal.Database{DB: db}
+}
+
+// NewMock generate MockDB object.
+func NewMock() *integration.MockDB {
+	mock := &integration.MockDB{Actual: []integration.QueryArgs{}}
 	return mock
 }
 
 // Select statement api.
-func Select(db *sql.DB, cols ...string) *Stmt {
-	stmt := &Stmt{DB: wrapDB(db)}
+func Select(db internal.DB, cols ...string) *Stmt {
+	stmt := &Stmt{DB: db}
 	stmt.Cmd = syntax.NewSelect(cols)
 	return stmt
 }
 
 // Insert statement api.
-func Insert(db *sql.DB, table string, cols ...string) *Stmt {
-	stmt := &Stmt{DB: wrapDB(db)}
+func Insert(db internal.DB, table string, cols ...string) *Stmt {
+	stmt := &Stmt{DB: db}
 	stmt.Cmd = syntax.NewInsert(table, cols)
 	return stmt
 }
 
 // Update statement api.
-func Update(db *sql.DB, table string, cols ...string) *Stmt {
-	stmt := &Stmt{DB: wrapDB(db)}
+func Update(db internal.DB, table string, cols ...string) *Stmt {
+	stmt := &Stmt{DB: db}
 	stmt.Cmd = syntax.NewUpdate(table, cols)
 	return stmt
 }
 
 // Delete statement api.
-func Delete(db *sql.DB) *Stmt {
-	stmt := &Stmt{DB: wrapDB(db)}
+func Delete(db internal.DB) *Stmt {
+	stmt := &Stmt{DB: db}
 	stmt.Cmd = syntax.NewDelete()
 	return stmt
 }

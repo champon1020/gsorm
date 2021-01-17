@@ -205,7 +205,7 @@ func TestBuildStmtSet_Fail(t *testing.T) {
 			internal.NewError(
 				internal.OpToString,
 				internal.KindType,
-				errors.New("Length of values is not valid"),
+				errors.New("type is invalid"),
 			),
 		},
 	}

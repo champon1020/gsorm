@@ -9,7 +9,6 @@ import (
 
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
@@ -46,11 +45,11 @@ func TestSQL_Write(t *testing.T) {
 }
 
 type MockDb struct {
-	QueryFunc func(string, ...interface{}) (syntax.Rows, error)
+	QueryFunc func(string, ...interface{}) (internal.Rows, error)
 	ExecFunc  func(string, ...interface{}) (sql.Result, error)
 }
 
-func (db *MockDb) Query(query string, args ...interface{}) (syntax.Rows, error) {
+func (db *MockDb) Query(query string, args ...interface{}) (internal.Rows, error) {
 	return db.QueryFunc(query, args...)
 }
 func (db *MockDb) Exec(query string, args ...interface{}) (sql.Result, error) {
@@ -105,7 +104,7 @@ func TestSQL_DoQuery(t *testing.T) {
 			*ptrName = (*testCase.Rows)[mockRows.Count-1].Name
 			return nil
 		}
-		mockdb := &MockDb{QueryFunc: func(string, ...interface{}) (syntax.Rows, error) { return mockRows, nil }}
+		mockdb := &MockDb{QueryFunc: func(string, ...interface{}) (internal.Rows, error) { return mockRows, nil }}
 		if err := mgorm.SQLDoQuery(s, mockdb, car); err != nil {
 			t.Error(err)
 		}
@@ -120,17 +119,17 @@ func TestSQL_DoQuery_Fail(t *testing.T) {
 
 	testCases := []struct {
 		Model     interface{}
-		QueryFunc func(string, ...interface{}) (syntax.Rows, error)
+		QueryFunc func(string, ...interface{}) (internal.Rows, error)
 		Error     error
 	}{
 		{
 			&[]Model{},
-			func(string, ...interface{}) (syntax.Rows, error) { return nil, errors.New("test1") },
+			func(string, ...interface{}) (internal.Rows, error) { return nil, errors.New("test1") },
 			internal.NewError(mgorm.OpSQLDoQuery, internal.KindDatabase, errors.New("test1")),
 		},
 		{
 			&[]Model{},
-			func(string, ...interface{}) (syntax.Rows, error) {
+			func(string, ...interface{}) (internal.Rows, error) {
 				return &MockRows{
 					Max:         1,
 					ColumnsFunc: func() ([]string, error) { return []string{}, errors.New("test2") },
@@ -141,7 +140,7 @@ func TestSQL_DoQuery_Fail(t *testing.T) {
 		},
 		{
 			&Model{},
-			func(string, ...interface{}) (syntax.Rows, error) {
+			func(string, ...interface{}) (internal.Rows, error) {
 				return &MockRows{
 					Max:         1,
 					ColumnsFunc: func() ([]string, error) { return []string{}, nil },
@@ -156,7 +155,7 @@ func TestSQL_DoQuery_Fail(t *testing.T) {
 		},
 		{
 			&[]Model{},
-			func(string, ...interface{}) (syntax.Rows, error) {
+			func(string, ...interface{}) (internal.Rows, error) {
 				return &MockRows{
 					Max:         1,
 					ColumnsFunc: func() ([]string, error) { return []string{}, nil },

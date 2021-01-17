@@ -16,25 +16,25 @@ type QueryArgs struct {
 	args  []interface{}
 }
 
-// MockDb is the mock databse object that implements DbIface.
-type MockDb struct {
+// MockDB is the mock databse object that implements DbIface.
+type MockDB struct {
 	Expected []QueryArgs
 	Actual   []QueryArgs
 }
 
-func (m *MockDb) addQuery(query string, args ...interface{}) {
+func (m *MockDB) addQuery(query string, args ...interface{}) {
 	qa := QueryArgs{query: query, args: args}
 	m.Actual = append(m.Actual, qa)
 }
 
 // Query is the function for implementing DbIface.
-func (m *MockDb) Query(query string, args ...interface{}) (*sql.Rows, error) {
+func (m *MockDB) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	m.addQuery(query, args...)
 	return nil, nil
 }
 
 // Exec is the function for implementing DbIface.
-func (m *MockDb) Exec(query string, args ...interface{}) (sql.Result, error) {
+func (m *MockDB) Exec(query string, args ...interface{}) (sql.Result, error) {
 	m.addQuery(query, args...)
 	return nil, nil
 }

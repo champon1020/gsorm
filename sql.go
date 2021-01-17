@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
 )
 
 // Op values for error handling.
@@ -32,7 +31,7 @@ func (s *SQL) write(str string) {
 	*s += SQL(str)
 }
 
-func (s *SQL) doQuery(db syntax.DB, model interface{}) error {
+func (s *SQL) doQuery(db internal.DB, model interface{}) error {
 	rows, err := db.Query(s.string())
 	if err != nil {
 		return internal.NewError(OpSQLDoQuery, internal.KindDatabase, err)
@@ -79,7 +78,7 @@ func (s *SQL) doQuery(db syntax.DB, model interface{}) error {
 	return nil
 }
 
-func (s *SQL) doExec(db syntax.DB) error {
+func (s *SQL) doExec(db internal.DB) error {
 	_, err := db.Exec(s.string())
 	if err != nil {
 		return internal.NewError(OpSQLDoExec, internal.KindDatabase, err)

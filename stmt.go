@@ -15,7 +15,7 @@ const (
 
 // Stmt keeps the sql statement.
 type Stmt struct {
-	DB         syntax.DB
+	DB         internal.DB
 	Cmd        syntax.Cmd
 	FromExpr   syntax.Expr
 	ValuesExpr syntax.Expr
