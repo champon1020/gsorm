@@ -1,16 +1,21 @@
-package syntax
+package mgorm
+
+import "github.com/champon1020/mgorm/syntax"
 
 // Stmt keeps the sql statement.
 type Stmt struct {
-	DB        DbIface
-	Mode      uint
-	Cmd       Cmd
-	From      Expr
-	Values    Expr
-	Set       Expr
-	WhereExpr Expr
-	AndOr     []Expr
-	Errors    []error
+	DB         syntax.DB
+	Cmd        syntax.Cmd
+	FromExpr   syntax.Expr
+	ValuesExpr syntax.Expr
+	SetExpr    syntax.Expr
+	WhereExpr  syntax.Expr
+	AndOr      []syntax.Expr
+	Errors     []error
+}
+
+func (s *Stmt) addError(err error) {
+	s.Errors = append(s.Errors, err)
 }
 
 // Query executes a query that returns some results.
@@ -36,8 +41,8 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 	sql.write(sel.Build().Build())
 
 	// Build FROM.
-	if s.From != nil {
-		from, err := s.From.Build()
+	if s.FromExpr != nil {
+		from, err := s.FromExpr.Build()
 		if err != nil {
 			return "", err
 		}
@@ -83,8 +88,8 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 	switch cmd := s.Cmd.(type) {
 	case *Insert:
 		sql.write(cmd.Build().Build())
-		if s.Values != nil {
-			values, err := s.Values.Build()
+		if s.ValuesExpr != nil {
+			values, err := s.ValuesExpr.Build()
 			if err != nil {
 				return "", err
 			}
@@ -92,8 +97,8 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 		}
 	case *Update:
 		sql.write(cmd.Build().Build())
-		if s.Set != nil {
-			set, err := s.Set.Build()
+		if s.SetExpr != nil {
+			set, err := s.SetExpr.Build()
 			if err != nil {
 				return "", err
 			}
@@ -101,8 +106,8 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 		}
 	case *Delete:
 		sql.write(cmd.Build().Build())
-		if s.From != nil {
-			from, err := s.From.Build()
+		if s.FromExpr != nil {
+			from, err := s.FromExpr.Build()
 			if err != nil {
 				return "", err
 			}
@@ -134,9 +139,31 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 	return sql, nil
 }
 
-// AddError append error to stmt.
-func (s *Stmt) addError(err error) {
-	s.Errors = append(s.Errors, err)
+// From calls FROM statement.
+func (s *Stmt) From(tables ...string) *Stmt {
+	s.FromExpr = NewFrom(tables)
+	return s
+}
+
+// Values calls VALUES statement.
+func (s *Stmt) Values(vals ...interface{}) *Stmt {
+	s.ValuesExpr = NewValues(vals)
+	return s
+}
+
+// Set calls SET statement.
+func (s *Stmt) Set(vals ...interface{}) *Stmt {
+	u, ok := s.Cmd.(*Update)
+	if !ok {
+		/* handle error */
+	}
+	set, err := NewSet(u.Columns, vals)
+	if err != nil {
+		s.addError(err)
+		return s
+	}
+	s.SetExpr = set
+	return s
 }
 
 // Where calls WHERE statement.

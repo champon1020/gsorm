@@ -1,8 +1,9 @@
-package syntax
+package internal_test
 
 import (
 	"testing"
 
+	"github.com/champon1020/mgorm/internal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,11 +40,12 @@ func TestToString(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res, _ := toString(testCase.Value)
+		res, _ := internal.ToString(testCase.Value)
 		assert.Equal(t, testCase.Result, res)
 	}
 }
 
+/*
 func TestToString_Fail(t *testing.T) {
 	testCases := []struct {
 		Value     interface{}
@@ -55,10 +57,8 @@ func TestToString_Fail(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		_, err := toString(testCase.Value)
+		_, err := internal.toString(testCase.Value)
 		assert.Equal(t, testCase.ErrorCode, err.(Error).Code)
 	}
 }
-
-func TestConvertToSnakeCase(t *testing.T) {
-}
+*/

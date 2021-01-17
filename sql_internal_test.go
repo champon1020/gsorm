@@ -1,4 +1,4 @@
-package syntax
+package mgorm
 
 import (
 	"database/sql"
@@ -43,11 +43,11 @@ func TestSQL_Write(t *testing.T) {
 }
 
 type MockDb struct {
-	QueryFunc func(string, ...interface{}) (RowsIface, error)
+	QueryFunc func(string, ...interface{}) (*sql.Rows, error)
 	ExecFunc  func(string, ...interface{}) (sql.Result, error)
 }
 
-func (db *MockDb) Query(query string, args ...interface{}) (RowsIface, error) {
+func (db *MockDb) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	return db.QueryFunc(query, args...)
 }
 func (db *MockDb) Exec(query string, args ...interface{}) (sql.Result, error) {

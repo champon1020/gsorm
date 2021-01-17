@@ -14,14 +14,14 @@ type Expr interface {
 	Build() (*StmtSet, error)
 }
 
-// DbIface is Db interface.
-type DbIface interface {
-	Query(string, ...interface{}) (RowsIface, error)
+// DB is interface that is implemented by *sql.DB.
+type DB interface {
+	Query(string, ...interface{}) (Rows, error)
 	Exec(string, ...interface{}) (sql.Result, error)
 }
 
-// RowsIface is Rows interface.
-type RowsIface interface {
+// Rows is interface that is implemented by *sql.Rows.
+type Rows interface {
 	Close() error
 	Columns() ([]string, error)
 	Next() bool

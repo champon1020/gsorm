@@ -3,9 +3,47 @@ package syntax_test
 import (
 	"testing"
 
-	"github.com/champon1020/minigorm/syntax"
+	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 )
+
+func TestSelect_Query(t *testing.T) {
+	s := &syntax.Select{}
+	assert.Equal(t, "SELECT", syntax.SelectQuery(s))
+}
+
+func TestSelect_AddColumn(t *testing.T) {
+	testCases := []struct {
+		Col    string
+		Select *syntax.Select
+		Result *syntax.Select
+	}{
+		{
+			Col:    "column1",
+			Select: &syntax.Select{},
+			Result: &syntax.Select{Columns: []syntax.Column{{Name: "column1"}}},
+		},
+		{
+			Col:    "column1 AS c1",
+			Select: &syntax.Select{},
+			Result: &syntax.Select{Columns: []syntax.Column{{Name: "column1", Alias: "c1"}}},
+		},
+		{
+			Col:    "column2",
+			Select: &syntax.Select{Columns: []syntax.Column{{Name: "column1"}}},
+			Result: &syntax.Select{Columns: []syntax.Column{{Name: "column1"}, {Name: "column2"}}},
+		},
+	}
+
+	for _, testCase := range testCases {
+		syntax.SelectAddColumn(testCase.Select, testCase.Col)
+		if diff := cmp.Diff(testCase.Select, testCase.Result); diff != "" {
+			internal.PrintTestDiff(t, diff)
+		}
+	}
+}
 
 func TestSelect_Build(t *testing.T) {
 	testCases := []struct {
@@ -33,7 +71,7 @@ func TestSelect_Build(t *testing.T) {
 	for _, testCase := range testCases {
 		res := testCase.Select.Build()
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
-			syntax.PrintTestDiff(t, diff)
+			internal.PrintTestDiff(t, diff)
 		}
 	}
 }
@@ -64,7 +102,7 @@ func TestNewSelect(t *testing.T) {
 	for _, testCase := range testCases {
 		res := syntax.NewSelect(testCase.Cols)
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
-			syntax.PrintTestDiff(t, diff)
+			internal.PrintTestDiff(t, diff)
 		}
 	}
 }

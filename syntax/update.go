@@ -2,7 +2,8 @@ package syntax
 
 // Update statement.
 type Update struct {
-	Table Table
+	Table   Table
+	Columns []string
 }
 
 func (u *Update) query() string {
@@ -11,6 +12,10 @@ func (u *Update) query() string {
 
 func (u *Update) addTable(table string) {
 	u.Table = *NewTable(table)
+}
+
+func (u *Update) addColumns(cols []string) {
+	u.Columns = cols
 }
 
 // Build make update statement set.
@@ -22,8 +27,9 @@ func (u *Update) Build() *StmtSet {
 }
 
 // NewUpdate create new update object.
-func NewUpdate(table string) *Update {
+func NewUpdate(table string, cols []string) *Update {
 	u := new(Update)
 	u.addTable(table)
+	u.addColumns(cols)
 	return u
 }

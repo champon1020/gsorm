@@ -3,7 +3,8 @@ package syntax_test
 import (
 	"testing"
 
-	"github.com/champon1020/minigorm/syntax"
+	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -18,7 +19,7 @@ func TestDelete_Build(t *testing.T) {
 	for _, testCase := range testCases {
 		res := testCase.Delete.Build()
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
-			syntax.PrintTestDiff(t, diff)
+			internal.PrintTestDiff(t, diff)
 		}
 	}
 }
