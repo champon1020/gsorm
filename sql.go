@@ -31,8 +31,9 @@ func (s *SQL) write(str string) {
 	*s += SQL(str)
 }
 
-func (s *SQL) doQuery(db internal.DB, model interface{}) error {
-	rows, err := db.Query(s.string())
+// doQuery executes query and sets rows to model structure.
+func (s *SQL) doQuery(db DB, model interface{}) error {
+	rows, err := db.query(s.string())
 	if err != nil {
 		return internal.NewError(OpSQLDoQuery, internal.KindDatabase, err)
 	}
@@ -78,8 +79,9 @@ func (s *SQL) doQuery(db internal.DB, model interface{}) error {
 	return nil
 }
 
-func (s *SQL) doExec(db internal.DB) error {
-	_, err := db.Exec(s.string())
+// doExec executes query without returning rows.
+func (s *SQL) doExec(db DB) error {
+	_, err := db.exec(s.string())
 	if err != nil {
 		return internal.NewError(OpSQLDoExec, internal.KindDatabase, err)
 	}

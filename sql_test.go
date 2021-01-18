@@ -44,40 +44,6 @@ func TestSQL_Write(t *testing.T) {
 	}
 }
 
-type MockDb struct {
-	QueryFunc func(string, ...interface{}) (internal.Rows, error)
-	ExecFunc  func(string, ...interface{}) (sql.Result, error)
-}
-
-func (db *MockDb) Query(query string, args ...interface{}) (internal.Rows, error) {
-	return db.QueryFunc(query, args...)
-}
-func (db *MockDb) Exec(query string, args ...interface{}) (sql.Result, error) {
-	return db.ExecFunc(query, args...)
-}
-
-type MockRows struct {
-	Max         int
-	Count       int
-	ColumnsFunc func() ([]string, error)
-	ScanFunc    func(...interface{}) error
-}
-
-func (r *MockRows) Close() error { return nil }
-func (r *MockRows) Columns() ([]string, error) {
-	return r.ColumnsFunc()
-}
-func (r *MockRows) Next() bool {
-	if r.Count >= r.Max {
-		return false
-	}
-	r.Count++
-	return true
-}
-func (r *MockRows) Scan(dest ...interface{}) error {
-	return r.ScanFunc(dest...)
-}
-
 func TestSQL_DoQuery(t *testing.T) {
 	type Car struct {
 		ID   int `mgorm:id`
@@ -94,7 +60,7 @@ func TestSQL_DoQuery(t *testing.T) {
 	s := new(mgorm.SQL)
 	for _, testCase := range testCases {
 		car := new([]Car)
-		mockRows := new(MockRows)
+		mockRows := new(mgorm.TestMockRows)
 		mockRows.Max = len(*testCase.Rows)
 		mockRows.ColumnsFunc = func() ([]string, error) { return []string{"id", "name"}, nil }
 		mockRows.ScanFunc = func(dest ...interface{}) error {
@@ -104,7 +70,9 @@ func TestSQL_DoQuery(t *testing.T) {
 			*ptrName = (*testCase.Rows)[mockRows.Count-1].Name
 			return nil
 		}
-		mockdb := &MockDb{QueryFunc: func(string, ...interface{}) (internal.Rows, error) { return mockRows, nil }}
+		mockdb := &mgorm.TestMockDB{
+			QueryFunc: func(string, ...interface{}) (mgorm.Rows, error) { return mockRows, nil },
+		}
 		if err := mgorm.SQLDoQuery(s, mockdb, car); err != nil {
 			t.Error(err)
 		}
@@ -119,18 +87,18 @@ func TestSQL_DoQuery_Fail(t *testing.T) {
 
 	testCases := []struct {
 		Model     interface{}
-		QueryFunc func(string, ...interface{}) (internal.Rows, error)
+		QueryFunc func(string, ...interface{}) (mgorm.Rows, error)
 		Error     error
 	}{
 		{
 			&[]Model{},
-			func(string, ...interface{}) (internal.Rows, error) { return nil, errors.New("test1") },
+			func(string, ...interface{}) (mgorm.Rows, error) { return nil, errors.New("test1") },
 			internal.NewError(mgorm.OpSQLDoQuery, internal.KindDatabase, errors.New("test1")),
 		},
 		{
 			&[]Model{},
-			func(string, ...interface{}) (internal.Rows, error) {
-				return &MockRows{
+			func(string, ...interface{}) (mgorm.Rows, error) {
+				return &mgorm.TestMockRows{
 					Max:         1,
 					ColumnsFunc: func() ([]string, error) { return []string{}, errors.New("test2") },
 					ScanFunc:    func(...interface{}) error { return nil },
@@ -140,8 +108,8 @@ func TestSQL_DoQuery_Fail(t *testing.T) {
 		},
 		{
 			&Model{},
-			func(string, ...interface{}) (internal.Rows, error) {
-				return &MockRows{
+			func(string, ...interface{}) (mgorm.Rows, error) {
+				return &mgorm.TestMockRows{
 					Max:         1,
 					ColumnsFunc: func() ([]string, error) { return []string{}, nil },
 					ScanFunc:    func(...interface{}) error { return nil },
@@ -155,8 +123,8 @@ func TestSQL_DoQuery_Fail(t *testing.T) {
 		},
 		{
 			&[]Model{},
-			func(string, ...interface{}) (internal.Rows, error) {
-				return &MockRows{
+			func(string, ...interface{}) (mgorm.Rows, error) {
+				return &mgorm.TestMockRows{
 					Max:         1,
 					ColumnsFunc: func() ([]string, error) { return []string{}, nil },
 					ScanFunc:    func(...interface{}) error { return errors.New("test3") },
@@ -168,7 +136,7 @@ func TestSQL_DoQuery_Fail(t *testing.T) {
 
 	s := new(mgorm.SQL)
 	for _, testCase := range testCases {
-		mockdb := &MockDb{QueryFunc: testCase.QueryFunc}
+		mockdb := &mgorm.TestMockDB{QueryFunc: testCase.QueryFunc}
 		err := mgorm.SQLDoQuery(s, mockdb, testCase.Model)
 		if err == nil {
 			t.Errorf("Error is not occurred")
@@ -190,7 +158,7 @@ func TestSQL_DoQuery_Fail(t *testing.T) {
 func TestSQL_DoExec(t *testing.T) {
 	s := new(mgorm.SQL)
 	flg := false
-	mockdb := &MockDb{ExecFunc: func(string, ...interface{}) (sql.Result, error) {
+	mockdb := &mgorm.TestMockDB{ExecFunc: func(string, ...interface{}) (sql.Result, error) {
 		flg = true
 		return nil, nil
 	}}
@@ -215,7 +183,7 @@ func TestSQL_DoExec_Fail(t *testing.T) {
 
 	s := new(mgorm.SQL)
 	for _, testCase := range testCases {
-		mockdb := &MockDb{ExecFunc: testCase.ExecFunc}
+		mockdb := &mgorm.TestMockDB{ExecFunc: testCase.ExecFunc}
 		err := mgorm.SQLDoExec(s, mockdb)
 		if err == nil {
 			t.Errorf("Error is not occurred")

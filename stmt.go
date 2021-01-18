@@ -15,7 +15,7 @@ const (
 
 // Stmt keeps the sql statement.
 type Stmt struct {
-	DB         internal.DB
+	DB         DB
 	Cmd        syntax.Cmd
 	FromExpr   syntax.Expr
 	ValuesExpr syntax.Expr
@@ -23,6 +23,9 @@ type Stmt struct {
 	WhereExpr  syntax.Expr
 	AndOr      []syntax.Expr
 	Errors     []error
+
+	// Used for test.
+	called []interface{}
 }
 
 func (s *Stmt) addError(err error) {
@@ -41,6 +44,7 @@ func (s *Stmt) Query(model interface{}) error {
 	return nil
 }
 
+// processQuerySQL aggregates the values stored in Stmt structure and returns as SQL object.
 func (s *Stmt) processQuerySQL() (SQL, error) {
 	var sql SQL
 
@@ -95,6 +99,7 @@ func (s *Stmt) Exec() error {
 	return nil
 }
 
+// processExecSQL aggregates the values stored in Stmt structure and returns as SQL object.
 func (s *Stmt) processExecSQL() (SQL, error) {
 	var sql SQL
 	switch cmd := s.Cmd.(type) {

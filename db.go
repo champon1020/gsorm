@@ -1,4 +1,4 @@
-package internal
+package mgorm
 
 import (
 	"database/sql"
@@ -6,8 +6,8 @@ import (
 
 // DB is interface that is implemented by *sql.DB.
 type DB interface {
-	Query(string, ...interface{}) (Rows, error)
-	Exec(string, ...interface{}) (sql.Result, error)
+	query(string, ...interface{}) (Rows, error)
+	exec(string, ...interface{}) (sql.Result, error)
 }
 
 // Rows is interface that is implemented by *sql.Rows.
@@ -19,16 +19,16 @@ type Rows interface {
 }
 
 // Database is the db structure.
-type Database struct {
+type database struct {
 	DB *sql.DB
 }
 
-// Query execute the query that returns rows.
-func (db *Database) Query(query string, args ...interface{}) (Rows, error) {
+// query executes the query that returns rows.
+func (db *database) query(query string, args ...interface{}) (Rows, error) {
 	return db.DB.Query(query, args...)
 }
 
-// Exec execute without returning any rows.
-func (db *Database) Exec(query string, args ...interface{}) (sql.Result, error) {
+// exec executes without returning any rows.
+func (db *database) exec(query string, args ...interface{}) (sql.Result, error) {
 	return db.DB.Exec(query, args...)
 }
