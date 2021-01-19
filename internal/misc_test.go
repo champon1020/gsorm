@@ -1,6 +1,7 @@
 package internal_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/champon1020/mgorm/internal"
@@ -45,20 +46,36 @@ func TestToString(t *testing.T) {
 	}
 }
 
-/*
 func TestToString_Fail(t *testing.T) {
 	testCases := []struct {
-		Value     interface{}
-		ErrorCode int
+		Value interface{}
+		Error error
 	}{
-		{map[string]string{"key": "value"}, ErrInvalidType},
-		{[]int{1, 2}, ErrInvalidType},
-		{[2]int{1, 2}, ErrInvalidType},
+		{
+			map[string]string{"key": "value"},
+			internal.NewError(internal.OpToString, internal.KindType, errors.New("type is invalid")),
+		},
+		{
+			[]int{1, 2},
+			internal.NewError(internal.OpToString, internal.KindType, errors.New("type is invalid")),
+		},
+		{
+			[2]int{1, 2},
+			internal.NewError(internal.OpToString, internal.KindType, errors.New("type is invalid")),
+		},
 	}
 
 	for _, testCase := range testCases {
-		_, err := internal.toString(testCase.Value)
-		assert.Equal(t, testCase.ErrorCode, err.(Error).Code)
+		_, err := internal.ToString(testCase.Value)
+		if err == nil {
+			t.Errorf("Error is not occurred")
+			continue
+		}
+		e, ok := err.(*internal.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			continue
+		}
+		assert.Equal(t, *e, *testCase.Error.(*internal.Error))
 	}
 }
-*/

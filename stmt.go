@@ -7,10 +7,18 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Op values for error handling.
+// Op values.
 const (
 	OpStmtProcessQuerySQL internal.Op = "mgorm.Stmt.processQuerySQL"
 	OpStmtProcessExecSQL  internal.Op = "mgorm.Stmt.processExecSQL"
+	OpQuery               internal.Op = "mgorm.Stmt.OpQuery"
+	OpExec                internal.Op = "mgorm.Stmt.OpExec"
+	OpFrom                internal.Op = "mgorm.Stmt.From"
+	OpValues              internal.Op = "mgorm.Stmt.Values"
+	OpSet                 internal.Op = "mgorm.Stmt.Set"
+	OpWhere               internal.Op = "mgorm.Stmt.Where"
+	OpAnd                 internal.Op = "mgorm.Stmt.And"
+	OpOr                  internal.Op = "mgorm.Stmt.Or"
 )
 
 // Stmt keeps the sql statement.
@@ -25,7 +33,11 @@ type Stmt struct {
 	Errors     []error
 
 	// Used for test.
-	called []interface{}
+	called []*opArgs
+}
+
+func (s *Stmt) call(op internal.Op, args ...interface{}) {
+	s.called = append(s.called, &opArgs{op: op, args: args})
 }
 
 func (s *Stmt) addError(err error) {
@@ -34,6 +46,12 @@ func (s *Stmt) addError(err error) {
 
 // Query executes a query that returns some results.
 func (s *Stmt) Query(model interface{}) error {
+	if db, ok := s.DB.(*MockDB); ok {
+		s.call(OpQuery, model)
+		db.addExecuted(s.called)
+		return nil
+	}
+
 	sql, err := s.processQuerySQL()
 	if err != nil {
 		return err
@@ -42,6 +60,12 @@ func (s *Stmt) Query(model interface{}) error {
 		return err
 	}
 	return nil
+}
+
+// ExpectQuery executes a query as mock database.
+func (s *Stmt) ExpectQuery(model interface{}) *Stmt {
+	s.call(OpQuery, model)
+	return s
 }
 
 // processQuerySQL aggregates the values stored in Stmt structure and returns as SQL object.
@@ -89,6 +113,12 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 
 // Exec executes a query without returning any results.
 func (s *Stmt) Exec() error {
+	if db, ok := s.DB.(*MockDB); ok {
+		s.call(OpQuery)
+		db.addExecuted(s.called)
+		return nil
+	}
+
 	sql, err := s.processExecSQL()
 	if err != nil {
 		return err
@@ -97,6 +127,12 @@ func (s *Stmt) Exec() error {
 		return err
 	}
 	return nil
+}
+
+// ExpectExec executes a query as mock database.
+func (s *Stmt) ExpectExec(model interface{}) *Stmt {
+	s.call(OpExec, model)
+	return s
 }
 
 // processExecSQL aggregates the values stored in Stmt structure and returns as SQL object.
@@ -161,12 +197,14 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 // From calls FROM statement.
 func (s *Stmt) From(tables ...string) *Stmt {
 	s.FromExpr = syntax.NewFrom(tables)
+	s.call(OpFrom, tables)
 	return s
 }
 
 // Values calls VALUES statement.
 func (s *Stmt) Values(vals ...interface{}) *Stmt {
 	s.ValuesExpr = syntax.NewValues(vals)
+	s.call(OpValues, vals)
 	return s
 }
 
@@ -182,26 +220,27 @@ func (s *Stmt) Set(vals ...interface{}) *Stmt {
 		return s
 	}
 	s.SetExpr = set
+	s.call(OpSet, vals)
 	return s
 }
 
 // Where calls WHERE statement.
 func (s *Stmt) Where(expr string, vals ...interface{}) *Stmt {
-	w := syntax.NewWhere(expr, vals...)
-	s.WhereExpr = w
+	s.WhereExpr = syntax.NewWhere(expr, vals...)
+	s.call(OpWhere, expr, vals)
 	return s
 }
 
 // And calls AND statement.
 func (s *Stmt) And(expr string, vals ...interface{}) *Stmt {
-	w := syntax.NewAnd(expr, vals...)
-	s.AndOr = append(s.AndOr, w)
+	s.AndOr = append(s.AndOr, syntax.NewAnd(expr, vals...))
+	s.call(OpAnd, expr, vals)
 	return s
 }
 
 // Or calls OR statement.
 func (s *Stmt) Or(expr string, vals ...interface{}) *Stmt {
-	w := syntax.NewOr(expr, vals...)
-	s.AndOr = append(s.AndOr, w)
+	s.AndOr = append(s.AndOr, syntax.NewOr(expr, vals...))
+	s.call(OpOr, expr, vals)
 	return s
 }

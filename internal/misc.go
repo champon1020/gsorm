@@ -42,7 +42,5 @@ func ToString(v interface{}) (string, error) {
 			return strconv.FormatBool(r.Bool()), nil
 		}
 	}
-
-	err := errors.New("type is invalid")
-	return "", NewError(OpToString, KindType, err)
+	return "", NewError(OpToString, KindType, errors.New("type is invalid"))
 }
