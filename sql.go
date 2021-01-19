@@ -12,9 +12,9 @@ import (
 
 // Op values for error handling.
 const (
-	OpSQLDoQuery internal.Op = "mgorm.SQL.doQuery"
-	OpSQLDoExec  internal.Op = "mgorm.SQL.doExec"
-	OpSetField   internal.Op = "mgorm.setField"
+	opSQLDoQuery internal.Op = "mgorm.SQL.doQuery"
+	opSQLDoExec  internal.Op = "mgorm.SQL.doExec"
+	opSetField   internal.Op = "mgorm.setField"
 )
 
 // SQL string.
@@ -32,18 +32,18 @@ func (s *SQL) write(str string) {
 }
 
 // doQuery executes query and sets rows to model structure.
-func (s *SQL) doQuery(db DB, model interface{}) error {
+func (s *SQL) doQuery(db sqlDB, model interface{}) error {
 	rows, err := db.query(s.string())
 	if err != nil {
-		return internal.NewError(OpSQLDoQuery, internal.KindDatabase, err)
+		return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
 	}
 	if rows == nil {
-		return internal.NewError(OpSQLDoQuery, internal.KindDatabase, errors.New("rows is nil"))
+		return internal.NewError(opSQLDoQuery, internal.KindDatabase, errors.New("rows is nil"))
 	}
 
 	cols, err := rows.Columns()
 	if err != nil {
-		return internal.NewError(OpSQLDoQuery, internal.KindDatabase, err)
+		return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
 	}
 
 	rowVal := make([]interface{}, len(cols))
@@ -58,12 +58,12 @@ func (s *SQL) doQuery(db DB, model interface{}) error {
 	// Model type must be slice or array.
 	if mt == nil || (mt.Kind() != reflect.Slice && mt.Kind() != reflect.Array) {
 		err := errors.New("model type must be slice or array")
-		return internal.NewError(OpSQLDoQuery, internal.KindType, err)
+		return internal.NewError(opSQLDoQuery, internal.KindType, err)
 	}
 
 	for rows.Next() {
 		if err := rows.Scan(rowValPtr...); err != nil {
-			return internal.NewError(OpSQLDoQuery, internal.KindDatabase, err)
+			return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
 		}
 
 		if err := setToModel(&mv, mt, cols, rowVal); err != nil {
@@ -80,10 +80,10 @@ func (s *SQL) doQuery(db DB, model interface{}) error {
 }
 
 // doExec executes query without returning rows.
-func (s *SQL) doExec(db DB) error {
+func (s *SQL) doExec(db sqlDB) error {
 	_, err := db.exec(s.string())
 	if err != nil {
-		return internal.NewError(OpSQLDoExec, internal.KindDatabase, err)
+		return internal.NewError(opSQLDoExec, internal.KindDatabase, err)
 	}
 	return nil
 }
@@ -124,7 +124,7 @@ func columnName(sf reflect.StructField) string {
 func setField(f reflect.Value, v interface{}) error {
 	if !f.CanSet() {
 		err := errors.New("field cannot be changes")
-		return internal.NewError(OpSetField, internal.KindBasic, err)
+		return internal.NewError(opSetField, internal.KindBasic, err)
 	}
 
 	switch f.Kind() {
@@ -132,7 +132,7 @@ func setField(f reflect.Value, v interface{}) error {
 		sv, ok := v.(string)
 		if !ok {
 			err := errors.New("field type is invalid")
-			return internal.NewError(OpSetField, internal.KindType, err)
+			return internal.NewError(opSetField, internal.KindType, err)
 		}
 		f.SetString(sv)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -140,7 +140,7 @@ func setField(f reflect.Value, v interface{}) error {
 		i64, err := strconv.ParseInt(src, 10, 64)
 		if err != nil {
 			err := errors.New("field type is invalid")
-			return internal.NewError(OpSetField, internal.KindType, err)
+			return internal.NewError(opSetField, internal.KindType, err)
 		}
 		f.SetInt(i64)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -148,7 +148,7 @@ func setField(f reflect.Value, v interface{}) error {
 		u64, err := strconv.ParseUint(src, 10, 64)
 		if err != nil {
 			err := errors.New("field type is invalid")
-			return internal.NewError(OpSetField, internal.KindType, err)
+			return internal.NewError(opSetField, internal.KindType, err)
 
 		}
 		f.SetUint(u64)
@@ -157,7 +157,7 @@ func setField(f reflect.Value, v interface{}) error {
 		f64, err := strconv.ParseFloat(src, 64)
 		if err != nil {
 			err := errors.New("field type is invalid")
-			return internal.NewError(OpSetField, internal.KindType, err)
+			return internal.NewError(opSetField, internal.KindType, err)
 
 		}
 		f.SetFloat(f64)
@@ -165,7 +165,7 @@ func setField(f reflect.Value, v interface{}) error {
 		b, ok := v.(bool)
 		if !ok {
 			err := errors.New("field type is invalid")
-			return internal.NewError(OpSetField, internal.KindType, err)
+			return internal.NewError(opSetField, internal.KindType, err)
 
 		}
 		f.SetBool(b)
@@ -174,7 +174,7 @@ func setField(f reflect.Value, v interface{}) error {
 			t, ok := v.(time.Time)
 			if !ok {
 				err := errors.New("field type is invalid")
-				return internal.NewError(OpSetField, internal.KindType, err)
+				return internal.NewError(opSetField, internal.KindType, err)
 
 			}
 			f.Set(reflect.ValueOf(t))

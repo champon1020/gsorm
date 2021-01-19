@@ -9,6 +9,104 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestStmt_ProcessQuerySQL(t *testing.T) {
+	testCases := []struct {
+		Stmt   *Stmt
+		Result string
+	}{
+		{
+			&Stmt{
+				cmd:      &syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
+				fromExpr: &syntax.From{Tables: []syntax.Table{{Name: "table"}}},
+			},
+			"SELECT column FROM table",
+		},
+		{
+			&Stmt{
+				cmd:       &syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
+				fromExpr:  &syntax.From{Tables: []syntax.Table{{Name: "table"}}},
+				whereExpr: &syntax.Where{Expr: "lhs = ?", Values: []interface{}{10}},
+			},
+			"SELECT column FROM table WHERE lhs = 10",
+		},
+		{
+			&Stmt{
+				cmd:       &syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
+				fromExpr:  &syntax.From{Tables: []syntax.Table{{Name: "table"}}},
+				whereExpr: &syntax.Where{Expr: "lhs1 = ?", Values: []interface{}{10}},
+				andOr: []syntax.Expr{
+					&syntax.And{Expr: "lhs2 = ? OR lhs3 = ?", Values: []interface{}{20, 30}},
+				},
+			},
+			"SELECT column FROM table WHERE lhs1 = 10 AND (lhs2 = 20 OR lhs3 = 30)",
+		},
+		{
+			&Stmt{
+				cmd:       &syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
+				fromExpr:  &syntax.From{Tables: []syntax.Table{{Name: "table"}}},
+				whereExpr: &syntax.Where{Expr: "lhs1 = ?", Values: []interface{}{10}},
+				andOr: []syntax.Expr{
+					&syntax.Or{Expr: "lhs2 = ? AND lhs3 = ?", Values: []interface{}{20, 30}},
+				},
+			},
+			"SELECT column FROM table WHERE lhs1 = 10 OR (lhs2 = 20 AND lhs3 = 30)",
+		},
+	}
+
+	for _, testCase := range testCases {
+		sql, _ := StmtProcessQuerySQL(testCase.Stmt)
+		assert.Equal(t, testCase.Result, string(sql))
+	}
+}
+
+func TestStmt_PrcessExecSQL(t *testing.T) {
+	testCases := []struct {
+		Stmt   *Stmt
+		Result string
+	}{
+		{
+			&Stmt{
+				cmd: &syntax.Insert{
+					Table:   syntax.Table{Name: "table"},
+					Columns: []syntax.Column{{Name: "column1"}, {Name: "column2"}},
+				},
+				valuesExpr: &syntax.Values{Columns: []interface{}{10, 20}},
+			},
+			"INSERT INTO table (column1, column2) VALUES (10, 20)",
+		},
+		{
+			&Stmt{
+				cmd:     &syntax.Update{Table: syntax.Table{Name: "table"}},
+				setExpr: &syntax.Set{Eqs: []syntax.Eq{{LHS: "lhs1", RHS: "rhs1"}, {LHS: "lhs2", RHS: "rhs2"}}},
+			},
+			"UPDATE table SET lhs1 = rhs1, lhs2 = rhs2",
+		},
+		{
+			&Stmt{
+				cmd:       &syntax.Update{Table: syntax.Table{Name: "table"}},
+				setExpr:   &syntax.Set{Eqs: []syntax.Eq{{LHS: "lhs1", RHS: "rhs1"}, {LHS: "lhs2", RHS: "rhs2"}}},
+				whereExpr: &syntax.Where{Expr: "lhs1 = ?", Values: []interface{}{10}},
+				andOr: []syntax.Expr{
+					&syntax.And{Expr: "lhs2 = ? OR lhs3 = ?", Values: []interface{}{20, 30}},
+				},
+			},
+			"UPDATE table SET lhs1 = rhs1, lhs2 = rhs2 WHERE lhs1 = 10 AND (lhs2 = 20 OR lhs3 = 30)",
+		},
+		{
+			&Stmt{
+				cmd:      &syntax.Delete{},
+				fromExpr: &syntax.From{Tables: []syntax.Table{{Name: "table"}}},
+			},
+			"DELETE FROM table",
+		},
+	}
+
+	for _, testCase := range testCases {
+		sql, _ := StmtProcessExecSQL(testCase.Stmt)
+		assert.Equal(t, testCase.Result, string(sql))
+	}
+}
+
 func TestStmt_From(t *testing.T) {
 	testCases := []struct {
 		Tables []string
@@ -19,9 +117,9 @@ func TestStmt_From(t *testing.T) {
 			[]string{"table1", "table2 AS t2"},
 			&Stmt{},
 			&Stmt{
-				FromExpr: &syntax.From{Tables: []syntax.Table{{Name: "table1"}, {Name: "table2", Alias: "t2"}}},
+				fromExpr: &syntax.From{Tables: []syntax.Table{{Name: "table1"}, {Name: "table2", Alias: "t2"}}},
 				called: []*opArgs{{
-					op:   OpFrom,
+					op:   opFrom,
 					args: []interface{}{[]string{"table1", "table2 AS t2"}},
 				}},
 			},
@@ -49,9 +147,9 @@ func TestStmt_Where(t *testing.T) {
 			[]interface{}{10},
 			&Stmt{},
 			&Stmt{
-				WhereExpr: &syntax.Where{Expr: "lhs = ?", Values: []interface{}{10}},
+				whereExpr: &syntax.Where{Expr: "lhs = ?", Values: []interface{}{10}},
 				called: []*opArgs{{
-					op:   OpWhere,
+					op:   opWhere,
 					args: []interface{}{"lhs = ?", []interface{}{10}},
 				}},
 			},
@@ -79,9 +177,9 @@ func TestStmt_And(t *testing.T) {
 			[]interface{}{10},
 			&Stmt{},
 			&Stmt{
-				AndOr: []syntax.Expr{&syntax.And{Expr: "lhs = ?", Values: []interface{}{10}}},
+				andOr: []syntax.Expr{&syntax.And{Expr: "lhs = ?", Values: []interface{}{10}}},
 				called: []*opArgs{{
-					op:   OpAnd,
+					op:   opAnd,
 					args: []interface{}{"lhs = ?", []interface{}{10}},
 				}},
 			},
@@ -109,9 +207,9 @@ func TestStmt_Or(t *testing.T) {
 			[]interface{}{10},
 			&Stmt{},
 			&Stmt{
-				AndOr: []syntax.Expr{&syntax.Or{Expr: "lhs = ?", Values: []interface{}{10}}},
+				andOr: []syntax.Expr{&syntax.Or{Expr: "lhs = ?", Values: []interface{}{10}}},
 				called: []*opArgs{{
-					op:   OpOr,
+					op:   opOr,
 					args: []interface{}{"lhs = ?", []interface{}{10}},
 				}},
 			},

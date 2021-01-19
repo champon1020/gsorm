@@ -9,28 +9,28 @@ import (
 
 // Op values.
 const (
-	OpStmtProcessQuerySQL internal.Op = "mgorm.Stmt.processQuerySQL"
-	OpStmtProcessExecSQL  internal.Op = "mgorm.Stmt.processExecSQL"
-	OpQuery               internal.Op = "mgorm.Stmt.OpQuery"
-	OpExec                internal.Op = "mgorm.Stmt.OpExec"
-	OpFrom                internal.Op = "mgorm.Stmt.From"
-	OpValues              internal.Op = "mgorm.Stmt.Values"
-	OpSet                 internal.Op = "mgorm.Stmt.Set"
-	OpWhere               internal.Op = "mgorm.Stmt.Where"
-	OpAnd                 internal.Op = "mgorm.Stmt.And"
-	OpOr                  internal.Op = "mgorm.Stmt.Or"
+	opStmtProcessQuerySQL internal.Op = "mgorm.Stmt.processQuerySQL"
+	opStmtProcessExecSQL  internal.Op = "mgorm.Stmt.processExecSQL"
+	opQuery               internal.Op = "mgorm.Stmt.OpQuery"
+	opExec                internal.Op = "mgorm.Stmt.OpExec"
+	opFrom                internal.Op = "mgorm.Stmt.From"
+	opValues              internal.Op = "mgorm.Stmt.Values"
+	opSet                 internal.Op = "mgorm.Stmt.Set"
+	opWhere               internal.Op = "mgorm.Stmt.Where"
+	opAnd                 internal.Op = "mgorm.Stmt.And"
+	opOr                  internal.Op = "mgorm.Stmt.Or"
 )
 
 // Stmt keeps the sql statement.
 type Stmt struct {
-	DB         DB
-	Cmd        syntax.Cmd
-	FromExpr   syntax.Expr
-	ValuesExpr syntax.Expr
-	SetExpr    syntax.Expr
-	WhereExpr  syntax.Expr
-	AndOr      []syntax.Expr
-	Errors     []error
+	db         sqlDB
+	cmd        syntax.Cmd
+	fromExpr   syntax.Expr
+	valuesExpr syntax.Expr
+	setExpr    syntax.Expr
+	whereExpr  syntax.Expr
+	andOr      []syntax.Expr
+	errors     []error
 
 	// Used for test.
 	called []*opArgs
@@ -41,13 +41,13 @@ func (s *Stmt) call(op internal.Op, args ...interface{}) {
 }
 
 func (s *Stmt) addError(err error) {
-	s.Errors = append(s.Errors, err)
+	s.errors = append(s.errors, err)
 }
 
 // Query executes a query that returns some results.
 func (s *Stmt) Query(model interface{}) error {
-	if db, ok := s.DB.(*MockDB); ok {
-		s.call(OpQuery, model)
+	if db, ok := s.db.(*MockDB); ok {
+		s.call(opQuery, model)
 		db.addExecuted(s.called)
 		return nil
 	}
@@ -56,7 +56,7 @@ func (s *Stmt) Query(model interface{}) error {
 	if err != nil {
 		return err
 	}
-	if err := sql.doQuery(s.DB, model); err != nil {
+	if err := sql.doQuery(s.db, model); err != nil {
 		return err
 	}
 	return nil
@@ -64,7 +64,7 @@ func (s *Stmt) Query(model interface{}) error {
 
 // ExpectQuery executes a query as mock database.
 func (s *Stmt) ExpectQuery(model interface{}) *Stmt {
-	s.call(OpQuery, model)
+	s.call(opQuery, model)
 	return s
 }
 
@@ -73,16 +73,16 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 	var sql SQL
 
 	// Build SELECT.
-	sel, ok := s.Cmd.(*syntax.Select)
+	sel, ok := s.cmd.(*syntax.Select)
 	if !ok {
 		err := errors.New("command must be SELECT")
-		return "", internal.NewError(OpStmtProcessQuerySQL, internal.KindBasic, err)
+		return "", internal.NewError(opStmtProcessQuerySQL, internal.KindBasic, err)
 	}
 	sql.write(sel.Build().Build())
 
 	// Build FROM.
-	if s.FromExpr != nil {
-		from, err := s.FromExpr.Build()
+	if s.fromExpr != nil {
+		from, err := s.fromExpr.Build()
 		if err != nil {
 			return "", err
 		}
@@ -90,8 +90,8 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 	}
 
 	// Build WHERE.
-	if s.WhereExpr != nil {
-		w, err := s.WhereExpr.Build()
+	if s.whereExpr != nil {
+		w, err := s.whereExpr.Build()
 		if err != nil {
 			return "", err
 		}
@@ -99,8 +99,8 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 	}
 
 	// Build AND or OR.
-	if len(s.AndOr) > 0 {
-		for _, e := range s.AndOr {
+	if len(s.andOr) > 0 {
+		for _, e := range s.andOr {
 			ao, err := e.Build()
 			if err != nil {
 				return "", err
@@ -113,8 +113,8 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 
 // Exec executes a query without returning any results.
 func (s *Stmt) Exec() error {
-	if db, ok := s.DB.(*MockDB); ok {
-		s.call(OpQuery)
+	if db, ok := s.db.(*MockDB); ok {
+		s.call(opQuery)
 		db.addExecuted(s.called)
 		return nil
 	}
@@ -123,7 +123,7 @@ func (s *Stmt) Exec() error {
 	if err != nil {
 		return err
 	}
-	if err := sql.doExec(s.DB); err != nil {
+	if err := sql.doExec(s.db); err != nil {
 		return err
 	}
 	return nil
@@ -131,18 +131,18 @@ func (s *Stmt) Exec() error {
 
 // ExpectExec executes a query as mock database.
 func (s *Stmt) ExpectExec(model interface{}) *Stmt {
-	s.call(OpExec, model)
+	s.call(opExec, model)
 	return s
 }
 
 // processExecSQL aggregates the values stored in Stmt structure and returns as SQL object.
 func (s *Stmt) processExecSQL() (SQL, error) {
 	var sql SQL
-	switch cmd := s.Cmd.(type) {
+	switch cmd := s.cmd.(type) {
 	case *syntax.Insert:
 		sql.write(cmd.Build().Build())
-		if s.ValuesExpr != nil {
-			values, err := s.ValuesExpr.Build()
+		if s.valuesExpr != nil {
+			values, err := s.valuesExpr.Build()
 			if err != nil {
 				return "", err
 			}
@@ -150,8 +150,8 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 		}
 	case *syntax.Update:
 		sql.write(cmd.Build().Build())
-		if s.SetExpr != nil {
-			set, err := s.SetExpr.Build()
+		if s.setExpr != nil {
+			set, err := s.setExpr.Build()
 			if err != nil {
 				return "", err
 			}
@@ -159,8 +159,8 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 		}
 	case *syntax.Delete:
 		sql.write(cmd.Build().Build())
-		if s.FromExpr != nil {
-			from, err := s.FromExpr.Build()
+		if s.fromExpr != nil {
+			from, err := s.fromExpr.Build()
 			if err != nil {
 				return "", err
 			}
@@ -168,13 +168,13 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 		}
 	default:
 		err := errors.New("command must be INSERT, UPDATE or DELETE")
-		return "", internal.NewError(OpStmtProcessExecSQL, internal.KindType, err)
+		return "", internal.NewError(opStmtProcessExecSQL, internal.KindType, err)
 
 	}
 
 	// Build WHERE.
-	if s.WhereExpr != nil {
-		w, err := s.WhereExpr.Build()
+	if s.whereExpr != nil {
+		w, err := s.whereExpr.Build()
 		if err != nil {
 			return "", err
 		}
@@ -182,8 +182,8 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 	}
 
 	// Build AND or OR.
-	if len(s.AndOr) > 0 {
-		for _, e := range s.AndOr {
+	if len(s.andOr) > 0 {
+		for _, e := range s.andOr {
 			ao, err := e.Build()
 			if err != nil {
 				return "", err
@@ -196,21 +196,21 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 
 // From calls FROM statement.
 func (s *Stmt) From(tables ...string) *Stmt {
-	s.FromExpr = syntax.NewFrom(tables)
-	s.call(OpFrom, tables)
+	s.fromExpr = syntax.NewFrom(tables)
+	s.call(opFrom, tables)
 	return s
 }
 
 // Values calls VALUES statement.
 func (s *Stmt) Values(vals ...interface{}) *Stmt {
-	s.ValuesExpr = syntax.NewValues(vals)
-	s.call(OpValues, vals)
+	s.valuesExpr = syntax.NewValues(vals)
+	s.call(opValues, vals)
 	return s
 }
 
 // Set calls SET statement.
 func (s *Stmt) Set(vals ...interface{}) *Stmt {
-	u, ok := s.Cmd.(*syntax.Update)
+	u, ok := s.cmd.(*syntax.Update)
 	if !ok {
 		/* handle error */
 	}
@@ -219,28 +219,28 @@ func (s *Stmt) Set(vals ...interface{}) *Stmt {
 		s.addError(err)
 		return s
 	}
-	s.SetExpr = set
-	s.call(OpSet, vals)
+	s.setExpr = set
+	s.call(opSet, vals)
 	return s
 }
 
 // Where calls WHERE statement.
 func (s *Stmt) Where(expr string, vals ...interface{}) *Stmt {
-	s.WhereExpr = syntax.NewWhere(expr, vals...)
-	s.call(OpWhere, expr, vals)
+	s.whereExpr = syntax.NewWhere(expr, vals...)
+	s.call(opWhere, expr, vals)
 	return s
 }
 
 // And calls AND statement.
 func (s *Stmt) And(expr string, vals ...interface{}) *Stmt {
-	s.AndOr = append(s.AndOr, syntax.NewAnd(expr, vals...))
-	s.call(OpAnd, expr, vals)
+	s.andOr = append(s.andOr, syntax.NewAnd(expr, vals...))
+	s.call(opAnd, expr, vals)
 	return s
 }
 
 // Or calls OR statement.
 func (s *Stmt) Or(expr string, vals ...interface{}) *Stmt {
-	s.AndOr = append(s.AndOr, syntax.NewOr(expr, vals...))
-	s.call(OpOr, expr, vals)
+	s.andOr = append(s.andOr, syntax.NewOr(expr, vals...))
+	s.call(opOr, expr, vals)
 	return s
 }
