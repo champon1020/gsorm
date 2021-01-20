@@ -2,6 +2,8 @@ package syntax
 
 import (
 	"strings"
+
+	"github.com/champon1020/mgorm/internal"
 )
 
 // Table expression.
@@ -82,7 +84,7 @@ type Eq struct {
 func (e *Eq) Build() (string, error) {
 	s := e.LHS
 	s += " = "
-	rhs, err := toString(e.RHS)
+	rhs, err := internal.ToString(e.RHS)
 	s += rhs
 	return s, err
 }

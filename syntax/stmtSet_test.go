@@ -3,7 +3,8 @@ package syntax_test
 import (
 	"testing"
 
-	"github.com/champon1020/minigorm/syntax"
+	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -20,7 +21,7 @@ func TestStmtSet_WriteClause(t *testing.T) {
 	for _, testCase := range testCases {
 		testCase.StmtSet.WriteClause(testCase.Clause)
 		if diff := cmp.Diff(testCase.StmtSet, testCase.Result); diff != "" {
-			syntax.PrintTestDiff(t, diff)
+			internal.PrintTestDiff(t, diff)
 		}
 	}
 }
@@ -42,7 +43,7 @@ func TestStmtSet_WriteValue(t *testing.T) {
 	for _, testCase := range testCases {
 		testCase.StmtSet.WriteValue(testCase.Value)
 		if diff := cmp.Diff(testCase.StmtSet, testCase.Result); diff != "" {
-			syntax.PrintTestDiff(t, diff)
+			internal.PrintTestDiff(t, diff)
 		}
 	}
 

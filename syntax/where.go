@@ -1,8 +1,16 @@
 package syntax
 
 import (
+	"errors"
 	"fmt"
 	"strings"
+
+	"github.com/champon1020/mgorm/internal"
+)
+
+// Op values for error handling.
+const (
+	OpBuildStmtSet internal.Op = "syntax.buildStmtSet"
 )
 
 // Where clause.
@@ -76,14 +84,14 @@ func NewOr(expr string, vals ...interface{}) *Or {
 // buildStmtSet make StmtSet with expr and values.
 func buildStmtSet(expr string, vals ...interface{}) (*StmtSet, error) {
 	if strings.Count(expr, "?") != len(vals) {
-		/* handle error */
-		return nil, newError(ErrInvalidLen, "Length of values is not valid")
+		err := errors.New("Length of values is not valid")
+		return nil, internal.NewError(OpBuildStmtSet, internal.KindBasic, err)
 	}
 
 	ss := new(StmtSet)
 	values := []interface{}{}
 	for _, v := range vals {
-		vStr, err := toString(v)
+		vStr, err := internal.ToString(v)
 		if err != nil {
 			return nil, err
 		}

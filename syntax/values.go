@@ -1,5 +1,7 @@
 package syntax
 
+import "github.com/champon1020/mgorm/internal"
+
 // Values expression.
 type Values struct {
 	Columns []interface{}
@@ -22,7 +24,7 @@ func (v *Values) Build() (*StmtSet, error) {
 		if i != 0 {
 			ss.WriteValue(",")
 		}
-		cStr, err := toString(c)
+		cStr, err := internal.ToString(c)
 		if err != nil {
 			return nil, err
 		}

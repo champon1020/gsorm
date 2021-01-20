@@ -1,5 +1,16 @@
 package syntax
 
+import (
+	"errors"
+
+	"github.com/champon1020/mgorm/internal"
+)
+
+// Op values for error handling.
+const (
+	OpNewSet internal.Op = "syntax.NewSet"
+)
+
 // Set expression.
 type Set struct {
 	Eqs []Eq
@@ -35,7 +46,8 @@ func (s *Set) Build() (*StmtSet, error) {
 // NewSet create new set object.
 func NewSet(lhs []string, rhs []interface{}) (*Set, error) {
 	if len(lhs) != len(rhs) {
-		return nil, newError(ErrInvalid, "Length is different between lhs and rhs")
+		err := errors.New("Length is different between lhs and rhs")
+		return nil, internal.NewError(OpNewSet, internal.KindBasic, err)
 	}
 	s := new(Set)
 	for i := 0; i < len(lhs); i++ {
