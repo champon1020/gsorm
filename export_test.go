@@ -3,7 +3,7 @@ package mgorm
 import "database/sql"
 
 // Exported values which is declared in db.go.
-type Rows = rows
+type Rows = sqlRows
 
 // Exported values which is declared in stmt.go.
 var (
@@ -26,11 +26,11 @@ var (
 )
 
 type TestMockDB struct {
-	QueryFunc func(string, ...interface{}) (rows, error)
+	QueryFunc func(string, ...interface{}) (sqlRows, error)
 	ExecFunc  func(string, ...interface{}) (sql.Result, error)
 }
 
-func (db *TestMockDB) query(query string, args ...interface{}) (rows, error) {
+func (db *TestMockDB) query(query string, args ...interface{}) (sqlRows, error) {
 	return db.QueryFunc(query, args...)
 }
 func (db *TestMockDB) exec(query string, args ...interface{}) (sql.Result, error) {
