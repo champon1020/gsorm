@@ -2,6 +2,7 @@ version: '3'
 services:
   test:
     image: genschsa/mysql-employees:latest
+    container_name: mysql-employees
     environment:
       MYSQL_ROOT_PASSWORD: toor
       MYSQL_ROOT_HOST: '%'

@@ -79,7 +79,7 @@ func TestStmt_PrcessExecSQL(t *testing.T) {
 				cmd:     &syntax.Update{Table: syntax.Table{Name: "table"}},
 				setExpr: &syntax.Set{Eqs: []syntax.Eq{{LHS: "lhs1", RHS: "rhs1"}, {LHS: "lhs2", RHS: "rhs2"}}},
 			},
-			"UPDATE table SET lhs1 = rhs1, lhs2 = rhs2",
+			`UPDATE table SET lhs1 = "rhs1", lhs2 = "rhs2"`,
 		},
 		{
 			&Stmt{
@@ -90,7 +90,7 @@ func TestStmt_PrcessExecSQL(t *testing.T) {
 					&syntax.And{Expr: "lhs2 = ? OR lhs3 = ?", Values: []interface{}{20, 30}},
 				},
 			},
-			"UPDATE table SET lhs1 = rhs1, lhs2 = rhs2 WHERE lhs1 = 10 AND (lhs2 = 20 OR lhs3 = 30)",
+			`UPDATE table SET lhs1 = "rhs1", lhs2 = "rhs2" WHERE lhs1 = 10 AND (lhs2 = 20 OR lhs3 = 30)`,
 		},
 		{
 			&Stmt{

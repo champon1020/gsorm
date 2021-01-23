@@ -22,7 +22,7 @@ func TestCmpError(t *testing.T) {
 		{
 			internal.NewError(OpTest1, internal.KindBasic, errors.New("test1 is occurred")),
 			internal.NewError(OpTest2, internal.KindType, errors.New("test2 is occurred")),
-			"\nOp:\n  got : test1.Op\n  want: test2.Op\nKind:\n  got : 0\n  want: 1\nErr:\n  got : test1 is occurred\n  want: test2 is occurred",
+			"\nOp:\n  got : test1.Op\n  want: test2.Op\nKind:\n  got : BasicError\n  want: TypeError\nErr:\n  got : test1 is occurred\n  want: test2 is occurred",
 		},
 	}
 

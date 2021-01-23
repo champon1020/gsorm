@@ -42,7 +42,7 @@ func TestValues_Build(t *testing.T) {
 	}{
 		{
 			&syntax.Values{Columns: []interface{}{"column", 2, true}},
-			&syntax.StmtSet{Clause: "VALUES", Value: "(column, 2, true)"},
+			&syntax.StmtSet{Clause: "VALUES", Value: `("column", 2, true)`},
 		},
 	}
 
