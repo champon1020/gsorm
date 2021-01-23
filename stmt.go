@@ -20,6 +20,7 @@ const (
 	opAnd                 internal.Op = "mgorm.Stmt.And"
 	opOr                  internal.Op = "mgorm.Stmt.Or"
 	opLimit               internal.Op = "mgorm.Stmt.Limit"
+	opOffset              internal.Op = "mgorm.Stmt.Offset"
 )
 
 // Stmt keeps the sql statement.
@@ -32,6 +33,7 @@ type Stmt struct {
 	whereExpr  syntax.Expr
 	andOr      []syntax.Expr
 	limitExpr  syntax.Expr
+	offsetExpr syntax.Expr
 	errors     []error
 
 	// Used for test.
@@ -113,6 +115,14 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 
 	if s.limitExpr != nil {
 		l, err := s.limitExpr.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.write(l.Build())
+	}
+
+	if s.offsetExpr != nil {
+		l, err := s.offsetExpr.Build()
 		if err != nil {
 			return "", err
 		}
@@ -260,5 +270,12 @@ func (s *Stmt) Or(expr string, vals ...interface{}) *Stmt {
 func (s *Stmt) Limit(num int) *Stmt {
 	s.limitExpr = syntax.NewLimit(num)
 	s.call(opLimit, num)
+	return s
+}
+
+// Offset calls OFFSET statement.
+func (s *Stmt) Offset(num int) *Stmt {
+	s.offsetExpr = syntax.NewOffset(num)
+	s.call(opOffset, num)
 	return s
 }

@@ -18,6 +18,11 @@ var (
 	LimitName = (*Limit).name
 )
 
+// Exported values which is declared in offset.go.
+var (
+	OffsetName = (*Offset).name
+)
+
 // Exported values which is declared in select.go.
 var (
 	SelectQuery     = (*Select).query

@@ -160,3 +160,27 @@ func SelectSample6(db *mgorm.DB) {
 		fmt.Printf("Index[0]: %v\n", (*emp)[0])
 	}
 }
+
+// SelectSample7 is.
+func SelectSample7(db *mgorm.DB) {
+	fmt.Println("Query Sample 7")
+	emp := new([]Employee)
+	start := time.Now()
+
+	// SELECT * FROM employees OFFSET 6;
+	err := mgorm.Select(db, "*").
+		From("employees").
+		Offset(6).
+		Query(emp)
+
+	end := time.Now()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
+	if len(*emp) > 0 {
+		fmt.Printf("Index[0]: %v\n", (*emp)[0])
+	}
+}
