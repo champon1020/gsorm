@@ -2,6 +2,7 @@ package internal
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -33,7 +34,8 @@ func ToString(v interface{}) (string, error) {
 	if r.IsValid() {
 		switch r.Kind() {
 		case reflect.String:
-			return r.String(), nil
+			s := fmt.Sprintf("%+q", r.String())
+			return s, nil
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			return strconv.FormatInt(r.Int(), 10), nil
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:

@@ -140,14 +140,14 @@ func TestBuildStmtSet(t *testing.T) {
 		Result *syntax.StmtSet
 	}{
 		{
-			"lhs = rhs",
+			`lhs = "rhs"`,
 			[]interface{}{},
-			&syntax.StmtSet{Value: "lhs = rhs"},
+			&syntax.StmtSet{Value: `lhs = "rhs"`},
 		},
 		{
 			"lhs = ?",
 			[]interface{}{"rhs"},
-			&syntax.StmtSet{Value: "lhs = rhs"},
+			&syntax.StmtSet{Value: `lhs = "rhs"`},
 		},
 		{
 			"lhs = ?",
@@ -157,17 +157,17 @@ func TestBuildStmtSet(t *testing.T) {
 		{
 			"lhs1 = ? AND lhs2 = ?",
 			[]interface{}{"rhs", 100},
-			&syntax.StmtSet{Value: "lhs1 = rhs AND lhs2 = 100"},
+			&syntax.StmtSet{Value: `lhs1 = "rhs" AND lhs2 = 100`},
 		},
 		{
 			"IN lhs (?, ?, ?)",
 			[]interface{}{"rhs", 100, true},
-			&syntax.StmtSet{Value: "IN lhs (rhs, 100, true)"},
+			&syntax.StmtSet{Value: `IN lhs ("rhs", 100, true)`},
 		},
 		{
 			"lhs LIKE %%?%%",
 			[]interface{}{"rhs"},
-			&syntax.StmtSet{Value: "lhs LIKE %rhs%"},
+			&syntax.StmtSet{Value: `lhs LIKE %"rhs"%`},
 		},
 		{
 			"lhs BETWEEN ? AND ?",

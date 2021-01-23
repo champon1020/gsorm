@@ -78,7 +78,7 @@ func TestEq_Build(t *testing.T) {
 		Eq     *syntax.Eq
 		Result string
 	}{
-		{&syntax.Eq{LHS: "lhs", RHS: "rhs"}, "lhs = rhs"},
+		{&syntax.Eq{LHS: "lhs", RHS: "rhs"}, `lhs = "rhs"`},
 	}
 
 	for _, testCase := range testCases {

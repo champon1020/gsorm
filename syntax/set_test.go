@@ -46,11 +46,11 @@ func TestSet_Build(t *testing.T) {
 	}{
 		{
 			&syntax.Set{Eqs: []syntax.Eq{{LHS: "lhs", RHS: "rhs"}}},
-			&syntax.StmtSet{Clause: "SET", Value: "lhs = rhs"},
+			&syntax.StmtSet{Clause: "SET", Value: `lhs = "rhs"`},
 		},
 		{
 			&syntax.Set{Eqs: []syntax.Eq{{LHS: "lhs1", RHS: "rhs1"}, {LHS: "lhs2", RHS: "rhs2"}}},
-			&syntax.StmtSet{Clause: "SET", Value: "lhs1 = rhs1, lhs2 = rhs2"},
+			&syntax.StmtSet{Clause: "SET", Value: `lhs1 = "rhs1", lhs2 = "rhs2"`},
 		},
 	}
 

@@ -33,6 +33,7 @@ func (s *SQL) write(str string) {
 
 // doQuery executes query and sets rows to model structure.
 func (s *SQL) doQuery(db sqlDB, model interface{}) error {
+	// Execute query.
 	rows, err := db.query(s.string())
 	if err != nil {
 		return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
@@ -41,17 +42,7 @@ func (s *SQL) doQuery(db sqlDB, model interface{}) error {
 		return internal.NewError(opSQLDoQuery, internal.KindDatabase, errors.New("rows is nil"))
 	}
 
-	cols, err := rows.Columns()
-	if err != nil {
-		return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
-	}
-
-	rowVal := make([][]byte, len(cols))
-	rowValPtr := []interface{}{}
-	for i := 0; i < len(rowVal); i++ {
-		rowValPtr = append(rowValPtr, &rowVal[i])
-	}
-
+	// Model reflection.
 	mt := reflect.TypeOf(model).Elem()
 	mv := reflect.New(mt).Elem()
 
@@ -61,16 +52,36 @@ func (s *SQL) doQuery(db sqlDB, model interface{}) error {
 		return internal.NewError(opSQLDoQuery, internal.KindType, err)
 	}
 
-	for rows.Next() {
-		if err := rows.Scan(rowValPtr...); err != nil {
-			return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
-		}
-
-		if err := setToModel(&mv, mt, cols, rowVal); err != nil {
-			return err
+	// Generate map to localize field index between row and model.
+	rCols, err := rows.Columns()
+	indR2M := make(map[int]int)
+	if err != nil {
+		return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
+	}
+	for i, c := range rCols {
+		for j := 0; j < mt.Elem().NumField(); j++ {
+			if c != columnName(mt.Elem().Field(j)) {
+				continue
+			}
+			indR2M[i] = j
 		}
 	}
 
+	// Prepare pointers which is used to rows.Scan().
+	rVal := make([][]byte, len(rCols))
+	rValPtr := []interface{}{}
+	for i := 0; i < len(rVal); i++ {
+		rValPtr = append(rValPtr, &rVal[i])
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(rValPtr...); err != nil {
+			return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
+		}
+		if err := setToModel(&mv, mt, &indR2M, rVal); err != nil {
+			return err
+		}
+	}
 	rows.Close()
 
 	modelRef := reflect.ValueOf(model).Elem()
@@ -88,24 +99,19 @@ func (s *SQL) doExec(db sqlDB) error {
 	return nil
 }
 
-func setToModel(mv *reflect.Value, mt reflect.Type, cols []string, rowVal [][]byte) error {
+func setToModel(mv *reflect.Value, mt reflect.Type, indR2M *map[int]int, rVal [][]byte) error {
 	// Generate reflect type and value for model.
 	t := mt.Elem()
 	v := reflect.Indirect(reflect.New(t))
 
-	// Loop with columns of rows.
-	for i, c := range cols {
-		for j := 0; j < t.NumField(); j++ {
-			// Check column name.
-			if c != columnName(t.Field(j)) {
-				continue
-			}
+	// Loop with number of columns in rows.
+	for ri := 0; ri < len(rVal); ri++ {
+		// mi is index of model field.
+		mi := (*indR2M)[ri]
 
-			// Set values to struct fields.
-			if err := setField(v.Field(j), t.Field(j), rowVal[i]); err != nil {
-				return err
-			}
-			break
+		// Set values to struct fields.
+		if err := setField(v.Field(mi), t.Field(mi), rVal[ri]); err != nil {
+			return err
 		}
 	}
 

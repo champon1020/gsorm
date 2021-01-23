@@ -65,8 +65,6 @@ func TestSQL_DoQuery(t *testing.T) {
 		mockRows.Max = len(*testCase.Rows)
 		mockRows.ColumnsFunc = func() ([]string, error) { return []string{"id", "name"}, nil }
 		mockRows.ScanFunc = func(dest ...interface{}) error {
-			//ptrID := dest[0].([]byte)
-			//ptrName := dest[1].([]byte)
 			ptrID := dest[0].(*[]byte)
 			ptrName := dest[1].(*[]byte)
 			*ptrID = []byte(fmt.Sprintf("%d", (*testCase.Rows)[mockRows.Count-1].ID))
