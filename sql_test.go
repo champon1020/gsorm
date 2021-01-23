@@ -3,6 +3,7 @@ package mgorm_test
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -64,10 +65,12 @@ func TestSQL_DoQuery(t *testing.T) {
 		mockRows.Max = len(*testCase.Rows)
 		mockRows.ColumnsFunc = func() ([]string, error) { return []string{"id", "name"}, nil }
 		mockRows.ScanFunc = func(dest ...interface{}) error {
-			ptrID := dest[0].(*interface{})
-			ptrName := dest[1].(*interface{})
-			*ptrID = (*testCase.Rows)[mockRows.Count-1].ID
-			*ptrName = (*testCase.Rows)[mockRows.Count-1].Name
+			//ptrID := dest[0].([]byte)
+			//ptrName := dest[1].([]byte)
+			ptrID := dest[0].(*[]byte)
+			ptrName := dest[1].(*[]byte)
+			*ptrID = []byte(fmt.Sprintf("%d", (*testCase.Rows)[mockRows.Count-1].ID))
+			*ptrName = []byte((*testCase.Rows)[mockRows.Count-1].Name)
 			return nil
 		}
 		mockdb := &mgorm.TestMockDB{
@@ -250,93 +253,112 @@ func TestSetField(t *testing.T) {
 		FID64 float64
 		Flg   bool
 		Time  time.Time
+		Time2 time.Time `layout:"2006-01-02"`
+		Time3 time.Time `layout:"time.ANSIC"`
 	}
 
 	testCases := []struct {
 		FieldNum int
-		Value    interface{}
+		Value    []byte
 		Result   reflect.Value
 	}{
 		{
 			0,
-			"test",
+			[]byte("test"),
 			reflect.ValueOf(&Car{Name: "test"}),
 		},
 		{
 			1,
-			100,
+			[]byte(fmt.Sprintf("%d", 100)),
 			reflect.ValueOf(&Car{ID: 100}),
 		},
 		{
 			2,
-			100,
+			[]byte(fmt.Sprintf("%d", 100)),
 			reflect.ValueOf(&Car{ID8: 100}),
 		},
 		{
 			3,
-			int16(100),
+			[]byte(fmt.Sprintf("%d", 100)),
 			reflect.ValueOf(&Car{ID16: 100}),
 		},
 		{
 			4,
-			int64(100),
+			[]byte(fmt.Sprintf("%d", 100)),
 			reflect.ValueOf(&Car{ID32: 100}),
 		},
 		{
 			5,
-			int32(100),
+			[]byte(fmt.Sprintf("%d", 100)),
 			reflect.ValueOf(&Car{ID64: 100}),
 		},
 		{
 			6,
-			100,
+			[]byte(fmt.Sprintf("%d", 100)),
 			reflect.ValueOf(&Car{UID: 100}),
 		},
 		{
 			7,
-			100,
+			[]byte(fmt.Sprintf("%d", 100)),
 			reflect.ValueOf(&Car{UID8: 100}),
 		},
 		{
 			8,
-			int16(100),
+			[]byte(fmt.Sprintf("%d", 100)),
 			reflect.ValueOf(&Car{UID16: 100}),
 		},
 		{
 			9,
-			int64(100),
+			[]byte(fmt.Sprintf("%d", 100)),
 			reflect.ValueOf(&Car{UID32: 100}),
 		},
 		{
 			10,
-			int32(100),
+			[]byte(fmt.Sprintf("%d", 100)),
 			reflect.ValueOf(&Car{UID64: 100}),
 		},
 		{
 			11,
-			float64(100.2),
+			[]byte(fmt.Sprintf("%f", 100.2)),
 			reflect.ValueOf(&Car{FID32: 100.2}),
 		},
 		{
 			12,
-			float32(100.2),
+			[]byte(fmt.Sprintf("%f", 100.2)),
 			reflect.ValueOf(&Car{FID64: 100.2}),
 		},
 		{
 			13,
-			true,
+			[]byte("true"),
 			reflect.ValueOf(&Car{Flg: true}),
 		},
 		{
 			14,
-			time.Date(2020, time.January, 2, 3, 4, 5, 6, time.UTC),
-			reflect.ValueOf(&Car{Time: time.Date(2020, time.January, 2, 3, 4, 5, 6, time.UTC)}),
+			[]byte("2020-01-02T03:04:05Z"),
+			reflect.ValueOf(&Car{
+				Time: time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC),
+			}),
+		},
+		{
+			15,
+			[]byte("2020-01-02"),
+			reflect.ValueOf(&Car{
+				Time2: time.Date(2020, time.January, 2, 0, 0, 0, 0, time.UTC),
+			}),
+		},
+		{
+			16,
+			[]byte("Thu Jan 2 03:04:05 2020"),
+			reflect.ValueOf(&Car{
+				Time3: time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC),
+			}),
 		},
 	}
 
 	for _, testCase := range testCases {
 		v := reflect.ValueOf(new(Car))
-		if err := mgorm.SetField(reflect.Indirect(v).Field(testCase.FieldNum), testCase.Value); err != nil {
+		sf := reflect.TypeOf(Car{}).Field(testCase.FieldNum)
+		if err := mgorm.SetField(reflect.Indirect(v).Field(testCase.FieldNum), sf, testCase.Value); err != nil {
 			t.Error(err)
 		}
 		assert.Equal(t, testCase.Result.Interface(), v.Interface())

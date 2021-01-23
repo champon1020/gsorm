@@ -5,15 +5,15 @@ import (
 )
 
 // Kind is kind of error.
-type Kind int
+type Kind string
 
 // Kinds of error.
 const (
-	KindBasic Kind = iota
-	KindType
-	KindMemory
-	KindDatabase
-	KindUnknown
+	KindBasic    Kind = "BasicError"
+	KindType     Kind = "TypeError"
+	KindMemory   Kind = "MemoryError"
+	KindDatabase Kind = "DatabaseError"
+	KindUnknown  Kind = "UnknownError"
 )
 
 // Op stores location information where error is occurred.
@@ -27,7 +27,8 @@ type Error struct {
 }
 
 func (e Error) Error() string {
-	return e.Err.Error()
+	msg := fmt.Sprintf("[%s] %s: %v", e.Kind, e.Op, e.Err)
+	return msg
 }
 
 // NewError generates error object.
@@ -42,7 +43,7 @@ func CmpError(actual Error, expected Error) string {
 		diff += fmt.Sprintf("\nOp:\n  got : %s\n  want: %s", actual.Op, expected.Op)
 	}
 	if actual.Kind != expected.Kind {
-		diff += fmt.Sprintf("\nKind:\n  got : %d\n  want: %d", actual.Kind, expected.Kind)
+		diff += fmt.Sprintf("\nKind:\n  got : %s\n  want: %s", actual.Kind, expected.Kind)
 	}
 	if actual.Err.Error() != expected.Err.Error() {
 		diff += fmt.Sprintf("\nErr:\n  got : %s\n  want: %s", actual.Err.Error(), expected.Err.Error())
