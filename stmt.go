@@ -19,6 +19,7 @@ const (
 	opWhere               internal.Op = "mgorm.Stmt.Where"
 	opAnd                 internal.Op = "mgorm.Stmt.And"
 	opOr                  internal.Op = "mgorm.Stmt.Or"
+	opLimit               internal.Op = "mgorm.Stmt.Limit"
 )
 
 // Stmt keeps the sql statement.
@@ -30,6 +31,7 @@ type Stmt struct {
 	setExpr    syntax.Expr
 	whereExpr  syntax.Expr
 	andOr      []syntax.Expr
+	limitExpr  syntax.Expr
 	errors     []error
 
 	// Used for test.
@@ -108,6 +110,15 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 			sql.write(ao.Build())
 		}
 	}
+
+	if s.limitExpr != nil {
+		l, err := s.limitExpr.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.write(l.Build())
+	}
+
 	return sql, nil
 }
 
@@ -242,5 +253,12 @@ func (s *Stmt) And(expr string, vals ...interface{}) *Stmt {
 func (s *Stmt) Or(expr string, vals ...interface{}) *Stmt {
 	s.andOr = append(s.andOr, syntax.NewOr(expr, vals...))
 	s.call(opOr, expr, vals)
+	return s
+}
+
+// Limit calls LIMIT statement.
+func (s *Stmt) Limit(num int) *Stmt {
+	s.limitExpr = syntax.NewLimit(num)
+	s.call(opLimit, num)
 	return s
 }

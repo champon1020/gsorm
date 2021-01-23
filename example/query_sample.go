@@ -19,6 +19,7 @@ type Employee struct {
 
 // SelectSample1 is.
 func SelectSample1(db *mgorm.DB) {
+	fmt.Println("Query Sample 1")
 	emp := new([]Employee)
 	start := time.Now()
 
@@ -41,6 +42,7 @@ func SelectSample1(db *mgorm.DB) {
 
 // SelectSample2 is.
 func SelectSample2(db *mgorm.DB) {
+	fmt.Println("Query Sample 2")
 	emp := new([]Employee)
 	start := time.Now()
 
@@ -63,6 +65,7 @@ func SelectSample2(db *mgorm.DB) {
 
 // SelectSample3 is.
 func SelectSample3(db *mgorm.DB) {
+	fmt.Println("Query Sample 3")
 	emp := new([]Employee)
 	start := time.Now()
 
@@ -86,6 +89,7 @@ func SelectSample3(db *mgorm.DB) {
 
 // SelectSample4 is.
 func SelectSample4(db *mgorm.DB) {
+	fmt.Println("Query Sample 4")
 	emp := new([]Employee)
 	start := time.Now()
 
@@ -110,6 +114,7 @@ func SelectSample4(db *mgorm.DB) {
 
 // SelectSample5 is.
 func SelectSample5(db *mgorm.DB) {
+	fmt.Println("Query Sample 5")
 	emp := new([]Employee)
 	start := time.Now()
 
@@ -118,6 +123,30 @@ func SelectSample5(db *mgorm.DB) {
 		From("employees").
 		Where("emp_no < ?", 15000).
 		Or("emp_no > ?", 20000).
+		Query(emp)
+
+	end := time.Now()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
+	if len(*emp) > 0 {
+		fmt.Printf("Index[0]: %v\n", (*emp)[0])
+	}
+}
+
+// SelectSample6 is.
+func SelectSample6(db *mgorm.DB) {
+	fmt.Println("Query Sample 6")
+	emp := new([]Employee)
+	start := time.Now()
+
+	// SELECT * FROM employees LIMIT 5;
+	err := mgorm.Select(db, "*").
+		From("employees").
+		Limit(5).
 		Query(emp)
 
 	end := time.Now()
