@@ -17,8 +17,8 @@ type Employee struct {
 	HireDate  time.Time `mgorm:"hire_date" layout:"2006-01-02"`
 }
 
-// Sample1 is.
-func Sample1(db *mgorm.DB) {
+// SelectSample1 is.
+func SelectSample1(db *mgorm.DB) {
 	emp := new([]Employee)
 	start := time.Now()
 
@@ -39,8 +39,8 @@ func Sample1(db *mgorm.DB) {
 	}
 }
 
-// Sample2 is.
-func Sample2(db *mgorm.DB) {
+// SelectSample2 is.
+func SelectSample2(db *mgorm.DB) {
 	emp := new([]Employee)
 	start := time.Now()
 
@@ -61,12 +61,12 @@ func Sample2(db *mgorm.DB) {
 	}
 }
 
-// Sample3 is.
-func Sample3(db *mgorm.DB) {
+// SelectSample3 is.
+func SelectSample3(db *mgorm.DB) {
 	emp := new([]Employee)
 	start := time.Now()
 
-	// SELECT * FROM employees WHERE id > 15000;
+	// SELECT * FROM employees WHERE emp_no > 15000;
 	err := mgorm.Select(db, "*").
 		From("employees").
 		Where("emp_no > ?", 15000).
@@ -84,15 +84,40 @@ func Sample3(db *mgorm.DB) {
 	}
 }
 
-// Sample4 is.
-func Sample4(db *mgorm.DB) {
+// SelectSample4 is.
+func SelectSample4(db *mgorm.DB) {
 	emp := new([]Employee)
 	start := time.Now()
 
+	// SELECT * FROM employees WHERE emp_no > 15000 AND birth_date < "1960-10-20";
 	err := mgorm.Select(db, "*").
 		From("employees").
 		Where("emp_no > ?", 15000).
 		And("birth_date < ?", "1960-10-20").
+		Query(emp)
+
+	end := time.Now()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
+	if len(*emp) > 0 {
+		fmt.Printf("Index[0]: %v\n", (*emp)[0])
+	}
+}
+
+// SelectSample5 is.
+func SelectSample5(db *mgorm.DB) {
+	emp := new([]Employee)
+	start := time.Now()
+
+	// SELECT * FROM employees WHERE emp_no < 15000 OR 20000 < emp_no;
+	err := mgorm.Select(db, "*").
+		From("employees").
+		Where("emp_no < ?", 15000).
+		Or("emp_no > ?", 20000).
 		Query(emp)
 
 	end := time.Now()

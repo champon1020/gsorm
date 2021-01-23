@@ -17,10 +17,18 @@ func main() {
 	}
 	db := mgorm.New(_db)
 
-	example.Sample1(db)
-	example.Sample2(db)
-	example.Sample3(db)
-	example.Sample4(db)
+	// Select samples.
+	example.SelectSample1(db)
+	example.SelectSample2(db)
+	example.SelectSample3(db)
+	example.SelectSample4(db)
+	example.SelectSample5(db)
+
+	// Insert samples.
+	example.InsertSample1(db)
+
+	// Update samples.
+	example.UpdateSample1(db)
 }
 
 /*
