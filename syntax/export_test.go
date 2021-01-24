@@ -58,5 +58,6 @@ var (
 	WhereName    = (*Where).name
 	AndName      = (*And).name
 	OrName       = (*Or).name
+	NotName      = (*Not).name
 	BuildStmtSet = buildStmtSet
 )

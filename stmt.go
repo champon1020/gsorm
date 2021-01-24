@@ -19,6 +19,7 @@ const (
 	opWhere               internal.Op = "mgorm.Stmt.Where"
 	opAnd                 internal.Op = "mgorm.Stmt.And"
 	opOr                  internal.Op = "mgorm.Stmt.Or"
+	opNot                 internal.Op = "mgorm.Stmt.Not"
 	opLimit               internal.Op = "mgorm.Stmt.Limit"
 	opOffset              internal.Op = "mgorm.Stmt.Offset"
 	opOrderBy             internal.Op = "mgorm.Stmt.OrderBy"
@@ -32,7 +33,7 @@ type Stmt struct {
 	valuesExpr  syntax.Expr
 	setExpr     syntax.Expr
 	whereExpr   syntax.Expr
-	andOr       []syntax.Expr
+	andOrNot    []syntax.Expr
 	limitExpr   syntax.Expr
 	offsetExpr  syntax.Expr
 	orderByExpr []syntax.Expr
@@ -115,9 +116,13 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 		sql.write(w.Build())
 	}
 
-	// Build AND or OR.
-	if len(s.andOr) > 0 {
-		for _, e := range s.andOr {
+	// Build AND, OR or NOT.
+	if len(s.andOrNot) > 0 {
+		// For WHERE NOT statement.
+		if s.whereExpr == nil {
+			sql.write("WHERE")
+		}
+		for _, e := range s.andOrNot {
 			ao, err := e.Build()
 			if err != nil {
 				return "", err
@@ -228,9 +233,13 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 		sql.write(w.Build())
 	}
 
-	// Build AND or OR.
-	if len(s.andOr) > 0 {
-		for _, e := range s.andOr {
+	// Build AND, OR or NOT.
+	if len(s.andOrNot) > 0 {
+		// For WHERE NOT statement.
+		if s.whereExpr == nil {
+			sql.write("WHERE")
+		}
+		for _, e := range s.andOrNot {
 			ao, err := e.Build()
 			if err != nil {
 				return "", err
@@ -282,15 +291,22 @@ func (s *Stmt) Where(expr string, vals ...interface{}) *Stmt {
 
 // And calls AND statement.
 func (s *Stmt) And(expr string, vals ...interface{}) *Stmt {
-	s.andOr = append(s.andOr, syntax.NewAnd(expr, vals...))
+	s.andOrNot = append(s.andOrNot, syntax.NewAnd(expr, vals...))
 	s.call(opAnd, expr, vals)
 	return s
 }
 
 // Or calls OR statement.
 func (s *Stmt) Or(expr string, vals ...interface{}) *Stmt {
-	s.andOr = append(s.andOr, syntax.NewOr(expr, vals...))
+	s.andOrNot = append(s.andOrNot, syntax.NewOr(expr, vals...))
 	s.call(opOr, expr, vals)
+	return s
+}
+
+// Not calls NOT statement.
+func (s *Stmt) Not(expr string, vals ...interface{}) *Stmt {
+	s.andOrNot = append(s.andOrNot, syntax.NewNot(expr, vals...))
+	s.call(opNot, expr, vals)
 	return s
 }
 

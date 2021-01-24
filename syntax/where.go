@@ -81,6 +81,29 @@ func NewOr(expr string, vals ...interface{}) *Or {
 	return &Or{Expr: expr, Values: vals}
 }
 
+// Not clause.
+type Not struct {
+	Expr   string
+	Values []interface{}
+}
+
+func (n *Not) name() string {
+	return "NOT"
+}
+
+// Build make NOT statement set.
+func (n *Not) Build() (*StmtSet, error) {
+	ss, err := buildStmtSet(n.Expr, n.Values...)
+	ss.WriteClause(n.name())
+	ss.Parens = true
+	return ss, err
+}
+
+// NewNot create NOT clause object.
+func NewNot(expr string, vals ...interface{}) *Not {
+	return &Not{Expr: expr, Values: vals}
+}
+
 // buildStmtSet make StmtSet with expr and values.
 func buildStmtSet(expr string, vals ...interface{}) (*StmtSet, error) {
 	if strings.Count(expr, "?") != len(vals) {

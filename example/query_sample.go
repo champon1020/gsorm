@@ -78,9 +78,10 @@ func SelectSample6(db *mgorm.DB, emp *[]Employee) (string, error) {
 
 // SelectSample7 is.
 func SelectSample7(db *mgorm.DB, emp *[]Employee) (string, error) {
-	// SELECT * FROM employees OFFSET 6;
+	// SELECT * FROM employees LIMIT 5 OFFSET 6;
 	s := mgorm.Select(db, "*").
 		From("employees").
+		Limit(5).
 		Offset(6)
 
 	return s.String(), s.Query(emp)
@@ -92,6 +93,15 @@ func SelectSample8(db *mgorm.DB, emp *[]Employee) (string, error) {
 	s := mgorm.Select(db, "*").
 		From("employees").
 		OrderBy("emp_no", true)
+
+	return s.String(), s.Query(emp)
+}
+
+// SelectSample9 is.
+func SelectSample9(db *mgorm.DB, emp *[]Employee) (string, error) {
+	s := mgorm.Select(db, "*").
+		From("employees").
+		Not("emp_no = ?", 10001)
 
 	return s.String(), s.Query(emp)
 }

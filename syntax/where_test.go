@@ -133,6 +133,51 @@ func TestNewOr(t *testing.T) {
 	}
 }
 
+func TestNot_Name(t *testing.T) {
+	n := new(syntax.Not)
+	assert.Equal(t, "NOT", syntax.NotName(n))
+}
+
+func TestNot_Build(t *testing.T) {
+	testCases := []struct {
+		Not    *syntax.Not
+		Result *syntax.StmtSet
+	}{
+		{
+			&syntax.Not{Expr: "lhs = ?", Values: []interface{}{10}},
+			&syntax.StmtSet{Clause: "NOT", Value: "lhs = 10", Parens: true},
+		},
+	}
+
+	for _, testCase := range testCases {
+		res, _ := testCase.Not.Build()
+		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+			internal.PrintTestDiff(t, diff)
+		}
+	}
+}
+
+func TestNewNot(t *testing.T) {
+	testCases := []struct {
+		Expr   string
+		Values []interface{}
+		Result *syntax.Not
+	}{
+		{
+			"lhs = ?",
+			[]interface{}{10},
+			&syntax.Not{Expr: "lhs = ?", Values: []interface{}{10}},
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := syntax.NewNot(testCase.Expr, testCase.Values...)
+		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+			internal.PrintTestDiff(t, diff)
+		}
+	}
+}
+
 func TestBuildStmtSet(t *testing.T) {
 	testCases := []struct {
 		Expr   string
