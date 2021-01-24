@@ -50,6 +50,17 @@ func (s *Stmt) addError(err error) {
 	s.errors = append(s.errors, err)
 }
 
+// String returns query string.
+func (s *Stmt) String() string {
+	_, ok := s.cmd.(*syntax.Select)
+	if ok {
+		sql, _ := s.processQuerySQL()
+		return sql.string()
+	}
+	sql, _ := s.processExecSQL()
+	return sql.string()
+}
+
 // Query executes a query that returns some results.
 func (s *Stmt) Query(model interface{}) error {
 	if db, ok := s.db.(*MockDB); ok {

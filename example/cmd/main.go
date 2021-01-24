@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/example"
@@ -17,19 +18,38 @@ func main() {
 	}
 	db := mgorm.New(_db)
 
-	// Select samples.
-	example.SelectSample1(db)
-	example.SelectSample2(db)
-	example.SelectSample3(db)
-	example.SelectSample4(db)
-	example.SelectSample5(db)
-	example.SelectSample6(db)
-	example.SelectSample7(db)
-	example.SelectSample8(db)
+	sampleList := []func(*mgorm.DB, *[]example.Employee) (string, error){
+		example.SelectSample1,
+		example.SelectSample2,
+		example.SelectSample3,
+		example.SelectSample4,
+		example.SelectSample5,
+		example.SelectSample6,
+		example.SelectSample7,
+		example.SelectSample8,
+	}
 
-	// Insert samples.
-	//example.InsertSample1(db)
+	for i, f := range sampleList {
+		fmt.Printf("-------------------------\n")
+		fmt.Printf("*** Query Sample %d ***\n", i+1)
+		emp := new([]example.Employee)
+		start := time.Now()
+		sql, err := f(db, emp)
+		end := time.Now()
 
-	// Update samples.
-	//example.UpdateSample1(db)
+		fmt.Printf("Query: %s\n", sql)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Printf("Time: %f[sec]\n", (end.Sub(start)).Seconds())
+		fmt.Printf("Len: %d\n", len(*emp))
+		fmt.Printf("First row:\n")
+		fmt.Printf("  emp_no: %v\n", (*emp)[0].EmpNo)
+		fmt.Printf("  birth_date: %v\n", (*emp)[0].BirthDate)
+		fmt.Printf("  first_name: %v\n", (*emp)[0].FirstName)
+		fmt.Printf("  last_name: %v\n", (*emp)[0].LastName)
+		fmt.Printf("  gender: %v\n", (*emp)[0].Gender)
+		fmt.Printf("  hire_date: %v\n", (*emp)[0].HireDate)
+	}
 }

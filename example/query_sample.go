@@ -1,7 +1,6 @@
 package example
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/champon1020/mgorm"
@@ -18,193 +17,81 @@ type Employee struct {
 }
 
 // SelectSample1 is.
-func SelectSample1(db *mgorm.DB) {
-	fmt.Println("Query Sample 1")
-	emp := new([]Employee)
-	start := time.Now()
-
+func SelectSample1(db *mgorm.DB, emp *[]Employee) (string, error) {
 	// SELECT * FROM employees;
-	err := mgorm.Select(db, "*").
-		From("employees").
-		Query(emp)
+	s := mgorm.Select(db, "*").
+		From("employees")
 
-	end := time.Now()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
-	if len(*emp) > 0 {
-		fmt.Printf("Index[0]: %v\n", (*emp)[0])
-	}
+	return s.String(), s.Query(emp)
 }
 
 // SelectSample2 is.
-func SelectSample2(db *mgorm.DB) {
-	fmt.Println("Query Sample 2")
-	emp := new([]Employee)
-	start := time.Now()
-
+func SelectSample2(db *mgorm.DB, emp *[]Employee) (string, error) {
 	// SELECT emp_no, first_name FROM employees;
-	err := mgorm.Select(db, "emp_no", "first_name").
-		From("employees").
-		Query(emp)
+	s := mgorm.Select(db, "emp_no", "first_name").
+		From("employees")
 
-	end := time.Now()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
-	if len(*emp) > 0 {
-		fmt.Printf("Index[0]: %v\n", (*emp)[0])
-	}
+	return s.String(), s.Query(emp)
 }
 
 // SelectSample3 is.
-func SelectSample3(db *mgorm.DB) {
-	fmt.Println("Query Sample 3")
-	emp := new([]Employee)
-	start := time.Now()
-
+func SelectSample3(db *mgorm.DB, emp *[]Employee) (string, error) {
 	// SELECT * FROM employees WHERE emp_no > 15000;
-	err := mgorm.Select(db, "*").
+	s := mgorm.Select(db, "*").
 		From("employees").
-		Where("emp_no > ?", 15000).
-		Query(emp)
+		Where("emp_no > ?", 15000)
 
-	end := time.Now()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
-	if len(*emp) > 0 {
-		fmt.Printf("Index[0]: %v\n", (*emp)[0])
-	}
+	return s.String(), s.Query(emp)
 }
 
 // SelectSample4 is.
-func SelectSample4(db *mgorm.DB) {
-	fmt.Println("Query Sample 4")
-	emp := new([]Employee)
-	start := time.Now()
-
+func SelectSample4(db *mgorm.DB, emp *[]Employee) (string, error) {
 	// SELECT * FROM employees WHERE emp_no > 15000 AND birth_date < "1960-10-20";
-	err := mgorm.Select(db, "*").
+	s := mgorm.Select(db, "*").
 		From("employees").
 		Where("emp_no > ?", 15000).
-		And("birth_date < ?", "1960-10-20").
-		Query(emp)
+		And("birth_date < ?", "1960-10-20")
 
-	end := time.Now()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
-	if len(*emp) > 0 {
-		fmt.Printf("Index[0]: %v\n", (*emp)[0])
-	}
+	return s.String(), s.Query(emp)
 }
 
 // SelectSample5 is.
-func SelectSample5(db *mgorm.DB) {
-	fmt.Println("Query Sample 5")
-	emp := new([]Employee)
-	start := time.Now()
-
+func SelectSample5(db *mgorm.DB, emp *[]Employee) (string, error) {
 	// SELECT * FROM employees WHERE emp_no < 15000 OR 20000 < emp_no;
-	err := mgorm.Select(db, "*").
+	s := mgorm.Select(db, "*").
 		From("employees").
 		Where("emp_no < ?", 15000).
-		Or("emp_no > ?", 20000).
-		Query(emp)
+		Or("emp_no > ?", 20000)
 
-	end := time.Now()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
-	if len(*emp) > 0 {
-		fmt.Printf("Index[0]: %v\n", (*emp)[0])
-	}
+	return s.String(), s.Query(emp)
 }
 
 // SelectSample6 is.
-func SelectSample6(db *mgorm.DB) {
-	fmt.Println("Query Sample 6")
-	emp := new([]Employee)
-	start := time.Now()
-
+func SelectSample6(db *mgorm.DB, emp *[]Employee) (string, error) {
 	// SELECT * FROM employees LIMIT 5;
-	err := mgorm.Select(db, "*").
+	s := mgorm.Select(db, "*").
 		From("employees").
-		Limit(5).
-		Query(emp)
+		Limit(5)
 
-	end := time.Now()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
-	if len(*emp) > 0 {
-		fmt.Printf("Index[0]: %v\n", (*emp)[0])
-	}
+	return s.String(), s.Query(emp)
 }
 
 // SelectSample7 is.
-func SelectSample7(db *mgorm.DB) {
-	fmt.Println("Query Sample 7")
-	emp := new([]Employee)
-	start := time.Now()
-
+func SelectSample7(db *mgorm.DB, emp *[]Employee) (string, error) {
 	// SELECT * FROM employees OFFSET 6;
-	err := mgorm.Select(db, "*").
+	s := mgorm.Select(db, "*").
 		From("employees").
-		Offset(6).
-		Query(emp)
+		Offset(6)
 
-	end := time.Now()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
-	if len(*emp) > 0 {
-		fmt.Printf("Index[0]: %v\n", (*emp)[0])
-	}
+	return s.String(), s.Query(emp)
 }
 
 // SelectSample8 is.
-func SelectSample8(db *mgorm.DB) {
-	fmt.Println("Query Sample 8")
-	emp := new([]Employee)
-	start := time.Now()
-
+func SelectSample8(db *mgorm.DB, emp *[]Employee) (string, error) {
 	// SELECT * FROM employees ORDER BY emp_no DESC;
-	err := mgorm.Select(db, "*").
+	s := mgorm.Select(db, "*").
 		From("employees").
-		OrderBy("emp_no", true).
-		Query(emp)
+		OrderBy("emp_no", true)
 
-	end := time.Now()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Printf("Time: %f[sec], Len: %d\n", (end.Sub(start)).Seconds(), len(*emp))
-	if len(*emp) > 0 {
-		fmt.Printf("Index[0]: %v\n", (*emp)[0])
-	}
+	return s.String(), s.Query(emp)
 }
