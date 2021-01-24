@@ -13,6 +13,7 @@ const (
 	KindType     Kind = "TypeError"
 	KindMemory   Kind = "MemoryError"
 	KindDatabase Kind = "DatabaseError"
+	KindRuntime  Kind = "RuntimeError"
 	KindUnknown  Kind = "UnknownError"
 )
 

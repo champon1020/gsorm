@@ -21,20 +21,22 @@ const (
 	opOr                  internal.Op = "mgorm.Stmt.Or"
 	opLimit               internal.Op = "mgorm.Stmt.Limit"
 	opOffset              internal.Op = "mgorm.Stmt.Offset"
+	opOrderBy             internal.Op = "mgorm.Stmt.OrderBy"
 )
 
 // Stmt keeps the sql statement.
 type Stmt struct {
-	db         sqlDB
-	cmd        syntax.Cmd
-	fromExpr   syntax.Expr
-	valuesExpr syntax.Expr
-	setExpr    syntax.Expr
-	whereExpr  syntax.Expr
-	andOr      []syntax.Expr
-	limitExpr  syntax.Expr
-	offsetExpr syntax.Expr
-	errors     []error
+	db          sqlDB
+	cmd         syntax.Cmd
+	fromExpr    syntax.Expr
+	valuesExpr  syntax.Expr
+	setExpr     syntax.Expr
+	whereExpr   syntax.Expr
+	andOr       []syntax.Expr
+	limitExpr   syntax.Expr
+	offsetExpr  syntax.Expr
+	orderByExpr []syntax.Expr
+	errors      []error
 
 	// Used for test.
 	called []*opArgs
@@ -113,6 +115,18 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 		}
 	}
 
+	// Build ORDER BY.
+	if len(s.orderByExpr) > 0 {
+		for _, e := range s.orderByExpr {
+			ob, err := e.Build()
+			if err != nil {
+				return "", err
+			}
+			sql.write(ob.Build())
+		}
+	}
+
+	// Build LIMIT.
 	if s.limitExpr != nil {
 		l, err := s.limitExpr.Build()
 		if err != nil {
@@ -121,6 +135,7 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 		sql.write(l.Build())
 	}
 
+	// Build OFFSET.
 	if s.offsetExpr != nil {
 		l, err := s.offsetExpr.Build()
 		if err != nil {
@@ -233,7 +248,9 @@ func (s *Stmt) Values(vals ...interface{}) *Stmt {
 func (s *Stmt) Set(vals ...interface{}) *Stmt {
 	u, ok := s.cmd.(*syntax.Update)
 	if !ok {
-		/* handle error */
+		err := errors.New("SET statement can be used with UPDATE command")
+		s.addError(internal.NewError(opSet, internal.KindRuntime, err))
+		return s
 	}
 	set, err := syntax.NewSet(u.Columns, vals)
 	if err != nil {
@@ -277,5 +294,12 @@ func (s *Stmt) Limit(num int) *Stmt {
 func (s *Stmt) Offset(num int) *Stmt {
 	s.offsetExpr = syntax.NewOffset(num)
 	s.call(opOffset, num)
+	return s
+}
+
+// OrderBy calls ORDER BY statement.
+func (s *Stmt) OrderBy(col string, desc bool) *Stmt {
+	s.orderByExpr = append(s.orderByExpr, syntax.NewOrderBy(col, desc))
+	s.call(opOrderBy, col, desc)
 	return s
 }

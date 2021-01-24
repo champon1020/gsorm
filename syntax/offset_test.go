@@ -11,7 +11,7 @@ import (
 
 func TestOffset_Name(t *testing.T) {
 	l := new(syntax.Offset)
-	assert.Equal(t, "LIMIT", syntax.OffsetName(l))
+	assert.Equal(t, "OFFSET", syntax.OffsetName(l))
 }
 
 func TestOffset_Build(t *testing.T) {
@@ -21,7 +21,7 @@ func TestOffset_Build(t *testing.T) {
 	}{
 		{
 			&syntax.Offset{Num: 5},
-			&syntax.StmtSet{Clause: "LIMIT", Value: "5"},
+			&syntax.StmtSet{Clause: "OFFSET", Value: "5"},
 		},
 	}
 

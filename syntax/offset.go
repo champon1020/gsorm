@@ -7,19 +7,19 @@ type Offset struct {
 	Num int
 }
 
-func (l *Offset) name() string {
-	return "LIMIT"
+func (o *Offset) name() string {
+	return "OFFSET"
 }
 
-// Build make limit statement set.
-func (l *Offset) Build() (*StmtSet, error) {
+// Build make offset statement set.
+func (o *Offset) Build() (*StmtSet, error) {
 	ss := new(StmtSet)
-	ss.WriteClause(l.name())
-	ss.WriteValue(strconv.Itoa(l.Num))
+	ss.WriteClause(o.name())
+	ss.WriteValue(strconv.Itoa(o.Num))
 	return ss, nil
 }
 
-// NewOffset create new limit object.
+// NewOffset create new offset object.
 func NewOffset(num int) *Offset {
 	return &Offset{Num: num}
 }

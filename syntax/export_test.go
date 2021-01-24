@@ -23,6 +23,11 @@ var (
 	OffsetName = (*Offset).name
 )
 
+// Exported values which is declared in orderby.go.
+var (
+	OrderByName = (*OrderBy).name
+)
+
 // Exported values which is declared in select.go.
 var (
 	SelectQuery     = (*Select).query

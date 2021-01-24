@@ -25,6 +25,7 @@ func main() {
 	example.SelectSample5(db)
 	example.SelectSample6(db)
 	example.SelectSample7(db)
+	example.SelectSample8(db)
 
 	// Insert samples.
 	//example.InsertSample1(db)
