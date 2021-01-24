@@ -104,7 +104,7 @@ func SelectSample9(db *mgorm.DB, emp *[]Employee) (string, error) {
 	// SELECT * FROM employees WHERE NOT (emp_no = 10001);
 	s := mgorm.Select(db, "*").
 		From("employees").
-		Not("emp_no = ?", 10001)
+		Where("NOT emp_no = ?", 10001)
 
 	return s.String(), s.Query(emp)
 }

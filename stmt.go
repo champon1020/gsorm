@@ -303,13 +303,6 @@ func (s *Stmt) Or(expr string, vals ...interface{}) *Stmt {
 	return s
 }
 
-// Not calls NOT statement.
-func (s *Stmt) Not(expr string, vals ...interface{}) *Stmt {
-	s.andOrNot = append(s.andOrNot, syntax.NewNot(expr, vals...))
-	s.call(opNot, expr, vals)
-	return s
-}
-
 // Limit calls LIMIT statement.
 func (s *Stmt) Limit(num int) *Stmt {
 	s.limitExpr = syntax.NewLimit(num)
