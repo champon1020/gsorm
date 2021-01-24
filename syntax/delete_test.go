@@ -23,3 +23,18 @@ func TestDelete_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestNewDelete(t *testing.T) {
+	testCases := []struct {
+		Result *syntax.Delete
+	}{
+		{&syntax.Delete{}},
+	}
+
+	for _, testCase := range testCases {
+		res := syntax.NewDelete()
+		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+			internal.PrintTestDiff(t, diff)
+		}
+	}
+}

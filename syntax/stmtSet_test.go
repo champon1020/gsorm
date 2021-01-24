@@ -6,6 +6,7 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStmtSet_WriteClause(t *testing.T) {
@@ -47,4 +48,29 @@ func TestStmtSet_WriteValue(t *testing.T) {
 		}
 	}
 
+}
+
+func TestStmtSet_Build(t *testing.T) {
+	testCases := []struct {
+		StmtSet *syntax.StmtSet
+		Result  string
+	}{
+		{
+			&syntax.StmtSet{Clause: "clause", Value: "value"},
+			"clause value",
+		},
+		{
+			&syntax.StmtSet{Clause: "clause", Value: "value", Parens: true},
+			"clause (value)",
+		},
+		{
+			&syntax.StmtSet{Clause: "clause", Value: ""},
+			"clause",
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.StmtSet.Build()
+		assert.Equal(t, testCase.Result, res)
+	}
 }
