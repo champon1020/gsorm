@@ -11,8 +11,8 @@ import (
 const (
 	opStmtProcessQuerySQL internal.Op = "mgorm.Stmt.processQuerySQL"
 	opStmtProcessExecSQL  internal.Op = "mgorm.Stmt.processExecSQL"
-	opQuery               internal.Op = "mgorm.Stmt.OpQuery"
-	opExec                internal.Op = "mgorm.Stmt.OpExec"
+	opQuery               internal.Op = "mgorm.Stmt.Query"
+	opExec                internal.Op = "mgorm.Stmt.Exec"
 	opFrom                internal.Op = "mgorm.Stmt.From"
 	opValues              internal.Op = "mgorm.Stmt.Values"
 	opSet                 internal.Op = "mgorm.Stmt.Set"

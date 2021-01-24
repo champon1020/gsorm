@@ -8,12 +8,14 @@ import (
 
 // Employee structure.
 type Employee struct {
-	EmpNo     int       `mgorm:"emp_no"`
-	BirthDate time.Time `mgorm:"birth_date" layout:"2006-01-02"`
-	FirstName string    `mgorm:"first_name"`
-	LastName  string    `mgorm:"last_name"`
-	Gender    string    `mgorm:"gender"`
-	HireDate  time.Time `mgorm:"hire_date" layout:"2006-01-02"`
+	EmpNo       int       `mgorm:"emp_no"`
+	BirthDate   time.Time `mgorm:"birth_date" layout:"2006-01-02"`
+	FirstName   string    `mgorm:"first_name"`
+	LastName    string    `mgorm:"last_name"`
+	Gender      string    `mgorm:"gender"`
+	HireDate    time.Time `mgorm:"hire_date" layout:"2006-01-02"`
+	ResultInt   int       `mgorm:"res_int"`
+	ResultFloat float32   `mgorm:"res_float"`
 }
 
 // SelectSample1 is.
@@ -99,9 +101,37 @@ func SelectSample8(db *mgorm.DB, emp *[]Employee) (string, error) {
 
 // SelectSample9 is.
 func SelectSample9(db *mgorm.DB, emp *[]Employee) (string, error) {
+	// SELECT * FROM employees WHERE NOT (emp_no = 10001);
 	s := mgorm.Select(db, "*").
 		From("employees").
 		Not("emp_no = ?", 10001)
+
+	return s.String(), s.Query(emp)
+}
+
+// SelectSample10 is.
+func SelectSample10(db *mgorm.DB, emp *[]Employee) (string, error) {
+	// SELECT COUNT(birth_date) AS res_int FROM employees;
+	s := mgorm.Count(db, "birth_date", "res_int").
+		From("employees")
+
+	return s.String(), s.Query(emp)
+}
+
+// SelectSample11 is.
+func SelectSample11(db *mgorm.DB, emp *[]Employee) (string, error) {
+	// SELECT AVG(emp_no) AS res_float FROM employees;
+	s := mgorm.Avg(db, "emp_no", "res_float").
+		From("employees")
+
+	return s.String(), s.Query(emp)
+}
+
+// SelectSample12 is.
+func SelectSample12(db *mgorm.DB, emp *[]Employee) (string, error) {
+	// SELECT SUM(birth_date) AS res_int FROM employees;
+	s := mgorm.Sum(db, "emp_no", "res_int").
+		From("employees")
 
 	return s.String(), s.Query(emp)
 }

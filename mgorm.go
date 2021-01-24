@@ -2,6 +2,7 @@ package mgorm
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
@@ -9,10 +10,13 @@ import (
 
 // Op values.
 const (
-	OpSelect internal.Op = "mgorm.Select"
-	OpInsert internal.Op = "mgorm.Insert"
-	OpUpdate internal.Op = "mgorm.Update"
-	OpDelete internal.Op = "mgorm.OpDelete"
+	opSelect internal.Op = "mgorm.Select"
+	opInsert internal.Op = "mgorm.Insert"
+	opUpdate internal.Op = "mgorm.Update"
+	opDelete internal.Op = "mgorm.Delete"
+	opCount  internal.Op = "mgorm.Count"
+	opAvg    internal.Op = "mgorm.Avg"
+	opSum    internal.Op = "mgorm.Sum"
 )
 
 // New generate DB object.
@@ -30,7 +34,7 @@ func NewMock() *MockDB {
 func Select(db sqlDB, cols ...string) *Stmt {
 	stmt := &Stmt{
 		db:     db,
-		called: []*opArgs{{op: OpSelect, args: []interface{}{cols}}},
+		called: []*opArgs{{op: opSelect, args: []interface{}{cols}}},
 	}
 	stmt.cmd = syntax.NewSelect(cols)
 	return stmt
@@ -40,7 +44,7 @@ func Select(db sqlDB, cols ...string) *Stmt {
 func Insert(db sqlDB, table string, cols ...string) *Stmt {
 	stmt := &Stmt{
 		db:     db,
-		called: []*opArgs{{op: OpUpdate, args: []interface{}{table, cols}}},
+		called: []*opArgs{{op: opUpdate, args: []interface{}{table, cols}}},
 	}
 	stmt.cmd = syntax.NewInsert(table, cols)
 	return stmt
@@ -50,7 +54,7 @@ func Insert(db sqlDB, table string, cols ...string) *Stmt {
 func Update(db sqlDB, table string, cols ...string) *Stmt {
 	stmt := &Stmt{
 		db:     db,
-		called: []*opArgs{{op: OpUpdate, args: []interface{}{table, cols}}},
+		called: []*opArgs{{op: opUpdate, args: []interface{}{table, cols}}},
 	}
 	stmt.cmd = syntax.NewUpdate(table, cols)
 	return stmt
@@ -60,5 +64,47 @@ func Update(db sqlDB, table string, cols ...string) *Stmt {
 func Delete(db sqlDB) *Stmt {
 	stmt := &Stmt{db: db}
 	stmt.cmd = syntax.NewDelete()
+	return stmt
+}
+
+// Count statement api.
+func Count(db sqlDB, col string, alias ...string) *Stmt {
+	stmt := &Stmt{
+		db:     db,
+		called: []*opArgs{{op: opCount, args: []interface{}{col}}},
+	}
+	s := fmt.Sprintf("COUNT(%s)", col)
+	if len(alias) > 0 {
+		s = fmt.Sprintf("%s AS %s", s, alias[0])
+	}
+	stmt.cmd = syntax.NewSelect([]string{s})
+	return stmt
+}
+
+// Avg statement api.
+func Avg(db sqlDB, col string, alias ...string) *Stmt {
+	stmt := &Stmt{
+		db:     db,
+		called: []*opArgs{{op: opAvg, args: []interface{}{10}}},
+	}
+	s := fmt.Sprintf("AVG(%s)", col)
+	if len(alias) > 0 {
+		s = fmt.Sprintf("%s AS %s", s, alias[0])
+	}
+	stmt.cmd = syntax.NewSelect([]string{s})
+	return stmt
+}
+
+// Sum statement api.
+func Sum(db sqlDB, col string, alias ...string) *Stmt {
+	stmt := &Stmt{
+		db:     db,
+		called: []*opArgs{{op: opSum, args: []interface{}{10}}},
+	}
+	s := fmt.Sprintf("SUM(%s)", col)
+	if len(alias) > 0 {
+		s = fmt.Sprintf("%s AS %s", s, alias[0])
+	}
+	stmt.cmd = syntax.NewSelect([]string{s})
 	return stmt
 }

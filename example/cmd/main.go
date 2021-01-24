@@ -28,6 +28,9 @@ func main() {
 		example.SelectSample7,
 		example.SelectSample8,
 		example.SelectSample9,
+		example.SelectSample10,
+		example.SelectSample11,
+		example.SelectSample12,
 	}
 
 	for i, f := range sampleList {
@@ -52,5 +55,7 @@ func main() {
 		fmt.Printf("  last_name: %v\n", (*emp)[0].LastName)
 		fmt.Printf("  gender: %v\n", (*emp)[0].Gender)
 		fmt.Printf("  hire_date: %v\n", (*emp)[0].HireDate)
+		fmt.Printf("  res_int: %v\n", (*emp)[0].ResultInt)
+		fmt.Printf("  res_float: %v\n", (*emp)[0].ResultFloat)
 	}
 }
