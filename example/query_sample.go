@@ -135,3 +135,21 @@ func SelectSample12(db *mgorm.DB, emp *[]Employee) (string, error) {
 
 	return s.String(), s.Query(emp)
 }
+
+// SelectSample13 is.
+func SelectSample13(db *mgorm.DB, emp *[]Employee) (string, error) {
+	// SELECT MIN(birth_date) AS res_int FROM employees;
+	s := mgorm.Min(db, "emp_no", "res_int").
+		From("employees")
+
+	return s.String(), s.Query(emp)
+}
+
+// SelectSample14 is.
+func SelectSample14(db *mgorm.DB, emp *[]Employee) (string, error) {
+	// SELECT MAX(birth_date) AS res_int FROM employees;
+	s := mgorm.Max(db, "emp_no", "res_int").
+		From("employees")
+
+	return s.String(), s.Query(emp)
+}

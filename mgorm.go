@@ -17,6 +17,8 @@ const (
 	opCount  internal.Op = "mgorm.Count"
 	opAvg    internal.Op = "mgorm.Avg"
 	opSum    internal.Op = "mgorm.Sum"
+	opMin    internal.Op = "mgorm.Min"
+	opMax    internal.Op = "mgorm.Max"
 )
 
 // New generate DB object.
@@ -102,6 +104,34 @@ func Sum(db sqlDB, col string, alias ...string) *Stmt {
 		called: []*opArgs{{op: opSum, args: []interface{}{10}}},
 	}
 	s := fmt.Sprintf("SUM(%s)", col)
+	if len(alias) > 0 {
+		s = fmt.Sprintf("%s AS %s", s, alias[0])
+	}
+	stmt.cmd = syntax.NewSelect([]string{s})
+	return stmt
+}
+
+// Min statement api.
+func Min(db sqlDB, col string, alias ...string) *Stmt {
+	stmt := &Stmt{
+		db:     db,
+		called: []*opArgs{{op: opMin, args: []interface{}{10}}},
+	}
+	s := fmt.Sprintf("MIN(%s)", col)
+	if len(alias) > 0 {
+		s = fmt.Sprintf("%s AS %s", s, alias[0])
+	}
+	stmt.cmd = syntax.NewSelect([]string{s})
+	return stmt
+}
+
+// Max statement api.
+func Max(db sqlDB, col string, alias ...string) *Stmt {
+	stmt := &Stmt{
+		db:     db,
+		called: []*opArgs{{op: opMax, args: []interface{}{10}}},
+	}
+	s := fmt.Sprintf("MAX(%s)", col)
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}

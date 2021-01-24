@@ -31,6 +31,8 @@ func main() {
 		example.SelectSample10,
 		example.SelectSample11,
 		example.SelectSample12,
+		example.SelectSample13,
+		example.SelectSample14,
 	}
 
 	for i, f := range sampleList {
