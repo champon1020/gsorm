@@ -27,6 +27,7 @@ const (
 	opLeftJoin            internal.Op = "mgorm.Stmt.LeftJoin"
 	opRightJoin           internal.Op = "mgorm.Stmt.RightJoin"
 	opFullJoin            internal.Op = "mgorm.Stmt.FullJoin"
+	opOn                  internal.Op = "mgorm.Stmt.On"
 )
 
 // Stmt keeps the sql statement.
@@ -42,6 +43,7 @@ type Stmt struct {
 	offsetExpr  syntax.Expr
 	orderByExpr []syntax.Expr
 	joinExpr    []syntax.Expr
+	onExpr      []syntax.Expr
 	errors      []error
 
 	// Used for test.
@@ -112,6 +114,32 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 		sql.write(from.Build())
 	}
 
+	// Build JOIN and ON.
+	if len(s.joinExpr) > 0 {
+		for i, e := range s.joinExpr {
+			// If onExpr is not sufficient, return error.
+			if len(s.onExpr) <= i {
+				/* handle error */
+				err := errors.New("JOIN was executed but ON is not called")
+				return "", internal.NewError(opStmtProcessQuerySQL, internal.KindRuntime, err)
+			}
+
+			// Build JOIN.
+			j, err := e.Build()
+			if err != nil {
+				return "", err
+			}
+			sql.write(j.Build())
+
+			// Build ON.
+			o, err := s.onExpr[i].Build()
+			if err != nil {
+				return "", err
+			}
+			sql.write(o.Build())
+		}
+	}
+
 	// Build WHERE.
 	if s.whereExpr != nil {
 		w, err := s.whereExpr.Build()
@@ -123,10 +151,6 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 
 	// Build AND, OR or NOT.
 	if len(s.andOrNot) > 0 {
-		// For WHERE NOT statement.
-		if s.whereExpr == nil {
-			sql.write("WHERE")
-		}
 		for _, e := range s.andOrNot {
 			ao, err := e.Build()
 			if err != nil {
@@ -240,10 +264,6 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 
 	// Build AND, OR or NOT.
 	if len(s.andOrNot) > 0 {
-		// For WHERE NOT statement.
-		if s.whereExpr == nil {
-			sql.write("WHERE")
-		}
 		for _, e := range s.andOrNot {
 			ao, err := e.Build()
 			if err != nil {
@@ -354,5 +374,12 @@ func (s *Stmt) RightJoin(table string) *Stmt {
 func (s *Stmt) FullJoin(table string) *Stmt {
 	s.joinExpr = append(s.joinExpr, syntax.NewJoin(table, syntax.FullJoin))
 	s.call(opJoin, table)
+	return s
+}
+
+// On calls ON statement.
+func (s *Stmt) On(expr string, vals ...interface{}) *Stmt {
+	s.onExpr = append(s.onExpr, syntax.NewOn(expr, vals...))
+	s.call(opOn, expr, vals)
 	return s
 }

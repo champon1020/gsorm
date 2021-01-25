@@ -91,6 +91,12 @@ func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) 
 		// SELECT MAX(birth_date) AS res_int FROM employees;
 		mgorm.Max(db, "emp_no", "res_int").
 			From("employees"),
+
+		// SELECT first_name FROM employees AS e INNER JOIN dept_manager AS d ON e.emp_no = d.emp_no;
+		mgorm.Select(db, "first_name").
+			From("employees AS e").
+			Join("dept_manager AS d").
+			On("e.emp_no = d.emp_no"),
 	}
 
 	next := true

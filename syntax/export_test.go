@@ -29,6 +29,11 @@ var (
 	OffsetName = (*Offset).name
 )
 
+// Exported values which is declared in on.go.
+var (
+	OnName = (*On).name
+)
+
 // Exported values which is declared in orderby.go.
 var (
 	OrderByName = (*OrderBy).name
