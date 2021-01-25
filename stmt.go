@@ -30,6 +30,7 @@ const (
 	opOn                  internal.Op = "mgorm.Stmt.On"
 	opUnion               internal.Op = "mgorm.Stmt.Union"
 	opUnionAll            internal.Op = "mgorm.Stmt.UnionAll"
+	opGroupBy             internal.Op = "mgorm.Stmt.GroupBy"
 )
 
 // Stmt keeps the sql statement.
@@ -47,6 +48,7 @@ type Stmt struct {
 	joinExpr    []syntax.Expr
 	onExpr      []syntax.Expr
 	unionExpr   syntax.Expr
+	groupByExpr syntax.Expr
 	errors      []error
 
 	// Used for test.
@@ -166,6 +168,15 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 			}
 			sql.write(ao.Build())
 		}
+	}
+
+	// Build GROUP BY.
+	if s.groupByExpr != nil {
+		g, err := s.groupByExpr.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.write(g.Build())
 	}
 
 	// Build ORDER BY.
@@ -412,5 +423,12 @@ func (s *Stmt) Union(stmt syntax.Var) *Stmt {
 func (s *Stmt) UnionAll(stmt syntax.Var) *Stmt {
 	s.unionExpr = syntax.NewUnion(stmt, true)
 	s.call(opUnionAll, stmt)
+	return s
+}
+
+// GroupBy calls GROUP BY statement.
+func (s *Stmt) GroupBy(cols ...string) *Stmt {
+	s.groupByExpr = syntax.NewGroupBy(cols)
+	s.call(opGroupBy, cols)
 	return s
 }

@@ -6,6 +6,12 @@ var (
 	FromAddTable = (*From).addTable
 )
 
+// Exported values which is declared in groupby.go.
+var (
+	GroupByName      = (*GroupBy).name
+	GroupByAddColumn = (*GroupBy).addColumn
+)
+
 // Exported values which is declared in insert.go.
 var (
 	InsertQuery     = (*Insert).query

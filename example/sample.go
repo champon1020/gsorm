@@ -114,6 +114,11 @@ func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) 
 				From("v_full_employees").
 				Var(),
 			),
+
+		// SELECT COUNT(first_name), last_name FROM employees GROUP BY last_name;
+		mgorm.Select(db, "COUNT(first_name) AS res_int", "last_name").
+			From("employees").
+			GroupBy("last_name"),
 	}
 
 	next := true
