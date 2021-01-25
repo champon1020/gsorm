@@ -51,6 +51,11 @@ var (
 	SetAddEq = (*Set).addEq
 )
 
+// Exported values which is declared in union.go.
+var (
+	UnionName = (*Union).name
+)
+
 // Exported values which is declared in update.go.
 var (
 	UpdateQuery     = (*Update).query

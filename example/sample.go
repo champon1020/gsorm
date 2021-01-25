@@ -97,6 +97,14 @@ func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) 
 			From("employees AS e").
 			Join("dept_manager AS d").
 			On("e.emp_no = d.emp_no"),
+
+		// SELECT emp_no, first_name FROM employees UNION SELECT emp_no, first_name FROM v_full_employees;
+		mgorm.Select(db, "emp_no", "first_name").
+			From("employees").
+			Union(mgorm.Select(nil, "emp_no", "first_name").
+				From("v_full_employees").
+				String(),
+			),
 	}
 
 	next := true

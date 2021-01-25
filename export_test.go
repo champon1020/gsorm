@@ -1,15 +1,11 @@
 package mgorm
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 // Exported values which is declared in db.go.
 type Rows = sqlRows
-
-// Exported values which is declared in stmt.go.
-var (
-	StmtProcessQuerySQL = (*Stmt).processQuerySQL
-	StmtProcessExecSQL  = (*Stmt).processExecSQL
-)
 
 // Exported values which is declared in sql.go.
 var (
@@ -58,3 +54,9 @@ func (r *TestMockRows) Next() bool {
 func (r *TestMockRows) Scan(dest ...interface{}) error {
 	return r.ScanFunc(dest...)
 }
+
+// Exported values which is declared in stmt.go.
+var (
+	StmtProcessQuerySQL = (*Stmt).processQuerySQL
+	StmtProcessExecSQL  = (*Stmt).processExecSQL
+)

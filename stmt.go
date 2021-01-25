@@ -28,6 +28,8 @@ const (
 	opRightJoin           internal.Op = "mgorm.Stmt.RightJoin"
 	opFullJoin            internal.Op = "mgorm.Stmt.FullJoin"
 	opOn                  internal.Op = "mgorm.Stmt.On"
+	opUnion               internal.Op = "mgorm.Stmt.Union"
+	opUnionAll            internal.Op = "mgorm.Stmt.UnionAll"
 )
 
 // Stmt keeps the sql statement.
@@ -44,6 +46,7 @@ type Stmt struct {
 	orderByExpr []syntax.Expr
 	joinExpr    []syntax.Expr
 	onExpr      []syntax.Expr
+	unionExpr   syntax.Expr
 	errors      []error
 
 	// Used for test.
@@ -189,6 +192,15 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 		sql.write(l.Build())
 	}
 
+	// Build UNION.
+	if s.unionExpr != nil {
+		u, err := s.unionExpr.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.write(u.Build())
+	}
+
 	return sql, nil
 }
 
@@ -211,8 +223,8 @@ func (s *Stmt) Exec() error {
 }
 
 // ExpectExec executes a query as mock database.
-func (s *Stmt) ExpectExec(model interface{}) *Stmt {
-	s.call(opExec, model)
+func (s *Stmt) ExpectExec() *Stmt {
+	s.call(opExec)
 	return s
 }
 
@@ -381,5 +393,19 @@ func (s *Stmt) FullJoin(table string) *Stmt {
 func (s *Stmt) On(expr string, vals ...interface{}) *Stmt {
 	s.onExpr = append(s.onExpr, syntax.NewOn(expr, vals...))
 	s.call(opOn, expr, vals)
+	return s
+}
+
+// Union calls UNION statement.
+func (s *Stmt) Union(stmt string) *Stmt {
+	s.unionExpr = syntax.NewUnion(stmt, false)
+	s.call(opUnion, stmt)
+	return s
+}
+
+// UnionAll calls UNION ALL statement.
+func (s *Stmt) UnionAll(stmt string) *Stmt {
+	s.unionExpr = syntax.NewUnion(stmt, true)
+	s.call(opUnionAll, stmt)
 	return s
 }
