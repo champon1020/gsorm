@@ -28,8 +28,3 @@ err := mgorm.Delete(db, "employees").
     Where(emp_no = ?, 10000).
     Exec()
 ```
-
-## Specification
-Framework specification is written in following files.
-
-- [SELECT.md](https://github.com/champon1020/mgorm/tree/main/specification/SELECT.md)
