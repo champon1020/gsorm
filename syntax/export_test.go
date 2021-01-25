@@ -13,6 +13,12 @@ var (
 	InsertAddColumn = (*Insert).addColumn
 )
 
+// Exported values which is declared in join.go.
+var (
+	JoinName     = (*Join).name
+	JoinAddTable = (*Join).addTable
+)
+
 // Exported values which is declared in limit.go.
 var (
 	LimitName = (*Limit).name

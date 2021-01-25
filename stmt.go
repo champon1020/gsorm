@@ -23,6 +23,10 @@ const (
 	opLimit               internal.Op = "mgorm.Stmt.Limit"
 	opOffset              internal.Op = "mgorm.Stmt.Offset"
 	opOrderBy             internal.Op = "mgorm.Stmt.OrderBy"
+	opJoin                internal.Op = "mgorm.Stmt.Join"
+	opLeftJoin            internal.Op = "mgorm.Stmt.LeftJoin"
+	opRightJoin           internal.Op = "mgorm.Stmt.RightJoin"
+	opFullJoin            internal.Op = "mgorm.Stmt.FullJoin"
 )
 
 // Stmt keeps the sql statement.
@@ -37,6 +41,7 @@ type Stmt struct {
 	limitExpr   syntax.Expr
 	offsetExpr  syntax.Expr
 	orderByExpr []syntax.Expr
+	joinExpr    []syntax.Expr
 	errors      []error
 
 	// Used for test.
@@ -321,5 +326,33 @@ func (s *Stmt) Offset(num int) *Stmt {
 func (s *Stmt) OrderBy(col string, desc bool) *Stmt {
 	s.orderByExpr = append(s.orderByExpr, syntax.NewOrderBy(col, desc))
 	s.call(opOrderBy, col, desc)
+	return s
+}
+
+// Join calls (INNER) JOIN statement.
+func (s *Stmt) Join(table string) *Stmt {
+	s.joinExpr = append(s.joinExpr, syntax.NewJoin(table, syntax.InnerJoin))
+	s.call(opJoin, table)
+	return s
+}
+
+// LeftJoin calls (INNER) JOIN statement.
+func (s *Stmt) LeftJoin(table string) *Stmt {
+	s.joinExpr = append(s.joinExpr, syntax.NewJoin(table, syntax.LeftJoin))
+	s.call(opJoin, table)
+	return s
+}
+
+// RightJoin calls (INNER) JOIN statement.
+func (s *Stmt) RightJoin(table string) *Stmt {
+	s.joinExpr = append(s.joinExpr, syntax.NewJoin(table, syntax.RightJoin))
+	s.call(opJoin, table)
+	return s
+}
+
+// FullJoin calls (INNER) JOIN statement.
+func (s *Stmt) FullJoin(table string) *Stmt {
+	s.joinExpr = append(s.joinExpr, syntax.NewJoin(table, syntax.FullJoin))
+	s.call(opJoin, table)
 	return s
 }
