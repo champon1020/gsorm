@@ -2,7 +2,7 @@ package syntax
 
 // Union expression.
 type Union struct {
-	Stmt string
+	Stmt Var
 	All  bool
 }
 
@@ -18,11 +18,11 @@ func (u *Union) name() string {
 func (u *Union) Build() (*StmtSet, error) {
 	ss := new(StmtSet)
 	ss.WriteClause(u.name())
-	ss.WriteValue(u.Stmt)
+	ss.WriteValue(string(u.Stmt))
 	return ss, nil
 }
 
 // NewUnion creates Union instance.
-func NewUnion(stmt string, all bool) *Union {
+func NewUnion(stmt Var, all bool) *Union {
 	return &Union{Stmt: stmt, All: all}
 }

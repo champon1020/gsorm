@@ -56,6 +56,15 @@ func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) 
 			From("employees").
 			Where("emp_no IN (SELECT emp_no FROM dept_manager WHERE dept_no = ?)", "d001"),
 
+		// SELECT * FROM employees WHERE emp_no IN (SELECT * FROM dept_manager WHERE dept_no = "d001");
+		mgorm.Select(db, "*").
+			From("employees").
+			Where("emp_no IN ?", mgorm.Select(db, "emp_no").
+				From("dept_manager").
+				Where("dept_no = ?", "d001").
+				Var(),
+			),
+
 		// SELECT * FROM employees LIMIT 5;
 		mgorm.Select(db, "*").
 			From("employees").
@@ -103,7 +112,7 @@ func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) 
 			From("employees").
 			Union(mgorm.Select(nil, "emp_no", "first_name").
 				From("v_full_employees").
-				String(),
+				Var(),
 			),
 	}
 

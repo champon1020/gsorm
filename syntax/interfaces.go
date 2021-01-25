@@ -11,3 +11,6 @@ type Expr interface {
 	name() string
 	Build() (*StmtSet, error)
 }
+
+// Var type.
+type Var string

@@ -61,6 +61,11 @@ func (s *Stmt) addError(err error) {
 	s.errors = append(s.errors, err)
 }
 
+// Var returns Stmt.String with syntax.Var type.
+func (s *Stmt) Var() syntax.Var {
+	return syntax.Var(s.String())
+}
+
 // String returns query string.
 func (s *Stmt) String() string {
 	_, ok := s.cmd.(*syntax.Select)
@@ -397,14 +402,14 @@ func (s *Stmt) On(expr string, vals ...interface{}) *Stmt {
 }
 
 // Union calls UNION statement.
-func (s *Stmt) Union(stmt string) *Stmt {
+func (s *Stmt) Union(stmt syntax.Var) *Stmt {
 	s.unionExpr = syntax.NewUnion(stmt, false)
 	s.call(opUnion, stmt)
 	return s
 }
 
 // UnionAll calls UNION ALL statement.
-func (s *Stmt) UnionAll(stmt string) *Stmt {
+func (s *Stmt) UnionAll(stmt syntax.Var) *Stmt {
 	s.unionExpr = syntax.NewUnion(stmt, true)
 	s.call(opUnionAll, stmt)
 	return s
