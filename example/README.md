@@ -25,6 +25,12 @@ type Employee struct {
 emp := new([]Employee)
 ```
 
+About `Employee`, it is possible to select column name with struct tag `mgorm`.
+If `mgorm` tag is not declared, the snake case of field name is used as column name.
+
+When field type is `time.Time`, you can define the layout with `layout` tag.
+Of course you can set variables like `time.ANSIC` or `time.RFC3339` to the tag.
+
 ## Simple Usage
 You can set multi columns to `mgorm.Select`.
 

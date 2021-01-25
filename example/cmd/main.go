@@ -18,29 +18,13 @@ func main() {
 	}
 	db := mgorm.New(_db)
 
-	sampleList := []func(*mgorm.DB, *[]example.Employee) (string, error){
-		example.SelectSample1,
-		example.SelectSample2,
-		example.SelectSample3,
-		example.SelectSample4,
-		example.SelectSample5,
-		example.SelectSample6,
-		example.SelectSample7,
-		example.SelectSample8,
-		example.SelectSample9,
-		example.SelectSample10,
-		example.SelectSample11,
-		example.SelectSample12,
-		example.SelectSample13,
-		example.SelectSample14,
-	}
-
-	for i, f := range sampleList {
+	i := 0
+	for {
 		fmt.Printf("-------------------------\n")
 		fmt.Printf("*** Query Sample %d ***\n", i+1)
 		emp := new([]example.Employee)
 		start := time.Now()
-		sql, err := f(db, emp)
+		sql, next, err := example.QuerySamples(db, emp, i)
 		end := time.Now()
 
 		fmt.Printf("Query: %s\n", sql)
@@ -59,5 +43,10 @@ func main() {
 		fmt.Printf("  hire_date: %v\n", (*emp)[0].HireDate)
 		fmt.Printf("  res_int: %v\n", (*emp)[0].ResultInt)
 		fmt.Printf("  res_float: %v\n", (*emp)[0].ResultFloat)
+
+		if !next {
+			break
+		}
+		i++
 	}
 }
