@@ -6,6 +6,17 @@ var (
 	FromAddTable = (*From).addTable
 )
 
+// Exported values which is declared in groupby.go.
+var (
+	GroupByName      = (*GroupBy).name
+	GroupByAddColumn = (*GroupBy).addColumn
+)
+
+// Exported values which is declared in having.go.
+var (
+	HavingName = (*Having).name
+)
+
 // Exported values which is declared in insert.go.
 var (
 	InsertQuery     = (*Insert).query
@@ -67,6 +78,13 @@ var (
 var (
 	ValuesName      = (*Values).name
 	ValuesAddColumn = (*Values).addColumn
+)
+
+// Exported values which is declared in when.go.
+var (
+	WhenName = (*When).name
+	ThenName = (*Then).name
+	ElseName = (*Else).name
 )
 
 // Exported values which is declared in where.go.

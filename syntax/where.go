@@ -91,6 +91,10 @@ func buildStmtSet(expr string, vals ...interface{}) (*StmtSet, error) {
 	ss := new(StmtSet)
 	values := []interface{}{}
 	for _, v := range vals {
+		if sel, ok := v.(Var); ok {
+			values = append(values, fmt.Sprintf("(%s)", sel))
+			continue
+		}
 		vStr, err := internal.ToString(v)
 		if err != nil {
 			return nil, err

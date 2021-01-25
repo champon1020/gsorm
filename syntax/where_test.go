@@ -24,6 +24,10 @@ func TestWhere_Build(t *testing.T) {
 			&syntax.Where{Expr: "lhs = ?", Values: []interface{}{10}},
 			&syntax.StmtSet{Clause: "WHERE", Value: "lhs = 10"},
 		},
+		{
+			&syntax.Where{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
+			&syntax.StmtSet{Clause: "WHERE", Value: `lhs1 = 10 AND lhs2 = "str"`},
+		},
 	}
 
 	for _, testCase := range testCases {

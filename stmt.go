@@ -30,6 +30,11 @@ const (
 	opOn                  internal.Op = "mgorm.Stmt.On"
 	opUnion               internal.Op = "mgorm.Stmt.Union"
 	opUnionAll            internal.Op = "mgorm.Stmt.UnionAll"
+	opGroupBy             internal.Op = "mgorm.Stmt.GroupBy"
+	opHaving              internal.Op = "mgorm.Stmt.Having"
+	opWhen                internal.Op = "mgorm.Stmt.When"
+	opThen                internal.Op = "mgorm.Stmt.Then"
+	opElse                internal.Op = "mgorm.Stmt.Else"
 )
 
 // Stmt keeps the sql statement.
@@ -47,6 +52,11 @@ type Stmt struct {
 	joinExpr    []syntax.Expr
 	onExpr      []syntax.Expr
 	unionExpr   syntax.Expr
+	groupByExpr syntax.Expr
+	havingExpr  syntax.Expr
+	whenExpr    []syntax.Expr
+	thenExpr    []syntax.Expr
+	elseExpr    syntax.Expr
 	errors      []error
 
 	// Used for test.
@@ -59,6 +69,11 @@ func (s *Stmt) call(op internal.Op, args ...interface{}) {
 
 func (s *Stmt) addError(err error) {
 	s.errors = append(s.errors, err)
+}
+
+// Var returns Stmt.String with syntax.Var type.
+func (s *Stmt) Var() syntax.Var {
+	return syntax.Var(s.String())
 }
 
 // String returns query string.
@@ -122,7 +137,6 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 		for i, e := range s.joinExpr {
 			// If onExpr is not sufficient, return error.
 			if len(s.onExpr) <= i {
-				/* handle error */
 				err := errors.New("JOIN was executed but ON is not called")
 				return "", internal.NewError(opStmtProcessQuerySQL, internal.KindRuntime, err)
 			}
@@ -163,6 +177,24 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 		}
 	}
 
+	// Build GROUP BY.
+	if s.groupByExpr != nil {
+		g, err := s.groupByExpr.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.write(g.Build())
+	}
+
+	// Build HAVING.
+	if s.havingExpr != nil {
+		h, err := s.havingExpr.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.write(h.Build())
+	}
+
 	// Build ORDER BY.
 	if len(s.orderByExpr) > 0 {
 		for _, e := range s.orderByExpr {
@@ -172,6 +204,40 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 			}
 			sql.write(ob.Build())
 		}
+	}
+
+	// Build CASE ... END.
+	if len(s.whenExpr) > 0 {
+		sql.write("CASE")
+		for i, e := range s.whenExpr {
+			// If thenExpr is not sufficient, return error.
+			if len(s.thenExpr) <= i {
+				err := errors.New("WHEN was executed but THEN is not called")
+				return "", internal.NewError(opStmtProcessQuerySQL, internal.KindRuntime, err)
+			}
+
+			// Build WHEN.
+			w, err := e.Build()
+			if err != nil {
+				return "", err
+			}
+			sql.write(w.Build())
+
+			// Build THEN.
+			t, err := s.thenExpr[i].Build()
+			if err != nil {
+				return "", err
+			}
+			sql.write(t.Build())
+		}
+		if s.elseExpr != nil {
+			e, err := s.elseExpr.Build()
+			if err != nil {
+				return "", err
+			}
+			sql.write(e.Build())
+		}
+		sql.write("END")
 	}
 
 	// Build LIMIT.
@@ -397,15 +463,50 @@ func (s *Stmt) On(expr string, vals ...interface{}) *Stmt {
 }
 
 // Union calls UNION statement.
-func (s *Stmt) Union(stmt string) *Stmt {
+func (s *Stmt) Union(stmt syntax.Var) *Stmt {
 	s.unionExpr = syntax.NewUnion(stmt, false)
 	s.call(opUnion, stmt)
 	return s
 }
 
 // UnionAll calls UNION ALL statement.
-func (s *Stmt) UnionAll(stmt string) *Stmt {
+func (s *Stmt) UnionAll(stmt syntax.Var) *Stmt {
 	s.unionExpr = syntax.NewUnion(stmt, true)
 	s.call(opUnionAll, stmt)
+	return s
+}
+
+// GroupBy calls GROUP BY statement.
+func (s *Stmt) GroupBy(cols ...string) *Stmt {
+	s.groupByExpr = syntax.NewGroupBy(cols)
+	s.call(opGroupBy, cols)
+	return s
+}
+
+// Having calls HAVING statement.
+func (s *Stmt) Having(expr string, vals ...interface{}) *Stmt {
+	s.havingExpr = syntax.NewHaving(expr, vals...)
+	s.call(opHaving, expr, vals)
+	return s
+}
+
+// When calls WHEN statement.
+func (s *Stmt) When(expr string, vals ...interface{}) *Stmt {
+	s.whenExpr = append(s.whenExpr, syntax.NewWhen(expr, vals...))
+	s.call(opWhen, expr, vals)
+	return s
+}
+
+// Then calls THEN statement.
+func (s *Stmt) Then(val interface{}) *Stmt {
+	s.thenExpr = append(s.thenExpr, syntax.NewThen(val))
+	s.call(opThen, val)
+	return s
+}
+
+// Else calls ELSE statement.
+func (s *Stmt) Else(val interface{}) *Stmt {
+	s.elseExpr = syntax.NewElse(val)
+	s.call(opElse, val)
 	return s
 }
