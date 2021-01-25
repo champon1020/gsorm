@@ -12,6 +12,11 @@ var (
 	GroupByAddColumn = (*GroupBy).addColumn
 )
 
+// Exported values which is declared in having.go.
+var (
+	HavingName = (*Having).name
+)
+
 // Exported values which is declared in insert.go.
 var (
 	InsertQuery     = (*Insert).query

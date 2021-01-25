@@ -31,6 +31,7 @@ const (
 	opUnion               internal.Op = "mgorm.Stmt.Union"
 	opUnionAll            internal.Op = "mgorm.Stmt.UnionAll"
 	opGroupBy             internal.Op = "mgorm.Stmt.GroupBy"
+	opHaving              internal.Op = "mgorm.Stmt.Having"
 )
 
 // Stmt keeps the sql statement.
@@ -49,6 +50,7 @@ type Stmt struct {
 	onExpr      []syntax.Expr
 	unionExpr   syntax.Expr
 	groupByExpr syntax.Expr
+	havingExpr  syntax.Expr
 	errors      []error
 
 	// Used for test.
@@ -177,6 +179,15 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 			return "", err
 		}
 		sql.write(g.Build())
+	}
+
+	// Build HAVING.
+	if s.havingExpr != nil {
+		h, err := s.havingExpr.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.write(h.Build())
 	}
 
 	// Build ORDER BY.
@@ -430,5 +441,12 @@ func (s *Stmt) UnionAll(stmt syntax.Var) *Stmt {
 func (s *Stmt) GroupBy(cols ...string) *Stmt {
 	s.groupByExpr = syntax.NewGroupBy(cols)
 	s.call(opGroupBy, cols)
+	return s
+}
+
+// Having calls HAVING statement.
+func (s *Stmt) Having(expr string, vals ...interface{}) *Stmt {
+	s.havingExpr = syntax.NewHaving(expr, vals...)
+	s.call(opHaving, expr, vals)
 	return s
 }

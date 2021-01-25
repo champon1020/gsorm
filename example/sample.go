@@ -115,10 +115,16 @@ func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) 
 				Var(),
 			),
 
-		// SELECT COUNT(first_name), last_name FROM employees GROUP BY last_name;
+		// SELECT COUNT(first_name) AS res_int, last_name FROM employees GROUP BY last_name;
 		mgorm.Select(db, "COUNT(first_name) AS res_int", "last_name").
 			From("employees").
 			GroupBy("last_name"),
+
+		// SELECT COUNT(first_name) AS res_int, last_name FROM employees GROUP BY last_name HAVING res_int < 200;
+		mgorm.Select(db, "COUNT(first_name) AS res_int", "last_name").
+			From("employees").
+			GroupBy("last_name").
+			Having("res_int < ?", 200),
 	}
 
 	next := true
