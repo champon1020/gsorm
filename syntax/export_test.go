@@ -80,6 +80,13 @@ var (
 	ValuesAddColumn = (*Values).addColumn
 )
 
+// Exported values which is declared in when.go.
+var (
+	WhenName = (*When).name
+	ThenName = (*Then).name
+	ElseName = (*Else).name
+)
+
 // Exported values which is declared in where.go.
 var (
 	WhereName    = (*Where).name
