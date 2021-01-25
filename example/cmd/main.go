@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/example"
@@ -17,34 +18,35 @@ func main() {
 	}
 	db := mgorm.New(_db)
 
-	example.Sample1(db)
-	example.Sample2(db)
-	example.Sample3(db)
-	example.Sample4(db)
-}
+	i := 0
+	for {
+		fmt.Printf("-------------------------\n")
+		fmt.Printf("*** Query Sample %d ***\n", i+1)
+		emp := new([]example.Employee)
+		start := time.Now()
+		sql, next, err := example.QuerySamples(db, emp, i)
+		end := time.Now()
 
-/*
-func sampleGorm() {
-	db, err := gorm.Open("mysql", "root:toor@tcp(127.0.0.1:33306)/employees")
-	if err != nil {
-		fmt.Println("Failed to open database connection")
-		return
+		fmt.Printf("Query: %s\n", sql)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Printf("Time: %f[sec]\n", (end.Sub(start)).Seconds())
+		fmt.Printf("Len: %d\n", len(*emp))
+		fmt.Printf("First row:\n")
+		fmt.Printf("  emp_no: %v\n", (*emp)[0].EmpNo)
+		fmt.Printf("  birth_date: %v\n", (*emp)[0].BirthDate)
+		fmt.Printf("  first_name: %v\n", (*emp)[0].FirstName)
+		fmt.Printf("  last_name: %v\n", (*emp)[0].LastName)
+		fmt.Printf("  gender: %v\n", (*emp)[0].Gender)
+		fmt.Printf("  hire_date: %v\n", (*emp)[0].HireDate)
+		fmt.Printf("  res_int: %v\n", (*emp)[0].ResultInt)
+		fmt.Printf("  res_float: %v\n", (*emp)[0].ResultFloat)
+
+		if !next {
+			break
+		}
+		i++
 	}
-
-	type Employee struct {
-		EmpNo     int    `gorm:"emp_no"`
-		BirthDate string `gorm:"birth_date"`
-		FirstName string `gorm:"first_name"`
-		LastName  string `gorm:"last_name"`
-		Gender    string `gorm:"gender"`
-		HireDate  string `gorm:"hire_date"`
-	}
-
-	emp := new([]Employee)
-	start := time.Now()
-	db.Find(emp)
-	end := time.Now()
-	fmt.Printf("[GORM] Len: %d, Index[0]: %v\n", len(*emp), (*emp)[0])
-	fmt.Printf("%f [sec]\n", (end.Sub(start)).Seconds())
 }
-*/

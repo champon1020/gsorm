@@ -11,26 +11,43 @@ import (
 const (
 	opStmtProcessQuerySQL internal.Op = "mgorm.Stmt.processQuerySQL"
 	opStmtProcessExecSQL  internal.Op = "mgorm.Stmt.processExecSQL"
-	opQuery               internal.Op = "mgorm.Stmt.OpQuery"
-	opExec                internal.Op = "mgorm.Stmt.OpExec"
+	opQuery               internal.Op = "mgorm.Stmt.Query"
+	opExec                internal.Op = "mgorm.Stmt.Exec"
 	opFrom                internal.Op = "mgorm.Stmt.From"
 	opValues              internal.Op = "mgorm.Stmt.Values"
 	opSet                 internal.Op = "mgorm.Stmt.Set"
 	opWhere               internal.Op = "mgorm.Stmt.Where"
 	opAnd                 internal.Op = "mgorm.Stmt.And"
 	opOr                  internal.Op = "mgorm.Stmt.Or"
+	opNot                 internal.Op = "mgorm.Stmt.Not"
+	opLimit               internal.Op = "mgorm.Stmt.Limit"
+	opOffset              internal.Op = "mgorm.Stmt.Offset"
+	opOrderBy             internal.Op = "mgorm.Stmt.OrderBy"
+	opJoin                internal.Op = "mgorm.Stmt.Join"
+	opLeftJoin            internal.Op = "mgorm.Stmt.LeftJoin"
+	opRightJoin           internal.Op = "mgorm.Stmt.RightJoin"
+	opFullJoin            internal.Op = "mgorm.Stmt.FullJoin"
+	opOn                  internal.Op = "mgorm.Stmt.On"
+	opUnion               internal.Op = "mgorm.Stmt.Union"
+	opUnionAll            internal.Op = "mgorm.Stmt.UnionAll"
 )
 
 // Stmt keeps the sql statement.
 type Stmt struct {
-	db         sqlDB
-	cmd        syntax.Cmd
-	fromExpr   syntax.Expr
-	valuesExpr syntax.Expr
-	setExpr    syntax.Expr
-	whereExpr  syntax.Expr
-	andOr      []syntax.Expr
-	errors     []error
+	db          sqlDB
+	cmd         syntax.Cmd
+	fromExpr    syntax.Expr
+	valuesExpr  syntax.Expr
+	setExpr     syntax.Expr
+	whereExpr   syntax.Expr
+	andOrNot    []syntax.Expr
+	limitExpr   syntax.Expr
+	offsetExpr  syntax.Expr
+	orderByExpr []syntax.Expr
+	joinExpr    []syntax.Expr
+	onExpr      []syntax.Expr
+	unionExpr   syntax.Expr
+	errors      []error
 
 	// Used for test.
 	called []*opArgs
@@ -42,6 +59,17 @@ func (s *Stmt) call(op internal.Op, args ...interface{}) {
 
 func (s *Stmt) addError(err error) {
 	s.errors = append(s.errors, err)
+}
+
+// String returns query string.
+func (s *Stmt) String() string {
+	_, ok := s.cmd.(*syntax.Select)
+	if ok {
+		sql, _ := s.processQuerySQL()
+		return sql.string()
+	}
+	sql, _ := s.processExecSQL()
+	return sql.string()
 }
 
 // Query executes a query that returns some results.
@@ -89,6 +117,32 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 		sql.write(from.Build())
 	}
 
+	// Build JOIN and ON.
+	if len(s.joinExpr) > 0 {
+		for i, e := range s.joinExpr {
+			// If onExpr is not sufficient, return error.
+			if len(s.onExpr) <= i {
+				/* handle error */
+				err := errors.New("JOIN was executed but ON is not called")
+				return "", internal.NewError(opStmtProcessQuerySQL, internal.KindRuntime, err)
+			}
+
+			// Build JOIN.
+			j, err := e.Build()
+			if err != nil {
+				return "", err
+			}
+			sql.write(j.Build())
+
+			// Build ON.
+			o, err := s.onExpr[i].Build()
+			if err != nil {
+				return "", err
+			}
+			sql.write(o.Build())
+		}
+	}
+
 	// Build WHERE.
 	if s.whereExpr != nil {
 		w, err := s.whereExpr.Build()
@@ -98,9 +152,9 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 		sql.write(w.Build())
 	}
 
-	// Build AND or OR.
-	if len(s.andOr) > 0 {
-		for _, e := range s.andOr {
+	// Build AND, OR or NOT.
+	if len(s.andOrNot) > 0 {
+		for _, e := range s.andOrNot {
 			ao, err := e.Build()
 			if err != nil {
 				return "", err
@@ -108,6 +162,45 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 			sql.write(ao.Build())
 		}
 	}
+
+	// Build ORDER BY.
+	if len(s.orderByExpr) > 0 {
+		for _, e := range s.orderByExpr {
+			ob, err := e.Build()
+			if err != nil {
+				return "", err
+			}
+			sql.write(ob.Build())
+		}
+	}
+
+	// Build LIMIT.
+	if s.limitExpr != nil {
+		l, err := s.limitExpr.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.write(l.Build())
+	}
+
+	// Build OFFSET.
+	if s.offsetExpr != nil {
+		l, err := s.offsetExpr.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.write(l.Build())
+	}
+
+	// Build UNION.
+	if s.unionExpr != nil {
+		u, err := s.unionExpr.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.write(u.Build())
+	}
+
 	return sql, nil
 }
 
@@ -130,8 +223,8 @@ func (s *Stmt) Exec() error {
 }
 
 // ExpectExec executes a query as mock database.
-func (s *Stmt) ExpectExec(model interface{}) *Stmt {
-	s.call(opExec, model)
+func (s *Stmt) ExpectExec() *Stmt {
+	s.call(opExec)
 	return s
 }
 
@@ -181,9 +274,9 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 		sql.write(w.Build())
 	}
 
-	// Build AND or OR.
-	if len(s.andOr) > 0 {
-		for _, e := range s.andOr {
+	// Build AND, OR or NOT.
+	if len(s.andOrNot) > 0 {
+		for _, e := range s.andOrNot {
 			ao, err := e.Build()
 			if err != nil {
 				return "", err
@@ -212,7 +305,9 @@ func (s *Stmt) Values(vals ...interface{}) *Stmt {
 func (s *Stmt) Set(vals ...interface{}) *Stmt {
 	u, ok := s.cmd.(*syntax.Update)
 	if !ok {
-		/* handle error */
+		err := errors.New("SET statement can be used with UPDATE command")
+		s.addError(internal.NewError(opSet, internal.KindRuntime, err))
+		return s
 	}
 	set, err := syntax.NewSet(u.Columns, vals)
 	if err != nil {
@@ -233,14 +328,84 @@ func (s *Stmt) Where(expr string, vals ...interface{}) *Stmt {
 
 // And calls AND statement.
 func (s *Stmt) And(expr string, vals ...interface{}) *Stmt {
-	s.andOr = append(s.andOr, syntax.NewAnd(expr, vals...))
+	s.andOrNot = append(s.andOrNot, syntax.NewAnd(expr, vals...))
 	s.call(opAnd, expr, vals)
 	return s
 }
 
 // Or calls OR statement.
 func (s *Stmt) Or(expr string, vals ...interface{}) *Stmt {
-	s.andOr = append(s.andOr, syntax.NewOr(expr, vals...))
+	s.andOrNot = append(s.andOrNot, syntax.NewOr(expr, vals...))
 	s.call(opOr, expr, vals)
+	return s
+}
+
+// Limit calls LIMIT statement.
+func (s *Stmt) Limit(num int) *Stmt {
+	s.limitExpr = syntax.NewLimit(num)
+	s.call(opLimit, num)
+	return s
+}
+
+// Offset calls OFFSET statement.
+func (s *Stmt) Offset(num int) *Stmt {
+	s.offsetExpr = syntax.NewOffset(num)
+	s.call(opOffset, num)
+	return s
+}
+
+// OrderBy calls ORDER BY statement.
+func (s *Stmt) OrderBy(col string, desc bool) *Stmt {
+	s.orderByExpr = append(s.orderByExpr, syntax.NewOrderBy(col, desc))
+	s.call(opOrderBy, col, desc)
+	return s
+}
+
+// Join calls (INNER) JOIN statement.
+func (s *Stmt) Join(table string) *Stmt {
+	s.joinExpr = append(s.joinExpr, syntax.NewJoin(table, syntax.InnerJoin))
+	s.call(opJoin, table)
+	return s
+}
+
+// LeftJoin calls (INNER) JOIN statement.
+func (s *Stmt) LeftJoin(table string) *Stmt {
+	s.joinExpr = append(s.joinExpr, syntax.NewJoin(table, syntax.LeftJoin))
+	s.call(opJoin, table)
+	return s
+}
+
+// RightJoin calls (INNER) JOIN statement.
+func (s *Stmt) RightJoin(table string) *Stmt {
+	s.joinExpr = append(s.joinExpr, syntax.NewJoin(table, syntax.RightJoin))
+	s.call(opJoin, table)
+	return s
+}
+
+// FullJoin calls (INNER) JOIN statement.
+func (s *Stmt) FullJoin(table string) *Stmt {
+	s.joinExpr = append(s.joinExpr, syntax.NewJoin(table, syntax.FullJoin))
+	s.call(opJoin, table)
+	return s
+}
+
+// On calls ON statement.
+func (s *Stmt) On(expr string, vals ...interface{}) *Stmt {
+	s.onExpr = append(s.onExpr, syntax.NewOn(expr, vals...))
+	s.call(opOn, expr, vals)
+	return s
+}
+
+// Union calls UNION statement.
+func (s *Stmt) Union(stmt string) *Stmt {
+	s.unionExpr = syntax.NewUnion(stmt, false)
+	s.call(opUnion, stmt)
+	return s
+}
+
+// UnionAll calls UNION ALL statement.
+func (s *Stmt) UnionAll(stmt string) *Stmt {
+	s.unionExpr = syntax.NewUnion(stmt, true)
+	s.call(opUnionAll, stmt)
 	return s
 }

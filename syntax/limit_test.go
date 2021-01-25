@@ -6,33 +6,46 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestDelete_Build(t *testing.T) {
+func TestLimit_Name(t *testing.T) {
+	l := new(syntax.Limit)
+	assert.Equal(t, "LIMIT", syntax.LimitName(l))
+}
+
+func TestLimit_Build(t *testing.T) {
 	testCases := []struct {
-		Delete *syntax.Delete
+		Limit  *syntax.Limit
 		Result *syntax.StmtSet
 	}{
-		{&syntax.Delete{}, &syntax.StmtSet{Clause: "DELETE"}},
+		{
+			&syntax.Limit{Num: 5},
+			&syntax.StmtSet{Clause: "LIMIT", Value: "5"},
+		},
 	}
 
 	for _, testCase := range testCases {
-		res := testCase.Delete.Build()
+		res, _ := testCase.Limit.Build()
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
 }
 
-func TestNewDelete(t *testing.T) {
+func TestNewLimit(t *testing.T) {
 	testCases := []struct {
-		Result *syntax.Delete
+		Num    int
+		Result *syntax.Limit
 	}{
-		{&syntax.Delete{}},
+		{
+			Num:    5,
+			Result: &syntax.Limit{Num: 5},
+		},
 	}
 
 	for _, testCase := range testCases {
-		res := syntax.NewDelete()
+		res := syntax.NewLimit(testCase.Num)
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}

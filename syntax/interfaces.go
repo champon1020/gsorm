@@ -1,12 +1,12 @@
 package syntax
 
-// Cmd interface.
+// Cmd is implemented by Select, Insert, Update and Delete types.
 type Cmd interface {
 	query() string
 	Build() *StmtSet
 }
 
-// Expr interface.
+// Expr is implemented by Where, And, and other types.
 type Expr interface {
 	name() string
 	Build() (*StmtSet, error)

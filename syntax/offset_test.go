@@ -6,33 +6,46 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestDelete_Build(t *testing.T) {
+func TestOffset_Name(t *testing.T) {
+	l := new(syntax.Offset)
+	assert.Equal(t, "OFFSET", syntax.OffsetName(l))
+}
+
+func TestOffset_Build(t *testing.T) {
 	testCases := []struct {
-		Delete *syntax.Delete
+		Offset *syntax.Offset
 		Result *syntax.StmtSet
 	}{
-		{&syntax.Delete{}, &syntax.StmtSet{Clause: "DELETE"}},
+		{
+			&syntax.Offset{Num: 5},
+			&syntax.StmtSet{Clause: "OFFSET", Value: "5"},
+		},
 	}
 
 	for _, testCase := range testCases {
-		res := testCase.Delete.Build()
+		res, _ := testCase.Offset.Build()
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
 }
 
-func TestNewDelete(t *testing.T) {
+func TestNewOffset(t *testing.T) {
 	testCases := []struct {
-		Result *syntax.Delete
+		Num    int
+		Result *syntax.Offset
 	}{
-		{&syntax.Delete{}},
+		{
+			Num:    5,
+			Result: &syntax.Offset{Num: 5},
+		},
 	}
 
 	for _, testCase := range testCases {
-		res := syntax.NewDelete()
+		res := syntax.NewOffset(testCase.Num)
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}

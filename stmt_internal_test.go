@@ -34,7 +34,7 @@ func TestStmt_ProcessQuerySQL(t *testing.T) {
 				cmd:       &syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
 				fromExpr:  &syntax.From{Tables: []syntax.Table{{Name: "table"}}},
 				whereExpr: &syntax.Where{Expr: "lhs1 = ?", Values: []interface{}{10}},
-				andOr: []syntax.Expr{
+				andOrNot: []syntax.Expr{
 					&syntax.And{Expr: "lhs2 = ? OR lhs3 = ?", Values: []interface{}{20, 30}},
 				},
 			},
@@ -45,7 +45,7 @@ func TestStmt_ProcessQuerySQL(t *testing.T) {
 				cmd:       &syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
 				fromExpr:  &syntax.From{Tables: []syntax.Table{{Name: "table"}}},
 				whereExpr: &syntax.Where{Expr: "lhs1 = ?", Values: []interface{}{10}},
-				andOr: []syntax.Expr{
+				andOrNot: []syntax.Expr{
 					&syntax.Or{Expr: "lhs2 = ? AND lhs3 = ?", Values: []interface{}{20, 30}},
 				},
 			},
@@ -86,7 +86,7 @@ func TestStmt_PrcessExecSQL(t *testing.T) {
 				cmd:       &syntax.Update{Table: syntax.Table{Name: "table"}},
 				setExpr:   &syntax.Set{Eqs: []syntax.Eq{{LHS: "lhs1", RHS: "rhs1"}, {LHS: "lhs2", RHS: "rhs2"}}},
 				whereExpr: &syntax.Where{Expr: "lhs1 = ?", Values: []interface{}{10}},
-				andOr: []syntax.Expr{
+				andOrNot: []syntax.Expr{
 					&syntax.And{Expr: "lhs2 = ? OR lhs3 = ?", Values: []interface{}{20, 30}},
 				},
 			},
@@ -177,7 +177,7 @@ func TestStmt_And(t *testing.T) {
 			[]interface{}{10},
 			&Stmt{},
 			&Stmt{
-				andOr: []syntax.Expr{&syntax.And{Expr: "lhs = ?", Values: []interface{}{10}}},
+				andOrNot: []syntax.Expr{&syntax.And{Expr: "lhs = ?", Values: []interface{}{10}}},
 				called: []*opArgs{{
 					op:   opAnd,
 					args: []interface{}{"lhs = ?", []interface{}{10}},
@@ -207,7 +207,7 @@ func TestStmt_Or(t *testing.T) {
 			[]interface{}{10},
 			&Stmt{},
 			&Stmt{
-				andOr: []syntax.Expr{&syntax.Or{Expr: "lhs = ?", Values: []interface{}{10}}},
+				andOrNot: []syntax.Expr{&syntax.Or{Expr: "lhs = ?", Values: []interface{}{10}}},
 				called: []*opArgs{{
 					op:   opOr,
 					args: []interface{}{"lhs = ?", []interface{}{10}},
