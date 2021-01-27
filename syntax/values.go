@@ -1,6 +1,10 @@
 package syntax
 
-import "github.com/champon1020/mgorm/internal"
+import (
+	"fmt"
+
+	"github.com/champon1020/mgorm/internal"
+)
 
 // Values expression.
 type Values struct {
@@ -13,6 +17,12 @@ func (v *Values) name() string {
 
 func (v *Values) addColumn(val interface{}) {
 	v.Columns = append(v.Columns, val)
+}
+
+// String returns string of function call.
+func (v *Values) String() string {
+	s := internal.SliceToString(v.Columns)
+	return fmt.Sprintf("%s(%s)", v.name(), s)
 }
 
 // Build make values statement set.

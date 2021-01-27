@@ -17,6 +17,7 @@ const (
 	opString              internal.Op = "mgorm.Stmt.String"
 	opQuery               internal.Op = "mgorm.Stmt.Query"
 	opExec                internal.Op = "mgorm.Stmt.Exec"
+	opSet                 internal.Op = "mgorm.Stmt.Set"
 )
 
 // Stmt keeps the sql statement.
@@ -290,6 +291,7 @@ func (s *Stmt) Having(expr string, vals ...interface{}) HavingStmt {
 	return s
 }
 
+/*
 // When calls WHEN statement.
 func (s *Stmt) When(expr string, vals ...interface{}) *Stmt {
 	s.call(syntax.NewWhen(expr, vals...))
@@ -307,3 +309,4 @@ func (s *Stmt) Else(val interface{}) *Stmt {
 	s.call(syntax.NewElse(val))
 	return s
 }
+*/

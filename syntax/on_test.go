@@ -14,6 +14,31 @@ func TestOn_Name(t *testing.T) {
 	assert.Equal(t, "ON", syntax.OnName(o))
 }
 
+func TestOn_String(t *testing.T) {
+	testCases := []struct {
+		On     *syntax.On
+		Result string
+	}{
+		{
+			&syntax.On{Expr: "lhs = rhs"},
+			`ON("lhs = rhs")`,
+		},
+		{
+			&syntax.On{Expr: "lhs = ?", Values: []interface{}{10}},
+			`ON("lhs = ?", 10)`,
+		},
+		{
+			&syntax.On{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
+			`ON("lhs1 = ? AND lhs2 = ?", 10, "str")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.On.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestOn_Build(t *testing.T) {
 	testCases := []struct {
 		On     *syntax.On

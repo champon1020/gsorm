@@ -35,6 +35,23 @@ func TestValues_AddColumn(t *testing.T) {
 	}
 }
 
+func TestValues_String(t *testing.T) {
+	testCases := []struct {
+		Values *syntax.Values
+		Result string
+	}{
+		{
+			&syntax.Values{Columns: []interface{}{"column", 2, true}},
+			`VALUES("column", 2, true)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Values.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestValues_Build(t *testing.T) {
 	testCases := []struct {
 		Values *syntax.Values

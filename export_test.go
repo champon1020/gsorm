@@ -14,8 +14,16 @@ var (
 	MockDBAddExecuted = (*MockDB).addExecuted
 )
 
+func (m *MockDB) ExportedSetExpected(s []*Stmt) {
+	m.expected = s
+}
+
 func (m *MockDB) ExportedGetExpected() []*Stmt {
 	return m.expected
+}
+
+func (m *MockDB) ExportedSetActual(s []*Stmt) {
+	m.actual = s
 }
 
 func (m *MockDB) ExportedGetActual() []*Stmt {

@@ -1,5 +1,7 @@
 package syntax
 
+import "fmt"
+
 // OrderBy expression.
 type OrderBy struct {
 	Column string
@@ -8,6 +10,11 @@ type OrderBy struct {
 
 func (o *OrderBy) name() string {
 	return "ORDER BY"
+}
+
+// String returns string of function call.
+func (o *OrderBy) String() string {
+	return fmt.Sprintf("%s(%q, %v)", o.name(), o.Column, o.Desc)
 }
 
 // Build make orderby statement set.

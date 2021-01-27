@@ -1,5 +1,7 @@
 package syntax
 
+import "fmt"
+
 // Update statement.
 type Update struct {
 	Table   Table
@@ -16,6 +18,15 @@ func (u *Update) addTable(table string) {
 
 func (u *Update) addColumns(cols []string) {
 	u.Columns = cols
+}
+
+// String returns string of function call.
+func (u *Update) String() string {
+	s := fmt.Sprintf("%q", u.Table.Build())
+	for _, c := range u.Columns {
+		s += fmt.Sprintf(", %q", c)
+	}
+	return fmt.Sprintf("%s(%s)", u.query(), s)
 }
 
 // Build make update statement set.

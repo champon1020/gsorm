@@ -1,5 +1,7 @@
 package syntax
 
+import "fmt"
+
 // Insert statement.
 type Insert struct {
 	Table   Table
@@ -17,6 +19,15 @@ func (i *Insert) addTable(table string) {
 func (i *Insert) addColumn(col string) {
 	column := NewColumn(col)
 	i.Columns = append(i.Columns, *column)
+}
+
+// String returns string of function call.
+func (i *Insert) String() string {
+	s := fmt.Sprintf("%q", i.Table.Build())
+	for _, c := range i.Columns {
+		s += fmt.Sprintf(", %q", c.Build())
+	}
+	return fmt.Sprintf("%s(%s)", i.query(), s)
 }
 
 // Build make insert statement set.

@@ -76,6 +76,53 @@ func TestInsert_AddColumn(t *testing.T) {
 	}
 }
 
+func TestInsert_String(t *testing.T) {
+	testCases := []struct {
+		Insert *syntax.Insert
+		Result string
+	}{
+		{
+			&syntax.Insert{
+				Table:   syntax.Table{Name: "table"},
+				Columns: []syntax.Column{},
+			},
+			`INSERT INTO("table")`,
+		},
+		{
+			&syntax.Insert{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []syntax.Column{},
+			},
+			`INSERT INTO("table AS t")`,
+		},
+		{
+			&syntax.Insert{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []syntax.Column{{Name: "column"}},
+			},
+			`INSERT INTO("table AS t", "column")`,
+		},
+		{
+			&syntax.Insert{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []syntax.Column{{Name: "column", Alias: "c"}},
+			},
+			`INSERT INTO("table AS t", "column AS c")`,
+		},
+		{
+			&syntax.Insert{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []syntax.Column{{Name: "column1", Alias: "c1"}, {Name: "column2", Alias: "c2"}},
+			},
+			`INSERT INTO("table AS t", "column1 AS c1", "column2 AS c2")`,
+		},
+	}
+	for _, testCase := range testCases {
+		res := testCase.Insert.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestInsert_Build(t *testing.T) {
 	testCases := []struct {
 		Insert *syntax.Insert

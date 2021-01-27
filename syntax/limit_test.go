@@ -14,6 +14,23 @@ func TestLimit_Name(t *testing.T) {
 	assert.Equal(t, "LIMIT", syntax.LimitName(l))
 }
 
+func TestLimit_String(t *testing.T) {
+	testCases := []struct {
+		Limit  *syntax.Limit
+		Result string
+	}{
+		{
+			&syntax.Limit{Num: 10},
+			`LIMIT(10)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Limit.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestLimit_Build(t *testing.T) {
 	testCases := []struct {
 		Limit  *syntax.Limit

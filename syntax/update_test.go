@@ -45,6 +45,27 @@ func TestUpdate_AddTable(t *testing.T) {
 	}
 }
 
+func TestUpdate_String(t *testing.T) {
+	testCases := []struct {
+		Update *syntax.Update
+		Result string
+	}{
+		{
+			&syntax.Update{Table: syntax.Table{Name: "table"}},
+			`UPDATE("table")`,
+		},
+		{
+			&syntax.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
+			`UPDATE("table AS t")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Update.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestUpdate_Build(t *testing.T) {
 	testCases := []struct {
 		Update *syntax.Update

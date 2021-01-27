@@ -14,6 +14,31 @@ func TestHavign_Name(t *testing.T) {
 	assert.Equal(t, "HAVING", syntax.HavingName(h))
 }
 
+func TestHaving_String(t *testing.T) {
+	testCases := []struct {
+		Having *syntax.Having
+		Result string
+	}{
+		{
+			&syntax.Having{Expr: "lhs = rhs"},
+			`HAVING("lhs = rhs")`,
+		},
+		{
+			&syntax.Having{Expr: "lhs = ?", Values: []interface{}{10}},
+			`HAVING("lhs = ?", 10)`,
+		},
+		{
+			&syntax.Having{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
+			`HAVING("lhs1 = ? AND lhs2 = ?", 10, "str")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Having.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestHaving_Build(t *testing.T) {
 	testCases := []struct {
 		Having *syntax.Having

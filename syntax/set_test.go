@@ -39,6 +39,27 @@ func TestSet_AddEq(t *testing.T) {
 	}
 }
 
+func TestSet_String(t *testing.T) {
+	testCases := []struct {
+		Set    *syntax.Set
+		Result string
+	}{
+		{
+			&syntax.Set{Eqs: []syntax.Eq{{LHS: "lhs", RHS: "rhs"}}},
+			`SET("rhs")`,
+		},
+		{
+			&syntax.Set{Eqs: []syntax.Eq{{LHS: "lhs", RHS: "rhs"}, {LHS: "lhs", RHS: 10}}},
+			`SET("rhs", 10)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Set.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestSet_Build(t *testing.T) {
 	testCases := []struct {
 		Set    *syntax.Set

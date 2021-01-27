@@ -46,3 +46,21 @@ func ToString(v interface{}) (string, error) {
 	}
 	return "", NewError(OpToString, KindType, errors.New("type is invalid"))
 }
+
+// SliceToString converts slice of interface{} to string separated with comma.
+// If type of element is string, enclose with quotes.
+func SliceToString(values []interface{}) string {
+	var s string
+	for i, v := range values {
+		if i != 0 {
+			s += ", "
+		}
+		switch v := v.(type) {
+		case string:
+			s += fmt.Sprintf("%q", v)
+		default:
+			s += fmt.Sprintf("%v", v)
+		}
+	}
+	return s
+}

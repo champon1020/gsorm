@@ -45,6 +45,31 @@ func TestSelect_AddColumn(t *testing.T) {
 	}
 }
 
+func TestSelect_String(t *testing.T) {
+	testCases := []struct {
+		Select *syntax.Select
+		Result string
+	}{
+		{
+			&syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
+			`SELECT("column")`,
+		},
+		{
+			&syntax.Select{Columns: []syntax.Column{{Name: "column", Alias: "c"}}},
+			`SELECT("column AS c")`,
+		},
+		{
+			&syntax.Select{Columns: []syntax.Column{{Name: "column1", Alias: "c1"}, {Name: "column2", Alias: "c2"}}},
+			`SELECT("column1 AS c1", "column2 AS c2")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Select.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestSelect_Build(t *testing.T) {
 	testCases := []struct {
 		Select *syntax.Select

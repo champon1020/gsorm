@@ -45,6 +45,31 @@ func TestFrom_AddTable(t *testing.T) {
 	}
 }
 
+func TestFrom_String(t *testing.T) {
+	testCases := []struct {
+		From   *syntax.From
+		Result string
+	}{
+		{
+			&syntax.From{Tables: []syntax.Table{{Name: "table"}}},
+			`FROM("table")`,
+		},
+		{
+			&syntax.From{Tables: []syntax.Table{{Name: "table", Alias: "t"}}},
+			`FROM("table AS t")`,
+		},
+		{
+			&syntax.From{Tables: []syntax.Table{{Name: "table1", Alias: "t1"}, {Name: "table2", Alias: "t2"}}},
+			`FROM("table1 AS t1", "table2 AS t2")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.From.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestFrom_Build(t *testing.T) {
 	testCases := []struct {
 		From   *syntax.From

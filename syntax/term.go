@@ -15,11 +15,9 @@ type Table struct {
 // Build make table expression as string.
 func (t *Table) Build() string {
 	s := t.Name
-
 	if len(t.Alias) > 0 {
 		s += " AS "
 	}
-
 	s += t.Alias
 	return s
 }
@@ -49,11 +47,9 @@ type Column struct {
 // Build make column expression as string.
 func (c *Column) Build() string {
 	s := c.Name
-
 	if len(c.Alias) > 0 {
 		s += " AS "
 	}
-
 	s += c.Alias
 	return s
 }

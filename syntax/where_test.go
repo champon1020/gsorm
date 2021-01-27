@@ -15,6 +15,31 @@ func TestWhere_Name(t *testing.T) {
 	assert.Equal(t, "WHERE", syntax.WhereName(w))
 }
 
+func TestWhere_String(t *testing.T) {
+	testCases := []struct {
+		Where  *syntax.Where
+		Result string
+	}{
+		{
+			&syntax.Where{Expr: "lhs = rhs"},
+			`WHERE("lhs = rhs")`,
+		},
+		{
+			&syntax.Where{Expr: "lhs = ?", Values: []interface{}{10}},
+			`WHERE("lhs = ?", 10)`,
+		},
+		{
+			&syntax.Where{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
+			`WHERE("lhs1 = ? AND lhs2 = ?", 10, "str")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Where.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestWhere_Build(t *testing.T) {
 	testCases := []struct {
 		Where  *syntax.Where
@@ -60,6 +85,31 @@ func TestAnd_Name(t *testing.T) {
 	assert.Equal(t, "AND", syntax.AndName(a))
 }
 
+func TestAnd_String(t *testing.T) {
+	testCases := []struct {
+		And    *syntax.And
+		Result string
+	}{
+		{
+			&syntax.And{Expr: "lhs = rhs"},
+			`AND("lhs = rhs")`,
+		},
+		{
+			&syntax.And{Expr: "lhs = ?", Values: []interface{}{10}},
+			`AND("lhs = ?", 10)`,
+		},
+		{
+			&syntax.And{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
+			`AND("lhs1 = ? AND lhs2 = ?", 10, "str")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.And.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestAnd_Build(t *testing.T) {
 	testCases := []struct {
 		And    *syntax.And
@@ -99,6 +149,31 @@ func TestNewAdd(t *testing.T) {
 func TestOr_Name(t *testing.T) {
 	o := new(syntax.Or)
 	assert.Equal(t, "OR", syntax.OrName(o))
+}
+
+func TestOr_String(t *testing.T) {
+	testCases := []struct {
+		Or     *syntax.Or
+		Result string
+	}{
+		{
+			&syntax.Or{Expr: "lhs = rhs"},
+			`OR("lhs = rhs")`,
+		},
+		{
+			&syntax.Or{Expr: "lhs = ?", Values: []interface{}{10}},
+			`OR("lhs = ?", 10)`,
+		},
+		{
+			&syntax.Or{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
+			`OR("lhs1 = ? AND lhs2 = ?", 10, "str")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Or.String()
+		assert.Equal(t, testCase.Result, res)
+	}
 }
 
 func TestOr_Build(t *testing.T) {

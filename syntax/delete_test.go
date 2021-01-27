@@ -6,7 +6,18 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 )
+
+func TestDelete_Query(t *testing.T) {
+	d := new(syntax.Delete)
+	assert.Equal(t, "DELETE", syntax.DeleteQuery(d))
+}
+
+func TestDelete_String(t *testing.T) {
+	d := new(syntax.Delete)
+	assert.Equal(t, "DELETE()", d.String())
+}
 
 func TestDelete_Build(t *testing.T) {
 	testCases := []struct {
