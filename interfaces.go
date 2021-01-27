@@ -103,34 +103,51 @@ type GroupByStmt interface {
 	ExecutableStmt
 }
 
-// HavingStmt is Stmt after Stmt.HavingStmt is executed.
+// HavingStmt is Stmt after Stmt.Having is executed.
 type HavingStmt interface {
 	OrderBy(string, bool) OrderByStmt
 	Union(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
-// OrderByStmt is Stmt after Stmt.OrderByStmt is executed.
+// OrderByStmt is Stmt after Stmt.OrderBy is executed.
 type OrderByStmt interface {
 	Limit(int) LimitStmt
 	Union(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
-// LimitStmt is Stmt after Stmt.LimitStmt is executed.
+// LimitStmt is Stmt after Stmt.Limit is executed.
 type LimitStmt interface {
 	Offset(int) OffsetStmt
 	Union(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
-// OffsetStmt is Stmt after Stmt.OffsetStmt is executed.
+// OffsetStmt is Stmt after Stmt.Offset is executed.
 type OffsetStmt interface {
 	Union(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
-// UnionStmt is Stmt after Stmt.UnionStmt is executed.
+// UnionStmt is Stmt after Stmt.Union is executed.
 type UnionStmt interface {
 	ExecutableStmt
+}
+
+// WhenStmt is Stmt after Stmt.When or mgorm.When is executed.
+type WhenStmt interface {
+	Then(interface{}) ThenStmt
+}
+
+// ThenStmt is Stmt after Stmt.Then is executed.
+type ThenStmt interface {
+	When(string, ...interface{}) WhenStmt
+	Else(interface{}) ElseStmt
+	Var() syntax.Var
+}
+
+// ElseStmt is Stmt after Stmt.Else is executed.
+type ElseStmt interface {
+	Var() syntax.Var
 }

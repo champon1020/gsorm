@@ -49,8 +49,11 @@ func (s *Stmt) Var() syntax.Var {
 
 // String returns query string.
 func (s *Stmt) String() string {
-	_, ok := s.cmd.(*syntax.Select)
-	if ok {
+	if _, ok := s.called[0].(*syntax.When); ok {
+		sql, _ := s.processCaseSQL()
+		return sql.string()
+	}
+	if _, ok := s.cmd.(*syntax.Select); ok {
 		sql, _ := s.processQuerySQL()
 		return sql.string()
 	}
@@ -118,6 +121,28 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 		}
 	}
 
+	return sql, nil
+}
+
+func (s *Stmt) processCaseSQL() (SQL, error) {
+	var sql SQL
+	sql.write("CASE")
+	for _, expr := range s.called {
+		switch expr := expr.(type) {
+		case *syntax.When,
+			*syntax.Then,
+			*syntax.Else:
+			e, err := expr.Build()
+			if err != nil {
+				return "", err
+			}
+			sql.write(e.Build())
+		default:
+			err := fmt.Errorf("%s is not supported", reflect.TypeOf(expr).Elem().String())
+			return "", internal.NewError(opStmtProcessQuerySQL, internal.KindRuntime, err)
+		}
+	}
+	sql.write("END")
 	return sql, nil
 }
 
@@ -291,22 +316,20 @@ func (s *Stmt) Having(expr string, vals ...interface{}) HavingStmt {
 	return s
 }
 
-/*
 // When calls WHEN statement.
-func (s *Stmt) When(expr string, vals ...interface{}) *Stmt {
+func (s *Stmt) When(expr string, vals ...interface{}) WhenStmt {
 	s.call(syntax.NewWhen(expr, vals...))
 	return s
 }
 
 // Then calls THEN statement.
-func (s *Stmt) Then(val interface{}) *Stmt {
+func (s *Stmt) Then(val interface{}) ThenStmt {
 	s.call(syntax.NewThen(val))
 	return s
 }
 
 // Else calls ELSE statement.
-func (s *Stmt) Else(val interface{}) *Stmt {
+func (s *Stmt) Else(val interface{}) ElseStmt {
 	s.call(syntax.NewElse(val))
 	return s
 }
-*/

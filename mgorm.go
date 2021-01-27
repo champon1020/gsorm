@@ -100,3 +100,10 @@ func Max(db sqlDB, col string, alias ...string) SelectStmt {
 	stmt.cmd = syntax.NewSelect([]string{s})
 	return stmt
 }
+
+// When statement api.
+func When(expr string, vals ...interface{}) WhenStmt {
+	stmt := new(Stmt)
+	stmt.call(syntax.NewWhen(expr, vals...))
+	return stmt
+}

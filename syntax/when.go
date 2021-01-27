@@ -1,6 +1,10 @@
 package syntax
 
-import "github.com/champon1020/mgorm/internal"
+import (
+	"fmt"
+
+	"github.com/champon1020/mgorm/internal"
+)
 
 // When expression.
 type When struct {
@@ -10,6 +14,15 @@ type When struct {
 
 func (w *When) name() string {
 	return "WHEN"
+}
+
+// String returns string of function call.
+func (w *When) String() string {
+	s := fmt.Sprintf("%q", w.Expr)
+	if len(w.Values) > 0 {
+		s += fmt.Sprintf(", %s", internal.SliceToString(w.Values))
+	}
+	return fmt.Sprintf("%s(%s)", w.name(), s)
 }
 
 // Build makes WHEN statement set.
@@ -33,6 +46,15 @@ func (t *Then) name() string {
 	return "THEN"
 }
 
+// String returns string of function call.
+func (t *Then) String() string {
+	switch v := t.Value.(type) {
+	case string:
+		return fmt.Sprintf("%s(%q)", t.name(), v)
+	}
+	return fmt.Sprintf("%s(%v)", t.name(), t.Value)
+}
+
 // Build makes THEN statement set.
 func (t *Then) Build() (*StmtSet, error) {
 	ss := new(StmtSet)
@@ -54,6 +76,15 @@ type Else struct {
 
 func (e *Else) name() string {
 	return "ELSE"
+}
+
+// String returns string of function call.
+func (e *Else) String() string {
+	switch v := e.Value.(type) {
+	case string:
+		return fmt.Sprintf("%s(%q)", e.name(), v)
+	}
+	return fmt.Sprintf("%s(%v)", e.name(), e.Value)
 }
 
 // Build makes ELSE statement set.

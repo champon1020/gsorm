@@ -58,6 +58,47 @@ func TestStmt_ProcessQuerySQL(t *testing.T) {
 	}
 }
 
+func TestStmt_ProcessCaseSQL(t *testing.T) {
+	testCases := []struct {
+		Called []syntax.Expr
+		Result string
+	}{
+		{
+			[]syntax.Expr{
+				&syntax.When{Expr: "lhs > rhs"},
+				&syntax.Then{"value"},
+			},
+			`CASE WHEN lhs > rhs THEN "value" END`,
+		},
+		{
+			[]syntax.Expr{
+				&syntax.When{Expr: "lhs1 > rhs1"},
+				&syntax.Then{"value1"},
+				&syntax.When{Expr: "lhs2 < rhs2"},
+				&syntax.Then{"value2"},
+			},
+			`CASE WHEN lhs1 > rhs1 THEN "value1" WHEN lhs2 < rhs2 THEN "value2" END`,
+		},
+		{
+			[]syntax.Expr{
+				&syntax.When{Expr: "lhs1 > rhs1"},
+				&syntax.Then{"value1"},
+				&syntax.When{Expr: "lhs2 < rhs2"},
+				&syntax.Then{"value2"},
+				&syntax.Else{"value3"},
+			},
+			`CASE WHEN lhs1 > rhs1 THEN "value1" WHEN lhs2 < rhs2 THEN "value2" ELSE "value3" END`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		stmt := new(mgorm.Stmt)
+		stmt.ExportedSetCalled(testCase.Called)
+		sql, _ := mgorm.StmtProcessCaseSQL(stmt)
+		assert.Equal(t, testCase.Result, string(sql))
+	}
+}
+
 func TestStmt_ProcessExecSQL(t *testing.T) {
 	testCases := []struct {
 		Cmd    syntax.Cmd
