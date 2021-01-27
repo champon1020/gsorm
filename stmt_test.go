@@ -1,150 +1,272 @@
 package mgorm_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/champon1020/mgorm"
+	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStmt_ProcessQuerySQL(t *testing.T) {
-	testCases := []struct {
-		Cmd    *syntax.Select
-		Called []syntax.Expr
+func TestStmt_String(t *testing.T) {
+	tests := []struct {
+		Stmt   *mgorm.Stmt
 		Result string
 	}{
 		{
-			&syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
-			[]syntax.Expr{
-				&syntax.From{Tables: []syntax.Table{{Name: "table"}}},
-			},
-			"SELECT column FROM table",
+			mgorm.Select(nil, "column1", "column2 AS c2").
+				From("table1 AS t1").
+				Join("table2 AS t2").
+				On("t1.column1 = t2.column1").
+				Where("lhs1 > ?", 10).
+				And("lhs2 = ? OR lhs3 = ?", "str", true).
+				OrderBy("t1.column1", true).
+				Limit(5).
+				Offset(6).
+				Union(mgorm.Select(nil, "column1", "column2 AS c2").
+					From("table3").
+					Var()).(*mgorm.Stmt),
+			`SELECT column1, column2 AS c2 ` +
+				`FROM table1 AS t1 ` +
+				`INNER JOIN table2 AS t2 ` +
+				`ON t1.column1 = t2.column1 ` +
+				`WHERE lhs1 > 10 ` +
+				`AND (lhs2 = "str" OR lhs3 = true) ` +
+				`ORDER BY t1.column1 DESC ` +
+				`LIMIT 5 ` +
+				`OFFSET 6 ` +
+				`UNION ` +
+				`SELECT column1, column2 AS c2 ` +
+				`FROM table3`,
 		},
 		{
-			&syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
-			[]syntax.Expr{
-				&syntax.From{Tables: []syntax.Table{{Name: "table"}}},
-				&syntax.Where{Expr: "lhs = ?", Values: []interface{}{10}},
-			},
-			"SELECT column FROM table WHERE lhs = 10",
+			mgorm.Select(nil, "column1", "column2 AS c2").
+				From("table1 AS t1").
+				LeftJoin("table2 AS t2").
+				On("t1.column1 = t2.column1").
+				Where("lhs1 > ?", 10).
+				Or("lhs2 = ? AND lhs3 = ?", "str", true).
+				UnionAll(mgorm.Select(nil, "column1", "column2 AS c2").
+					From("table3").
+					Var()).(*mgorm.Stmt),
+			`SELECT column1, column2 AS c2 ` +
+				`FROM table1 AS t1 ` +
+				`LEFT JOIN table2 AS t2 ` +
+				`ON t1.column1 = t2.column1 ` +
+				`WHERE lhs1 > 10 ` +
+				`OR (lhs2 = "str" AND lhs3 = true) ` +
+				`UNION ALL ` +
+				`SELECT column1, column2 AS c2 ` +
+				`FROM table3`,
 		},
 		{
-			&syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
-			[]syntax.Expr{
-				&syntax.From{Tables: []syntax.Table{{Name: "table"}}},
-				&syntax.Where{Expr: "lhs1 = ?", Values: []interface{}{10}},
-				&syntax.And{Expr: "lhs2 = ? OR lhs3 = ?", Values: []interface{}{20, 30}},
-			},
-			"SELECT column FROM table WHERE lhs1 = 10 AND (lhs2 = 20 OR lhs3 = 30)",
+			mgorm.Select(nil, "COUNT(column1)").
+				From("table1 AS t1").
+				RightJoin("table2 AS t2").
+				On("t1.column1 = t2.column1").
+				GroupBy("column1").
+				Having("column1 > ?", 10).(*mgorm.Stmt),
+			`SELECT COUNT(column1) ` +
+				`FROM table1 AS t1 ` +
+				`RIGHT JOIN table2 AS t2 ` +
+				`ON t1.column1 = t2.column1 ` +
+				`GROUP BY column1 ` +
+				`HAVING column1 > 10`,
 		},
 		{
-			&syntax.Select{Columns: []syntax.Column{{Name: "column"}}},
-			[]syntax.Expr{
-				&syntax.From{Tables: []syntax.Table{{Name: "table"}}},
-				&syntax.Where{Expr: "lhs1 = ?", Values: []interface{}{10}},
-				&syntax.Or{Expr: "lhs2 = ? AND lhs3 = ?", Values: []interface{}{20, 30}},
-			},
-			"SELECT column FROM table WHERE lhs1 = 10 OR (lhs2 = 20 AND lhs3 = 30)",
+			mgorm.Select(nil, "column1").
+				From("table1 AS t1").
+				FullJoin("table2 AS t2").
+				On("t1.column1 = t2.column1").(*mgorm.Stmt),
+			`SELECT column1 ` +
+				`FROM table1 AS t1 ` +
+				`FULL OUTER JOIN table2 AS t2 ` +
+				`ON t1.column1 = t2.column1`,
+		},
+		{
+			mgorm.When("lhs1 > ?", 10).
+				Then("value1").
+				When("lhs2 < ?", 10).
+				Then("value2").
+				Else("value3").(*mgorm.Stmt),
+			`CASE ` +
+				`WHEN lhs1 > 10 ` +
+				`THEN "value1" ` +
+				`WHEN lhs2 < 10 ` +
+				`THEN "value2" ` +
+				`ELSE "value3" ` +
+				`END`,
+		},
+		{
+			mgorm.Insert(nil, "table", "column1", "column2").
+				Values(10, "str").(*mgorm.Stmt),
+			`INSERT INTO table (column1, column2) ` +
+				`VALUES (10, "str")`,
+		},
+		{
+			mgorm.Update(nil, "table", "column1", "column2").
+				Set(10, "str").
+				Where("lhs = ?", 10).(*mgorm.Stmt),
+			`UPDATE table ` +
+				`SET column1 = 10, column2 = "str" ` +
+				`WHERE lhs = 10`,
+		},
+		{
+			mgorm.Delete(nil).
+				From("table").(*mgorm.Stmt),
+			`DELETE FROM table`,
+		},
+		{
+			mgorm.Count(nil, "column", "c").
+				From("table").(*mgorm.Stmt),
+			`SELECT COUNT(column) AS c FROM table`,
+		},
+		{
+			mgorm.Avg(nil, "column", "c").
+				From("table").(*mgorm.Stmt),
+			`SELECT AVG(column) AS c FROM table`,
+		},
+		{
+			mgorm.Sum(nil, "column", "c").
+				From("table").(*mgorm.Stmt),
+			`SELECT SUM(column) AS c FROM table`,
+		},
+		{
+			mgorm.Max(nil, "column", "c").
+				From("table").(*mgorm.Stmt),
+			`SELECT MAX(column) AS c FROM table`,
+		},
+		{
+			mgorm.Min(nil, "column", "c").
+				From("table").(*mgorm.Stmt),
+			`SELECT MIN(column) AS c FROM table`,
 		},
 	}
 
-	for _, testCase := range testCases {
-		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCmd(testCase.Cmd)
-		stmt.ExportedSetCalled(testCase.Called)
-		sql, _ := mgorm.StmtProcessQuerySQL(stmt)
-		assert.Equal(t, testCase.Result, string(sql))
+	for _, test := range tests {
+		res := test.Stmt.String()
+		assert.Equal(t, test.Result, res)
 	}
 }
 
-func TestStmt_ProcessCaseSQL(t *testing.T) {
-	testCases := []struct {
-		Called []syntax.Expr
-		Result string
-	}{
-		{
-			[]syntax.Expr{
-				&syntax.When{Expr: "lhs > rhs"},
-				&syntax.Then{"value"},
-			},
-			`CASE WHEN lhs > rhs THEN "value" END`,
-		},
-		{
-			[]syntax.Expr{
-				&syntax.When{Expr: "lhs1 > rhs1"},
-				&syntax.Then{"value1"},
-				&syntax.When{Expr: "lhs2 < rhs2"},
-				&syntax.Then{"value2"},
-			},
-			`CASE WHEN lhs1 > rhs1 THEN "value1" WHEN lhs2 < rhs2 THEN "value2" END`,
-		},
-		{
-			[]syntax.Expr{
-				&syntax.When{Expr: "lhs1 > rhs1"},
-				&syntax.Then{"value1"},
-				&syntax.When{Expr: "lhs2 < rhs2"},
-				&syntax.Then{"value2"},
-				&syntax.Else{"value3"},
-			},
-			`CASE WHEN lhs1 > rhs1 THEN "value1" WHEN lhs2 < rhs2 THEN "value2" ELSE "value3" END`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCalled(testCase.Called)
-		sql, _ := mgorm.StmtProcessCaseSQL(stmt)
-		assert.Equal(t, testCase.Result, string(sql))
-	}
-}
-
-func TestStmt_ProcessExecSQL(t *testing.T) {
-	testCases := []struct {
+func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
+	tests := []struct {
 		Cmd    syntax.Cmd
 		Called []syntax.Expr
-		Result string
+		Error  error
 	}{
 		{
-			&syntax.Insert{
-				Table:   syntax.Table{Name: "table"},
-				Columns: []syntax.Column{{Name: "column1"}, {Name: "column2"}},
-			},
-			[]syntax.Expr{
-				&syntax.Values{Columns: []interface{}{10, 20}},
-			},
-			"INSERT INTO table (column1, column2) VALUES (10, 20)",
-		},
-		{
-			&syntax.Update{Table: syntax.Table{Name: "table"}},
-			[]syntax.Expr{
-				&syntax.Set{Eqs: []syntax.Eq{{LHS: "lhs1", RHS: "rhs1"}, {LHS: "lhs2", RHS: "rhs2"}}},
-			},
-			`UPDATE table SET lhs1 = "rhs1", lhs2 = "rhs2"`,
-		},
-		{
-			&syntax.Update{Table: syntax.Table{Name: "table"}},
-			[]syntax.Expr{
-				&syntax.Set{Eqs: []syntax.Eq{{LHS: "lhs1", RHS: "rhs1"}, {LHS: "lhs2", RHS: "rhs2"}}},
-				&syntax.Where{Expr: "lhs1 = ?", Values: []interface{}{10}},
-				&syntax.And{Expr: "lhs2 = ? OR lhs3 = ?", Values: []interface{}{20, 30}},
-			},
-			`UPDATE table SET lhs1 = "rhs1", lhs2 = "rhs2" WHERE lhs1 = 10 AND (lhs2 = 20 OR lhs3 = 30)`,
-		},
-		{
 			&syntax.Delete{},
+			nil,
+			internal.NewError(
+				mgorm.OpStmtProcessQuerySQL,
+				internal.KindRuntime,
+				errors.New("command must be SELECT"),
+			),
+		},
+		{
+			&syntax.Select{},
 			[]syntax.Expr{
-				&syntax.From{Tables: []syntax.Table{{Name: "table"}}},
+				&syntax.From{},
+				&syntax.When{},
 			},
-			"DELETE FROM table",
+			internal.NewError(
+				mgorm.OpStmtProcessQuerySQL,
+				internal.KindRuntime,
+				errors.New("syntax.When is not supported"),
+			),
 		},
 	}
 
-	for _, testCase := range testCases {
+	for _, test := range tests {
 		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCmd(testCase.Cmd)
-		stmt.ExportedSetCalled(testCase.Called)
-		sql, _ := mgorm.StmtProcessExecSQL(stmt)
-		assert.Equal(t, testCase.Result, string(sql))
+		stmt.ExportedSetCmd(test.Cmd)
+		stmt.ExportedSetCalled(test.Called)
+		_, err := mgorm.StmtProcessQuerySQL(stmt)
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			continue
+		}
+		e, ok := err.(*internal.Error)
+		if !ok {
+			t.Errorf("Type of error is invalid")
+			continue
+		}
+		if diff := internal.CmpError(e, test.Error.(*internal.Error)); diff != "" {
+			t.Errorf(diff)
+		}
+	}
+}
+
+func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
+	tests := []struct {
+		Called []syntax.Expr
+		Error  error
+	}{
+		{
+			[]syntax.Expr{
+				&syntax.When{},
+				&syntax.Where{},
+			},
+			internal.NewError(
+				mgorm.OpStmtProcessCaseSQL,
+				internal.KindRuntime,
+				errors.New("syntax.Where is not supported"),
+			),
+		},
+	}
+
+	for _, test := range tests {
+		stmt := new(mgorm.Stmt)
+		stmt.ExportedSetCalled(test.Called)
+		_, err := mgorm.StmtProcessCaseSQL(stmt)
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			continue
+		}
+		e, ok := err.(*internal.Error)
+		if !ok {
+			t.Errorf("Type of error is invalid")
+			continue
+		}
+		if diff := internal.CmpError(e, test.Error.(*internal.Error)); diff != "" {
+			t.Errorf(diff)
+		}
+	}
+}
+
+func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
+	tests := []struct {
+		Cmd   syntax.Cmd
+		Error error
+	}{
+		{
+			&syntax.Select{},
+			internal.NewError(
+				mgorm.OpStmtProcessExecSQL,
+				internal.KindRuntime,
+				errors.New("command must be INSERT, UPDATE or DELETE"),
+			),
+		},
+	}
+
+	for _, test := range tests {
+		stmt := new(mgorm.Stmt)
+		stmt.ExportedSetCmd(test.Cmd)
+		_, err := mgorm.StmtProcessExecSQL(stmt)
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			continue
+		}
+		e, ok := err.(*internal.Error)
+		if !ok {
+			t.Errorf("Type of error is invalid")
+			continue
+		}
+		if diff := internal.CmpError(e, test.Error.(*internal.Error)); diff != "" {
+			t.Errorf(diff)
+		}
 	}
 }

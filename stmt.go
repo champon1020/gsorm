@@ -12,6 +12,7 @@ import (
 // Op values.
 const (
 	opStmtProcessQuerySQL internal.Op = "mgorm.Stmt.processQuerySQL"
+	opStmtProcessCaseSQL  internal.Op = "mgorm.Stmt.processCaseSQL"
 	opStmtProcessExecSQL  internal.Op = "mgorm.Stmt.processExecSQL"
 	opVar                 internal.Op = "mgorm.Stmt.Var"
 	opString              internal.Op = "mgorm.Stmt.String"
@@ -139,7 +140,7 @@ func (s *Stmt) processCaseSQL() (SQL, error) {
 			sql.write(e.Build())
 		default:
 			err := fmt.Errorf("%s is not supported", reflect.TypeOf(expr).Elem().String())
-			return "", internal.NewError(opStmtProcessQuerySQL, internal.KindRuntime, err)
+			return "", internal.NewError(opStmtProcessCaseSQL, internal.KindRuntime, err)
 		}
 	}
 	sql.write("END")
@@ -179,7 +180,7 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 		sql.write(s.cmd.Build().Build())
 	default:
 		err := errors.New("command must be INSERT, UPDATE or DELETE")
-		return "", internal.NewError(opStmtProcessExecSQL, internal.KindType, err)
+		return "", internal.NewError(opStmtProcessExecSQL, internal.KindRuntime, err)
 
 	}
 

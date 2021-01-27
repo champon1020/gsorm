@@ -15,21 +15,21 @@ import (
 )
 
 func TestSQL_String(t *testing.T) {
-	testCases := []struct {
+	tests := []struct {
 		SQL    mgorm.SQL
 		Result reflect.Kind
 	}{
 		{"Test", reflect.String},
 	}
 
-	for _, testCase := range testCases {
-		sql := mgorm.SQLString(&testCase.SQL)
-		assert.Equal(t, testCase.Result, reflect.TypeOf(sql).Kind())
+	for _, test := range tests {
+		sql := mgorm.SQLString(&test.SQL)
+		assert.Equal(t, test.Result, reflect.TypeOf(sql).Kind())
 	}
 }
 
 func TestSQL_Write(t *testing.T) {
-	testCases := []struct {
+	tests := []struct {
 		SQL    mgorm.SQL
 		Str    string
 		Result mgorm.SQL
@@ -39,9 +39,9 @@ func TestSQL_Write(t *testing.T) {
 		{"(test", ")", "(test)"},
 	}
 
-	for _, testCase := range testCases {
-		mgorm.SQLWrite(&testCase.SQL, testCase.Str)
-		assert.Equal(t, testCase.Result, testCase.SQL)
+	for _, test := range tests {
+		mgorm.SQLWrite(&test.SQL, test.Str)
+		assert.Equal(t, test.Result, test.SQL)
 	}
 }
 
@@ -51,7 +51,7 @@ func TestSQL_DoQuery(t *testing.T) {
 		Name string
 	}
 
-	testCases := []struct {
+	tests := []struct {
 		Rows *[]Car
 	}{
 		{&[]Car{{ID: 100, Name: "test"}}},
@@ -59,16 +59,16 @@ func TestSQL_DoQuery(t *testing.T) {
 	}
 
 	s := new(mgorm.SQL)
-	for _, testCase := range testCases {
+	for _, test := range tests {
 		car := new([]Car)
 		mockRows := new(mgorm.TestMockRows)
-		mockRows.Max = len(*testCase.Rows)
+		mockRows.Max = len(*test.Rows)
 		mockRows.ColumnsFunc = func() ([]string, error) { return []string{"id", "name"}, nil }
 		mockRows.ScanFunc = func(dest ...interface{}) error {
 			ptrID := dest[0].(*[]byte)
 			ptrName := dest[1].(*[]byte)
-			*ptrID = []byte(fmt.Sprintf("%d", (*testCase.Rows)[mockRows.Count-1].ID))
-			*ptrName = []byte((*testCase.Rows)[mockRows.Count-1].Name)
+			*ptrID = []byte(fmt.Sprintf("%d", (*test.Rows)[mockRows.Count-1].ID))
+			*ptrName = []byte((*test.Rows)[mockRows.Count-1].Name)
 			return nil
 		}
 		mockdb := &mgorm.TestMockDB{
@@ -77,7 +77,7 @@ func TestSQL_DoQuery(t *testing.T) {
 		if err := mgorm.SQLDoQuery(s, mockdb, car); err != nil {
 			t.Error(err)
 		}
-		if diff := cmp.Diff(car, testCase.Rows); diff != "" {
+		if diff := cmp.Diff(car, test.Rows); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -95,6 +95,11 @@ func TestSQL_DoQuery_Fail(t *testing.T) {
 			&[]Model{},
 			func(string, ...interface{}) (mgorm.Rows, error) { return nil, errors.New("test1") },
 			internal.NewError(mgorm.OpSQLDoQuery, internal.KindDatabase, errors.New("test1")),
+		},
+		{
+			&[]Model{},
+			func(string, ...interface{}) (mgorm.Rows, error) { return nil, nil },
+			internal.NewError(mgorm.OpSQLDoQuery, internal.KindDatabase, errors.New("rows is nil")),
 		},
 		{
 			&[]Model{},
@@ -150,7 +155,7 @@ func TestSQL_DoQuery_Fail(t *testing.T) {
 			continue
 		}
 
-		if diff := internal.CmpError(*e, *testCase.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
 			t.Errorf(diff)
 		}
 	}
@@ -197,7 +202,7 @@ func TestSQL_DoExec_Fail(t *testing.T) {
 			continue
 		}
 
-		if diff := internal.CmpError(*e, *testCase.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
 			t.Errorf(diff)
 		}
 	}

@@ -80,9 +80,12 @@ func (r *TestMockRows) Scan(dest ...interface{}) error {
 
 // Exported values which is declared in stmt.go.
 var (
-	StmtProcessQuerySQL = (*Stmt).processQuerySQL
-	StmtProcessCaseSQL  = (*Stmt).processCaseSQL
-	StmtProcessExecSQL  = (*Stmt).processExecSQL
+	StmtProcessQuerySQL   = (*Stmt).processQuerySQL
+	StmtProcessCaseSQL    = (*Stmt).processCaseSQL
+	StmtProcessExecSQL    = (*Stmt).processExecSQL
+	OpStmtProcessQuerySQL = opStmtProcessQuerySQL
+	OpStmtProcessCaseSQL  = opStmtProcessCaseSQL
+	OpStmtProcessExecSQL  = opStmtProcessExecSQL
 )
 
 func (s *Stmt) ExportedGetCmd() syntax.Cmd {

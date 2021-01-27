@@ -35,11 +35,15 @@ type DeleteStmt interface {
 // FromStmt is Stmt after Stmt.From is executed.
 type FromStmt interface {
 	Join(string) JoinStmt
+	LeftJoin(string) JoinStmt
+	RightJoin(string) JoinStmt
+	FullJoin(string) JoinStmt
 	Where(string, ...interface{}) WhereStmt
 	GroupBy(...string) GroupByStmt
 	OrderBy(string, bool) OrderByStmt
 	Limit(int) LimitStmt
 	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
@@ -62,9 +66,11 @@ type JoinStmt interface {
 // OnStmt is Stmt after Stmt.On is executed.
 type OnStmt interface {
 	Where(string, ...interface{}) WhereStmt
+	GroupBy(...string) GroupByStmt
 	OrderBy(string, bool) OrderByStmt
 	Limit(int) LimitStmt
 	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
@@ -76,6 +82,7 @@ type WhereStmt interface {
 	OrderBy(string, bool) OrderByStmt
 	Limit(int) LimitStmt
 	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
@@ -84,6 +91,7 @@ type AndStmt interface {
 	GroupBy(...string) GroupByStmt
 	OrderBy(string, bool) OrderByStmt
 	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
@@ -92,6 +100,7 @@ type OrStmt interface {
 	GroupBy(...string) GroupByStmt
 	OrderBy(string, bool) OrderByStmt
 	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
@@ -100,6 +109,7 @@ type GroupByStmt interface {
 	Having(string, ...interface{}) HavingStmt
 	OrderBy(string, bool) OrderByStmt
 	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
@@ -107,6 +117,7 @@ type GroupByStmt interface {
 type HavingStmt interface {
 	OrderBy(string, bool) OrderByStmt
 	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
@@ -114,6 +125,7 @@ type HavingStmt interface {
 type OrderByStmt interface {
 	Limit(int) LimitStmt
 	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
@@ -121,12 +133,14 @@ type OrderByStmt interface {
 type LimitStmt interface {
 	Offset(int) OffsetStmt
 	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
 // OffsetStmt is Stmt after Stmt.Offset is executed.
 type OffsetStmt interface {
 	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 

@@ -302,7 +302,7 @@ func TestBuildStmtSet_Fail(t *testing.T) {
 			continue
 		}
 
-		if diff := internal.CmpError(*e, *testCase.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
 			t.Errorf(diff)
 		}
 	}
