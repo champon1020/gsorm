@@ -8,6 +8,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestConvertToSnakeCase(t *testing.T) {
+	tests := []struct {
+		String string
+		Result string
+	}{
+		{"thisIsString", "this_is_string"},
+		{"this", "this"},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.Result, internal.ConvertToSnakeCase(test.String))
+	}
+}
+
 func TestToString(t *testing.T) {
 	var (
 		n0 int    = 1
@@ -77,5 +91,21 @@ func TestToString_Fail(t *testing.T) {
 			continue
 		}
 		assert.Equal(t, *e, *testCase.Error.(*internal.Error))
+	}
+}
+
+func TestSliceToString(t *testing.T) {
+	tests := []struct {
+		Values []interface{}
+		Result string
+	}{
+		{
+			[]interface{}{10, "str", true},
+			`10, "str", true`,
+		},
+	}
+
+	for _, test := range tests {
+		assert.Equal(t, test.Result, internal.SliceToString(test.Values))
 	}
 }

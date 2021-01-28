@@ -1,5 +1,7 @@
 package syntax
 
+import "fmt"
+
 // GroupBy expression.
 type GroupBy struct {
 	Columns []Column
@@ -11,6 +13,18 @@ func (g *GroupBy) name() string {
 
 func (g *GroupBy) addColumn(col string) {
 	g.Columns = append(g.Columns, *NewColumn(col))
+}
+
+// String returns string of function call.
+func (g *GroupBy) String() string {
+	var s string
+	for i, c := range g.Columns {
+		if i != 0 {
+			s += ", "
+		}
+		s += fmt.Sprintf("%q", c.Build())
+	}
+	return fmt.Sprintf("%s(%s)", g.name(), s)
 }
 
 // Build make GROUP BY statement set.

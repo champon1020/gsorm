@@ -1,6 +1,9 @@
 package syntax
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 // Offset expression.
 type Offset struct {
@@ -9,6 +12,11 @@ type Offset struct {
 
 func (o *Offset) name() string {
 	return "OFFSET"
+}
+
+// String returns string of function call.
+func (o *Offset) String() string {
+	return fmt.Sprintf("%s(%v)", o.name(), o.Num)
 }
 
 // Build make offset statement set.

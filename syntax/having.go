@@ -1,5 +1,11 @@
 package syntax
 
+import (
+	"fmt"
+
+	"github.com/champon1020/mgorm/internal"
+)
+
 // Having expression.
 type Having struct {
 	Expr   string
@@ -8,6 +14,16 @@ type Having struct {
 
 func (h *Having) name() string {
 	return "HAVING"
+}
+
+// String returns string of function call.
+func (h *Having) String() string {
+	s := fmt.Sprintf("%q", h.Expr)
+	if len(h.Values) > 0 {
+		s += ", "
+		s += internal.SliceToString(h.Values)
+	}
+	return fmt.Sprintf("%s(%s)", h.name(), s)
 }
 
 // Build makes HAVING statement set.

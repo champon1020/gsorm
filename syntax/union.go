@@ -1,5 +1,7 @@
 package syntax
 
+import "fmt"
+
 // Union expression.
 type Union struct {
 	Stmt Var
@@ -12,6 +14,11 @@ func (u *Union) name() string {
 		n += " ALL"
 	}
 	return n
+}
+
+// String returns string of function call.
+func (u *Union) String() string {
+	return fmt.Sprintf("%s(%q)", u.name(), u.Stmt)
 }
 
 // Build make UNION statement set.

@@ -1,5 +1,7 @@
 package syntax
 
+import "fmt"
+
 // JoinType is type of JOIN statement.
 type JoinType string
 
@@ -23,6 +25,11 @@ func (j *Join) name() string {
 
 func (j *Join) addTable(table string) {
 	j.Table = *NewTable(table)
+}
+
+// String returns string of function call.
+func (j *Join) String() string {
+	return fmt.Sprintf("%s(%q)", j.name(), j.Table.Build())
 }
 
 // Build make JOIN statement set.

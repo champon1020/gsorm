@@ -14,6 +14,27 @@ func TestOrderBy_Name(t *testing.T) {
 	assert.Equal(t, "ORDER BY", syntax.OrderByName(o))
 }
 
+func TestOrderBy_String(t *testing.T) {
+	testCases := []struct {
+		OrderBy *syntax.OrderBy
+		Result  string
+	}{
+		{
+			&syntax.OrderBy{Column: "column"},
+			`ORDER BY("column", false)`,
+		},
+		{
+			&syntax.OrderBy{Column: "column", Desc: true},
+			`ORDER BY("column", true)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.OrderBy.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestOrderBy_Build(t *testing.T) {
 	testCases := []struct {
 		OrderBy *syntax.OrderBy

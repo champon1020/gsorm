@@ -1,6 +1,9 @@
 package syntax
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 // Limit expression.
 type Limit struct {
@@ -9,6 +12,11 @@ type Limit struct {
 
 func (l *Limit) name() string {
 	return "LIMIT"
+}
+
+// String returns string of function call.
+func (l *Limit) String() string {
+	return fmt.Sprintf("%s(%v)", l.name(), l.Num)
 }
 
 // Build make limit statement set.

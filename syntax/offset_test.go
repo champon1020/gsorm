@@ -14,6 +14,23 @@ func TestOffset_Name(t *testing.T) {
 	assert.Equal(t, "OFFSET", syntax.OffsetName(l))
 }
 
+func TestOffset_String(t *testing.T) {
+	testCases := []struct {
+		Offset *syntax.Offset
+		Result string
+	}{
+		{
+			&syntax.Offset{Num: 10},
+			`OFFSET(10)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Offset.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestOffset_Build(t *testing.T) {
 	testCases := []struct {
 		Offset *syntax.Offset

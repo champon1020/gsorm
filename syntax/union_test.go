@@ -24,6 +24,27 @@ func TestUnion_Name(t *testing.T) {
 	}
 }
 
+func TestUnion_String(t *testing.T) {
+	testCases := []struct {
+		Union  *syntax.Union
+		Result string
+	}{
+		{
+			&syntax.Union{Stmt: "SELECT * FROM dept_manager"},
+			`UNION("SELECT * FROM dept_manager")`,
+		},
+		{
+			&syntax.Union{Stmt: "SELECT * FROM dept_manager", All: true},
+			`UNION ALL("SELECT * FROM dept_manager")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Union.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestUnion_Build(t *testing.T) {
 	testCases := []struct {
 		Union  *syntax.Union

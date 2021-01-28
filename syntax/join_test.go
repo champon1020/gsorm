@@ -51,6 +51,35 @@ func TestJoin_AddTable(t *testing.T) {
 	}
 }
 
+func TestJoin_String(t *testing.T) {
+	testCases := []struct {
+		Join   *syntax.Join
+		Result string
+	}{
+		{
+			&syntax.Join{Table: syntax.Table{Name: "table"}, Type: syntax.InnerJoin},
+			`INNER JOIN("table")`,
+		},
+		{
+			&syntax.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: syntax.LeftJoin},
+			`LEFT JOIN("table AS t")`,
+		},
+		{
+			&syntax.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: syntax.RightJoin},
+			`RIGHT JOIN("table AS t")`,
+		},
+		{
+			&syntax.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: syntax.FullJoin},
+			`FULL OUTER JOIN("table AS t")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.Join.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestJoin_Build(t *testing.T) {
 	testCases := []struct {
 		Join   *syntax.Join

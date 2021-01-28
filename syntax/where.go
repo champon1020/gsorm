@@ -23,6 +23,16 @@ func (w *Where) name() string {
 	return "WHERE"
 }
 
+// String returns string of function call.
+func (w *Where) String() string {
+	s := fmt.Sprintf("%q", w.Expr)
+	if len(w.Values) > 0 {
+		s += ", "
+		s += internal.SliceToString(w.Values)
+	}
+	return fmt.Sprintf("%s(%s)", w.name(), s)
+}
+
 // Build make WHERE statement set.
 func (w *Where) Build() (*StmtSet, error) {
 	ss, err := buildStmtSet(w.Expr, w.Values...)
@@ -43,6 +53,16 @@ type And struct {
 
 func (a *And) name() string {
 	return "AND"
+}
+
+// String returns string of function call.
+func (a *And) String() string {
+	s := fmt.Sprintf("%q", a.Expr)
+	if len(a.Values) > 0 {
+		s += ", "
+		s += internal.SliceToString(a.Values)
+	}
+	return fmt.Sprintf("%s(%s)", a.name(), s)
 }
 
 // Build make AND statement set.
@@ -66,6 +86,16 @@ type Or struct {
 
 func (o *Or) name() string {
 	return "OR"
+}
+
+// String returns string of function call.
+func (o *Or) String() string {
+	s := fmt.Sprintf("%q", o.Expr)
+	if len(o.Values) > 0 {
+		s += ", "
+		s += internal.SliceToString(o.Values)
+	}
+	return fmt.Sprintf("%s(%s)", o.name(), s)
 }
 
 // Build make OR statement set.

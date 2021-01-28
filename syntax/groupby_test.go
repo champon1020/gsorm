@@ -45,6 +45,34 @@ func TestGroupBy_AddColumn(t *testing.T) {
 	}
 }
 
+func TestGroupBy_String(t *testing.T) {
+	testCases := []struct {
+		GroupBy *syntax.GroupBy
+		Result  string
+	}{
+		{
+			&syntax.GroupBy{Columns: []syntax.Column{{Name: "column"}}},
+			`GROUP BY("column")`,
+		},
+		{
+			&syntax.GroupBy{Columns: []syntax.Column{{Name: "column", Alias: "c"}}},
+			`GROUP BY("column AS c")`,
+		},
+		{
+			&syntax.GroupBy{Columns: []syntax.Column{
+				{Name: "column1", Alias: "c1"},
+				{Name: "column2", Alias: "c2"},
+			}},
+			`GROUP BY("column1 AS c1", "column2 AS c2")`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := testCase.GroupBy.String()
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
 func TestGroupBy_Build(t *testing.T) {
 	testCases := []struct {
 		GroupBy *syntax.GroupBy

@@ -1,5 +1,10 @@
 package syntax
 
+// Exported values which is declared in delete.go.
+var (
+	DeleteQuery = (*Delete).query
+)
+
 // Exported values which is declared in from.go.
 var (
 	FromName     = (*From).name

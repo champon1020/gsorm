@@ -2,6 +2,7 @@ package syntax
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/champon1020/mgorm/internal"
 )
@@ -23,6 +24,23 @@ func (s *Set) name() string {
 func (s *Set) addEq(lhs string, rhs interface{}) {
 	e := NewEq(lhs, rhs)
 	s.Eqs = append(s.Eqs, *e)
+}
+
+// String returns string of function call.
+func (s *Set) String() string {
+	var str string
+	for i, eq := range s.Eqs {
+		if i != 0 {
+			str += ", "
+		}
+		switch rhs := eq.RHS.(type) {
+		case string:
+			str += fmt.Sprintf("%q", rhs)
+		default:
+			str += fmt.Sprintf("%v", rhs)
+		}
+	}
+	return fmt.Sprintf("%s(%s)", s.name(), str)
 }
 
 // Build make set statement set.
