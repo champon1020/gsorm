@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
@@ -26,9 +27,9 @@ func TestBuildStmtSet(t *testing.T) {
 			&syntax.StmtSet{Value: `lhs = "rhs"`},
 		},
 		{
-			"lhs = ?",
-			[]interface{}{100},
-			&syntax.StmtSet{Value: "lhs = 100"},
+			"NOT lhs = ?",
+			[]interface{}{"rhs"},
+			&syntax.StmtSet{Value: `NOT lhs = "rhs"`},
 		},
 		{
 			"lhs1 = ? AND lhs2 = ?",
@@ -49,6 +50,14 @@ func TestBuildStmtSet(t *testing.T) {
 			"lhs BETWEEN ? AND ?",
 			[]interface{}{10, 100},
 			&syntax.StmtSet{Value: "lhs BETWEEN 10 AND 100"},
+		},
+		{
+			"IN ?",
+			[]interface{}{mgorm.Select(nil, "*").
+				From("table").
+				Where("lhs = ?", "rhs").
+				Var()},
+			&syntax.StmtSet{Value: `IN (SELECT * FROM table WHERE lhs = "rhs")`},
 		},
 	}
 
