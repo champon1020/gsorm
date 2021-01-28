@@ -9,48 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestJoin_Name(t *testing.T) {
-	testCases := []struct {
-		Join   *syntax.Join
-		Result string
-	}{
-		{&syntax.Join{Type: syntax.InnerJoin}, "INNER JOIN"},
-		{&syntax.Join{Type: syntax.LeftJoin}, "LEFT JOIN"},
-		{&syntax.Join{Type: syntax.RightJoin}, "RIGHT JOIN"},
-		{&syntax.Join{Type: syntax.FullJoin}, "FULL OUTER JOIN"},
-	}
-
-	for _, testCase := range testCases {
-		assert.Equal(t, testCase.Result, syntax.JoinName(testCase.Join))
-	}
-}
-
-func TestJoin_AddTable(t *testing.T) {
-	testCases := []struct {
-		Join   *syntax.Join
-		Table  string
-		Result *syntax.Join
-	}{
-		{
-			&syntax.Join{},
-			"table",
-			&syntax.Join{Table: syntax.Table{Name: "table"}},
-		},
-		{
-			&syntax.Join{},
-			"table AS t",
-			&syntax.Join{Table: syntax.Table{Name: "table", Alias: "t"}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		syntax.JoinAddTable(testCase.Join, testCase.Table)
-		if diff := cmp.Diff(testCase.Join, testCase.Result); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-	}
-}
-
 func TestJoin_String(t *testing.T) {
 	testCases := []struct {
 		Join   *syntax.Join
@@ -90,13 +48,17 @@ func TestJoin_Build(t *testing.T) {
 			&syntax.StmtSet{Clause: "INNER JOIN", Value: "table"},
 		},
 		{
-			&syntax.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: syntax.InnerJoin},
-			&syntax.StmtSet{Clause: "INNER JOIN", Value: "table AS t"},
+			&syntax.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: syntax.LeftJoin},
+			&syntax.StmtSet{Clause: "LEFT JOIN", Value: "table AS t"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		res, _ := testCase.Join.Build()
+		res, err := testCase.Join.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
@@ -111,8 +73,13 @@ func TestNewJoin(t *testing.T) {
 	}{
 		{
 			"table",
-			syntax.InnerJoin,
-			&syntax.Join{Table: syntax.Table{Name: "table"}, Type: "INNER JOIN"},
+			syntax.RightJoin,
+			&syntax.Join{Table: syntax.Table{Name: "table"}, Type: "RIGHT JOIN"},
+		},
+		{
+			"table AS t",
+			syntax.FullJoin,
+			&syntax.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: "FULL OUTER JOIN"},
 		},
 	}
 

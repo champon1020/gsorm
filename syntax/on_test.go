@@ -9,11 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOn_Name(t *testing.T) {
-	o := new(syntax.On)
-	assert.Equal(t, "ON", syntax.OnName(o))
-}
-
 func TestOn_String(t *testing.T) {
 	testCases := []struct {
 		On     *syntax.On
@@ -52,10 +47,18 @@ func TestOn_Build(t *testing.T) {
 			&syntax.On{Expr: "lhs = ?", Values: []interface{}{10}},
 			&syntax.StmtSet{Clause: "ON", Value: "lhs = 10"},
 		},
+		{
+			&syntax.On{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
+			&syntax.StmtSet{Clause: "ON", Value: `lhs1 = 10 AND lhs2 = "str"`},
+		},
 	}
 
 	for _, testCase := range testCases {
-		res, _ := testCase.On.Build()
+		res, err := testCase.On.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}

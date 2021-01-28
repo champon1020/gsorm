@@ -9,11 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDelete_Query(t *testing.T) {
-	d := new(syntax.Delete)
-	assert.Equal(t, "DELETE", syntax.DeleteQuery(d))
-}
-
 func TestDelete_String(t *testing.T) {
 	d := new(syntax.Delete)
 	assert.Equal(t, "DELETE()", d.String())

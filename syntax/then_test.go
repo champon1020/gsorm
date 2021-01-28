@@ -9,36 +9,48 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOffset_String(t *testing.T) {
+func TestThen_String(t *testing.T) {
 	testCases := []struct {
-		Offset *syntax.Offset
+		Then   *syntax.Then
 		Result string
 	}{
 		{
-			&syntax.Offset{Num: 10},
-			`OFFSET(10)`,
+			&syntax.Then{Value: 10},
+			`THEN(10)`,
+		},
+		{
+			&syntax.Then{Value: "str"},
+			`THEN("str")`,
+		},
+		{
+			&syntax.Then{Value: true},
+			`THEN(true)`,
 		},
 	}
 
 	for _, testCase := range testCases {
-		res := testCase.Offset.String()
+		res := testCase.Then.String()
 		assert.Equal(t, testCase.Result, res)
 	}
 }
 
-func TestOffset_Build(t *testing.T) {
+func TestThen_Build(t *testing.T) {
 	testCases := []struct {
-		Offset *syntax.Offset
+		Then   *syntax.Then
 		Result *syntax.StmtSet
 	}{
 		{
-			&syntax.Offset{Num: 5},
-			&syntax.StmtSet{Clause: "OFFSET", Value: "5"},
+			&syntax.Then{Value: 10},
+			&syntax.StmtSet{Clause: "THEN", Value: "10"},
+		},
+		{
+			&syntax.Then{Value: "str"},
+			&syntax.StmtSet{Clause: "THEN", Value: `"str"`},
 		},
 	}
 
 	for _, testCase := range testCases {
-		res, err := testCase.Offset.Build()
+		res, err := testCase.Then.Build()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
@@ -49,19 +61,23 @@ func TestOffset_Build(t *testing.T) {
 	}
 }
 
-func TestNewOffset(t *testing.T) {
+func TestNewThen(t *testing.T) {
 	testCases := []struct {
-		Num    int
-		Result *syntax.Offset
+		Value  interface{}
+		Result *syntax.Then
 	}{
 		{
-			Num:    5,
-			Result: &syntax.Offset{Num: 5},
+			10,
+			&syntax.Then{Value: 10},
+		},
+		{
+			"str",
+			&syntax.Then{Value: "str"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		res := syntax.NewOffset(testCase.Num)
+		res := syntax.NewThen(testCase.Value)
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}

@@ -9,90 +9,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInsert_Query(t *testing.T) {
-	i := &syntax.Insert{}
-	assert.Equal(t, "INSERT INTO", syntax.InsertQuery(i))
-}
-
-func TestInsert_AddTable(t *testing.T) {
-	testCases := []struct {
-		Table  string
-		Insert *syntax.Insert
-		Result *syntax.Insert
-	}{
-		{
-			"table",
-			&syntax.Insert{},
-			&syntax.Insert{Table: syntax.Table{Name: "table"}},
-		},
-		{
-			"table AS t",
-			&syntax.Insert{},
-			&syntax.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
-		},
-		{
-			"table2",
-			&syntax.Insert{Table: syntax.Table{Name: "table1", Alias: "t1"}},
-			&syntax.Insert{Table: syntax.Table{Name: "table2"}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		syntax.InsertAddTable(testCase.Insert, testCase.Table)
-		if diff := cmp.Diff(testCase.Insert, testCase.Result); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-	}
-}
-
-func TestInsert_AddColumn(t *testing.T) {
-	testCases := []struct {
-		Column string
-		Insert *syntax.Insert
-		Result *syntax.Insert
-	}{
-		{
-			"column",
-			&syntax.Insert{},
-			&syntax.Insert{Columns: []syntax.Column{{Name: "column"}}},
-		},
-		{
-			"column AS c",
-			&syntax.Insert{},
-			&syntax.Insert{Columns: []syntax.Column{{Name: "column", Alias: "c"}}},
-		},
-		{
-			"column2",
-			&syntax.Insert{Columns: []syntax.Column{{Name: "column1"}}},
-			&syntax.Insert{Columns: []syntax.Column{{Name: "column1"}, {Name: "column2"}}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		syntax.InsertAddColumn(testCase.Insert, testCase.Column)
-		if diff := cmp.Diff(testCase.Insert, testCase.Result); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-	}
-}
-
 func TestInsert_String(t *testing.T) {
 	testCases := []struct {
 		Insert *syntax.Insert
 		Result string
 	}{
 		{
-			&syntax.Insert{
-				Table:   syntax.Table{Name: "table"},
-				Columns: []syntax.Column{},
-			},
+			&syntax.Insert{Table: syntax.Table{Name: "table"}},
 			`INSERT INTO("table")`,
 		},
 		{
-			&syntax.Insert{
-				Table:   syntax.Table{Name: "table", Alias: "t"},
-				Columns: []syntax.Column{},
-			},
+			&syntax.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
 			`INSERT INTO("table AS t")`,
 		},
 		{
@@ -129,22 +56,26 @@ func TestInsert_Build(t *testing.T) {
 		Result *syntax.StmtSet
 	}{
 		{
-			&syntax.Insert{Table: syntax.Table{Name: "table"}, Columns: []syntax.Column{{Name: "column1"}}},
-			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table (column1)"},
+			&syntax.Insert{Table: syntax.Table{Name: "table"}},
+			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table"},
+		},
+		{
+			&syntax.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
+			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table AS t"},
 		},
 		{
 			&syntax.Insert{
-				Table:   syntax.Table{Name: "table"},
-				Columns: []syntax.Column{{Name: "column1"}, {Name: "column2"}},
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []syntax.Column{{Name: "column"}},
 			},
-			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table (column1, column2)"},
+			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table AS t (column)"},
 		},
 		{
 			&syntax.Insert{
-				Table:   syntax.Table{Name: "table"},
-				Columns: []syntax.Column{{Name: "column1", Alias: "c1"}},
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []syntax.Column{{Name: "column", Alias: "c"}},
 			},
-			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table (column1 AS c1)"},
+			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table AS t (column AS c)"},
 		},
 		{
 			&syntax.Insert{
@@ -171,15 +102,28 @@ func TestNewInsert(t *testing.T) {
 	}{
 		{
 			"table",
-			[]string{"column1"},
-			&syntax.Insert{Table: syntax.Table{Name: "table"}, Columns: []syntax.Column{{Name: "column1"}}},
+			[]string{},
+			&syntax.Insert{Table: syntax.Table{Name: "table"}},
 		},
 		{
 			"table AS t",
-			[]string{"column1 AS c1"},
+			[]string{},
+			&syntax.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
+		},
+		{
+			"table AS t",
+			[]string{"column"},
 			&syntax.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
-				Columns: []syntax.Column{{Name: "column1", Alias: "c1"}},
+				Columns: []syntax.Column{{Name: "column"}},
+			},
+		},
+		{
+			"table AS t",
+			[]string{"column AS c"},
+			&syntax.Insert{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []syntax.Column{{Name: "column", Alias: "c"}},
 			},
 		},
 		{

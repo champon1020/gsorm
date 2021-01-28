@@ -15,8 +15,16 @@ func TestStmtSet_WriteClause(t *testing.T) {
 		Clause  string
 		Result  *syntax.StmtSet
 	}{
-		{&syntax.StmtSet{Clause: ""}, "clause", &syntax.StmtSet{Clause: "clause"}},
-		{&syntax.StmtSet{Clause: "clause1"}, "clause2", &syntax.StmtSet{Clause: "clause1 clause2"}},
+		{
+			&syntax.StmtSet{Clause: ""},
+			"clause",
+			&syntax.StmtSet{Clause: "clause"},
+		},
+		{
+			&syntax.StmtSet{Clause: "clause1"},
+			"clause2",
+			&syntax.StmtSet{Clause: "clause1 clause2"},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -33,12 +41,36 @@ func TestStmtSet_WriteValue(t *testing.T) {
 		Value   string
 		Result  *syntax.StmtSet
 	}{
-		{&syntax.StmtSet{Value: ""}, "value", &syntax.StmtSet{Value: "value"}},
-		{&syntax.StmtSet{Value: "("}, "value", &syntax.StmtSet{Value: "(value"}},
-		{&syntax.StmtSet{Value: "(value"}, ")", &syntax.StmtSet{Value: "(value)"}},
-		{&syntax.StmtSet{Value: "value1"}, "value2", &syntax.StmtSet{Value: "value1 value2"}},
-		{&syntax.StmtSet{Value: "value1"}, ",", &syntax.StmtSet{Value: "value1,"}},
-		{&syntax.StmtSet{Value: "value1,"}, "value2", &syntax.StmtSet{Value: "value1, value2"}},
+		{
+			&syntax.StmtSet{Value: ""},
+			"value",
+			&syntax.StmtSet{Value: "value"},
+		},
+		{
+			&syntax.StmtSet{Value: "("},
+			"value",
+			&syntax.StmtSet{Value: "(value"},
+		},
+		{
+			&syntax.StmtSet{Value: "(value"},
+			")",
+			&syntax.StmtSet{Value: "(value)"},
+		},
+		{
+			&syntax.StmtSet{Value: "value1"},
+			"value2",
+			&syntax.StmtSet{Value: "value1 value2"},
+		},
+		{
+			&syntax.StmtSet{Value: "value1"},
+			",",
+			&syntax.StmtSet{Value: "value1,"},
+		},
+		{
+			&syntax.StmtSet{Value: "value1,"},
+			"value2",
+			&syntax.StmtSet{Value: "value1, value2"},
+		},
 	}
 
 	for _, testCase := range testCases {

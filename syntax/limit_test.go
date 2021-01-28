@@ -9,11 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLimit_Name(t *testing.T) {
-	l := new(syntax.Limit)
-	assert.Equal(t, "LIMIT", syntax.LimitName(l))
-}
-
 func TestLimit_String(t *testing.T) {
 	testCases := []struct {
 		Limit  *syntax.Limit
@@ -43,7 +38,11 @@ func TestLimit_Build(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res, _ := testCase.Limit.Build()
+		res, err := testCase.Limit.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}

@@ -9,11 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHavign_Name(t *testing.T) {
-	h := new(syntax.Having)
-	assert.Equal(t, "HAVING", syntax.HavingName(h))
-}
-
 func TestHaving_String(t *testing.T) {
 	testCases := []struct {
 		Having *syntax.Having
@@ -61,7 +56,7 @@ func TestHaving_Build(t *testing.T) {
 	for _, testCase := range testCases {
 		res, err := testCase.Having.Build()
 		if err != nil {
-			t.Errorf("%v\n", err)
+			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {

@@ -9,33 +9,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUnion_Name(t *testing.T) {
-	testCases := []struct {
-		Union  *syntax.Union
-		Result string
-	}{
-		{&syntax.Union{}, "UNION"},
-		{&syntax.Union{All: true}, "UNION ALL"},
-	}
-
-	for _, testCase := range testCases {
-		res := syntax.UnionName(testCase.Union)
-		assert.Equal(t, testCase.Result, res)
-	}
-}
-
 func TestUnion_String(t *testing.T) {
 	testCases := []struct {
 		Union  *syntax.Union
 		Result string
 	}{
 		{
-			&syntax.Union{Stmt: "SELECT * FROM dept_manager"},
-			`UNION("SELECT * FROM dept_manager")`,
+			&syntax.Union{Stmt: "SELECT * FROM table"},
+			`UNION("SELECT * FROM table")`,
 		},
 		{
-			&syntax.Union{Stmt: "SELECT * FROM dept_manager", All: true},
-			`UNION ALL("SELECT * FROM dept_manager")`,
+			&syntax.Union{Stmt: "SELECT * FROM table", All: true},
+			`UNION ALL("SELECT * FROM table")`,
 		},
 	}
 
@@ -51,19 +36,19 @@ func TestUnion_Build(t *testing.T) {
 		Result *syntax.StmtSet
 	}{
 		{
-			&syntax.Union{Stmt: "SELECT * FROM dept_manager"},
-			&syntax.StmtSet{Clause: "UNION", Value: "SELECT * FROM dept_manager"},
+			&syntax.Union{Stmt: "SELECT * FROM table"},
+			&syntax.StmtSet{Clause: "UNION", Value: "SELECT * FROM table"},
 		},
 		{
-			&syntax.Union{Stmt: "SELECT * FROM dept_manager", All: true},
-			&syntax.StmtSet{Clause: "UNION ALL", Value: "SELECT * FROM dept_manager"},
+			&syntax.Union{Stmt: "SELECT * FROM table", All: true},
+			&syntax.StmtSet{Clause: "UNION ALL", Value: "SELECT * FROM table"},
 		},
 	}
 
 	for _, testCase := range testCases {
 		res, err := testCase.Union.Build()
 		if err != nil {
-			t.Errorf("%v\n", err)
+			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
@@ -79,14 +64,14 @@ func TestNewUnion(t *testing.T) {
 		Result *syntax.Union
 	}{
 		{
-			"SELECT * FROM dept_manager",
+			"SELECT * FROM table",
 			false,
-			&syntax.Union{Stmt: "SELECT * FROM dept_manager", All: false},
+			&syntax.Union{Stmt: "SELECT * FROM table", All: false},
 		},
 		{
-			"SELECT * FROM dept_manager",
+			"SELECT * FROM table",
 			true,
-			&syntax.Union{Stmt: "SELECT * FROM dept_manager", All: true},
+			&syntax.Union{Stmt: "SELECT * FROM table", All: true},
 		},
 	}
 

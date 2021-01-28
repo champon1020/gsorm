@@ -35,14 +35,16 @@ func (i *Insert) Build() *StmtSet {
 	ss := new(StmtSet)
 	ss.WriteClause(i.query())
 	ss.WriteValue(i.Table.Build())
-	ss.WriteValue("(")
-	for j, c := range i.Columns {
-		if j != 0 {
-			ss.WriteValue(",")
+	if len(i.Columns) > 0 {
+		ss.WriteValue("(")
+		for j, c := range i.Columns {
+			if j != 0 {
+				ss.WriteValue(",")
+			}
+			ss.WriteValue(c.Build())
 		}
-		ss.WriteValue(c.Build())
+		ss.WriteValue(")")
 	}
-	ss.WriteValue(")")
 	return ss
 }
 

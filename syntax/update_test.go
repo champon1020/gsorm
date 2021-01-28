@@ -9,42 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUpdate_Query(t *testing.T) {
-	u := &syntax.Update{}
-	assert.Equal(t, "UPDATE", syntax.UpdateQuery(u))
-}
-
-func TestUpdate_AddTable(t *testing.T) {
-	testCases := []struct {
-		Table  string
-		Update *syntax.Update
-		Result *syntax.Update
-	}{
-		{
-			"table",
-			&syntax.Update{},
-			&syntax.Update{Table: syntax.Table{Name: "table"}},
-		},
-		{
-			"table AS t",
-			&syntax.Update{},
-			&syntax.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
-		},
-		{
-			"table2",
-			&syntax.Update{Table: syntax.Table{Name: "table1", Alias: "t1"}},
-			&syntax.Update{Table: syntax.Table{Name: "table2"}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		syntax.UpdateAddTable(testCase.Update, testCase.Table)
-		if diff := cmp.Diff(testCase.Update, testCase.Result); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-	}
-}
-
 func TestUpdate_String(t *testing.T) {
 	testCases := []struct {
 		Update *syntax.Update
@@ -57,6 +21,20 @@ func TestUpdate_String(t *testing.T) {
 		{
 			&syntax.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
 			`UPDATE("table AS t")`,
+		},
+		{
+			&syntax.Update{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []string{"column"},
+			},
+			`UPDATE("table AS t", "column")`,
+		},
+		{
+			&syntax.Update{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []string{"column1", "column2"},
+			},
+			`UPDATE("table AS t", "column1", "column2")`,
 		},
 	}
 
@@ -77,6 +55,20 @@ func TestUpdate_Build(t *testing.T) {
 		},
 		{
 			&syntax.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
+			&syntax.StmtSet{Clause: "UPDATE", Value: "table AS t"},
+		},
+		{
+			&syntax.Update{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []string{"column"},
+			},
+			&syntax.StmtSet{Clause: "UPDATE", Value: "table AS t"},
+		},
+		{
+			&syntax.Update{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []string{"column1", "column2"},
+			},
 			&syntax.StmtSet{Clause: "UPDATE", Value: "table AS t"},
 		},
 	}
@@ -102,8 +94,24 @@ func TestNewUpdate(t *testing.T) {
 		},
 		{
 			"table AS t",
+			[]string{},
+			&syntax.Update{Table: syntax.Table{Name: "table", Alias: "t"}, Columns: []string{}},
+		},
+		{
+			"table AS t",
+			[]string{"column"},
+			&syntax.Update{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []string{"column"},
+			},
+		},
+		{
+			"table AS t",
 			[]string{"column1", "column2"},
-			&syntax.Update{Table: syntax.Table{Name: "table", Alias: "t"}, Columns: []string{"column1", "column2"}},
+			&syntax.Update{
+				Table:   syntax.Table{Name: "table", Alias: "t"},
+				Columns: []string{"column1", "column2"},
+			},
 		},
 	}
 

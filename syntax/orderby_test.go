@@ -9,11 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOrderBy_Name(t *testing.T) {
-	o := new(syntax.OrderBy)
-	assert.Equal(t, "ORDER BY", syntax.OrderByName(o))
-}
-
 func TestOrderBy_String(t *testing.T) {
 	testCases := []struct {
 		OrderBy *syntax.OrderBy
@@ -41,17 +36,21 @@ func TestOrderBy_Build(t *testing.T) {
 		Result  *syntax.StmtSet
 	}{
 		{
-			&syntax.OrderBy{Column: "id"},
-			&syntax.StmtSet{Clause: "ORDER BY", Value: "id"},
+			&syntax.OrderBy{Column: "column"},
+			&syntax.StmtSet{Clause: "ORDER BY", Value: "column"},
 		},
 		{
-			&syntax.OrderBy{Column: "id", Desc: true},
-			&syntax.StmtSet{Clause: "ORDER BY", Value: "id DESC"},
+			&syntax.OrderBy{Column: "column", Desc: true},
+			&syntax.StmtSet{Clause: "ORDER BY", Value: "column DESC"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		res, _ := testCase.OrderBy.Build()
+		res, err := testCase.OrderBy.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
 		if diff := cmp.Diff(res, testCase.Result); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
@@ -65,14 +64,14 @@ func TestNewOrderBy(t *testing.T) {
 		Result *syntax.OrderBy
 	}{
 		{
-			"id",
+			"column",
 			false,
-			&syntax.OrderBy{Column: "id", Desc: false},
+			&syntax.OrderBy{Column: "column", Desc: false},
 		},
 		{
-			"id",
+			"column",
 			true,
-			&syntax.OrderBy{Column: "id", Desc: true},
+			&syntax.OrderBy{Column: "column", Desc: true},
 		},
 	}
 
