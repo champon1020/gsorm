@@ -7,6 +7,8 @@ import (
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/mgorm/syntax/cmd"
+	"github.com/champon1020/mgorm/syntax/expr"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -158,7 +160,7 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 		Error  error
 	}{
 		{
-			&syntax.Delete{},
+			&cmd.Delete{},
 			nil,
 			internal.NewError(
 				mgorm.OpStmtProcessQuerySQL,
@@ -167,15 +169,15 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 			),
 		},
 		{
-			&syntax.Select{},
+			&cmd.Select{},
 			[]syntax.Expr{
-				&syntax.From{},
-				&syntax.When{},
+				&expr.From{},
+				&expr.When{},
 			},
 			internal.NewError(
 				mgorm.OpStmtProcessQuerySQL,
 				internal.KindRuntime,
-				errors.New("syntax.When is not supported"),
+				errors.New("expr.When is not supported"),
 			),
 		},
 	}
@@ -207,13 +209,13 @@ func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
 	}{
 		{
 			[]syntax.Expr{
-				&syntax.When{},
-				&syntax.Where{},
+				&expr.When{},
+				&expr.Where{},
 			},
 			internal.NewError(
 				mgorm.OpStmtProcessCaseSQL,
 				internal.KindRuntime,
-				errors.New("syntax.Where is not supported"),
+				errors.New("expr.Where is not supported"),
 			),
 		},
 	}
@@ -243,7 +245,7 @@ func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
 		Error error
 	}{
 		{
-			&syntax.Select{},
+			&cmd.Select{},
 			internal.NewError(
 				mgorm.OpStmtProcessExecSQL,
 				internal.KindRuntime,

@@ -7,6 +7,8 @@ import (
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/mgorm/syntax/cmd"
+	"github.com/champon1020/mgorm/syntax/expr"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -20,15 +22,15 @@ func TestMockDB_AddExecuted(t *testing.T) {
 	}{
 		{
 			&mgorm.MockDB{},
-			&syntax.Select{},
+			&cmd.Select{},
 			[]syntax.Expr{
-				&syntax.From{},
-				&syntax.Where{},
+				&expr.From{},
+				&expr.Where{},
 			},
-			&syntax.Select{},
+			&cmd.Select{},
 			[]syntax.Expr{
-				&syntax.From{},
-				&syntax.Where{},
+				&expr.From{},
+				&expr.Where{},
 			},
 		},
 	}
@@ -61,15 +63,15 @@ func TestMockDB_AddExpected(t *testing.T) {
 	}{
 		{
 			&mgorm.MockDB{},
-			&syntax.Select{},
+			&cmd.Select{},
 			[]syntax.Expr{
-				&syntax.From{},
-				&syntax.Where{},
+				&expr.From{},
+				&expr.Where{},
 			},
-			&syntax.Select{},
+			&cmd.Select{},
 			[]syntax.Expr{
-				&syntax.From{},
-				&syntax.Where{},
+				&expr.From{},
+				&expr.Where{},
 			},
 		},
 	}
