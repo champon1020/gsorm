@@ -13,7 +13,7 @@ import (
 )
 
 func TestStmt_String(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		Stmt   *mgorm.Stmt
 		Result string
 	}{
@@ -147,14 +147,14 @@ func TestStmt_String(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		res := test.Stmt.String()
-		assert.Equal(t, test.Result, res)
+	for _, testCase := range testCases {
+		res := testCase.Stmt.String()
+		assert.Equal(t, testCase.Result, res)
 	}
 }
 
 func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		Cmd    syntax.Cmd
 		Called []syntax.Expr
 		Error  error
@@ -182,10 +182,10 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, testCase := range testCases {
 		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCmd(test.Cmd)
-		stmt.ExportedSetCalled(test.Called)
+		stmt.ExportedSetCmd(testCase.Cmd)
+		stmt.ExportedSetCalled(testCase.Called)
 		_, err := mgorm.StmtProcessQuerySQL(stmt)
 		if err == nil {
 			t.Errorf("Error was not occurred")
@@ -196,14 +196,14 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(e, test.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
 			t.Errorf(diff)
 		}
 	}
 }
 
 func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		Called []syntax.Expr
 		Error  error
 	}{
@@ -220,9 +220,9 @@ func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, testCase := range testCases {
 		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCalled(test.Called)
+		stmt.ExportedSetCalled(testCase.Called)
 		_, err := mgorm.StmtProcessCaseSQL(stmt)
 		if err == nil {
 			t.Errorf("Error was not occurred")
@@ -233,14 +233,14 @@ func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(e, test.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
 			t.Errorf(diff)
 		}
 	}
 }
 
 func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		Cmd   syntax.Cmd
 		Error error
 	}{
@@ -254,9 +254,9 @@ func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, testCase := range testCases {
 		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCmd(test.Cmd)
+		stmt.ExportedSetCmd(testCase.Cmd)
 		_, err := mgorm.StmtProcessExecSQL(stmt)
 		if err == nil {
 			t.Errorf("Error was not occurred")
@@ -267,7 +267,7 @@ func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(e, test.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
 			t.Errorf(diff)
 		}
 	}

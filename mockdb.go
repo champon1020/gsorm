@@ -19,11 +19,15 @@ type MockDB struct {
 	actual   []*Stmt
 }
 
-// Query is the function for implementing DB.
-func (m *MockDB) query(string, ...interface{}) (sqlRows, error) { return nil, nil }
+// query is the fake function for implementing DB.
+func (m *MockDB) query(string, ...interface{}) (*sql.Rows, error) {
+	return nil, nil
+}
 
-// Exec is the function for implementing DB.
-func (m *MockDB) exec(string, ...interface{}) (sql.Result, error) { return nil, nil }
+// exec is the fake function for implementing DB.
+func (m *MockDB) exec(string, ...interface{}) (sql.Result, error) {
+	return nil, nil
+}
 
 func (m *MockDB) addExecuted(stmt *Stmt) {
 	m.actual = append(m.actual, stmt)

@@ -9,8 +9,12 @@ import (
 )
 
 // New generate DB object.
-func New(db *sql.DB) *DB {
-	return &DB{db: db}
+func New(dn, dsn string) (*DB, error) {
+	db, err := sql.Open(dn, dsn)
+	if err != nil {
+		return nil, err
+	}
+	return &DB{db: db}, nil
 }
 
 // NewMock generate MockDB object.

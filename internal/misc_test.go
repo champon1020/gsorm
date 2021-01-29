@@ -9,7 +9,7 @@ import (
 )
 
 func TestConvertToSnakeCase(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		String string
 		Result string
 	}{
@@ -17,8 +17,8 @@ func TestConvertToSnakeCase(t *testing.T) {
 		{"this", "this"},
 	}
 
-	for _, test := range tests {
-		assert.Equal(t, test.Result, internal.ConvertToSnakeCase(test.String))
+	for _, testCase := range testCases {
+		assert.Equal(t, testCase.Result, internal.ConvertToSnakeCase(testCase.String))
 	}
 }
 
@@ -95,7 +95,7 @@ func TestToString_Fail(t *testing.T) {
 }
 
 func TestSliceToString(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		Values []interface{}
 		Result string
 	}{
@@ -105,7 +105,7 @@ func TestSliceToString(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		assert.Equal(t, test.Result, internal.SliceToString(test.Values))
+	for _, testCase := range testCases {
+		assert.Equal(t, testCase.Result, internal.SliceToString(testCase.Values))
 	}
 }

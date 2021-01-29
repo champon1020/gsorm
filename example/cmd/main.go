@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"time"
 
@@ -11,12 +10,11 @@ import (
 )
 
 func main() {
-	_db, err := sql.Open("mysql", "root:toor@tcp(127.0.0.1:33306)/employees")
+	db, err := mgorm.New("mysql", "root:toor@tcp(127.0.0.1:33306)/employees")
 	if err != nil {
 		fmt.Println("Failed to open database connection")
 		return
 	}
-	db := mgorm.New(_db)
 
 	i := 0
 	for {

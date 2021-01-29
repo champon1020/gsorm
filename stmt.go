@@ -54,31 +54,31 @@ func (s *Stmt) Var() syntax.Var {
 func (s *Stmt) String() string {
 	if _, ok := s.called[0].(*expr.When); ok {
 		sql, _ := s.processCaseSQL()
-		return sql.string()
+		return sql.String()
 	}
 	if _, ok := s.cmd.(*cmd.Select); ok {
 		sql, _ := s.processQuerySQL()
-		return sql.string()
+		return sql.String()
 	}
 	s.execute(opString)
 	sql, _ := s.processExecSQL()
-	return sql.string()
+	return sql.String()
 }
 
 // Query executes a query that returns some results.
 func (s *Stmt) Query(model interface{}) error {
-	if db, ok := s.db.(*MockDB); ok {
+	switch db := s.db.(type) {
+	case *DB:
+		sql, err := s.processQuerySQL()
+		if err != nil {
+			return err
+		}
+		if err := internal.Query(db.db, &sql, model); err != nil {
+			return err
+		}
+	case *MockDB:
 		s.execute(opQuery, model)
 		db.addExecuted(s)
-		return nil
-	}
-
-	sql, err := s.processQuerySQL()
-	if err != nil {
-		return err
-	}
-	if err := sql.doQuery(s.db, model); err != nil {
-		return err
 	}
 	return nil
 }
@@ -89,15 +89,15 @@ func (s *Stmt) ExpectQuery(model interface{}) *Stmt {
 	return s
 }
 
-func (s *Stmt) processQuerySQL() (SQL, error) {
-	var sql SQL
+func (s *Stmt) processQuerySQL() (internal.SQL, error) {
+	var sql internal.SQL
 
 	sel, ok := s.cmd.(*cmd.Select)
 	if !ok {
 		err := errors.New("command must be SELECT")
 		return "", internal.NewError(opStmtProcessQuerySQL, internal.KindRuntime, err)
 	}
-	sql.write(sel.Build().Build())
+	sql.Write(sel.Build().Build())
 
 	for _, e := range s.called {
 		switch e := e.(type) {
@@ -117,7 +117,7 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 			if err != nil {
 				return "", err
 			}
-			sql.write(s.Build())
+			sql.Write(s.Build())
 		default:
 			err := fmt.Errorf("%s is not supported", reflect.TypeOf(e).Elem().String())
 			return "", internal.NewError(opStmtProcessQuerySQL, internal.KindRuntime, err)
@@ -127,9 +127,9 @@ func (s *Stmt) processQuerySQL() (SQL, error) {
 	return sql, nil
 }
 
-func (s *Stmt) processCaseSQL() (SQL, error) {
-	var sql SQL
-	sql.write("CASE")
+func (s *Stmt) processCaseSQL() (internal.SQL, error) {
+	var sql internal.SQL
+	sql.Write("CASE")
 	for _, e := range s.called {
 		switch e := e.(type) {
 		case *expr.When,
@@ -139,30 +139,30 @@ func (s *Stmt) processCaseSQL() (SQL, error) {
 			if err != nil {
 				return "", err
 			}
-			sql.write(s.Build())
+			sql.Write(s.Build())
 		default:
 			err := fmt.Errorf("%s is not supported", reflect.TypeOf(e).Elem().String())
 			return "", internal.NewError(opStmtProcessCaseSQL, internal.KindRuntime, err)
 		}
 	}
-	sql.write("END")
+	sql.Write("END")
 	return sql, nil
 }
 
 // Exec executes a query without returning any results.
 func (s *Stmt) Exec() error {
-	if db, ok := s.db.(*MockDB); ok {
+	switch db := s.db.(type) {
+	case *DB:
+		sql, err := s.processExecSQL()
+		if err != nil {
+			return err
+		}
+		if err := internal.Exec(db.db, &sql); err != nil {
+			return err
+		}
+	case *MockDB:
 		s.execute(opExec)
 		db.addExecuted(s)
-		return nil
-	}
-
-	sql, err := s.processExecSQL()
-	if err != nil {
-		return err
-	}
-	if err := sql.doExec(s.db); err != nil {
-		return err
 	}
 	return nil
 }
@@ -174,12 +174,12 @@ func (s *Stmt) ExpectExec() *Stmt {
 }
 
 // processExecSQL aggregates the values stored in Stmt structure and returns as SQL object.
-func (s *Stmt) processExecSQL() (SQL, error) {
-	var sql SQL
+func (s *Stmt) processExecSQL() (internal.SQL, error) {
+	var sql internal.SQL
 
 	switch s.cmd.(type) {
 	case *cmd.Insert, *cmd.Update, *cmd.Delete:
-		sql.write(s.cmd.Build().Build())
+		sql.Write(s.cmd.Build().Build())
 	default:
 		err := errors.New("command must be INSERT, UPDATE or DELETE")
 		return "", internal.NewError(opStmtProcessExecSQL, internal.KindRuntime, err)
@@ -193,7 +193,7 @@ func (s *Stmt) processExecSQL() (SQL, error) {
 			if err != nil {
 				return "", err
 			}
-			sql.write(s.Build())
+			sql.Write(s.Build())
 		}
 	}
 

@@ -133,7 +133,10 @@ func TestMockDB_Result_Fail(t *testing.T) {
 				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).ExpectQuery(nil),
 				mgorm.Select(nil, "*").From("table").Where("lhs1 = ? AND lhs2 = ?", 10, "str").ExpectQuery(nil),
 			},
-			errors.New(`SELECT("*").FROM("table").WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") was executed, but not expected`),
+			errors.New(`SELECT("*").` +
+				`FROM("table").` +
+				`WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") ` +
+				`was executed, but not expected`),
 		},
 		{
 			[]*mgorm.Stmt{
@@ -143,7 +146,11 @@ func TestMockDB_Result_Fail(t *testing.T) {
 			[]*mgorm.Stmt{
 				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).ExpectQuery(nil),
 			},
-			errors.New(`no query was executed, but SELECT("*").FROM("table").WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") is expected`),
+			errors.New(`no query was executed, but ` +
+				`SELECT("*").` +
+				`FROM("table").` +
+				`WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") ` +
+				`is expected`),
 		},
 		{
 			[]*mgorm.Stmt{
@@ -152,7 +159,14 @@ func TestMockDB_Result_Fail(t *testing.T) {
 			[]*mgorm.Stmt{
 				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).ExpectQuery(nil),
 			},
-			errors.New(`SELECT("*").FROM("table").WHERE("lhs = ?", 10) was executed, but SELECT("*").FROM("table").WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") is expected`),
+			errors.New(`SELECT("*").` +
+				`FROM("table").` +
+				`WHERE("lhs = ?", 10) ` +
+				`was executed, but ` +
+				`SELECT("*").` +
+				`FROM("table").` +
+				`WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") ` +
+				`is expected`),
 		},
 		{
 			[]*mgorm.Stmt{
@@ -161,7 +175,14 @@ func TestMockDB_Result_Fail(t *testing.T) {
 			[]*mgorm.Stmt{
 				mgorm.Select(nil, "*").From("table").Where("lhs1 = ? AND lhs2 = ?", 10, "str").(*mgorm.Stmt),
 			},
-			errors.New(`SELECT("*").FROM("table").WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") was executed, but SELECT("*").FROM("table").WHERE("lhs = ?", 10) is expected`),
+			errors.New(`SELECT("*").` +
+				`FROM("table").` +
+				`WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") ` +
+				`was executed, but ` +
+				`SELECT("*").` +
+				`FROM("table").` +
+				`WHERE("lhs = ?", 10) ` +
+				`is expected`),
 		},
 	}
 

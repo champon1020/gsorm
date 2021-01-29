@@ -1,45 +1,23 @@
-package mgorm
+package internal
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
 	"time"
-
-	"github.com/champon1020/mgorm/internal"
 )
 
-// Op values for error handling.
-const (
-	opSQLDoQuery internal.Op = "mgorm.SQL.doQuery"
-	opSQLDoExec  internal.Op = "mgorm.SQL.doExec"
-	opSetField   internal.Op = "mgorm.setField"
-)
-
-// SQL string.
-type SQL string
-
-func (s *SQL) string() string {
-	return string(*s)
-}
-
-func (s *SQL) write(str string) {
-	if len(*s) != 0 && str != ")" {
-		*s += " "
-	}
-	*s += SQL(str)
-}
-
-// doQuery executes query and sets rows to model structure.
-func (s *SQL) doQuery(db sqlDB, model interface{}) error {
+// Query executes query and sets rows to model structure.
+func Query(db *sql.DB, s *SQL, model interface{}) error {
 	// Execute query.
-	rows, err := db.query(s.string())
+	rows, err := db.Query(s.String())
 	if err != nil {
-		return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
+		return NewError(opSQLDoQuery, KindDatabase, err)
 	}
 	if rows == nil {
-		return internal.NewError(opSQLDoQuery, internal.KindDatabase, errors.New("rows is nil"))
+		return NewError(opSQLDoQuery, KindDatabase, errors.New("rows is nil"))
 	}
 
 	// Model reflection.
@@ -49,14 +27,14 @@ func (s *SQL) doQuery(db sqlDB, model interface{}) error {
 	// Model type must be slice or array.
 	if mt == nil || (mt.Kind() != reflect.Slice && mt.Kind() != reflect.Array) {
 		err := errors.New("model type must be slice or array")
-		return internal.NewError(opSQLDoQuery, internal.KindType, err)
+		return NewError(opSQLDoQuery, KindType, err)
 	}
 
 	// Generate map to localize field index between row and model.
 	rCols, err := rows.Columns()
 	indR2M := make(map[int]int)
 	if err != nil {
-		return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
+		return NewError(opSQLDoQuery, KindDatabase, err)
 	}
 	for i, c := range rCols {
 		for j := 0; j < mt.Elem().NumField(); j++ {
@@ -76,7 +54,7 @@ func (s *SQL) doQuery(db sqlDB, model interface{}) error {
 
 	for rows.Next() {
 		if err := rows.Scan(rValPtr...); err != nil {
-			return internal.NewError(opSQLDoQuery, internal.KindDatabase, err)
+			return NewError(opSQLDoQuery, KindDatabase, err)
 		}
 		if err := setToModel(&mv, mt, &indR2M, rVal); err != nil {
 			return err
@@ -90,13 +68,20 @@ func (s *SQL) doQuery(db sqlDB, model interface{}) error {
 	return nil
 }
 
-// doExec executes query without returning rows.
-func (s *SQL) doExec(db sqlDB) error {
-	_, err := db.exec(s.string())
+// Exec executes query without returning rows.
+func Exec(db *sql.DB, s *SQL) error {
+	_, err := db.Exec(s.String())
 	if err != nil {
-		return internal.NewError(opSQLDoExec, internal.KindDatabase, err)
+		return NewError(opSQLDoExec, KindDatabase, err)
 	}
 	return nil
+}
+
+func columnName(sf reflect.StructField) string {
+	if sf.Tag.Get("mgorm") == "" {
+		return ConvertToSnakeCase(sf.Name)
+	}
+	return sf.Tag.Get("mgorm")
 }
 
 func setToModel(mv *reflect.Value, mt reflect.Type, indR2M *map[int]int, rVal [][]byte) error {
@@ -120,17 +105,10 @@ func setToModel(mv *reflect.Value, mt reflect.Type, indR2M *map[int]int, rVal []
 	return nil
 }
 
-func columnName(sf reflect.StructField) string {
-	if sf.Tag.Get("mgorm") == "" {
-		return internal.ConvertToSnakeCase(sf.Name)
-	}
-	return sf.Tag.Get("mgorm")
-}
-
 func setField(f reflect.Value, sf reflect.StructField, v []byte) error {
 	if !f.CanSet() {
 		err := errors.New("field cannot be changes")
-		return internal.NewError(opSetField, internal.KindBasic, err)
+		return NewError(opSetField, KindBasic, err)
 	}
 
 	switch f.Kind() {
@@ -142,7 +120,7 @@ func setField(f reflect.Value, sf reflect.StructField, v []byte) error {
 		i64, err := strconv.ParseInt(src, 10, 64)
 		if err != nil {
 			err := fmt.Errorf(`field type "%v" is invalid`, f.Kind())
-			return internal.NewError(opSetField, internal.KindType, err)
+			return NewError(opSetField, KindType, err)
 		}
 		f.SetInt(i64)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -150,7 +128,7 @@ func setField(f reflect.Value, sf reflect.StructField, v []byte) error {
 		u64, err := strconv.ParseUint(src, 10, 64)
 		if err != nil {
 			err := fmt.Errorf(`field type "%v" is invalid`, f.Kind())
-			return internal.NewError(opSetField, internal.KindType, err)
+			return NewError(opSetField, KindType, err)
 
 		}
 		f.SetUint(u64)
@@ -159,7 +137,7 @@ func setField(f reflect.Value, sf reflect.StructField, v []byte) error {
 		f64, err := strconv.ParseFloat(src, 64)
 		if err != nil {
 			err := fmt.Errorf(`field type "%v" is invalid`, f.Kind())
-			return internal.NewError(opSetField, internal.KindType, err)
+			return NewError(opSetField, KindType, err)
 
 		}
 		f.SetFloat(f64)
@@ -168,7 +146,7 @@ func setField(f reflect.Value, sf reflect.StructField, v []byte) error {
 		b, err := strconv.ParseBool(src)
 		if err != nil {
 			err := fmt.Errorf(`field type "%v" is invalid`, f.Kind())
-			return internal.NewError(opSetField, internal.KindType, err)
+			return NewError(opSetField, KindType, err)
 
 		}
 		f.SetBool(b)
@@ -182,7 +160,7 @@ func setField(f reflect.Value, sf reflect.StructField, v []byte) error {
 			t, err := time.Parse(layout, src)
 			if err != nil {
 				err := fmt.Errorf(`field type "%v" is invalid`, f.Kind())
-				return internal.NewError(opSetField, internal.KindType, err)
+				return NewError(opSetField, KindType, err)
 
 			}
 			f.Set(reflect.ValueOf(t))
