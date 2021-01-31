@@ -31,8 +31,11 @@ func (o *On) String() string {
 // Build make ON statement set.
 func (o *On) Build() (*syntax.StmtSet, error) {
 	ss, err := syntax.BuildStmtSet(o.Expr, o.Values...)
+	if err != nil {
+		return nil, err
+	}
 	ss.WriteClause(o.Name())
-	return ss, err
+	return ss, nil
 }
 
 // NewOn create On instance.

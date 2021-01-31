@@ -30,8 +30,11 @@ func (w *When) String() string {
 // Build makes WHEN statement set.
 func (w *When) Build() (*syntax.StmtSet, error) {
 	ss, err := syntax.BuildStmtSet(w.Expr, w.Values...)
+	if err != nil {
+		return nil, err
+	}
 	ss.WriteClause(w.Name())
-	return ss, err
+	return ss, nil
 }
 
 // NewWhen creates When instance.

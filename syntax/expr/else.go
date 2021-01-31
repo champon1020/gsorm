@@ -31,8 +31,11 @@ func (e *Else) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteClause(e.Name())
 	vStr, err := internal.ToString(e.Value)
+	if err != nil {
+		return nil, err
+	}
 	ss.WriteValue(vStr)
-	return ss, err
+	return ss, nil
 }
 
 // NewElse creates Else instance.

@@ -31,8 +31,11 @@ func (h *Having) String() string {
 // Build makes HAVING statement set.
 func (h *Having) Build() (*syntax.StmtSet, error) {
 	ss, err := syntax.BuildStmtSet(h.Expr, h.Values...)
+	if err != nil {
+		return nil, err
+	}
 	ss.WriteClause(h.Name())
-	return ss, err
+	return ss, nil
 }
 
 // NewHaving creates Having instance.

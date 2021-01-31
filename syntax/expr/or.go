@@ -31,9 +31,12 @@ func (o *Or) String() string {
 // Build make OR statement set.
 func (o *Or) Build() (*syntax.StmtSet, error) {
 	ss, err := syntax.BuildStmtSet(o.Expr, o.Values...)
+	if err != nil {
+		return nil, err
+	}
 	ss.WriteClause(o.Name())
 	ss.Parens = true
-	return ss, err
+	return ss, nil
 }
 
 // NewOr create OR clause object.

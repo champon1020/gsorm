@@ -31,8 +31,11 @@ func (t *Then) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteClause(t.Name())
 	vStr, err := internal.ToString(t.Value)
+	if err != nil {
+		return nil, err
+	}
 	ss.WriteValue(vStr)
-	return ss, err
+	return ss, nil
 }
 
 // NewThen creates Then instance.

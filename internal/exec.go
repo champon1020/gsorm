@@ -32,10 +32,10 @@ func Query(db *sql.DB, s *SQL, model interface{}) error {
 
 	// Generate map to localize field index between row and model.
 	rCols, err := rows.Columns()
-	indR2M := make(map[int]int)
 	if err != nil {
 		return NewError(opSQLDoQuery, KindDatabase, err)
 	}
+	indR2M := make(map[int]int)
 	for i, c := range rCols {
 		for j := 0; j < mt.Elem().NumField(); j++ {
 			if c != columnName(mt.Elem().Field(j)) {
@@ -84,7 +84,7 @@ func columnName(sf reflect.StructField) string {
 	return sf.Tag.Get("mgorm")
 }
 
-func setToModel(mv *reflect.Value, mt reflect.Type, indR2M *map[int]int, rVal [][]byte) error {
+func setToModel(mv *reflect.Value, mt reflect.Type, indexMap *map[int]int, rVal [][]byte) error {
 	// Generate reflect type and value for model.
 	t := mt.Elem()
 	v := reflect.Indirect(reflect.New(t))
@@ -92,7 +92,7 @@ func setToModel(mv *reflect.Value, mt reflect.Type, indR2M *map[int]int, rVal []
 	// Loop with number of columns in rows.
 	for ri := 0; ri < len(rVal); ri++ {
 		// mi is index of model field.
-		mi := (*indR2M)[ri]
+		mi := (*indexMap)[ri]
 
 		// Set values to struct fields.
 		if err := setField(v.Field(mi), t.Field(mi), rVal[ri]); err != nil {
@@ -159,7 +159,7 @@ func setField(f reflect.Value, sf reflect.StructField, v []byte) error {
 			}
 			t, err := time.Parse(layout, src)
 			if err != nil {
-				err := fmt.Errorf(`field type "%v" is invalid`, f.Kind())
+				err := fmt.Errorf(`Cannot parse %s to time.Time with format of %s`, src, layout)
 				return NewError(opSetField, KindType, err)
 
 			}

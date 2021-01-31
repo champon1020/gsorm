@@ -31,9 +31,12 @@ func (a *And) String() string {
 // Build make AND statement set.
 func (a *And) Build() (*syntax.StmtSet, error) {
 	ss, err := syntax.BuildStmtSet(a.Expr, a.Values...)
+	if err != nil {
+		return nil, err
+	}
 	ss.WriteClause(a.Name())
 	ss.Parens = true
-	return ss, err
+	return ss, nil
 }
 
 // NewAnd create AND clause object.
