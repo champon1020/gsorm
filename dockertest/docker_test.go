@@ -405,6 +405,7 @@ func TestJoin(t *testing.T) {
 				From("mock").
 				Join("mock2").
 				On("mock.id = mock2.id").
+				OrderBy("id", false).
 				Limit(2).(*mgorm.Stmt),
 			&[]Model2{
 				{
@@ -446,6 +447,7 @@ func TestJoin(t *testing.T) {
 				From("mock").
 				LeftJoin("mock2").
 				On("mock.id = mock2.id").
+				OrderBy("id", false).
 				Limit(2).(*mgorm.Stmt),
 			&[]Model2{
 				{
@@ -469,18 +471,18 @@ func TestJoin(t *testing.T) {
 				From("mock").
 				RightJoin("mock2").
 				On("mock.id = mock2.id").
-				Limit(2).
-				Offset(2).(*mgorm.Stmt),
+				OrderBy("id2", true).
+				Limit(2).(*mgorm.Stmt),
 			&[]Model2{
+				{
+					ID2:     14,
+					Company: "JKL Film",
+				},
 				{
 					ID:        3,
 					FirstName: "Jake",
 					ID2:       3,
 					Company:   "GHI Corporation",
-				},
-				{
-					ID2:     14,
-					Company: "JKL Film",
 				},
 			},
 		},
