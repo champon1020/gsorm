@@ -94,8 +94,13 @@ func setToModel(mv *reflect.Value, mt reflect.Type, indexMap *map[int]int, rVal 
 		// mi is index of model field.
 		mi := (*indexMap)[ri]
 
+		valStr := string(rVal[ri])
+		if valStr == "" {
+			continue
+		}
+
 		// Set values to struct fields.
-		if err := setField(v.Field(mi), t.Field(mi), rVal[ri]); err != nil {
+		if err := setField(v.Field(mi), t.Field(mi), valStr); err != nil {
 			return err
 		}
 	}
@@ -105,7 +110,7 @@ func setToModel(mv *reflect.Value, mt reflect.Type, indexMap *map[int]int, rVal 
 	return nil
 }
 
-func setField(f reflect.Value, sf reflect.StructField, v []byte) error {
+func setField(f reflect.Value, sf reflect.StructField, v string) error {
 	if !f.CanSet() {
 		err := errors.New("field cannot be changes")
 		return NewError(opSetField, KindBasic, err)
@@ -113,53 +118,47 @@ func setField(f reflect.Value, sf reflect.StructField, v []byte) error {
 
 	switch f.Kind() {
 	case reflect.String:
-		sv := string(v)
-		f.SetString(sv)
+		f.SetString(v)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		src := string(v)
-		i64, err := strconv.ParseInt(src, 10, 64)
+		i64, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
-			err := fmt.Errorf(`field type "%v" is invalid`, f.Kind())
+			err := fmt.Errorf(`field type "%v" is invalid with value "%s"`, f.Kind(), v)
 			return NewError(opSetField, KindType, err)
 		}
 		f.SetInt(i64)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		src := string(v)
-		u64, err := strconv.ParseUint(src, 10, 64)
+		u64, err := strconv.ParseUint(v, 10, 64)
 		if err != nil {
-			err := fmt.Errorf(`field type "%v" is invalid`, f.Kind())
+			err := fmt.Errorf(`field type "%v" is invalid with value "%s"`, f.Kind(), v)
 			return NewError(opSetField, KindType, err)
 
 		}
 		f.SetUint(u64)
 	case reflect.Float32, reflect.Float64:
-		src := string(v)
-		f64, err := strconv.ParseFloat(src, 64)
+		f64, err := strconv.ParseFloat(v, 64)
 		if err != nil {
-			err := fmt.Errorf(`field type "%v" is invalid`, f.Kind())
+			err := fmt.Errorf(`field type "%v" is invalid with value "%s"`, f.Kind(), v)
 			return NewError(opSetField, KindType, err)
 
 		}
 		f.SetFloat(f64)
 	case reflect.Bool:
-		src := string(v)
-		b, err := strconv.ParseBool(src)
+		b, err := strconv.ParseBool(v)
 		if err != nil {
-			err := fmt.Errorf(`field type "%v" is invalid`, f.Kind())
+			err := fmt.Errorf(`field type "%v" is invalid with value "%s"`, f.Kind(), v)
 			return NewError(opSetField, KindType, err)
 
 		}
 		f.SetBool(b)
 	case reflect.Struct:
 		if f.Type() == reflect.TypeOf(time.Time{}) {
-			src := string(v)
 			layout := timeFormat(sf.Tag.Get("layout"))
 			if layout == "" {
 				layout = time.RFC3339
 			}
-			t, err := time.Parse(layout, src)
+			t, err := time.Parse(layout, v)
 			if err != nil {
-				err := fmt.Errorf(`Cannot parse %s to time.Time with format of %s`, src, layout)
+				err := fmt.Errorf(`Cannot parse %s to time.Time with format of %s`, v, layout)
 				return NewError(opSetField, KindType, err)
 
 			}

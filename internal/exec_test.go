@@ -64,96 +64,96 @@ func TestSetField(t *testing.T) {
 
 	testCases := []struct {
 		FieldNum int
-		Value    []byte
+		Value    string
 		Result   reflect.Value
 	}{
 		{
 			0,
-			[]byte("test"),
+			"test",
 			reflect.ValueOf(&Car{Name: "test"}),
 		},
 		{
 			1,
-			[]byte(fmt.Sprintf("%d", 100)),
+			fmt.Sprintf("%d", 100),
 			reflect.ValueOf(&Car{ID: 100}),
 		},
 		{
 			2,
-			[]byte(fmt.Sprintf("%d", 100)),
+			fmt.Sprintf("%d", 100),
 			reflect.ValueOf(&Car{ID8: 100}),
 		},
 		{
 			3,
-			[]byte(fmt.Sprintf("%d", 100)),
+			fmt.Sprintf("%d", 100),
 			reflect.ValueOf(&Car{ID16: 100}),
 		},
 		{
 			4,
-			[]byte(fmt.Sprintf("%d", 100)),
+			fmt.Sprintf("%d", 100),
 			reflect.ValueOf(&Car{ID32: 100}),
 		},
 		{
 			5,
-			[]byte(fmt.Sprintf("%d", 100)),
+			fmt.Sprintf("%d", 100),
 			reflect.ValueOf(&Car{ID64: 100}),
 		},
 		{
 			6,
-			[]byte(fmt.Sprintf("%d", 100)),
+			fmt.Sprintf("%d", 100),
 			reflect.ValueOf(&Car{UID: 100}),
 		},
 		{
 			7,
-			[]byte(fmt.Sprintf("%d", 100)),
+			fmt.Sprintf("%d", 100),
 			reflect.ValueOf(&Car{UID8: 100}),
 		},
 		{
 			8,
-			[]byte(fmt.Sprintf("%d", 100)),
+			fmt.Sprintf("%d", 100),
 			reflect.ValueOf(&Car{UID16: 100}),
 		},
 		{
 			9,
-			[]byte(fmt.Sprintf("%d", 100)),
+			fmt.Sprintf("%d", 100),
 			reflect.ValueOf(&Car{UID32: 100}),
 		},
 		{
 			10,
-			[]byte(fmt.Sprintf("%d", 100)),
+			fmt.Sprintf("%d", 100),
 			reflect.ValueOf(&Car{UID64: 100}),
 		},
 		{
 			11,
-			[]byte(fmt.Sprintf("%f", 100.2)),
+			fmt.Sprintf("%f", 100.2),
 			reflect.ValueOf(&Car{FID32: 100.2}),
 		},
 		{
 			12,
-			[]byte(fmt.Sprintf("%f", 100.2)),
+			fmt.Sprintf("%f", 100.2),
 			reflect.ValueOf(&Car{FID64: 100.2}),
 		},
 		{
 			13,
-			[]byte("true"),
+			"true",
 			reflect.ValueOf(&Car{Flg: true}),
 		},
 		{
 			14,
-			[]byte("2020-01-02T03:04:05Z"),
+			"2020-01-02T03:04:05Z",
 			reflect.ValueOf(&Car{
 				Time: time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC),
 			}),
 		},
 		{
 			15,
-			[]byte("2020-01-02"),
+			"2020-01-02",
 			reflect.ValueOf(&Car{
 				Time2: time.Date(2020, time.January, 2, 0, 0, 0, 0, time.UTC),
 			}),
 		},
 		{
 			16,
-			[]byte("Thu Jan 2 03:04:05 2020"),
+			"Thu Jan 2 03:04:05 2020",
 			reflect.ValueOf(&Car{
 				Time3: time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC),
 			}),

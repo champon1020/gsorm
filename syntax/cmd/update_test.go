@@ -76,7 +76,7 @@ func TestUpdate_Build(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := testCase.Update.Build()
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -118,7 +118,7 @@ func TestNewUpdate(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := cmd.NewUpdate(testCase.Table, testCase.Columns)
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}

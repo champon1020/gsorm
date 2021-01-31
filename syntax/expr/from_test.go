@@ -60,7 +60,7 @@ func TestFrom_Build(t *testing.T) {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -87,7 +87,7 @@ func TestNewFrom(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := expr.NewFrom(testCase.Tables)
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}

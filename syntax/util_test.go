@@ -63,7 +63,7 @@ func TestBuildStmtSet(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res, _ := syntax.BuildStmtSet(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -108,7 +108,7 @@ func TestBuildStmtSet_Fail(t *testing.T) {
 			continue
 		}
 
-		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
 			t.Errorf(diff)
 		}
 	}

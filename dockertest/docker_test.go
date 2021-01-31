@@ -228,13 +228,14 @@ func TestSelectAll(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
+	for i, testCase := range testCases {
 		model := new([]Model)
 		if err := testCase.Stmt.Query(model); err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		if diff := cmp.Diff(model, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, model); diff != "" {
+			t.Errorf("Got difference with sample %d", i)
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -316,13 +317,14 @@ func TestWhere(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
+	for i, testCase := range testCases {
 		model := new([]Model)
 		if err := testCase.Stmt.Query(model); err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		if diff := cmp.Diff(model, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, model); diff != "" {
+			t.Errorf("Got difference with sample %d", i)
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -353,13 +355,14 @@ func TestLimitOffsetOrderBy(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
+	for i, testCase := range testCases {
 		model := new([]Model)
 		if err := testCase.Stmt.Query(model); err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		if diff := cmp.Diff(model, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, model); diff != "" {
+			t.Errorf("Got difference with sample %d", i)
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -437,45 +440,23 @@ func TestJoin(t *testing.T) {
 		{
 			mgorm.Select(db,
 				"mock.id AS id",
-				"height",
-				"gender",
-				"day_of_the_week",
-				"date1",
-				"date2",
-				"first_name",
-				"last_name",
+				"mock.first_name",
 				"mock2.id AS id2",
-				"from_date",
-				"company",
-				"country").
+				"company").
 				From("mock").
 				LeftJoin("mock2").
 				On("mock.id = mock2.id").
 				Limit(2).(*mgorm.Stmt),
 			&[]Model2{
 				{
-					ID:           0,
-					Height:       170.2,
-					Gender:       "M",
-					DayOfTheWeek: "Sun",
-					Date1:        time.Date(2005, time.June, 15, 0, 0, 0, 0, time.UTC),
-					Date2:        time.Date(2006, time.September, 28, 20, 22, 22, 0, time.UTC),
-					FirstName:    "Mick",
-					LastName:     "Boult",
+					ID:        0,
+					FirstName: "Mick",
 				},
 				{
-					ID:           1,
-					Height:       160.3,
-					Gender:       "F",
-					DayOfTheWeek: "Mon",
-					Date1:        time.Date(2016, time.August, 31, 0, 0, 0, 0, time.UTC),
-					Date2:        time.Date(1984, time.December, 1, 16, 45, 45, 0, time.UTC),
-					FirstName:    "Kathryn",
-					LastName:     "Langshaw",
-					ID2:          1,
-					FromDate:     time.Date(2016, time.August, 31, 0, 0, 0, 0, time.UTC),
-					Company:      "ABC Company",
-					Country:      "Japan",
+					ID:        1,
+					FirstName: "Kathryn",
+					ID2:       1,
+					Company:   "ABC Company",
 				},
 			},
 		},
@@ -505,13 +486,14 @@ func TestJoin(t *testing.T) {
 		},
 	}
 
-	for _, testCase := range testCases {
+	for i, testCase := range testCases {
 		model2 := new([]Model2)
 		if err := testCase.Stmt.Query(model2); err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		if diff := cmp.Diff(model2, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, model2); diff != "" {
+			t.Errorf("Got difference with sample %d", i)
 			internal.PrintTestDiff(t, diff)
 		}
 	}

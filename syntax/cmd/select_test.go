@@ -62,7 +62,7 @@ func TestSelect_Build(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := testCase.Select.Build()
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -92,7 +92,7 @@ func TestNewSelect(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := cmd.NewSelect(testCase.Cols)
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}

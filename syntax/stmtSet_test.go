@@ -29,7 +29,7 @@ func TestStmtSet_WriteClause(t *testing.T) {
 
 	for _, testCase := range testCases {
 		testCase.StmtSet.WriteClause(testCase.Clause)
-		if diff := cmp.Diff(testCase.StmtSet, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, testCase.StmtSet); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -75,7 +75,7 @@ func TestStmtSet_WriteValue(t *testing.T) {
 
 	for _, testCase := range testCases {
 		testCase.StmtSet.WriteValue(testCase.Value)
-		if diff := cmp.Diff(testCase.StmtSet, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, testCase.StmtSet); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}

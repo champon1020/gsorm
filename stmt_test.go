@@ -196,7 +196,7 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
 			t.Errorf(diff)
 		}
 	}
@@ -233,7 +233,7 @@ func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
 			t.Errorf(diff)
 		}
 	}
@@ -267,7 +267,7 @@ func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
 			t.Errorf(diff)
 		}
 	}

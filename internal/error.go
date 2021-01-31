@@ -38,7 +38,7 @@ func NewError(op Op, kind Kind, err error) error {
 }
 
 // CmpError compare the twe errors.
-func CmpError(actual *Error, expected *Error) string {
+func CmpError(expected *Error, actual *Error) string {
 	var diff string
 	if actual.Op != expected.Op {
 		diff += fmt.Sprintf("\nOp:\n  got : %s\n  want: %s", actual.Op, expected.Op)

@@ -25,7 +25,7 @@ func TestDelete_Build(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := testCase.Delete.Build()
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -40,7 +40,7 @@ func TestNewDelete(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := cmd.NewDelete()
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}

@@ -52,7 +52,7 @@ func TestWhere_Build(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res, _ := testCase.Where.Build()
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -69,7 +69,7 @@ func TestNewWhere(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := expr.NewWhere(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}

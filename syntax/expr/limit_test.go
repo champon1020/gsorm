@@ -44,7 +44,7 @@ func TestLimit_Build(t *testing.T) {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -63,7 +63,7 @@ func TestNewLimit(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := expr.NewLimit(testCase.Num)
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}

@@ -56,7 +56,7 @@ func TestElse_Build(t *testing.T) {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -73,7 +73,7 @@ func TestNewElse(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := expr.NewElse(testCase.Value)
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
