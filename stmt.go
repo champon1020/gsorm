@@ -67,6 +67,10 @@ func (s *Stmt) String() string {
 
 // Query executes a query that returns some results.
 func (s *Stmt) Query(model interface{}) error {
+	if len(s.errors) > 0 {
+		return s.errors[0]
+	}
+
 	switch db := s.db.(type) {
 	case *DB:
 		sql, err := s.processQuerySQL()
@@ -151,6 +155,10 @@ func (s *Stmt) processCaseSQL() (internal.SQL, error) {
 
 // Exec executes a query without returning any results.
 func (s *Stmt) Exec() error {
+	if len(s.errors) > 0 {
+		return s.errors[0]
+	}
+
 	switch db := s.db.(type) {
 	case *DB:
 		sql, err := s.processExecSQL()

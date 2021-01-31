@@ -1,7 +1,6 @@
 package mgorm
 
 import (
-	"database/sql"
 	"fmt"
 
 	"github.com/champon1020/mgorm/internal"
@@ -19,14 +18,10 @@ type MockDB struct {
 	actual   []*Stmt
 }
 
-// query is the fake function for implementing DB.
-func (m *MockDB) query(string, ...interface{}) (*sql.Rows, error) {
-	return nil, nil
-}
-
-// exec is the fake function for implementing DB.
-func (m *MockDB) exec(string, ...interface{}) (sql.Result, error) {
-	return nil, nil
+// Ping verifies a connection to the database is still alive, establishing a connection if necessary.
+// This is dummy function for implementing mgorm.sqlDB.
+func (m *MockDB) Ping() error {
+	return nil
 }
 
 func (m *MockDB) addExecuted(stmt *Stmt) {

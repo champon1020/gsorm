@@ -1,15 +1,12 @@
 package mgorm
 
 import (
-	"database/sql"
-
 	"github.com/champon1020/mgorm/syntax"
 )
 
 // sqlDB is interface that is implemented by *sql.DB.
 type sqlDB interface {
-	query(string, ...interface{}) (*sql.Rows, error)
-	exec(string, ...interface{}) (sql.Result, error)
+	Ping() error
 }
 
 // ExecutableStmt is executable interface of Stmt.
