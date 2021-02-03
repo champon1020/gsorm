@@ -1,37 +1,58 @@
-CREATE DATABASE IF NOT EXISTS mock;
-USE mock;
+CREATE DATABASE IF NOT EXISTS employees;
+USE employees;
 
-CREATE TABLE IF NOT EXISTS mock(
-       id INT PRIMARY KEY NOT NULL,
-       height FLOAT NOT NULL,
-       gender CHAR(1) NOT NULL,
-       day_of_the_week BINARY(3) NOT NULL,
-       first_name VARCHAR(128) NOT NULL,
-       last_name VARBINARY(128) NOT NULL,
-       date1 DATE NOT NULL,
-       date2 DATETIME NOT NULL
+CREATE TABLE IF NOT EXISTS employees(
+       emp_no INT PRIMARY KEY NOT NULL,
+       birth_date DATE NOT NULL,
+       first_name VARCHAR(32) NOT NULL,
+       last_name BINARY(32) NOT NULL,
+       gender ENUM('M', 'F') NOT NULL,
+       hire_date DATE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS mock2(
-       id INT PRIMARY KEY NOT NULL,
-       company VARCHAR(128) NOT NULL,
-       country VARCHAR(128) NOT NULL,
-       from_date DATE NOT NULL
+CREATE TABLE IF NOT EXISTS salaries(
+       emp_no INT NOT NULL,
+       salary int(11) NOT NULL,
+       from_date DATE NOT NULL,
+       to_date DATE NOT NULL,
+       CONSTRAINT fk_emp_no
+                  FOREIGN KEY (emp_no)
+                  REFERENCES employees (emp_no)
+                  ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS titles(
+       emp_no INT NOT NULL,
+       title VARCHAR(50) NOT NULL,
+       from_date DATE NOT NULL,
+       to_date DATE NOT NULL,
+       CONSTRAINT fk_emp_no
+                  FOREIGN KEY (emp_no)
+                  REFERENCES employees (emp_no)
+                  ON DELETE CASCADE       
 );
 
 LOAD DATA LOCAL INFILE
-     "/docker/data/mock.csv"
-     INTO TABLE mock
+     "/docker/data/employees.csv"
+     INTO TABLE employees
      CHARACTER SET utf8
      FIELDS TERMINATED BY ','
      ENCLOSED BY '"'
-     (id, height, gender, day_of_the_week, date1, date2, first_name, last_name);
+     (emp_no, birth_date, first_name, last_name, gender, hire_date);
 
 LOAD DATA LOCAL INFILE
-     "/docker/data/mock2.csv"
-     INTO TABLE mock2
+     "/docker/data/salaries.csv"
+     INTO TABLE salaries
      CHARACTER SET utf8
      FIELDS TERMINATED BY ','
      ENCLOSED BY '"'
-     (id, from_date, company, country);
+     (emp_no, salary, from_date, to_date);
+
+LOAD DATA LOCAL INFILE
+     "/docker/data/titles.csv"
+     INTO TABLE titles
+     CHARACTER SET utf8
+     FIELDS TERMINATED BY ','
+     ENCLOSED BY '"'
+     (emp_no, title, from_date, to_date);
 
