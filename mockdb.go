@@ -7,6 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+// opArgs stores function name (operation) with arguments.
 type opArgs struct {
 	op   internal.Op
 	args []interface{}
@@ -24,6 +25,7 @@ func (m *MockDB) Ping() error {
 	return nil
 }
 
+// addExecuted adds executed function calls.
 func (m *MockDB) addExecuted(stmt *Stmt) {
 	m.actual = append(m.actual, stmt)
 }
@@ -76,6 +78,8 @@ func (m *MockDB) Result() error {
 	return nil
 }
 
+// getFunctionString gets called function like following example.
+//   exmaple: SELECT(...).FROM(...).WHERE(...).QUERY(...).
 func getFunctionString(stmt *Stmt) string {
 	s := stmt.cmd.String()
 	for _, e := range stmt.called {

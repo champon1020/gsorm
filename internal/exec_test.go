@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestColumnName(t *testing.T) {
+func TestColumnNameFromTag(t *testing.T) {
 	type Model1 struct {
 		UID int `mgorm:"id"`
 	}
@@ -36,12 +36,62 @@ func TestColumnName(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		cn := internal.ColumnName(testCase.Struct)
+		cn := internal.ColumnNameFromTag(testCase.Struct)
 		assert.Equal(t, testCase.Result, cn)
 	}
 }
 
-func TestSetField(t *testing.T) {
+func TestMapOfColumnsToFields(t *testing.T) {
+	type Model1 struct {
+		ID        int
+		Name      string
+		BirthDate time.Time
+	}
+
+	type Model2 struct {
+		ID   int
+		Name string `mgorm:"first_name"`
+	}
+
+	testCases := []struct {
+		Columns   []string
+		ModelType reflect.Type
+		Result    map[int]int
+	}{
+		{
+			Columns:   []string{"id", "name", "birth_date"},
+			ModelType: reflect.TypeOf(Model1{}),
+			Result:    map[int]int{0: 0, 1: 1, 2: 2},
+		},
+		{
+			Columns:   []string{"name", "birth_date", "id"},
+			ModelType: reflect.TypeOf(Model1{}),
+			Result:    map[int]int{0: 1, 1: 2, 2: 0},
+		},
+		{
+			Columns:   []string{"first_name", "id"},
+			ModelType: reflect.TypeOf(Model2{}),
+			Result:    map[int]int{0: 1, 1: 0},
+		},
+		{
+			Columns:   []string{"first_name", "first_name", "id"},
+			ModelType: reflect.TypeOf(Model2{}),
+			Result:    map[int]int{0: 1, 1: 1, 2: 0},
+		},
+		{
+			Columns:   []string{},
+			ModelType: reflect.TypeOf(Model2{}),
+			Result:    map[int]int{},
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := internal.MapOfColumnsToFields(testCase.Columns, testCase.ModelType)
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
+func TestSetValueToField(t *testing.T) {
 	type Car struct {
 		Name  string
 		ID    int
@@ -63,9 +113,9 @@ func TestSetField(t *testing.T) {
 	}
 
 	testCases := []struct {
-		FieldNum int
-		Value    string
-		Result   reflect.Value
+		FieldIndex int
+		Value      string
+		Result     reflect.Value
 	}{
 		{
 			0,
@@ -74,28 +124,28 @@ func TestSetField(t *testing.T) {
 		},
 		{
 			1,
-			fmt.Sprintf("%d", 100),
-			reflect.ValueOf(&Car{ID: 100}),
+			fmt.Sprintf("%d", 10),
+			reflect.ValueOf(&Car{ID: 10}),
 		},
 		{
 			2,
-			fmt.Sprintf("%d", 100),
-			reflect.ValueOf(&Car{ID8: 100}),
+			fmt.Sprintf("%d", 10),
+			reflect.ValueOf(&Car{ID8: 10}),
 		},
 		{
 			3,
-			fmt.Sprintf("%d", 100),
-			reflect.ValueOf(&Car{ID16: 100}),
+			fmt.Sprintf("%d", 10),
+			reflect.ValueOf(&Car{ID16: 10}),
 		},
 		{
 			4,
-			fmt.Sprintf("%d", 100),
-			reflect.ValueOf(&Car{ID32: 100}),
+			fmt.Sprintf("%d", 10),
+			reflect.ValueOf(&Car{ID32: 10}),
 		},
 		{
 			5,
-			fmt.Sprintf("%d", 100),
-			reflect.ValueOf(&Car{ID64: 100}),
+			fmt.Sprintf("%d", 10),
+			reflect.ValueOf(&Car{ID64: 10}),
 		},
 		{
 			6,
@@ -161,11 +211,126 @@ func TestSetField(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		v := reflect.ValueOf(new(Car))
-		sf := reflect.TypeOf(Car{}).Field(testCase.FieldNum)
-		if err := internal.SetField(reflect.Indirect(v).Field(testCase.FieldNum), sf, testCase.Value); err != nil {
-			t.Error(err)
+		ref := reflect.ValueOf(new(Car))
+		if err := internal.SetValueToField(
+			ref.Elem(),
+			testCase.FieldIndex,
+			testCase.Value,
+		); err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
 		}
-		assert.Equal(t, testCase.Result.Interface(), v.Interface())
+		assert.Equal(t, testCase.Result.Interface(), ref.Interface())
+	}
+}
+
+func TestSetValueToVar(t *testing.T) {
+	var (
+		s   string
+		i   int
+		i8  int8
+		i16 int16
+		i32 int32
+		i64 int64
+		u   uint
+		u8  uint8
+		u16 uint16
+		u32 uint32
+		u64 uint64
+		f32 float32
+		f64 float64
+		b   bool
+		tm  time.Time
+	)
+
+	testCases := []struct {
+		Ref    interface{}
+		Value  string
+		Result reflect.Value
+	}{
+		{
+			Ref:    &s,
+			Value:  "str",
+			Result: reflect.ValueOf("str"),
+		},
+		{
+			Ref:    &i,
+			Value:  "10",
+			Result: reflect.ValueOf(10),
+		},
+		{
+			Ref:    &i8,
+			Value:  "10",
+			Result: reflect.ValueOf(int8(10)),
+		},
+		{
+			Ref:    &i16,
+			Value:  "10",
+			Result: reflect.ValueOf(int16(10)),
+		},
+		{
+			Ref:    &i32,
+			Value:  "10",
+			Result: reflect.ValueOf(int32(10)),
+		},
+		{
+			Ref:    &i64,
+			Value:  "10",
+			Result: reflect.ValueOf(int64(10)),
+		},
+		{
+			Ref:    &u,
+			Value:  "100",
+			Result: reflect.ValueOf(uint(100)),
+		},
+		{
+			Ref:    &u8,
+			Value:  "100",
+			Result: reflect.ValueOf(uint8(100)),
+		},
+		{
+			Ref:    &u16,
+			Value:  "100",
+			Result: reflect.ValueOf(uint16(100)),
+		},
+		{
+			Ref:    &u32,
+			Value:  "100",
+			Result: reflect.ValueOf(uint32(100)),
+		},
+		{
+			Ref:    &u64,
+			Value:  "100",
+			Result: reflect.ValueOf(uint64(100)),
+		},
+		{
+			Ref:    &f32,
+			Value:  "100.2",
+			Result: reflect.ValueOf(float32(100.2)),
+		},
+		{
+			Ref:    &f64,
+			Value:  "100.2",
+			Result: reflect.ValueOf(float64(100.2)),
+		},
+		{
+			Ref:    &b,
+			Value:  "true",
+			Result: reflect.ValueOf(true),
+		},
+		{
+			Ref:    &tm,
+			Value:  "2020-01-02T03:04:05Z",
+			Result: reflect.ValueOf(time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC)),
+		},
+	}
+
+	for _, testCase := range testCases {
+		ref := reflect.ValueOf(testCase.Ref).Elem()
+		if err := internal.SetValueToVar(ref, testCase.Value); err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
+		assert.Equal(t, testCase.Result.Interface(), ref.Interface())
 	}
 }

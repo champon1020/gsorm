@@ -1,12 +1,5 @@
 package internal
 
-// Op values for error handling.
-const (
-	opSQLDoQuery Op = "mgorm.SQL.doQuery"
-	opSQLDoExec  Op = "mgorm.SQL.doExec"
-	opSetField   Op = "mgorm.setField"
-)
-
 // SQL string.
 type SQL string
 
