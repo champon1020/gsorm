@@ -24,7 +24,7 @@ func TestStmt_String(t *testing.T) {
 				On("t1.column1 = t2.column1").
 				Where("lhs1 > ?", 10).
 				And("lhs2 = ? OR lhs3 = ?", "str", true).
-				OrderBy("t1.column1", true).
+				OrderByDesc("t1.column1").
 				Limit(5).
 				Offset(6).
 				Union(mgorm.Select(nil, "column1", "column2 AS c2").

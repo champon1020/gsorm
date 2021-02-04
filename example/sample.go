@@ -79,7 +79,7 @@ func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) 
 		// SELECT * FROM employees ORDER BY emp_no DESC;
 		mgorm.Select(db, "*").
 			From("employees").
-			OrderBy("emp_no", true),
+			OrderBy("emp_no"),
 
 		// SELECT COUNT(birth_date) AS res_int FROM employees;
 		mgorm.Count(db, "birth_date", "res_int").

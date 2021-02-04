@@ -47,7 +47,8 @@ type FromStmt interface {
 	FullJoin(string) JoinStmt
 	Where(string, ...interface{}) WhereStmt
 	GroupBy(...string) GroupByStmt
-	OrderBy(string, bool) OrderByStmt
+	OrderBy(string) OrderByStmt
+	OrderByDesc(string) OrderByStmt
 	Limit(int) LimitStmt
 	Union(syntax.Var) UnionStmt
 	UnionAll(syntax.Var) UnionStmt
@@ -74,7 +75,8 @@ type JoinStmt interface {
 type OnStmt interface {
 	Where(string, ...interface{}) WhereStmt
 	GroupBy(...string) GroupByStmt
-	OrderBy(string, bool) OrderByStmt
+	OrderBy(string) OrderByStmt
+	OrderByDesc(string) OrderByStmt
 	Limit(int) LimitStmt
 	Union(syntax.Var) UnionStmt
 	UnionAll(syntax.Var) UnionStmt
@@ -86,7 +88,8 @@ type WhereStmt interface {
 	And(string, ...interface{}) AndStmt
 	Or(string, ...interface{}) OrStmt
 	GroupBy(...string) GroupByStmt
-	OrderBy(string, bool) OrderByStmt
+	OrderBy(string) OrderByStmt
+	OrderByDesc(string) OrderByStmt
 	Limit(int) LimitStmt
 	Union(syntax.Var) UnionStmt
 	UnionAll(syntax.Var) UnionStmt
@@ -96,7 +99,8 @@ type WhereStmt interface {
 // AndStmt is Stmt after Stmt.And is executed.
 type AndStmt interface {
 	GroupBy(...string) GroupByStmt
-	OrderBy(string, bool) OrderByStmt
+	OrderBy(string) OrderByStmt
+	OrderByDesc(string) OrderByStmt
 	Union(syntax.Var) UnionStmt
 	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
@@ -105,7 +109,8 @@ type AndStmt interface {
 // OrStmt is Stmt after Stmt.Or is executed.
 type OrStmt interface {
 	GroupBy(...string) GroupByStmt
-	OrderBy(string, bool) OrderByStmt
+	OrderBy(string) OrderByStmt
+	OrderByDesc(string) OrderByStmt
 	Union(syntax.Var) UnionStmt
 	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
@@ -114,7 +119,8 @@ type OrStmt interface {
 // GroupByStmt is Stmt after Stmt.GroupBy is executed.
 type GroupByStmt interface {
 	Having(string, ...interface{}) HavingStmt
-	OrderBy(string, bool) OrderByStmt
+	OrderBy(string) OrderByStmt
+	OrderByDesc(string) OrderByStmt
 	Union(syntax.Var) UnionStmt
 	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
@@ -122,7 +128,8 @@ type GroupByStmt interface {
 
 // HavingStmt is Stmt after Stmt.Having is executed.
 type HavingStmt interface {
-	OrderBy(string, bool) OrderByStmt
+	OrderBy(string) OrderByStmt
+	OrderByDesc(string) OrderByStmt
 	Union(syntax.Var) UnionStmt
 	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt

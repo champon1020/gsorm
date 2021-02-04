@@ -268,8 +268,14 @@ func (s *Stmt) Offset(num int) OffsetStmt {
 }
 
 // OrderBy calls ORDER BY statement.
-func (s *Stmt) OrderBy(col string, desc bool) OrderByStmt {
-	s.call(expr.NewOrderBy(col, desc))
+func (s *Stmt) OrderBy(col string) OrderByStmt {
+	s.call(expr.NewOrderBy(col, false))
+	return s
+}
+
+// OrderByDesc calls ORDER BY ... DESC statement.
+func (s *Stmt) OrderByDesc(col string) OrderByStmt {
+	s.call(expr.NewOrderBy(col, true))
 	return s
 }
 

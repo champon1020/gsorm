@@ -17,7 +17,7 @@ func TestOrderBy(t *testing.T) {
 		{
 			mgorm.Select(db, "first_name").
 				From("employees").
-				OrderBy("first_name", false).(*mgorm.Stmt),
+				OrderBy("first_name").(*mgorm.Stmt),
 			&[]Employee{
 				{FirstName: "Anneke"},
 				{FirstName: "Bezalel"},
@@ -36,7 +36,7 @@ func TestOrderBy(t *testing.T) {
 		{
 			mgorm.Select(db, "first_name").
 				From("employees").
-				OrderBy("first_name", true).(*mgorm.Stmt),
+				OrderByDesc("first_name").(*mgorm.Stmt),
 			&[]Employee{
 				{FirstName: "Tzvetan"},
 				{FirstName: "Sumant"},
