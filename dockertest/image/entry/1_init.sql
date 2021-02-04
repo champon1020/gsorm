@@ -5,20 +5,20 @@ CREATE TABLE IF NOT EXISTS employees(
        emp_no INT PRIMARY KEY NOT NULL,
        birth_date DATE NOT NULL,
        first_name VARCHAR(32) NOT NULL,
-       last_name BINARY(32) NOT NULL,
+       last_name VARBINARY(32) NOT NULL,
        gender ENUM('M', 'F') NOT NULL,
        hire_date DATE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS salaries(
        emp_no INT NOT NULL,
-       salary int(11) NOT NULL,
+       salary INT NOT NULL,
        from_date DATE NOT NULL,
        to_date DATE NOT NULL,
-       CONSTRAINT fk_emp_no
+       CONSTRAINT fk_emp_no1
                   FOREIGN KEY (emp_no)
                   REFERENCES employees (emp_no)
-                  ON DELETE CASCADE
+                  ON DELETE CASCADE       
 );
 
 CREATE TABLE IF NOT EXISTS titles(
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS titles(
        title VARCHAR(50) NOT NULL,
        from_date DATE NOT NULL,
        to_date DATE NOT NULL,
-       CONSTRAINT fk_emp_no
+       CONSTRAINT fk_emp_no2
                   FOREIGN KEY (emp_no)
                   REFERENCES employees (emp_no)
                   ON DELETE CASCADE       
