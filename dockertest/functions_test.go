@@ -57,11 +57,14 @@ func TestCountSum(t *testing.T) {
 		Stmt   *mgorm.Stmt
 		Result *int
 	}{
+		// SELECT COUNT(emp_no) FROM salaries;
 		{
 			mgorm.Count(db, "emp_no").
 				From("salaries").(*mgorm.Stmt),
 			&cnt,
 		},
+
+		// SELECT SUM(salary) FROM salaries;
 		{
 			mgorm.Sum(db, "salary").
 				From("salaries").(*mgorm.Stmt),
@@ -91,6 +94,7 @@ func TestAvg(t *testing.T) {
 		Stmt   *mgorm.Stmt
 		Result *float64
 	}{
+		// SELECT AVG(salary) FROM salaries;
 		{
 			mgorm.Avg(db, "salary").
 				From("salaries").(*mgorm.Stmt),
