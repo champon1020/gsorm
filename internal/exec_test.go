@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm/internal"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -221,6 +222,36 @@ func TestSetValueToField(t *testing.T) {
 			continue
 		}
 		assert.Equal(t, testCase.Result.Interface(), ref.Interface())
+	}
+}
+
+func TestSetValueToMap(t *testing.T) {
+	m := make(map[int]string)
+
+	testCases := []struct {
+		Ref    interface{}
+		Key    string
+		Value  string
+		Result reflect.Value
+	}{
+		{
+			Ref:    &m,
+			Key:    "10",
+			Value:  "str",
+			Result: reflect.ValueOf(&map[int]string{10: "str"}),
+		},
+	}
+
+	for _, testCase := range testCases {
+		mResult := make(map[int]string)
+		ref := reflect.ValueOf(&mResult)
+		if err := internal.SetValueToMap(ref.Elem(), testCase.Key, testCase.Value); err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
+		if diff := cmp.Diff(testCase.Result.Interface(), ref.Interface()); diff != "" {
+			internal.PrintTestDiff(t, diff)
+		}
 	}
 }
 

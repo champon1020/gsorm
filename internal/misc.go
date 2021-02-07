@@ -97,7 +97,7 @@ func typeStringToKind(typ string) reflect.Type {
 	case "int64":
 		return reflect.TypeOf(int64(0))
 	case "uint":
-		return reflect.TypeOf(uint8(0))
+		return reflect.TypeOf(uint(0))
 	case "uint8":
 		return reflect.TypeOf(uint8(0))
 	case "uint16":

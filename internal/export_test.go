@@ -5,5 +5,8 @@ var (
 	ColumnNameFromTag    = columnNameFromTag
 	MapOfColumnsToFields = mapOfColumnsToFields
 	SetValueToField      = setValueToField
+	SetValueToMap        = setValueToMap
 	SetValueToVar        = setValueToVar
+	MapKeyType           = mapKeyType
+	MapValueType         = mapValueType
 )
