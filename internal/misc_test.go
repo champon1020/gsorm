@@ -94,7 +94,7 @@ func TestToString_Fail(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		_, err := internal.ToString(testCase.Value)
+		_, err := internal.ToString(testCase.Value, false)
 		if err == nil {
 			t.Errorf("Error is not occurred")
 			continue

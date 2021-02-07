@@ -88,20 +88,6 @@ func TestStmt_String(t *testing.T) {
 				`ON t1.column1 = t2.column1`,
 		},
 		{
-			mgorm.When("lhs1 > ?", 10).
-				Then("value1").
-				When("lhs2 < ?", 10).
-				Then("value2").
-				Else("value3").(*mgorm.Stmt),
-			`CASE ` +
-				`WHEN lhs1 > 10 ` +
-				`THEN "value1" ` +
-				`WHEN lhs2 < 10 ` +
-				`THEN "value2" ` +
-				`ELSE "value3" ` +
-				`END`,
-		},
-		{
 			mgorm.Insert(nil, "table", "column1", "column2").
 				Values(10, "str").(*mgorm.Stmt),
 			`INSERT INTO table (column1, column2) ` +
@@ -223,7 +209,7 @@ func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
 	for _, testCase := range testCases {
 		stmt := new(mgorm.Stmt)
 		stmt.ExportedSetCalled(testCase.Called)
-		_, err := mgorm.StmtProcessCaseSQL(stmt)
+		_, err := mgorm.StmtProcessCaseSQL(stmt, false)
 		if err == nil {
 			t.Errorf("Error was not occurred")
 			continue

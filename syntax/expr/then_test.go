@@ -45,11 +45,11 @@ func TestThen_Build(t *testing.T) {
 			&syntax.StmtSet{Clause: "THEN", Value: "10"},
 		},
 		{
-			&expr.Then{Value: "str", IsColumn: true},
+			&expr.Then{Value: "str"},
 			&syntax.StmtSet{Clause: "THEN", Value: `"str"`},
 		},
 		{
-			&expr.Then{Value: "str"},
+			&expr.Then{Value: "str", IsColumn: true},
 			&syntax.StmtSet{Clause: "THEN", Value: "str"},
 		},
 	}

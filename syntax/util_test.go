@@ -10,7 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestBuildStmtSet(t *testing.T) {
+func TestBuildStmtSetForExpression(t *testing.T) {
 	testCases := []struct {
 		Expr   string
 		Values []interface{}
@@ -62,14 +62,14 @@ func TestBuildStmtSet(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res, _ := syntax.BuildStmtSet(testCase.Expr, testCase.Values...)
+		res, _ := syntax.BuildStmtSetForExpression(testCase.Expr, testCase.Values...)
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
 }
 
-func TestBuildStmtSet_Fail(t *testing.T) {
+func TestBuildStmtSetForExpression_Fail(t *testing.T) {
 	testCases := []struct {
 		Expr   string
 		Values []interface{}
@@ -79,7 +79,7 @@ func TestBuildStmtSet_Fail(t *testing.T) {
 			"lhs = ? AND rhs = ?",
 			[]interface{}{10},
 			internal.NewError(
-				syntax.OpBuildStmtSet,
+				syntax.OpBuildStmtSetForExpression,
 				internal.KindBasic,
 				errors.New("Length of values is not valid"),
 			),
@@ -96,7 +96,7 @@ func TestBuildStmtSet_Fail(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		_, err := syntax.BuildStmtSet(testCase.Expr, testCase.Values...)
+		_, err := syntax.BuildStmtSetForExpression(testCase.Expr, testCase.Values...)
 		if err == nil {
 			t.Errorf("Error is not occurred")
 			continue

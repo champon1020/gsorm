@@ -10,14 +10,14 @@ import (
 
 // Op values for error handling.
 const (
-	OpBuildStmtSet internal.Op = "syntax.BuildStmtSet"
+	OpBuildStmtSetForExpression internal.Op = "syntax.BuildStmtSetForExpression"
 )
 
 // BuildStmtSetForExpression make StmtSet with expr and values.
 func BuildStmtSetForExpression(expr string, vals ...interface{}) (*StmtSet, error) {
 	if strings.Count(expr, "?") != len(vals) {
 		err := errors.New("Length of values is not valid")
-		return nil, internal.NewError(OpBuildStmtSet, internal.KindBasic, err)
+		return nil, internal.NewError(OpBuildStmtSetForExpression, internal.KindBasic, err)
 	}
 
 	ss := new(StmtSet)
