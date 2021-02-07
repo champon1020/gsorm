@@ -50,39 +50,58 @@ func Query(db *sql.DB, s *SQL, model interface{}) error {
 		// Generate new slice|array.
 		vec := reflect.New(mt).Elem()
 
-		// Get index map.
-		indR2M := mapOfColumnsToFields(rCols, mt.Elem())
+		if mt.Elem().Kind() == reflect.Struct {
+			// Get index map.
+			indR2M := mapOfColumnsToFields(rCols, mt.Elem())
 
-		// Loop with rows.
-		for rows.Next() {
-			// Scan values from rows.
-			if err := rows.Scan(rValPtr...); err != nil {
-				return NewError(opQuery, KindDatabase, err)
+			for rows.Next() {
+				if err := rows.Scan(rValPtr...); err != nil {
+					return NewError(opQuery, KindDatabase, err)
+				}
+
+				// Set values to model struct.
+				v := reflect.New(mt.Elem()).Elem()
+				if err := setValuesToModel(v, &indR2M, rVal); err != nil {
+					return err
+				}
+
+				// Append value to slice|array.
+				vec = reflect.Append(vec, v)
+			}
+		} else {
+			if len(rCols) != 1 {
+				err := fmt.Errorf("Column length must be 1 but got %d", len(rCols))
+				return NewError(opQuery, KindBasic, err)
 			}
 
-			// Set values to model struct.
-			v := reflect.New(mt.Elem()).Elem()
-			if err := setValuesToModel(v, &indR2M, rVal); err != nil {
-				return err
-			}
+			for rows.Next() {
+				if err := rows.Scan(rValPtr...); err != nil {
+					return NewError(opQuery, KindDatabase, err)
+				}
 
-			// Append value to slice|array.
-			vec = reflect.Append(vec, v)
+				// Set values to variable.
+				v := reflect.New(mt.Elem()).Elem()
+				if err := setValueToVar(v, string(rVal[0])); err != nil {
+					return err
+				}
+
+				// Append value to slice|array.
+				vec = reflect.Append(vec, v)
+			}
 		}
-
 		// Set slice|array to model.
 		ref := reflect.ValueOf(model).Elem()
 		ref.Set(vec)
 	case reflect.Map:
 		if len(rCols) != 2 {
-			/* handle error */
+			err := fmt.Errorf("Column length must be 2 but got %d", len(rCols))
+			return NewError(opQuery, KindBasic, err)
 		}
 
-		// Generate new map.
-		mapRef := reflect.New(mt).Elem()
+		// Get map value.
+		mapRef := reflect.ValueOf(model).Elem()
 
 		for rows.Next() {
-			// Scan values from rows.
 			if err := rows.Scan(rValPtr...); err != nil {
 				return NewError(opQuery, KindDatabase, err)
 			}
@@ -92,10 +111,6 @@ func Query(db *sql.DB, s *SQL, model interface{}) error {
 				return err
 			}
 		}
-
-		// Set map to model.
-		ref := reflect.ValueOf(model).Elem()
-		ref.Set(mapRef)
 	case reflect.Struct:
 		// Generate new struct.
 		v := reflect.New(mt).Elem()
@@ -103,7 +118,6 @@ func Query(db *sql.DB, s *SQL, model interface{}) error {
 		// Get index map.
 		indR2M := mapOfColumnsToFields(rCols, mt)
 
-		// Scan values from rows.
 		if rows.Next() {
 			if err := rows.Scan(rValPtr...); err != nil {
 				return NewError(opQuery, KindDatabase, err)
@@ -132,18 +146,21 @@ func Query(db *sql.DB, s *SQL, model interface{}) error {
 		reflect.Float64,
 		reflect.Bool,
 		reflect.String:
+		if len(rCols) != 1 {
+			err := fmt.Errorf("Column length must be 1 but got %d", len(rCols))
+			return NewError(opQuery, KindBasic, err)
+		}
+
 		// Generate new variable.
 		v := reflect.New(mt).Elem()
 
 		if rows.Next() {
-			// Scan values from rows.
 			if err := rows.Scan(rValPtr...); err != nil {
 				return NewError(opQuery, KindDatabase, err)
 			}
 
 			// Set values to model.
-			valStr := string(rVal[0])
-			if err := setValueToVar(v, valStr); err != nil {
+			if err := setValueToVar(v, string(rVal[0])); err != nil {
 				return err
 			}
 		}
@@ -252,15 +269,16 @@ func setValueToField(modelRef reflect.Value, index int, val string) error {
 	return NewError(opSetValueToField, KindType, err)
 }
 
-func setValueToMap(mapRef reflect.Value, key string, val string) Error {
+// setValueToMap inserts the pair of key and value to map.
+func setValueToMap(mapRef reflect.Value, key string, val string) error {
 	if !mapRef.CanSet() {
 		err := errors.New("Cannot set to variable")
 		return NewError(opSetValueToField, KindBasic, err)
 	}
 
 	// Generate new value of map key and value.
-	kVal := reflect.New(mapKeyType(reflect.TypeOf(mapRef.Interface())))
-	vVal := reflect.New(mapValueType(reflect.TypeOf(mapRef.Interface())))
+	kVal := reflect.New(mapKeyType(reflect.TypeOf(mapRef.Interface()))).Elem()
+	vVal := reflect.New(mapValueType(reflect.TypeOf(mapRef.Interface()))).Elem()
 
 	// Set values to reflect.Value.
 	setValueToVar(kVal, key)

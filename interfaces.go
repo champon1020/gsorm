@@ -178,9 +178,11 @@ type ThenStmt interface {
 	When(string, ...interface{}) WhenStmt
 	Else(interface{}) ElseStmt
 	Var() syntax.Var
+	Column() string
 }
 
 // ElseStmt is Stmt after Stmt.Else is executed.
 type ElseStmt interface {
 	Var() syntax.Var
+	Column() string
 }

@@ -9,7 +9,8 @@ import (
 
 // Else expression.
 type Else struct {
-	Value interface{}
+	Value    interface{}
+	IsColumn bool
 }
 
 // Name returns string of clause.
@@ -30,7 +31,7 @@ func (e *Else) String() string {
 func (e *Else) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteClause(e.Name())
-	vStr, err := internal.ToString(e.Value)
+	vStr, err := internal.ToString(e.Value, !e.IsColumn)
 	if err != nil {
 		return nil, err
 	}

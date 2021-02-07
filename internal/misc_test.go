@@ -22,7 +22,7 @@ func TestConvertToSnakeCase(t *testing.T) {
 	}
 }
 
-func TestToString(t *testing.T) {
+func TestToStringWithQuotes(t *testing.T) {
 	var (
 		n0 int    = 1
 		n1 int8   = 2
@@ -55,7 +55,21 @@ func TestToString(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res, _ := internal.ToString(testCase.Value)
+		res, _ := internal.ToString(testCase.Value, true)
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
+func TestTOStringWituhoutQuotes(t *testing.T) {
+	testCases := []struct {
+		Value  interface{}
+		Result string
+	}{
+		{"rhs", "rhs"},
+	}
+
+	for _, testCase := range testCases {
+		res, _ := internal.ToString(testCase.Value, false)
 		assert.Equal(t, testCase.Result, res)
 	}
 }

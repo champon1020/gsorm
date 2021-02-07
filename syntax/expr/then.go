@@ -9,7 +9,8 @@ import (
 
 // Then expression
 type Then struct {
-	Value interface{}
+	Value    interface{}
+	IsColumn bool
 }
 
 // Name returns string of clause.
@@ -30,7 +31,7 @@ func (t *Then) String() string {
 func (t *Then) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteClause(t.Name())
-	vStr, err := internal.ToString(t.Value)
+	vStr, err := internal.ToString(t.Value, !t.IsColumn)
 	if err != nil {
 		return nil, err
 	}

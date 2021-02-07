@@ -30,7 +30,7 @@ func (a *And) String() string {
 
 // Build make AND statement set.
 func (a *And) Build() (*syntax.StmtSet, error) {
-	ss, err := syntax.BuildStmtSet(a.Expr, a.Values...)
+	ss, err := syntax.BuildStmtSetForExpression(a.Expr, a.Values...)
 	if err != nil {
 		return nil, err
 	}

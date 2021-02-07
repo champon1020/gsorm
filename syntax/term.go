@@ -80,7 +80,7 @@ type Eq struct {
 func (e *Eq) Build() (string, error) {
 	s := e.LHS
 	s += " = "
-	rhs, err := internal.ToString(e.RHS)
+	rhs, err := internal.ToString(e.RHS, true)
 	s += rhs
 	return s, err
 }

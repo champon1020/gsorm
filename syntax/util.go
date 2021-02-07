@@ -13,8 +13,8 @@ const (
 	OpBuildStmtSet internal.Op = "syntax.BuildStmtSet"
 )
 
-// BuildStmtSet make StmtSet with expr and values.
-func BuildStmtSet(expr string, vals ...interface{}) (*StmtSet, error) {
+// BuildStmtSetForExpression make StmtSet with expr and values.
+func BuildStmtSetForExpression(expr string, vals ...interface{}) (*StmtSet, error) {
 	if strings.Count(expr, "?") != len(vals) {
 		err := errors.New("Length of values is not valid")
 		return nil, internal.NewError(OpBuildStmtSet, internal.KindBasic, err)
@@ -27,7 +27,7 @@ func BuildStmtSet(expr string, vals ...interface{}) (*StmtSet, error) {
 			values = append(values, fmt.Sprintf("(%s)", sel))
 			continue
 		}
-		vStr, err := internal.ToString(v)
+		vStr, err := internal.ToString(v, true)
 		if err != nil {
 			return nil, err
 		}

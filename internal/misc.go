@@ -30,13 +30,17 @@ func ConvertToSnakeCase(str string) (snake string) {
 }
 
 // ToString convert the value of interface to string.
-func ToString(v interface{}) (string, error) {
+// If quotes is true, attache double quotes to string value.
+func ToString(v interface{}, quotes bool) (string, error) {
 	r := reflect.ValueOf(v)
 	if r.IsValid() {
 		switch r.Kind() {
 		case reflect.String:
-			s := fmt.Sprintf("%+q", r.String())
-			return s, nil
+			if quotes {
+				s := fmt.Sprintf("%+q", r.String())
+				return s, nil
+			}
+			return r.String(), nil
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			return strconv.FormatInt(r.Int(), 10), nil
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:

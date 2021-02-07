@@ -45,13 +45,17 @@ func TestElse_Build(t *testing.T) {
 			&syntax.StmtSet{Clause: "ELSE", Value: "10"},
 		},
 		{
-			&expr.Else{Value: "str"},
+			&expr.Else{Value: "str", IsColumn: true},
 			&syntax.StmtSet{Clause: "ELSE", Value: `"str"`},
+		},
+		{
+			&expr.Else{Value: "str"},
+			&syntax.StmtSet{Clause: "ELSE", Value: "str"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		res, err := testCase.Else.Build()
+		res, err := testCase.Else.Build(testCase.IsColumn)
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue

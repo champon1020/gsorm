@@ -16,6 +16,7 @@ const (
 	opStmtProcessQuerySQL internal.Op = "mgorm.Stmt.processQuerySQL"
 	opStmtProcessCaseSQL  internal.Op = "mgorm.Stmt.processCaseSQL"
 	opStmtProcessExecSQL  internal.Op = "mgorm.Stmt.processExecSQL"
+	opColumn              internal.Op = "mgorm.Stmt.Column"
 	opVar                 internal.Op = "mgorm.Stmt.Var"
 	opString              internal.Op = "mgorm.Stmt.String"
 	opQuery               internal.Op = "mgorm.Stmt.Query"
@@ -44,24 +45,53 @@ func (s *Stmt) addError(err error) {
 	s.errors = append(s.errors, err)
 }
 
+// Column returns string with column format.
+func (s *Stmt) Column() string {
+	if _, ok := s.db.(*MockDB); ok {
+		s.execute(opColumn)
+	}
+	sql, err := s.processCaseSQL(true)
+	if err != nil {
+		s.addError(err)
+		return ""
+	}
+	return sql.String()
+}
+
 // Var returns Stmt.String with syntax.Var type.
 func (s *Stmt) Var() syntax.Var {
-	s.execute(opVar)
+	if _, ok := s.db.(*MockDB); ok {
+		s.execute(opVar)
+	}
+	if _, ok := s.called[0].(*expr.When); ok {
+		sql, err := s.processCaseSQL(false)
+		if err != nil {
+			s.addError(err)
+			return ""
+		}
+		return syntax.Var(sql.String())
+	}
 	return syntax.Var(s.String())
 }
 
 // String returns query string.
 func (s *Stmt) String() string {
-	if _, ok := s.called[0].(*expr.When); ok {
-		sql, _ := s.processCaseSQL()
-		return sql.String()
+	if _, ok := s.db.(*MockDB); ok {
+		s.execute(opString)
 	}
 	if _, ok := s.cmd.(*cmd.Select); ok {
-		sql, _ := s.processQuerySQL()
+		sql, err := s.processQuerySQL()
+		if err != nil {
+			s.addError(err)
+			return ""
+		}
 		return sql.String()
 	}
-	s.execute(opString)
-	sql, _ := s.processExecSQL()
+	sql, err := s.processExecSQL()
+	if err != nil {
+		s.addError(err)
+		return ""
+	}
 	return sql.String()
 }
 
@@ -87,12 +117,41 @@ func (s *Stmt) Query(model interface{}) error {
 	return nil
 }
 
+// Exec executes a query without returning any results.
+func (s *Stmt) Exec() error {
+	if len(s.errors) > 0 {
+		return s.errors[0]
+	}
+
+	switch db := s.db.(type) {
+	case *DB:
+		sql, err := s.processExecSQL()
+		if err != nil {
+			return err
+		}
+		if err := internal.Exec(db.db, &sql); err != nil {
+			return err
+		}
+	case *MockDB:
+		s.execute(opExec)
+		db.addExecuted(s)
+	}
+	return nil
+}
+
 // ExpectQuery executes a query as mock database.
 func (s *Stmt) ExpectQuery(model interface{}) *Stmt {
 	s.execute(opQuery, model)
 	return s
 }
 
+// ExpectExec executes a query as mock database.
+func (s *Stmt) ExpectExec() *Stmt {
+	s.execute(opExec)
+	return s
+}
+
+// processQuerySQL builds SQL with called expressions.
 func (s *Stmt) processQuerySQL() (internal.SQL, error) {
 	var sql internal.SQL
 
@@ -131,14 +190,28 @@ func (s *Stmt) processQuerySQL() (internal.SQL, error) {
 	return sql, nil
 }
 
-func (s *Stmt) processCaseSQL() (internal.SQL, error) {
+// processCaseSQL builds SQL with called expressions.
+// isColumn flag indicates whether this is called from Stmt.Column() or not.
+func (s *Stmt) processCaseSQL(isColumn bool) (internal.SQL, error) {
 	var sql internal.SQL
 	sql.Write("CASE")
 	for _, e := range s.called {
 		switch e := e.(type) {
-		case *expr.When,
-			*expr.Then,
-			*expr.Else:
+		case *expr.When:
+			s, err := e.Build()
+			if err != nil {
+				return "", err
+			}
+			sql.Write(s.Build())
+		case *expr.Then:
+			e.IsColumn = isColumn
+			s, err := e.Build()
+			if err != nil {
+				return "", err
+			}
+			sql.Write(s.Build())
+		case *expr.Else:
+			e.IsColumn = isColumn
 			s, err := e.Build()
 			if err != nil {
 				return "", err
@@ -153,35 +226,7 @@ func (s *Stmt) processCaseSQL() (internal.SQL, error) {
 	return sql, nil
 }
 
-// Exec executes a query without returning any results.
-func (s *Stmt) Exec() error {
-	if len(s.errors) > 0 {
-		return s.errors[0]
-	}
-
-	switch db := s.db.(type) {
-	case *DB:
-		sql, err := s.processExecSQL()
-		if err != nil {
-			return err
-		}
-		if err := internal.Exec(db.db, &sql); err != nil {
-			return err
-		}
-	case *MockDB:
-		s.execute(opExec)
-		db.addExecuted(s)
-	}
-	return nil
-}
-
-// ExpectExec executes a query as mock database.
-func (s *Stmt) ExpectExec() *Stmt {
-	s.execute(opExec)
-	return s
-}
-
-// processExecSQL aggregates the values stored in Stmt structure and returns as SQL object.
+// processQuerySQL builds SQL with called expressions.
 func (s *Stmt) processExecSQL() (internal.SQL, error) {
 	var sql internal.SQL
 

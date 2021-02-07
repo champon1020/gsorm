@@ -36,7 +36,7 @@ func (v *Values) Build() (*syntax.StmtSet, error) {
 		if i != 0 {
 			ss.WriteValue(",")
 		}
-		cStr, err := internal.ToString(c)
+		cStr, err := internal.ToString(c, true)
 		if err != nil {
 			return nil, err
 		}

@@ -30,7 +30,7 @@ func (o *On) String() string {
 
 // Build make ON statement set.
 func (o *On) Build() (*syntax.StmtSet, error) {
-	ss, err := syntax.BuildStmtSet(o.Expr, o.Values...)
+	ss, err := syntax.BuildStmtSetForExpression(o.Expr, o.Values...)
 	if err != nil {
 		return nil, err
 	}

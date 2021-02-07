@@ -30,7 +30,7 @@ func (w *Where) String() string {
 
 // Build make WHERE statement set.
 func (w *Where) Build() (*syntax.StmtSet, error) {
-	ss, err := syntax.BuildStmtSet(w.Expr, w.Values...)
+	ss, err := syntax.BuildStmtSetForExpression(w.Expr, w.Values...)
 	if err != nil {
 		return nil, err
 	}
