@@ -35,7 +35,7 @@ func TestNewTable(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := syntax.NewTable(testCase.TableStr)
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -67,7 +67,7 @@ func TestNewColumn(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := syntax.NewColumn(testCase.ColStr)
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
@@ -82,7 +82,11 @@ func TestEq_Build(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res, _ := testCase.Eq.Build()
+		res, err := testCase.Eq.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
 		assert.Equal(t, testCase.Result, res)
 	}
 }
@@ -98,7 +102,7 @@ func TestNewEq(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := syntax.NewEq(testCase.LHS, testCase.RHS)
-		if diff := cmp.Diff(res, testCase.Result); diff != "" {
+		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}

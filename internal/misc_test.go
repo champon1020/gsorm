@@ -2,6 +2,7 @@ package internal_test
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 
 	"github.com/champon1020/mgorm/internal"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestConvertToSnakeCase(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		String string
 		Result string
 	}{
@@ -17,12 +18,12 @@ func TestConvertToSnakeCase(t *testing.T) {
 		{"this", "this"},
 	}
 
-	for _, test := range tests {
-		assert.Equal(t, test.Result, internal.ConvertToSnakeCase(test.String))
+	for _, testCase := range testCases {
+		assert.Equal(t, testCase.Result, internal.ConvertToSnakeCase(testCase.String))
 	}
 }
 
-func TestToString(t *testing.T) {
+func TestToStringWithQuotes(t *testing.T) {
 	var (
 		n0 int    = 1
 		n1 int8   = 2
@@ -55,7 +56,21 @@ func TestToString(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res, _ := internal.ToString(testCase.Value)
+		res, _ := internal.ToString(testCase.Value, true)
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
+func TestToStringWituhoutQuotes(t *testing.T) {
+	testCases := []struct {
+		Value  interface{}
+		Result string
+	}{
+		{"rhs", "rhs"},
+	}
+
+	for _, testCase := range testCases {
+		res, _ := internal.ToString(testCase.Value, false)
 		assert.Equal(t, testCase.Result, res)
 	}
 }
@@ -80,7 +95,7 @@ func TestToString_Fail(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		_, err := internal.ToString(testCase.Value)
+		_, err := internal.ToString(testCase.Value, false)
 		if err == nil {
 			t.Errorf("Error is not occurred")
 			continue
@@ -95,7 +110,7 @@ func TestToString_Fail(t *testing.T) {
 }
 
 func TestSliceToString(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		Values []interface{}
 		Result string
 	}{
@@ -105,7 +120,67 @@ func TestSliceToString(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		assert.Equal(t, test.Result, internal.SliceToString(test.Values))
+	for _, testCase := range testCases {
+		assert.Equal(t, testCase.Result, internal.SliceToString(testCase.Values))
+	}
+}
+
+func TestMapKeyType(t *testing.T) {
+	var (
+		m0 = make(map[int]uint)
+		m1 = make(map[int8]int)
+		m2 = make(map[int16]int8)
+		m3 = make(map[int32]int16)
+		m4 = make(map[int64]int32)
+		m5 = make(map[uint]int64)
+	)
+
+	testCases := []struct {
+		MapRef interface{}
+		Result reflect.Type
+	}{
+		{m0, reflect.TypeOf(int(0))},
+		{m1, reflect.TypeOf(int8(0))},
+		{m2, reflect.TypeOf(int16(0))},
+		{m3, reflect.TypeOf(int32(0))},
+		{m4, reflect.TypeOf(int64(0))},
+		{m5, reflect.TypeOf(uint(0))},
+	}
+
+	for _, testCase := range testCases {
+		typ := internal.MapKeyType(reflect.TypeOf(testCase.MapRef))
+		assert.Equal(t, testCase.Result, typ)
+	}
+}
+
+func TestMapValueType(t *testing.T) {
+	var (
+		m0 = make(map[uint64]uint8)
+		m1 = make(map[uint8]uint16)
+		m2 = make(map[uint16]uint32)
+		m3 = make(map[uint32]uint64)
+		m4 = make(map[float64]float32)
+		m5 = make(map[float32]float64)
+		m6 = make(map[string]bool)
+		m7 = make(map[bool]string)
+	)
+
+	testCases := []struct {
+		MapRef interface{}
+		Result reflect.Type
+	}{
+		{m0, reflect.TypeOf(uint8(0))},
+		{m1, reflect.TypeOf(uint16(0))},
+		{m2, reflect.TypeOf(uint32(0))},
+		{m3, reflect.TypeOf(uint64(0))},
+		{m4, reflect.TypeOf(float32(0.0))},
+		{m5, reflect.TypeOf(float64(0.0))},
+		{m6, reflect.TypeOf(false)},
+		{m7, reflect.TypeOf("")},
+	}
+
+	for _, testCase := range testCases {
+		typ := internal.MapValueType(reflect.TypeOf(testCase.MapRef))
+		assert.Equal(t, testCase.Result, typ)
 	}
 }

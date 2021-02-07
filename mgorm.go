@@ -4,12 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/mgorm/syntax/cmd"
+	"github.com/champon1020/mgorm/syntax/expr"
 )
 
 // New generate DB object.
-func New(db *sql.DB) *DB {
-	return &DB{db: db}
+func New(dn, dsn string) (*DB, error) {
+	db, err := sql.Open(dn, dsn)
+	if err != nil {
+		return nil, err
+	}
+	return &DB{db: db}, nil
 }
 
 // NewMock generate MockDB object.
@@ -21,28 +26,28 @@ func NewMock() *MockDB {
 // Select statement api.
 func Select(db sqlDB, cols ...string) SelectStmt {
 	stmt := &Stmt{db: db}
-	stmt.cmd = syntax.NewSelect(cols)
+	stmt.cmd = cmd.NewSelect(cols)
 	return stmt
 }
 
 // Insert statement api.
 func Insert(db sqlDB, table string, cols ...string) InsertStmt {
 	stmt := &Stmt{db: db}
-	stmt.cmd = syntax.NewInsert(table, cols)
+	stmt.cmd = cmd.NewInsert(table, cols)
 	return stmt
 }
 
 // Update statement api.
 func Update(db sqlDB, table string, cols ...string) UpdateStmt {
 	stmt := &Stmt{db: db}
-	stmt.cmd = syntax.NewUpdate(table, cols)
+	stmt.cmd = cmd.NewUpdate(table, cols)
 	return stmt
 }
 
 // Delete statement api.
 func Delete(db sqlDB) DeleteStmt {
 	stmt := &Stmt{db: db}
-	stmt.cmd = syntax.NewDelete()
+	stmt.cmd = cmd.NewDelete()
 	return stmt
 }
 
@@ -53,7 +58,7 @@ func Count(db sqlDB, col string, alias ...string) SelectStmt {
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}
-	stmt.cmd = syntax.NewSelect([]string{s})
+	stmt.cmd = cmd.NewSelect([]string{s})
 	return stmt
 }
 
@@ -64,7 +69,7 @@ func Avg(db sqlDB, col string, alias ...string) SelectStmt {
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}
-	stmt.cmd = syntax.NewSelect([]string{s})
+	stmt.cmd = cmd.NewSelect([]string{s})
 	return stmt
 }
 
@@ -75,7 +80,7 @@ func Sum(db sqlDB, col string, alias ...string) SelectStmt {
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}
-	stmt.cmd = syntax.NewSelect([]string{s})
+	stmt.cmd = cmd.NewSelect([]string{s})
 	return stmt
 }
 
@@ -86,7 +91,7 @@ func Min(db sqlDB, col string, alias ...string) SelectStmt {
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}
-	stmt.cmd = syntax.NewSelect([]string{s})
+	stmt.cmd = cmd.NewSelect([]string{s})
 	return stmt
 }
 
@@ -97,13 +102,13 @@ func Max(db sqlDB, col string, alias ...string) SelectStmt {
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}
-	stmt.cmd = syntax.NewSelect([]string{s})
+	stmt.cmd = cmd.NewSelect([]string{s})
 	return stmt
 }
 
 // When statement api.
-func When(expr string, vals ...interface{}) WhenStmt {
+func When(e string, vals ...interface{}) WhenStmt {
 	stmt := new(Stmt)
-	stmt.call(syntax.NewWhen(expr, vals...))
+	stmt.call(expr.NewWhen(e, vals...))
 	return stmt
 }

@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Op values for error handling.
@@ -29,13 +30,17 @@ func ConvertToSnakeCase(str string) (snake string) {
 }
 
 // ToString convert the value of interface to string.
-func ToString(v interface{}) (string, error) {
+// If quotes is true, attache double quotes to string value.
+func ToString(v interface{}, quotes bool) (string, error) {
 	r := reflect.ValueOf(v)
 	if r.IsValid() {
 		switch r.Kind() {
 		case reflect.String:
-			s := fmt.Sprintf("%+q", r.String())
-			return s, nil
+			if quotes {
+				s := fmt.Sprintf("%+q", r.String())
+				return s, nil
+			}
+			return r.String(), nil
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			return strconv.FormatInt(r.Int(), 10), nil
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
@@ -63,4 +68,89 @@ func SliceToString(values []interface{}) string {
 		}
 	}
 	return s
+}
+
+// mapKeyType returns map key type with reflect.Type.
+func mapKeyType(typ reflect.Type) reflect.Type {
+	key := strings.Split(strings.Split(typ.String(), "[")[1], "]")[0]
+	return typeStringToKind(key)
+}
+
+// mapValueType returns map value type with reflect.Type.
+func mapValueType(typ reflect.Type) reflect.Type {
+	val := strings.Split(typ.String(), "]")[1]
+	return typeStringToKind(val)
+}
+
+func typeStringToKind(typ string) reflect.Type {
+	switch typ {
+	case "string":
+		return reflect.TypeOf("")
+	case "int":
+		return reflect.TypeOf(0)
+	case "int8":
+		return reflect.TypeOf(int8(0))
+	case "int16":
+		return reflect.TypeOf(int16(0))
+	case "int32":
+		return reflect.TypeOf(int32(0))
+	case "int64":
+		return reflect.TypeOf(int64(0))
+	case "uint":
+		return reflect.TypeOf(uint(0))
+	case "uint8":
+		return reflect.TypeOf(uint8(0))
+	case "uint16":
+		return reflect.TypeOf(uint16(0))
+	case "uint32":
+		return reflect.TypeOf(uint32(0))
+	case "uint64":
+		return reflect.TypeOf(uint64(0))
+	case "float32":
+		return reflect.TypeOf(float32(0.0))
+	case "float64":
+		return reflect.TypeOf(float64(0.0))
+	case "bool":
+		return reflect.TypeOf(false)
+	case "time.Time":
+		return reflect.TypeOf(time.Time{})
+	}
+	return nil
+}
+
+// TimeFormat returns layout of date.
+func TimeFormat(layout string) string {
+	switch layout {
+	case "time.ANSIC":
+		return time.ANSIC
+	case "time.UnixDate":
+		return time.UnixDate
+	case "time.RubyDate":
+		return time.RubyDate
+	case "time.RFC822":
+		return time.RFC822
+	case "time.RFC822Z":
+		return time.RFC822Z
+	case "time.RFC850":
+		return time.RFC850
+	case "time.RFC1123":
+		return time.RFC1123
+	case "time.RFC1123Z":
+		return time.RFC1123Z
+	case "time.RFC3339":
+		return time.RFC3339
+	case "time.RFC3339Nano":
+		return time.RFC3339Nano
+	case "time.Kitchen":
+		return time.Kitchen
+	case "time.Stamp":
+		return time.Stamp
+	case "time.StampMilli":
+		return time.StampMilli
+	case "time.StampMicro":
+		return time.StampMicro
+	case "time.StampNano":
+		return time.StampNano
+	}
+	return layout
 }

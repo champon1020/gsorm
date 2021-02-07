@@ -7,11 +7,13 @@ import (
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/mgorm/syntax/cmd"
+	"github.com/champon1020/mgorm/syntax/expr"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestStmt_String(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		Stmt   *mgorm.Stmt
 		Result string
 	}{
@@ -22,7 +24,7 @@ func TestStmt_String(t *testing.T) {
 				On("t1.column1 = t2.column1").
 				Where("lhs1 > ?", 10).
 				And("lhs2 = ? OR lhs3 = ?", "str", true).
-				OrderBy("t1.column1", true).
+				OrderByDesc("t1.column1").
 				Limit(5).
 				Offset(6).
 				Union(mgorm.Select(nil, "column1", "column2 AS c2").
@@ -86,20 +88,6 @@ func TestStmt_String(t *testing.T) {
 				`ON t1.column1 = t2.column1`,
 		},
 		{
-			mgorm.When("lhs1 > ?", 10).
-				Then("value1").
-				When("lhs2 < ?", 10).
-				Then("value2").
-				Else("value3").(*mgorm.Stmt),
-			`CASE ` +
-				`WHEN lhs1 > 10 ` +
-				`THEN "value1" ` +
-				`WHEN lhs2 < 10 ` +
-				`THEN "value2" ` +
-				`ELSE "value3" ` +
-				`END`,
-		},
-		{
 			mgorm.Insert(nil, "table", "column1", "column2").
 				Values(10, "str").(*mgorm.Stmt),
 			`INSERT INTO table (column1, column2) ` +
@@ -145,20 +133,20 @@ func TestStmt_String(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		res := test.Stmt.String()
-		assert.Equal(t, test.Result, res)
+	for _, testCase := range testCases {
+		res := testCase.Stmt.String()
+		assert.Equal(t, testCase.Result, res)
 	}
 }
 
 func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		Cmd    syntax.Cmd
 		Called []syntax.Expr
 		Error  error
 	}{
 		{
-			&syntax.Delete{},
+			&cmd.Delete{},
 			nil,
 			internal.NewError(
 				mgorm.OpStmtProcessQuerySQL,
@@ -167,23 +155,23 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 			),
 		},
 		{
-			&syntax.Select{},
+			&cmd.Select{},
 			[]syntax.Expr{
-				&syntax.From{},
-				&syntax.When{},
+				&expr.From{},
+				&expr.When{},
 			},
 			internal.NewError(
 				mgorm.OpStmtProcessQuerySQL,
 				internal.KindRuntime,
-				errors.New("syntax.When is not supported"),
+				errors.New("expr.When is not supported"),
 			),
 		},
 	}
 
-	for _, test := range tests {
+	for _, testCase := range testCases {
 		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCmd(test.Cmd)
-		stmt.ExportedSetCalled(test.Called)
+		stmt.ExportedSetCmd(testCase.Cmd)
+		stmt.ExportedSetCalled(testCase.Called)
 		_, err := mgorm.StmtProcessQuerySQL(stmt)
 		if err == nil {
 			t.Errorf("Error was not occurred")
@@ -194,34 +182,34 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(e, test.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
 			t.Errorf(diff)
 		}
 	}
 }
 
 func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		Called []syntax.Expr
 		Error  error
 	}{
 		{
 			[]syntax.Expr{
-				&syntax.When{},
-				&syntax.Where{},
+				&expr.When{},
+				&expr.Where{},
 			},
 			internal.NewError(
 				mgorm.OpStmtProcessCaseSQL,
 				internal.KindRuntime,
-				errors.New("syntax.Where is not supported"),
+				errors.New("expr.Where is not supported"),
 			),
 		},
 	}
 
-	for _, test := range tests {
+	for _, testCase := range testCases {
 		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCalled(test.Called)
-		_, err := mgorm.StmtProcessCaseSQL(stmt)
+		stmt.ExportedSetCalled(testCase.Called)
+		_, err := mgorm.StmtProcessCaseSQL(stmt, false)
 		if err == nil {
 			t.Errorf("Error was not occurred")
 			continue
@@ -231,19 +219,19 @@ func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(e, test.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
 			t.Errorf(diff)
 		}
 	}
 }
 
 func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		Cmd   syntax.Cmd
 		Error error
 	}{
 		{
-			&syntax.Select{},
+			&cmd.Select{},
 			internal.NewError(
 				mgorm.OpStmtProcessExecSQL,
 				internal.KindRuntime,
@@ -252,9 +240,9 @@ func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, testCase := range testCases {
 		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCmd(test.Cmd)
+		stmt.ExportedSetCmd(testCase.Cmd)
 		_, err := mgorm.StmtProcessExecSQL(stmt)
 		if err == nil {
 			t.Errorf("Error was not occurred")
@@ -265,7 +253,7 @@ func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(e, test.Error.(*internal.Error)); diff != "" {
+		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
 			t.Errorf(diff)
 		}
 	}
