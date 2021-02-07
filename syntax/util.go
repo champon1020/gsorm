@@ -23,7 +23,7 @@ func BuildStmtSetForExpression(expr string, vals ...interface{}) (*StmtSet, erro
 	ss := new(StmtSet)
 	values := []interface{}{}
 	for _, v := range vals {
-		if sel, ok := v.(Var); ok {
+		if sel, ok := v.(Sub); ok {
 			values = append(values, fmt.Sprintf("(%s)", sel))
 			continue
 		}

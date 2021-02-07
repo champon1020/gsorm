@@ -45,23 +45,28 @@ func (s *Stmt) addError(err error) {
 	s.errors = append(s.errors, err)
 }
 
-// Column returns string with column format.
-func (s *Stmt) Column() string {
+// CaseColumn returns string without double quotes.
+// This is used for CASE WHEN ... statement
+func (s *Stmt) CaseColumn() string {
 	if _, ok := s.db.(*MockDB); ok {
 		s.execute(opColumn)
 	}
-	sql, err := s.processCaseSQL(true)
-	if err != nil {
-		s.addError(err)
-		return ""
+	if _, ok := s.called[0].(*expr.When); ok {
+		sql, err := s.processCaseSQL(true)
+		if err != nil {
+			s.addError(err)
+			return ""
+		}
+		return sql.String()
 	}
-	return sql.String()
+	return s.String()
 }
 
-// Var returns Stmt.String with syntax.Var type.
-func (s *Stmt) Var() syntax.Var {
+// CaseValue returns string with double quotes.
+// This is used for CASE WHEN ... statement
+func (s *Stmt) CaseValue() string {
 	if _, ok := s.db.(*MockDB); ok {
-		s.execute(opVar)
+		s.execute(opColumn)
 	}
 	if _, ok := s.called[0].(*expr.When); ok {
 		sql, err := s.processCaseSQL(false)
@@ -69,9 +74,18 @@ func (s *Stmt) Var() syntax.Var {
 			s.addError(err)
 			return ""
 		}
-		return syntax.Var(sql.String())
+		return sql.String()
 	}
-	return syntax.Var(s.String())
+	return s.String()
+}
+
+// Sub returns Stmt.String with syntax.Sub type.
+// This is used for UNION or WHERE with SELECT clause.
+func (s *Stmt) Sub() syntax.Sub {
+	if _, ok := s.db.(*MockDB); ok {
+		s.execute(opVar)
+	}
+	return syntax.Sub(s.String())
 }
 
 // String returns query string.
@@ -355,13 +369,13 @@ func (s *Stmt) On(e string, vals ...interface{}) OnStmt {
 }
 
 // Union calls UNION statement.
-func (s *Stmt) Union(stmt syntax.Var) UnionStmt {
+func (s *Stmt) Union(stmt syntax.Sub) UnionStmt {
 	s.call(expr.NewUnion(stmt, false))
 	return s
 }
 
 // UnionAll calls UNION ALL statement.
-func (s *Stmt) UnionAll(stmt syntax.Var) UnionStmt {
+func (s *Stmt) UnionAll(stmt syntax.Sub) UnionStmt {
 	s.call(expr.NewUnion(stmt, true))
 	return s
 }

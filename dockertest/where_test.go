@@ -78,7 +78,7 @@ func TestSelectWhere(t *testing.T) {
 				Where("emp_no IN ?",
 					mgorm.Select(nil, "DISTINCT emp_no").
 						From("salaries").
-						Where("salary < ?", 60000).Var(),
+						Where("salary < ?", 60000).Sub(),
 				).(*mgorm.Stmt),
 			&[]Employee{
 				{EmpNo: 10004},

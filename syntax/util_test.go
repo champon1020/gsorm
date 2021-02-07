@@ -56,7 +56,7 @@ func TestBuildStmtSetForExpression(t *testing.T) {
 			[]interface{}{mgorm.Select(nil, "*").
 				From("table").
 				Where("lhs = ?", "rhs").
-				Var()},
+				Sub()},
 			&syntax.StmtSet{Value: `IN (SELECT * FROM table WHERE lhs = "rhs")`},
 		},
 	}
