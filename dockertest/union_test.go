@@ -14,6 +14,10 @@ func UnionTest(t *testing.T) {
 		Stmt   *mgorm.Stmt
 		Result *[]time.Time
 	}{
+		// SELECT hire_date AS date FROM employees
+		// UNION
+		// SELECT from_date AS date FROM salaries
+		// LIMIT 5;
 		{
 			mgorm.Select(db, "hire_date AS date").
 				From("employees").
@@ -30,6 +34,11 @@ func UnionTest(t *testing.T) {
 				time.Date(1986, time.August, 28, 0, 0, 0, 0, time.UTC),
 			},
 		},
+
+		// SELECT from_date AS date FROM salaries
+		// UNION
+		// SELECT from_date AS date FROM titles
+		// LIMIT 5;
 		{
 			mgorm.Select(db, "from_date AS date").
 				From("salaries").

@@ -23,11 +23,14 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not connect to docker: %v", err)
 	}
 
+	// Build container.
+	//options := &dockertest.RunOptions{Name: "mysql-mock", ExposedPorts: []string{"53306"}}
 	resource, err := pool.BuildAndRun("mysql-mock", "./image/Dockerfile", []string{})
 	if err != nil {
 		log.Fatalf("Could not start resource: %v", err)
 	}
 
+	// Connect to database.
 	if err := pool.Retry(func() error {
 		db, err = mgorm.New(
 			"mysql",
@@ -37,6 +40,13 @@ func TestMain(m *testing.M) {
 	}); err != nil {
 		log.Fatalf("Could not connect to docker: %v", err)
 	}
+
+	defer func() {
+		db.Close()
+		if err := pool.Purge(resource); err != nil {
+			log.Fatalf("Could not purge resource: %v", err)
+		}
+	}()
 
 	start := time.Now()
 	// Ignore any errors which is printed by go-sql-driver/mysql.
@@ -54,13 +64,6 @@ func TestMain(m *testing.M) {
 	mysql.SetLogger(log.New(os.Stderr, "[mysql] ", log.Ldate|log.Ltime|log.Lshortfile))
 
 	m.Run()
-
-	defer func() {
-		db.Close()
-		if err := pool.Purge(resource); err != nil {
-			log.Fatalf("Could not purge resource: %v", err)
-		}
-	}()
 }
 
 type Employee struct {

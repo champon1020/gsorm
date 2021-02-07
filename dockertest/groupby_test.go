@@ -13,6 +13,7 @@ func TestGroupBy(t *testing.T) {
 		Stmt   *mgorm.Stmt
 		Result map[string]int
 	}{
+		// SELECT title, COUNT(title) FROM titles GROUP BY title;
 		{
 			mgorm.Select(db, "title", "COUNT(title)").
 				From("titles").
@@ -24,6 +25,8 @@ func TestGroupBy(t *testing.T) {
 				"Staff":           3,
 			},
 		},
+
+		// SELECT title, COUNT(title) FROM titles GROUP BY title HAVING COUNT(title) != 1;
 		{
 			mgorm.Select(db, "title", "COUNT(title)").
 				From("titles").
@@ -38,8 +41,8 @@ func TestGroupBy(t *testing.T) {
 	}
 
 	for i, testCase := range testCases {
-		model := new(map[string]int)
-		if err := testCase.Stmt.Query(model); err != nil {
+		model := make(map[string]int)
+		if err := testCase.Stmt.Query(&model); err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			t.Errorf("Executed SQL: %s", testCase.Stmt.String())
 			continue
