@@ -66,6 +66,54 @@ func SliceToString(values []interface{}) string {
 	return s
 }
 
+// mapKeyType returns map key type with reflect.Type.
+func mapKeyType(typ reflect.Type) reflect.Type {
+	key := strings.Split(strings.Split(typ.String(), "[")[1], "]")[0]
+	return typeStringToKind(key)
+}
+
+// mapValueType returns map value type with reflect.Type.
+func mapValueType(typ reflect.Type) reflect.Type {
+	val := strings.Split(typ.String(), "]")[1]
+	return typeStringToKind(val)
+}
+
+func typeStringToKind(typ string) reflect.Type {
+	switch typ {
+	case "string":
+		return reflect.TypeOf("")
+	case "int":
+		return reflect.TypeOf(0)
+	case "int8":
+		return reflect.TypeOf(int8(0))
+	case "int16":
+		return reflect.TypeOf(int16(0))
+	case "int32":
+		return reflect.TypeOf(int32(0))
+	case "int64":
+		return reflect.TypeOf(int64(0))
+	case "uint":
+		return reflect.TypeOf(uint8(0))
+	case "uint8":
+		return reflect.TypeOf(uint8(0))
+	case "uint16":
+		return reflect.TypeOf(uint16(0))
+	case "uint32":
+		return reflect.TypeOf(uint32(0))
+	case "uint64":
+		return reflect.TypeOf(uint64(0))
+	case "float32":
+		return reflect.TypeOf(float32(0.0))
+	case "float64":
+		return reflect.TypeOf(float64(0.0))
+	case "bool":
+		return reflect.TypeOf(false)
+	case "time.Time":
+		return reflect.TypeOf(time.Time{})
+	}
+	return nil
+}
+
 // TimeFormat returns layout of date.
 func TimeFormat(layout string) string {
 	switch layout {

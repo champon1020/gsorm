@@ -73,6 +73,29 @@ func Query(db *sql.DB, s *SQL, model interface{}) error {
 		// Set slice|array to model.
 		ref := reflect.ValueOf(model).Elem()
 		ref.Set(vec)
+	case reflect.Map:
+		if len(rCols) != 2 {
+			/* handle error */
+		}
+
+		// Generate new map.
+		mapRef := reflect.New(mt).Elem()
+
+		for rows.Next() {
+			// Scan values from rows.
+			if err := rows.Scan(rValPtr...); err != nil {
+				return NewError(opQuery, KindDatabase, err)
+			}
+
+			// Set index and value to map.
+			if err := setValueToMap(mapRef, string(rVal[0]), string(rVal[1])); err != nil {
+				return err
+			}
+		}
+
+		// Set map to model.
+		ref := reflect.ValueOf(model).Elem()
+		ref.Set(mapRef)
 	case reflect.Struct:
 		// Generate new struct.
 		v := reflect.New(mt).Elem()
@@ -227,6 +250,26 @@ func setValueToField(modelRef reflect.Value, index int, val string) error {
 
 	err := fmt.Errorf("Type %v is not supported", ref.Kind())
 	return NewError(opSetValueToField, KindType, err)
+}
+
+func setValueToMap(mapRef reflect.Value, key string, val string) Error {
+	if !mapRef.CanSet() {
+		err := errors.New("Cannot set to variable")
+		return NewError(opSetValueToField, KindBasic, err)
+	}
+
+	// Generate new value of map key and value.
+	kVal := reflect.New(mapKeyType(reflect.TypeOf(mapRef.Interface())))
+	vVal := reflect.New(mapValueType(reflect.TypeOf(mapRef.Interface())))
+
+	// Set values to reflect.Value.
+	setValueToVar(kVal, key)
+	setValueToVar(vVal, val)
+
+	// Set key and value to map.
+	mapRef.SetMapIndex(kVal, vVal)
+
+	return nil
 }
 
 // setValueToVar sets string value to variable.

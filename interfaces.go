@@ -160,6 +160,11 @@ type OffsetStmt interface {
 
 // UnionStmt is Stmt after Stmt.Union is executed.
 type UnionStmt interface {
+	OrderBy(string) OrderByStmt
+	OrderByDesc(string) OrderByStmt
+	Limit(int) LimitStmt
+	Union(syntax.Var) UnionStmt
+	UnionAll(syntax.Var) UnionStmt
 	ExecutableStmt
 }
 
