@@ -20,7 +20,7 @@ type Employee struct {
 
 // QuerySamples returns a sample by index.
 func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) {
-	querySamples := []mgorm.ExecutableStmt{
+	querySamples := []mgorm.QueryCallable{
 		// SELECT * FROM employees;
 		mgorm.Select(db, "*").
 			From("employees"),
@@ -137,7 +137,7 @@ func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) 
 
 // ExecSamples returns a sample by index.
 func ExecSamples(db *mgorm.DB, i int) (string, bool, error) {
-	execSamples := []mgorm.ExecutableStmt{
+	execSamples := []mgorm.ExecCallable{
 		// INSERT INTO employees ("emp_no", "birth_date", "first_name", "last_name", "gender", "hire_date")
 		// VALUES (10000, "1997-04-30", "Taro", "Yokohama", "M", "2020-01-02");
 		mgorm.Insert(db, "employees", "emp_no", "birth_date", "first_name", "last_name", "gender", "hire_date").
