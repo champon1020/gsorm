@@ -6,23 +6,23 @@ import (
 
 // Exported values which is declared in mockdb.go.
 var (
-	MockDBAddExecuted = (*MockDB).addExecuted
+	MockDBCompareTo = (*MockDB).compareTo
 )
-
-func (m *MockDB) ExportedSetExpected(s []*Stmt) {
-	m.expected = s
-}
 
 func (m *MockDB) ExportedGetExpected() []*Stmt {
 	return m.expected
 }
 
-func (m *MockDB) ExportedSetActual(s []*Stmt) {
-	m.actual = s
+func (m *MockDB) ExportedSetExpected(s []*Stmt) {
+	m.expected = s
 }
 
-func (m *MockDB) ExportedGetActual() []*Stmt {
-	return m.actual
+func (m *MockDB) ExportedGetWillReturn() map[int]interface{} {
+	return m.willReturn
+}
+
+func (m *MockDB) ExportedSetWillReturn(willReturn map[int]interface{}) {
+	m.willReturn = willReturn
 }
 
 // Exported values which is declared in stmt.go.
