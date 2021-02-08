@@ -4,8 +4,8 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// sqlDB is interface that is implemented by *sql.DB.
-type sqlDB interface {
+// Pool is database object like DB or Tx.
+type Pool interface {
 	Ping() error
 }
 

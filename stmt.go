@@ -26,7 +26,7 @@ const (
 
 // Stmt keeps the sql statement.
 type Stmt struct {
-	db     sqlDB
+	db     Pool
 	cmd    syntax.Cmd
 	called []syntax.Expr
 	errors []error
@@ -108,17 +108,39 @@ func (s *Stmt) Query(model interface{}) error {
 		return s.errors[0]
 	}
 
-	switch db := s.db.(type) {
+	switch pool := s.db.(type) {
 	case *DB:
 		sql, err := s.processQuerySQL()
 		if err != nil {
 			return err
 		}
-		if err := internal.Query(db.db, &sql, model); err != nil {
+
+		rows, err := pool.db.Query(sql.String())
+		if err != nil {
+			return internal.NewError(opQuery, internal.KindDatabase, err)
+		}
+
+		defer rows.Close()
+		if err := internal.MapRowsToModel(rows, model); err != nil {
+			return err
+		}
+	case *Tx:
+		sql, err := s.processQuerySQL()
+		if err != nil {
+			return err
+		}
+
+		rows, err := pool.tx.Query(sql.String())
+		if err != nil {
+			return internal.NewError(opQuery, internal.KindDatabase, err)
+		}
+
+		defer rows.Close()
+		if err := internal.MapRowsToModel(rows, model); err != nil {
 			return err
 		}
 	case *MockDB:
-		returned, err := db.compareTo(s)
+		returned, err := pool.compareTo(s)
 		if err != nil {
 			return err
 		}
@@ -135,17 +157,25 @@ func (s *Stmt) Exec() error {
 		return s.errors[0]
 	}
 
-	switch db := s.db.(type) {
+	switch pool := s.db.(type) {
 	case *DB:
 		sql, err := s.processExecSQL()
 		if err != nil {
 			return err
 		}
-		if err := internal.Exec(db.db, &sql); err != nil {
+		if _, err := pool.db.Exec(sql.String()); err != nil {
+			return internal.NewError(opExec, internal.KindDatabase, err)
+		}
+	case *Tx:
+		sql, err := s.processExecSQL()
+		if err != nil {
 			return err
 		}
+		if _, err := pool.tx.Exec(sql.String()); err != nil {
+			return internal.NewError(opExec, internal.KindDatabase, err)
+		}
 	case *MockDB:
-		returned, err := db.compareTo(s)
+		returned, err := pool.compareTo(s)
 		if err != nil {
 			return err
 		}
