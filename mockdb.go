@@ -7,16 +7,22 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-// opArgs stores function name (operation) with arguments.
-type opArgs struct {
-	op   internal.Op
-	args []interface{}
-}
+const (
+	opCompareTo = "mgorm.MockDB.compareTo"
+	opComplete  = "mgorm.MockDB.Complete"
+)
 
-// MockDB is the mock databse object that implements DB.
+// MockDB is the mock databse object.
+// This structure stores what query will be executed and what value will be returned.
 type MockDB struct {
+	// Store expected statements.
 	expected []*Stmt
-	actual   []*Stmt
+
+	// Store data which is to be returned with query execution.
+	willReturn map[int]interface{}
+
+	// How many times query was executed.
+	execCnt int
 }
 
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.
@@ -25,65 +31,56 @@ func (m *MockDB) Ping() error {
 	return nil
 }
 
-// addExecuted adds executed function calls.
-func (m *MockDB) addExecuted(stmt *Stmt) {
-	m.actual = append(m.actual, stmt)
-}
-
-// AddExpected adds expected function calls.
-func (m *MockDB) AddExpected(stmt *Stmt) {
+// Expect adds expected statement to be executed.
+func (m *MockDB) Expect(stmt *Stmt) *MockDB {
 	m.expected = append(m.expected, stmt)
+	return m
 }
 
-// Result returns the difference between expected and actual queries that is executed.
-func (m *MockDB) Result() error {
-	i := 0
-	for ; i < len(m.actual); i++ {
-		if len(m.expected) <= i {
-			return fmt.Errorf("%v was executed, but not expected", getFunctionString(m.actual[i]))
-		}
+// Return adds value which is to be returned with query.
+func (m *MockDB) Return(v interface{}) {
+	if len(m.expected) == 0 {
+		return
+	}
+	idx := len(m.expected) - 1
+	m.willReturn[idx] = v
+}
 
-		j := 0
-		for ; j < len(m.actual[i].called); j++ {
-			if len(m.expected[i].called) <= j {
-				return fmt.Errorf(
-					"%v was executed, but %v is expected",
-					getFunctionString(m.actual[i]),
-					getFunctionString(m.expected[i]),
-				)
-			}
+// compareTo compares executed statement with expected statement.
+// This function is called when some query was executed.
+func (m *MockDB) compareTo(stmt *Stmt) (interface{}, error) {
+	if len(m.expected) <= m.execCnt {
+		err := fmt.Errorf("%s was executed, but not expected", stmt.funcString())
+		return nil, internal.NewError(opCompareTo, internal.KindRuntime, err)
+	}
 
-			if diff := cmp.Diff(m.actual[i].called[j], m.expected[i].called[j]); diff != "" {
-				return fmt.Errorf(
-					"%v was executed, but %v is expected",
-					getFunctionString(m.actual[i]),
-					getFunctionString(m.expected[i]),
-				)
-			}
-		}
+	expStmt := m.expected[m.execCnt]
+	if len(stmt.called) != len(expStmt.called) {
+		err := fmt.Errorf("%s was executed, but %s is expected", stmt.funcString(), expStmt.funcString())
+		return nil, internal.NewError(opCompareTo, internal.KindRuntime, err)
+	}
 
-		if j < len(m.expected[i].called) {
-			return fmt.Errorf(
-				"%v was executed, but %v is expected",
-				getFunctionString(m.actual[i]),
-				getFunctionString(m.expected[i]),
-			)
+	for i, e := range expStmt.called {
+		if diff := cmp.Diff(stmt.called[i], e); diff != "" {
+			err := fmt.Errorf(
+				"%s was executed, but %s is expected", stmt.funcString(), expStmt.funcString())
+			return nil, internal.NewError(opCompareTo, internal.KindRuntime, err)
 		}
 	}
 
-	if i < len(m.expected) {
-		return fmt.Errorf("no query was executed, but %v is expected", getFunctionString(m.expected[i]))
-	}
+	defer func() { m.execCnt++ }()
 
+	if v, ok := m.willReturn[m.execCnt]; ok {
+		return v, nil
+	}
+	return nil, nil
+}
+
+// Complete checks whether all of expected statements was executed or not.
+func (m *MockDB) Complete() error {
+	if len(m.expected) != 0 {
+		err := fmt.Errorf("no query has left, but %s is expected", m.expected[0].funcString())
+		return internal.NewError(opComplete, internal.KindRuntime, err)
+	}
 	return nil
-}
-
-// getFunctionString gets called function like following example.
-//   exmaple: SELECT(...).FROM(...).WHERE(...).QUERY(...).
-func getFunctionString(stmt *Stmt) string {
-	s := stmt.cmd.String()
-	for _, e := range stmt.called {
-		s += fmt.Sprintf(".%s", e.String())
-	}
-	return s
 }

@@ -26,19 +26,14 @@ const (
 
 // Stmt keeps the sql statement.
 type Stmt struct {
-	db       sqlDB
-	cmd      syntax.Cmd
-	called   []syntax.Expr
-	executed *opArgs
-	errors   []error
+	db     sqlDB
+	cmd    syntax.Cmd
+	called []syntax.Expr
+	errors []error
 }
 
 func (s *Stmt) call(e syntax.Expr) {
 	s.called = append(s.called, e)
-}
-
-func (s *Stmt) execute(op internal.Op, args ...interface{}) {
-	s.executed = &opArgs{op: op, args: args}
 }
 
 func (s *Stmt) addError(err error) {
@@ -48,9 +43,6 @@ func (s *Stmt) addError(err error) {
 // CaseColumn returns string without double quotes.
 // This is used for CASE WHEN ... statement
 func (s *Stmt) CaseColumn() string {
-	if _, ok := s.db.(*MockDB); ok {
-		s.execute(opColumn)
-	}
 	if _, ok := s.called[0].(*expr.When); ok {
 		sql, err := s.processCaseSQL(true)
 		if err != nil {
@@ -65,9 +57,6 @@ func (s *Stmt) CaseColumn() string {
 // CaseValue returns string with double quotes.
 // This is used for CASE WHEN ... statement
 func (s *Stmt) CaseValue() string {
-	if _, ok := s.db.(*MockDB); ok {
-		s.execute(opColumn)
-	}
 	if _, ok := s.called[0].(*expr.When); ok {
 		sql, err := s.processCaseSQL(false)
 		if err != nil {
@@ -82,17 +71,11 @@ func (s *Stmt) CaseValue() string {
 // Sub returns Stmt.String with syntax.Sub type.
 // This is used for UNION or WHERE with SELECT clause.
 func (s *Stmt) Sub() syntax.Sub {
-	if _, ok := s.db.(*MockDB); ok {
-		s.execute(opVar)
-	}
 	return syntax.Sub(s.String())
 }
 
 // String returns query string.
 func (s *Stmt) String() string {
-	if _, ok := s.db.(*MockDB); ok {
-		s.execute(opString)
-	}
 	if _, ok := s.cmd.(*cmd.Select); ok {
 		sql, err := s.processQuerySQL()
 		if err != nil {
@@ -107,6 +90,16 @@ func (s *Stmt) String() string {
 		return ""
 	}
 	return sql.String()
+}
+
+// stmtFuncString returns called function like following example.
+//   exmaple: SELECT(...).FROM(...).WHERE(...).QUERY(...).
+func (s *Stmt) funcString() string {
+	str := s.cmd.String()
+	for _, e := range s.called {
+		str += fmt.Sprintf(".%s", e.String())
+	}
+	return str
 }
 
 // Query executes a query that returns some results.
@@ -125,8 +118,13 @@ func (s *Stmt) Query(model interface{}) error {
 			return err
 		}
 	case *MockDB:
-		s.execute(opQuery, model)
-		db.addExecuted(s)
+		returned, err := db.compareTo(s)
+		if err != nil {
+			return err
+		}
+		if returned != nil {
+			/* process */
+		}
 	}
 	return nil
 }
@@ -147,21 +145,24 @@ func (s *Stmt) Exec() error {
 			return err
 		}
 	case *MockDB:
-		s.execute(opExec)
-		db.addExecuted(s)
+		returned, err := db.compareTo(s)
+		if err != nil {
+			return err
+		}
+		if returned != nil {
+			/* process */
+		}
 	}
 	return nil
 }
 
 // ExpectQuery executes a query as mock database.
 func (s *Stmt) ExpectQuery(model interface{}) *Stmt {
-	s.execute(opQuery, model)
 	return s
 }
 
 // ExpectExec executes a query as mock database.
 func (s *Stmt) ExpectExec() *Stmt {
-	s.execute(opExec)
 	return s
 }
 

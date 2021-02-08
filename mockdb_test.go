@@ -1,201 +1,99 @@
 package mgorm_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
-	"github.com/champon1020/mgorm/syntax/cmd"
-	"github.com/champon1020/mgorm/syntax/expr"
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestMockDB_AddExecuted(t *testing.T) {
+func TestMockDB_Return(t *testing.T) {
 	testCases := []struct {
-		MockDB       *mgorm.MockDB
-		Cmd          syntax.Cmd
-		Called       []syntax.Expr
-		ResultCmd    syntax.Cmd
-		ResultCalled []syntax.Expr
+		MockDBExpected   []*mgorm.Stmt
+		WillReturn       interface{}
+		ResultWillReturn map[int]interface{}
 	}{
 		{
-			&mgorm.MockDB{},
-			&cmd.Select{},
-			[]syntax.Expr{
-				&expr.From{},
-				&expr.Where{},
+			[]*mgorm.Stmt{},
+			10001,
+			map[int]interface{}{},
+		},
+		{
+			[]*mgorm.Stmt{
+				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
 			},
-			&cmd.Select{},
-			[]syntax.Expr{
-				&expr.From{},
-				&expr.Where{},
+			"some_name",
+			map[int]interface{}{0: "some_name"},
+		},
+		{
+			[]*mgorm.Stmt{
+				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
+				mgorm.Select(nil, "emp_no").From("employees").(*mgorm.Stmt),
 			},
+			10001,
+			map[int]interface{}{1: 10001},
 		},
 	}
 
 	for _, testCase := range testCases {
-		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCmd(testCase.Cmd)
-		stmt.ExportedSetCalled(testCase.Called)
-		mgorm.MockDBAddExecuted(testCase.MockDB, stmt)
+		mock := new(mgorm.MockDB)
+		mock.ExportedSetExpected(testCase.MockDBExpected)
+		mock.ExportedSetWillReturn(make(map[int]interface{}))
 
-		actualCmd := testCase.MockDB.ExportedGetActual()[0].ExportedGetCmd()
-		if diff := cmp.Diff(testCase.ResultCmd, actualCmd); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-
-		actualCalled := testCase.MockDB.ExportedGetActual()[0].ExportedGetCalled()
-		if diff := cmp.Diff(testCase.ResultCalled, actualCalled); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-	}
-}
-
-func TestMockDB_AddExpected(t *testing.T) {
-	testCases := []struct {
-		MockDB       *mgorm.MockDB
-		Cmd          syntax.Cmd
-		Called       []syntax.Expr
-		ResultCmd    syntax.Cmd
-		ResultCalled []syntax.Expr
-	}{
-		{
-			&mgorm.MockDB{},
-			&cmd.Select{},
-			[]syntax.Expr{
-				&expr.From{},
-				&expr.Where{},
-			},
-			&cmd.Select{},
-			[]syntax.Expr{
-				&expr.From{},
-				&expr.Where{},
-			},
-		},
-	}
-
-	for _, testCase := range testCases {
-		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCmd(testCase.Cmd)
-		stmt.ExportedSetCalled(testCase.Called)
-		testCase.MockDB.AddExpected(stmt)
-
-		expectedCmd := testCase.MockDB.ExportedGetExpected()[0].ExportedGetCmd()
-		if diff := cmp.Diff(testCase.ResultCmd, expectedCmd); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-
-		expectedCalled := testCase.MockDB.ExportedGetExpected()[0].ExportedGetCalled()
-		if diff := cmp.Diff(testCase.ResultCalled, expectedCalled); diff != "" {
+		mock.Return(testCase.WillReturn)
+		if diff := cmp.Diff(testCase.ResultWillReturn, mock.ExportedGetWillReturn()); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
 	}
 }
 
-func TestMockDB_Result(t *testing.T) {
+func TestMockDB_CompareTo(t *testing.T) {
 	testCases := []struct {
-		Expected []*mgorm.Stmt
-		Actual   []*mgorm.Stmt
+		MockDBExpected   []*mgorm.Stmt
+		MockDBWillReturn map[int]interface{}
+		Executed         *mgorm.Stmt
+		ResultReturned   interface{}
 	}{
 		{
 			[]*mgorm.Stmt{
-				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).(*mgorm.Stmt),
+				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
 			},
+			map[int]interface{}{},
+			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
+			nil,
+		},
+		{
 			[]*mgorm.Stmt{
-				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).ExpectQuery(nil),
+				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
 			},
+			map[int]interface{}{0: "some_name"},
+			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
+			"some_name",
+		},
+		{
+			[]*mgorm.Stmt{
+				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
+				mgorm.Select(nil, "emp_no").From("employees").(*mgorm.Stmt),
+			},
+			map[int]interface{}{0: "some_name"},
+			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
+			"some_name",
 		},
 	}
 
 	for _, testCase := range testCases {
-		mockdb := new(mgorm.MockDB)
-		mockdb.ExportedSetExpected(testCase.Expected)
-		mockdb.ExportedSetActual(testCase.Actual)
-		if err := mockdb.Result(); err != nil {
-			t.Errorf("Error was occurred:\n  %v", err)
-		}
-	}
-}
+		mock := new(mgorm.MockDB)
+		mock.ExportedSetExpected(testCase.MockDBExpected)
+		mock.ExportedSetWillReturn(testCase.MockDBWillReturn)
 
-func TestMockDB_Result_Fail(t *testing.T) {
-	testCases := []struct {
-		Expected []*mgorm.Stmt
-		Actual   []*mgorm.Stmt
-		Error    error
-	}{
-		{
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).(*mgorm.Stmt),
-			},
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).ExpectQuery(nil),
-				mgorm.Select(nil, "*").From("table").Where("lhs1 = ? AND lhs2 = ?", 10, "str").ExpectQuery(nil),
-			},
-			errors.New(`SELECT("*").` +
-				`FROM("table").` +
-				`WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") ` +
-				`was executed, but not expected`),
-		},
-		{
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).(*mgorm.Stmt),
-				mgorm.Select(nil, "*").From("table").Where("lhs1 = ? AND lhs2 = ?", 10, "str").(*mgorm.Stmt),
-			},
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).ExpectQuery(nil),
-			},
-			errors.New(`no query was executed, but ` +
-				`SELECT("*").` +
-				`FROM("table").` +
-				`WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") ` +
-				`is expected`),
-		},
-		{
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "*").From("table").Where("lhs1 = ? AND lhs2 = ?", 10, "str").(*mgorm.Stmt),
-			},
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).ExpectQuery(nil),
-			},
-			errors.New(`SELECT("*").` +
-				`FROM("table").` +
-				`WHERE("lhs = ?", 10) ` +
-				`was executed, but ` +
-				`SELECT("*").` +
-				`FROM("table").` +
-				`WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") ` +
-				`is expected`),
-		},
-		{
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "*").From("table").Where("lhs = ?", 10).ExpectQuery(nil),
-			},
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "*").From("table").Where("lhs1 = ? AND lhs2 = ?", 10, "str").(*mgorm.Stmt),
-			},
-			errors.New(`SELECT("*").` +
-				`FROM("table").` +
-				`WHERE("lhs1 = ? AND lhs2 = ?", 10, "str") ` +
-				`was executed, but ` +
-				`SELECT("*").` +
-				`FROM("table").` +
-				`WHERE("lhs = ?", 10) ` +
-				`is expected`),
-		},
-	}
-
-	for _, testCase := range testCases {
-		mockdb := new(mgorm.MockDB)
-		mockdb.ExportedSetExpected(testCase.Expected)
-		mockdb.ExportedSetActual(testCase.Actual)
-		err := mockdb.Result()
-		if err == nil {
-			t.Errorf("Error was not occurred\n")
+		returned, err := mgorm.MockDBCompareTo(mock, testCase.Executed)
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
 		}
-		if err.Error() != testCase.Error.Error() {
-			t.Errorf("\nGot : %v\nWant: %v\n", err, testCase.Error)
+		if diff := cmp.Diff(testCase.ResultReturned, returned); diff != "" {
+			internal.PrintTestDiff(t, diff)
 		}
 	}
 }
