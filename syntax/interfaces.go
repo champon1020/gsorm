@@ -14,5 +14,5 @@ type Expr interface {
 	Build() (*StmtSet, error)
 }
 
-// Var type.
-type Var string
+// Sub type.
+type Sub string

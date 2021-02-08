@@ -23,7 +23,7 @@ func UnionTest(t *testing.T) {
 				From("employees").
 				Union(mgorm.Select(nil, "from_date AS date").
 					From("salaries").
-					Var(),
+					Sub(),
 				).
 				Limit(5).(*mgorm.Stmt),
 			&[]time.Time{
@@ -44,7 +44,7 @@ func UnionTest(t *testing.T) {
 				From("salaries").
 				UnionAll(mgorm.Select(nil, "from_date AS date").
 					From("titles").
-					Var(),
+					Sub(),
 				).
 				Limit(5).(*mgorm.Stmt),
 			&[]time.Time{

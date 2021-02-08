@@ -8,7 +8,7 @@ import (
 
 // Union expression.
 type Union struct {
-	Stmt syntax.Var
+	Stmt syntax.Sub
 	All  bool
 }
 
@@ -35,6 +35,6 @@ func (u *Union) Build() (*syntax.StmtSet, error) {
 }
 
 // NewUnion creates Union instance.
-func NewUnion(stmt syntax.Var, all bool) *Union {
+func NewUnion(stmt syntax.Sub, all bool) *Union {
 	return &Union{Stmt: stmt, All: all}
 }

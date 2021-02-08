@@ -29,7 +29,7 @@ func TestStmt_String(t *testing.T) {
 				Offset(6).
 				Union(mgorm.Select(nil, "column1", "column2 AS c2").
 					From("table3").
-					Var()).(*mgorm.Stmt),
+					Sub()).(*mgorm.Stmt),
 			`SELECT column1, column2 AS c2 ` +
 				`FROM table1 AS t1 ` +
 				`INNER JOIN table2 AS t2 ` +
@@ -52,7 +52,7 @@ func TestStmt_String(t *testing.T) {
 				Or("lhs2 = ? AND lhs3 = ?", "str", true).
 				UnionAll(mgorm.Select(nil, "column1", "column2 AS c2").
 					From("table3").
-					Var()).(*mgorm.Stmt),
+					Sub()).(*mgorm.Stmt),
 			`SELECT column1, column2 AS c2 ` +
 				`FROM table1 AS t1 ` +
 				`LEFT JOIN table2 AS t2 ` +

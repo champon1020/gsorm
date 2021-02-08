@@ -60,7 +60,7 @@ func TestUnion_Build(t *testing.T) {
 
 func TestNewUnion(t *testing.T) {
 	testCases := []struct {
-		Stmt   syntax.Var
+		Stmt   syntax.Sub
 		All    bool
 		Result *expr.Union
 	}{

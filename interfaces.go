@@ -9,13 +9,18 @@ type sqlDB interface {
 	Ping() error
 }
 
-// ExecutableStmt is executable interface of Stmt.
-type ExecutableStmt interface {
+// QueryCallable is embedded into interfaces which is callable Stmt.Query.
+type QueryCallable interface {
 	Query(interface{}) error
 	ExpectQuery(interface{}) *Stmt
+	Sub() syntax.Sub
+	String() string
+}
+
+// ExecCallable is embedded into interfaces which is callable Stmt.Exec.
+type ExecCallable interface {
 	Exec() error
 	ExpectExec() *Stmt
-	Var() syntax.Var
 	String() string
 }
 
@@ -50,20 +55,20 @@ type FromStmt interface {
 	OrderBy(string) OrderByStmt
 	OrderByDesc(string) OrderByStmt
 	Limit(int) LimitStmt
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
 }
 
 // ValuesStmt is Stmt after Stmt.Values is executed.
 type ValuesStmt interface {
-	ExecutableStmt
+	ExecCallable
 }
 
 // SetStmt is Stmt after Stmt.Set is executed.
 type SetStmt interface {
 	Where(string, ...interface{}) WhereStmt
-	ExecutableStmt
+	ExecCallable
 }
 
 // JoinStmt is Stmt after Stmt.Join, Stmt.LeftJoin, RightJoin or FullJoin is executed.
@@ -78,9 +83,9 @@ type OnStmt interface {
 	OrderBy(string) OrderByStmt
 	OrderByDesc(string) OrderByStmt
 	Limit(int) LimitStmt
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
 }
 
 // WhereStmt is Stmt after Stmt.Where is executed.
@@ -91,9 +96,10 @@ type WhereStmt interface {
 	OrderBy(string) OrderByStmt
 	OrderByDesc(string) OrderByStmt
 	Limit(int) LimitStmt
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
+	ExecCallable
 }
 
 // AndStmt is Stmt after Stmt.And is executed.
@@ -101,9 +107,10 @@ type AndStmt interface {
 	GroupBy(...string) GroupByStmt
 	OrderBy(string) OrderByStmt
 	OrderByDesc(string) OrderByStmt
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
+	ExecCallable
 }
 
 // OrStmt is Stmt after Stmt.Or is executed.
@@ -111,9 +118,10 @@ type OrStmt interface {
 	GroupBy(...string) GroupByStmt
 	OrderBy(string) OrderByStmt
 	OrderByDesc(string) OrderByStmt
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
+	ExecCallable
 }
 
 // GroupByStmt is Stmt after Stmt.GroupBy is executed.
@@ -121,41 +129,41 @@ type GroupByStmt interface {
 	Having(string, ...interface{}) HavingStmt
 	OrderBy(string) OrderByStmt
 	OrderByDesc(string) OrderByStmt
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
 }
 
 // HavingStmt is Stmt after Stmt.Having is executed.
 type HavingStmt interface {
 	OrderBy(string) OrderByStmt
 	OrderByDesc(string) OrderByStmt
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
 }
 
 // OrderByStmt is Stmt after Stmt.OrderBy is executed.
 type OrderByStmt interface {
 	Limit(int) LimitStmt
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
 }
 
 // LimitStmt is Stmt after Stmt.Limit is executed.
 type LimitStmt interface {
 	Offset(int) OffsetStmt
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
 }
 
 // OffsetStmt is Stmt after Stmt.Offset is executed.
 type OffsetStmt interface {
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
 }
 
 // UnionStmt is Stmt after Stmt.Union is executed.
@@ -163,9 +171,9 @@ type UnionStmt interface {
 	OrderBy(string) OrderByStmt
 	OrderByDesc(string) OrderByStmt
 	Limit(int) LimitStmt
-	Union(syntax.Var) UnionStmt
-	UnionAll(syntax.Var) UnionStmt
-	ExecutableStmt
+	Union(syntax.Sub) UnionStmt
+	UnionAll(syntax.Sub) UnionStmt
+	QueryCallable
 }
 
 // WhenStmt is Stmt after Stmt.When or mgorm.When is executed.
@@ -177,12 +185,13 @@ type WhenStmt interface {
 type ThenStmt interface {
 	When(string, ...interface{}) WhenStmt
 	Else(interface{}) ElseStmt
-	Var() syntax.Var
-	Column() string
+	CaseColumn() string
+	CaseValue() string
 }
 
 // ElseStmt is Stmt after Stmt.Else is executed.
 type ElseStmt interface {
-	Var() syntax.Var
-	Column() string
+	CaseColumn() string
+	CaseValue() string
+	QueryCallable
 }

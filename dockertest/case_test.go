@@ -21,7 +21,7 @@ func TestCase(t *testing.T) {
 		{
 			mgorm.Select(db, mgorm.When("gender = ?", "M").
 				Then("first_name").
-				Else("last_name").Column()).
+				Else("last_name").CaseColumn()).
 				From("employees").
 				OrderBy("emp_no").(*mgorm.Stmt),
 			&[]string{
@@ -35,6 +35,31 @@ func TestCase(t *testing.T) {
 				"Saniya",
 				"Peac",
 				"Piveteau",
+			},
+		},
+
+		// SELECT CASE
+		// WHEN gender = "M" THEN "MAN"
+		// ELSE "WOMAN"
+		// END
+		// FROM employees ORDER BY emp_no;
+		{
+			mgorm.Select(db, mgorm.When("gender = ?", "M").
+				Then("MAN").
+				Else("WOMAN").CaseValue()).
+				From("employees").
+				OrderBy("emp_no").(*mgorm.Stmt),
+			&[]string{
+				"MAN",
+				"WOMAN",
+				"MAN",
+				"MAN",
+				"MAN",
+				"WOMAN",
+				"WOMAN",
+				"MAN",
+				"WOMAN",
+				"WOMAN",
 			},
 		},
 	}
