@@ -139,15 +139,19 @@ func (s *Stmt) Query(model interface{}) error {
 		if err := internal.MapRowsToModel(rows, model); err != nil {
 			return err
 		}
-	case *MockDB:
-		returned, err := pool.compareTo(s)
+	case Mock:
+		returned, err := compareTo(pool, s)
 		if err != nil {
 			return err
 		}
 		if returned != nil {
 			/* process */
 		}
+	default:
+		err := errors.New("Database object type must be *DB, *Tx, *MockDB or *MockTx")
+		return internal.NewError(opQuery, internal.KindRuntime, err)
 	}
+
 	return nil
 }
 
@@ -174,26 +178,17 @@ func (s *Stmt) Exec() error {
 		if _, err := pool.tx.Exec(sql.String()); err != nil {
 			return internal.NewError(opExec, internal.KindDatabase, err)
 		}
-	case *MockDB:
-		returned, err := pool.compareTo(s)
+	case Mock:
+		_, err := compareTo(pool, s)
 		if err != nil {
 			return err
 		}
-		if returned != nil {
-			/* process */
-		}
+	default:
+		err := errors.New("Database object type must be *DB, *Tx, *MockDB or *MockTx")
+		return internal.NewError(opQuery, internal.KindRuntime, err)
 	}
+
 	return nil
-}
-
-// ExpectQuery executes a query as mock database.
-func (s *Stmt) ExpectQuery(model interface{}) *Stmt {
-	return s
-}
-
-// ExpectExec executes a query as mock database.
-func (s *Stmt) ExpectExec() *Stmt {
-	return s
 }
 
 // processQuerySQL builds SQL with called expressions.
