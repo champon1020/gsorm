@@ -24,35 +24,35 @@ func NewMock() *MockDB {
 }
 
 // Select statement api.
-func Select(db sqlDB, cols ...string) SelectStmt {
+func Select(db Pool, cols ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	stmt.cmd = cmd.NewSelect(cols)
 	return stmt
 }
 
 // Insert statement api.
-func Insert(db sqlDB, table string, cols ...string) InsertStmt {
+func Insert(db Pool, table string, cols ...string) InsertStmt {
 	stmt := &Stmt{db: db}
 	stmt.cmd = cmd.NewInsert(table, cols)
 	return stmt
 }
 
 // Update statement api.
-func Update(db sqlDB, table string, cols ...string) UpdateStmt {
+func Update(db Pool, table string, cols ...string) UpdateStmt {
 	stmt := &Stmt{db: db}
 	stmt.cmd = cmd.NewUpdate(table, cols)
 	return stmt
 }
 
 // Delete statement api.
-func Delete(db sqlDB) DeleteStmt {
+func Delete(db Pool) DeleteStmt {
 	stmt := &Stmt{db: db}
 	stmt.cmd = cmd.NewDelete()
 	return stmt
 }
 
 // Count statement api.
-func Count(db sqlDB, col string, alias ...string) SelectStmt {
+func Count(db Pool, col string, alias ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	s := fmt.Sprintf("COUNT(%s)", col)
 	if len(alias) > 0 {
@@ -63,7 +63,7 @@ func Count(db sqlDB, col string, alias ...string) SelectStmt {
 }
 
 // Avg statement api.
-func Avg(db sqlDB, col string, alias ...string) SelectStmt {
+func Avg(db Pool, col string, alias ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	s := fmt.Sprintf("AVG(%s)", col)
 	if len(alias) > 0 {
@@ -74,7 +74,7 @@ func Avg(db sqlDB, col string, alias ...string) SelectStmt {
 }
 
 // Sum statement api.
-func Sum(db sqlDB, col string, alias ...string) SelectStmt {
+func Sum(db Pool, col string, alias ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	s := fmt.Sprintf("SUM(%s)", col)
 	if len(alias) > 0 {
@@ -85,7 +85,7 @@ func Sum(db sqlDB, col string, alias ...string) SelectStmt {
 }
 
 // Min statement api.
-func Min(db sqlDB, col string, alias ...string) SelectStmt {
+func Min(db Pool, col string, alias ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	s := fmt.Sprintf("MIN(%s)", col)
 	if len(alias) > 0 {
@@ -96,7 +96,7 @@ func Min(db sqlDB, col string, alias ...string) SelectStmt {
 }
 
 // Max statement api.
-func Max(db sqlDB, col string, alias ...string) SelectStmt {
+func Max(db Pool, col string, alias ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	s := fmt.Sprintf("MAX(%s)", col)
 	if len(alias) > 0 {

@@ -4,15 +4,21 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// sqlDB is interface that is implemented by *sql.DB.
-type sqlDB interface {
+// Pool is database object like DB, Tx, MockDB and MockTx.
+type Pool interface {
 	Ping() error
+}
+
+// Mock is mock database interface.
+type Mock interface {
+	Ping() error
+	Complete() error
+	popExpected() expectation
 }
 
 // QueryCallable is embedded into interfaces which is callable Stmt.Query.
 type QueryCallable interface {
 	Query(interface{}) error
-	ExpectQuery(interface{}) *Stmt
 	Sub() syntax.Sub
 	String() string
 }
@@ -20,7 +26,6 @@ type QueryCallable interface {
 // ExecCallable is embedded into interfaces which is callable Stmt.Exec.
 type ExecCallable interface {
 	Exec() error
-	ExpectExec() *Stmt
 	String() string
 }
 

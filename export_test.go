@@ -6,23 +6,39 @@ import (
 
 // Exported values which is declared in mockdb.go.
 var (
-	MockDBCompareTo = (*MockDB).compareTo
+	CompareTo = compareTo
 )
 
-func (m *MockDB) ExportedGetExpected() []*Stmt {
-	return m.expected
+type ExpectedQuery = expectedQuery
+
+func (m *MockDB) ExportedPushExpected(s *Stmt, v interface{}) {
+	m.expected = append(m.expected, &expectedQuery{stmt: s, willReturn: v})
 }
 
-func (m *MockDB) ExportedSetExpected(s []*Stmt) {
-	m.expected = s
+func (m *MockDB) ExportedPopExpected() expectation {
+	if len(m.expected) == 0 {
+		return nil
+	}
+	return m.expected[0]
 }
 
-func (m *MockDB) ExportedGetWillReturn() map[int]interface{} {
-	return m.willReturn
+func (m *MockTx) ExportedPushExpected(s *Stmt, v interface{}) {
+	m.expected = append(m.expected, &expectedQuery{stmt: s, willReturn: v})
 }
 
-func (m *MockDB) ExportedSetWillReturn(willReturn map[int]interface{}) {
-	m.willReturn = willReturn
+func (m *MockTx) ExportedPopExpected() expectation {
+	if len(m.expected) == 0 {
+		return nil
+	}
+	return m.expected[0]
+}
+
+func (e *ExpectedQuery) ExportedGetStmt() *Stmt {
+	return e.stmt
+}
+
+func (e *ExpectedQuery) ExportedSetStmt(s *Stmt) {
+	e.stmt = s
 }
 
 // Exported values which is declared in stmt.go.

@@ -17,18 +17,8 @@ const (
 	opSetValueToVar   Op = "internal.setValueToVar"
 )
 
-// Query executes query and sets rows to model structure.
-func Query(db *sql.DB, s *SQL, model interface{}) error {
-	// Execute query.
-	rows, err := db.Query(s.String())
-	if err != nil {
-		return NewError(opQuery, KindDatabase, err)
-	}
-	if rows == nil {
-		return NewError(opQuery, KindDatabase, errors.New("rows is nil"))
-	}
-	defer rows.Close()
-
+// MapRowsToModel executes query and sets rows to model structure.
+func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 	// Type of model.
 	mt := reflect.TypeOf(model).Elem()
 
@@ -172,15 +162,6 @@ func Query(db *sql.DB, s *SQL, model interface{}) error {
 		return NewError(opQuery, KindType, err)
 	}
 
-	return nil
-}
-
-// Exec executes query without returning rows.
-func Exec(db *sql.DB, s *SQL) error {
-	_, err := db.Exec(s.String())
-	if err != nil {
-		return NewError(opExec, KindDatabase, err)
-	}
 	return nil
 }
 
