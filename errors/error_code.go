@@ -15,3 +15,23 @@ const (
 	DBScanError
 	MockError
 )
+
+func (e errorCode) String() string {
+	switch e {
+	case UnknownError:
+		return "Unknown"
+	case InvalidTypeError:
+		return "Invalid Type"
+	case InvalidFormatError:
+		return "Invalid Format"
+	case InvalidValueError:
+		return "Invalid Value"
+	case UnchangeableError:
+		return "Unchangeable"
+	case DBColumnError, DBQueryError, DBScanError:
+		return "Database Error"
+	case MockError:
+		return "Mock Error"
+	}
+	return ""
+}

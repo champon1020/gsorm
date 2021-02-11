@@ -12,7 +12,10 @@ type Error struct {
 }
 
 func (e Error) Error() string {
-	return fmt.Sprintf("%v", e.Msg)
+	if e.Line != 0 {
+		return fmt.Sprintf("[%s] Line=%d | %v", e.Code.String(), e.Line, e.Msg)
+	}
+	return fmt.Sprintf("[%s] %v", e.Code.String(), e.Msg)
 }
 
 // Is validates whether err is same error value or not.
