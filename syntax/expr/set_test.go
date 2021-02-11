@@ -1,10 +1,10 @@
 package expr_test
 
 import (
-	"errors"
 	"testing"
 	"time"
 
+	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/expr"
@@ -123,11 +123,7 @@ func TestNewSet_Fail(t *testing.T) {
 		{
 			[]string{"lhs1", "lhs2"},
 			[]interface{}{10},
-			internal.NewError(
-				expr.OpNewSet,
-				internal.KindBasic,
-				errors.New("Length is different between lhs and rhs"),
-			),
+			errors.New("Length is different between lhs and rhs", errors.InvalidValueError),
 		},
 	}
 
@@ -137,13 +133,16 @@ func TestNewSet_Fail(t *testing.T) {
 			t.Errorf("Error is not occurred")
 			continue
 		}
-		e, ok := err.(*internal.Error)
+		actualError, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Error type is invalid")
 			continue
 		}
-		if diff := internal.CmpError(e, testCase.Error.(*internal.Error)); diff != "" {
-			t.Errorf(diff)
+		resultError := testCase.Error.(*errors.Error)
+		if !resultError.Is(actualError) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
 		}
 	}
 }

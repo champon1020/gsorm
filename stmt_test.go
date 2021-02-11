@@ -1,11 +1,10 @@
 package mgorm_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/cmd"
 	"github.com/champon1020/mgorm/syntax/expr"
@@ -148,11 +147,7 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 		{
 			&cmd.Delete{},
 			nil,
-			internal.NewError(
-				mgorm.OpStmtProcessQuerySQL,
-				internal.KindRuntime,
-				errors.New("command must be SELECT"),
-			),
+			errors.New("Command must be SELECT", errors.InvalidValueError),
 		},
 		{
 			&cmd.Select{},
@@ -160,11 +155,7 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 				&expr.From{},
 				&expr.When{},
 			},
-			internal.NewError(
-				mgorm.OpStmtProcessQuerySQL,
-				internal.KindRuntime,
-				errors.New("expr.When is not supported"),
-			),
+			errors.New("Type expr.When is not supported", errors.InvalidTypeError),
 		},
 	}
 
@@ -177,13 +168,16 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 			t.Errorf("Error was not occurred")
 			continue
 		}
-		e, ok := err.(*internal.Error)
+		actualError, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
-			t.Errorf(diff)
+		resultError := testCase.Error.(*errors.Error)
+		if !resultError.Is(actualError) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
 		}
 	}
 }
@@ -198,11 +192,7 @@ func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
 				&expr.When{},
 				&expr.Where{},
 			},
-			internal.NewError(
-				mgorm.OpStmtProcessCaseSQL,
-				internal.KindRuntime,
-				errors.New("expr.Where is not supported"),
-			),
+			errors.New("Type expr.Where is not supported", errors.InvalidTypeError),
 		},
 	}
 
@@ -214,13 +204,16 @@ func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
 			t.Errorf("Error was not occurred")
 			continue
 		}
-		e, ok := err.(*internal.Error)
+		actualError, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
-			t.Errorf(diff)
+		resultError := testCase.Error.(*errors.Error)
+		if !resultError.Is(actualError) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
 		}
 	}
 }
@@ -232,11 +225,7 @@ func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
 	}{
 		{
 			&cmd.Select{},
-			internal.NewError(
-				mgorm.OpStmtProcessExecSQL,
-				internal.KindRuntime,
-				errors.New("command must be INSERT, UPDATE or DELETE"),
-			),
+			errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidTypeError),
 		},
 	}
 
@@ -248,13 +237,16 @@ func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
 			t.Errorf("Error was not occurred")
 			continue
 		}
-		e, ok := err.(*internal.Error)
+		actualError, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Type of error is invalid")
 			continue
 		}
-		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
-			t.Errorf(diff)
+		resultError := testCase.Error.(*errors.Error)
+		if !resultError.Is(actualError) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
 		}
 	}
 }

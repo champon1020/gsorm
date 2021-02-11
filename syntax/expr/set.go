@@ -1,16 +1,10 @@
 package expr
 
 import (
-	"errors"
 	"fmt"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/syntax"
-)
-
-// Op values for error handling.
-const (
-	OpNewSet internal.Op = "syntax.NewSet"
 )
 
 // Set expression.
@@ -65,8 +59,7 @@ func (s *Set) Build() (*syntax.StmtSet, error) {
 // NewSet create new set object.
 func NewSet(lhs []string, rhs []interface{}) (*Set, error) {
 	if len(lhs) != len(rhs) {
-		err := errors.New("Length is different between lhs and rhs")
-		return nil, internal.NewError(OpNewSet, internal.KindBasic, err)
+		return nil, errors.New("Length is different between lhs and rhs", errors.InvalidValueError)
 	}
 	s := new(Set)
 	for i := 0; i < len(lhs); i++ {

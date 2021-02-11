@@ -4,16 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/errors"
 	"github.com/google/go-cmp/cmp"
-)
-
-const (
-	opCompareTo      = "mgorm.MockDB.compareTo"
-	opComplete       = "mgorm.MockDB.Complete"
-	opMockDBBegin    = "mgorm.MockDB.Begin"
-	opMockTxCommit   = "mgorm.MockTx.Commit"
-	opMockTxRollback = "mgorm.MockTx.Rollback"
 )
 
 // MockDB is the mock databse object.
@@ -58,8 +50,7 @@ func (m *MockDB) Close() error {
 func (m *MockDB) Begin() (*MockTx, error) {
 	tx := m.nextTx()
 	if tx == nil {
-		err := fmt.Errorf("%s was executed but not expected", opMockDBBegin)
-		return nil, internal.NewError(opMockDBBegin, internal.KindRuntime, err)
+		return nil, errors.New("mgorm.(*MockDB).Begin was executed but not expected", errors.MockError)
 	}
 	return tx, nil
 }
@@ -87,8 +78,8 @@ func (m *MockDB) Return(v interface{}) {
 // Complete checks whether all of expected statements was executed or not.
 func (m *MockDB) Complete() error {
 	if len(m.expected) != 0 {
-		err := fmt.Errorf("No query was executed, but %s is expected", m.expected[0].String())
-		return internal.NewError(opComplete, internal.KindRuntime, err)
+		msg := fmt.Sprintf("No query was executed, but %s is expected", m.expected[0].String())
+		return errors.New(msg, errors.MockError)
 	}
 	for _, tx := range m.tx {
 		if err := tx.Complete(); err != nil {
@@ -135,12 +126,10 @@ func (m *MockTx) Ping() error {
 func (m *MockTx) Commit() error {
 	expected := m.popExpected()
 	if expected == nil {
-		err := fmt.Errorf("%s was executed but not expected", opMockTxCommit)
-		return internal.NewError(opMockTxCommit, internal.KindRuntime, err)
+		return errors.New("mgorm.(*MockTx).Commit was executed but not expected", errors.MockError)
 	}
 	if _, ok := expected.(*expectedCommit); !ok {
-		err := fmt.Errorf("%s was executed but not expected", opMockTxCommit)
-		return internal.NewError(opMockTxCommit, internal.KindRuntime, err)
+		return errors.New("mgorm.(*MockTx).Commit was executed but not expected", errors.MockError)
 	}
 	return nil
 }
@@ -149,12 +138,10 @@ func (m *MockTx) Commit() error {
 func (m *MockTx) Rollback() error {
 	expected := m.popExpected()
 	if expected == nil {
-		err := fmt.Errorf("%s was executed but not expected", opMockTxRollback)
-		return internal.NewError(opMockTxRollback, internal.KindRuntime, err)
+		return errors.New("mgorm.(*MockTx).Rollback was executed but not expected", errors.MockError)
 	}
 	if _, ok := expected.(*expectedRollback); !ok {
-		err := fmt.Errorf("%s was executed but not expected", opMockTxRollback)
-		return internal.NewError(opMockTxCommit, internal.KindRuntime, err)
+		return errors.New("mgorm.(*MockTx).Rollback was executed but not expected", errors.MockError)
 	}
 	return nil
 }
@@ -185,8 +172,8 @@ func (m *MockTx) Return(v interface{}) {
 // Complete checks whether all of expected statements was executed or not.
 func (m *MockTx) Complete() error {
 	if len(m.expected) != 0 {
-		err := fmt.Errorf("No query was executed, but %s is expected", m.expected[0].String())
-		return internal.NewError(opComplete, internal.KindRuntime, err)
+		msg := fmt.Sprintf("No query was executed, but %s is expected", m.expected[0].String())
+		return errors.New(msg, errors.MockError)
 	}
 	return nil
 }
@@ -206,25 +193,25 @@ func (m *MockTx) popExpected() expectation {
 func compareTo(mock Mock, stmt *Stmt) (interface{}, error) {
 	expected := mock.popExpected()
 	if expected == nil {
-		err := fmt.Errorf("%s was executed but not expected", stmt.funcString())
-		return nil, internal.NewError(opCompareTo, internal.KindRuntime, err)
+		msg := fmt.Sprintf("%s was executed but not expected", stmt.funcString())
+		return nil, errors.New(msg, errors.MockError)
 	}
 
 	e, ok := expected.(*expectedQuery)
 	if !ok {
-		err := fmt.Errorf("%s was executed but not expected", expected.String())
-		return nil, internal.NewError(opCompareTo, internal.KindRuntime, err)
+		msg := fmt.Sprintf("%s was executed but not expected", stmt.funcString())
+		return nil, errors.New(msg, errors.MockError)
 	}
 
 	if len(stmt.called) != len(e.stmt.called) {
-		err := fmt.Errorf("%s was executed, but %s is expected", stmt.funcString(), e.stmt.funcString())
-		return nil, internal.NewError(opCompareTo, internal.KindRuntime, err)
+		msg := fmt.Sprintf("%s was executed, but %s is expected", stmt.funcString(), e.stmt.funcString())
+		return nil, errors.New(msg, errors.MockError)
 	}
 
 	for i, expr := range e.stmt.called {
 		if diff := cmp.Diff(stmt.called[i], expr); diff != "" {
-			err := fmt.Errorf("%s was executed, but %s is expected", stmt.funcString(), e.stmt.funcString())
-			return nil, internal.NewError(opCompareTo, internal.KindRuntime, err)
+			msg := fmt.Sprintf("%s was executed, but %s is expected", stmt.funcString(), e.stmt.funcString())
+			return nil, errors.New(msg, errors.MockError)
 		}
 	}
 

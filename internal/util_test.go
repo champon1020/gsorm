@@ -1,11 +1,12 @@
 package internal_test
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
+	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -82,30 +83,35 @@ func TestToString_Fail(t *testing.T) {
 	}{
 		{
 			map[string]string{"key": "value"},
-			internal.NewError(internal.OpToString, internal.KindType, errors.New("type is invalid")),
+			errors.New("Type map is not supported", errors.InvalidTypeError),
 		},
 		{
 			[]int{1, 2},
-			internal.NewError(internal.OpToString, internal.KindType, errors.New("type is invalid")),
+			errors.New("Type slice is not supported", errors.InvalidTypeError),
 		},
 		{
 			[2]int{1, 2},
-			internal.NewError(internal.OpToString, internal.KindType, errors.New("type is invalid")),
+			errors.New("Type array is not supported", errors.InvalidTypeError),
 		},
 	}
 
 	for _, testCase := range testCases {
 		_, err := internal.ToString(testCase.Value, false)
 		if err == nil {
-			t.Errorf("Error is not occurred")
+			t.Errorf("Error was not occurred")
 			continue
 		}
-		e, ok := err.(*internal.Error)
+		actualError, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Error type is invalid")
 			continue
 		}
-		assert.Equal(t, *e, *testCase.Error.(*internal.Error))
+		resultError := testCase.Error.(*errors.Error)
+		if !resultError.Is(err) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
+		}
 	}
 }
 

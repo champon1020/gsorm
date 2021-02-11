@@ -2,19 +2,12 @@ package internal
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
 	"time"
-)
 
-// Op values for error handling.
-const (
-	opQuery           Op = "internal.Query"
-	opExec            Op = "internal.Exec"
-	opSetValueToField Op = "internal.setValueToField"
-	opSetValueToVar   Op = "internal.setValueToVar"
+	"github.com/champon1020/mgorm/errors"
 )
 
 // MapRowsToModel executes query and sets rows to model structure.
@@ -25,7 +18,7 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 	// Get columns from rows.
 	rCols, err := rows.Columns()
 	if err != nil {
-		return NewError(opQuery, KindDatabase, err)
+		return errors.New(err.Error(), errors.DBColumnError)
 	}
 
 	// Prepare pointers which is used to rows.Scan().
@@ -46,7 +39,7 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 
 			for rows.Next() {
 				if err := rows.Scan(rValPtr...); err != nil {
-					return NewError(opQuery, KindDatabase, err)
+					return errors.New(err.Error(), errors.DBScanError)
 				}
 
 				// Set values to model struct.
@@ -60,13 +53,13 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 			}
 		} else {
 			if len(rCols) != 1 {
-				err := fmt.Errorf("Column length must be 1 but got %d", len(rCols))
-				return NewError(opQuery, KindBasic, err)
+				msg := fmt.Sprintf("Column length must be 1 but got %d", len(rCols))
+				return errors.New(msg, errors.DBColumnError)
 			}
 
 			for rows.Next() {
 				if err := rows.Scan(rValPtr...); err != nil {
-					return NewError(opQuery, KindDatabase, err)
+					return errors.New(err.Error(), errors.DBScanError)
 				}
 
 				// Set values to variable.
@@ -84,8 +77,8 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 		ref.Set(vec)
 	case reflect.Map:
 		if len(rCols) != 2 {
-			err := fmt.Errorf("Column length must be 2 but got %d", len(rCols))
-			return NewError(opQuery, KindBasic, err)
+			msg := fmt.Sprintf("Column length must be 2 but got %d", len(rCols))
+			return errors.New(msg, errors.DBColumnError)
 		}
 
 		// Get map value.
@@ -93,7 +86,7 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 
 		for rows.Next() {
 			if err := rows.Scan(rValPtr...); err != nil {
-				return NewError(opQuery, KindDatabase, err)
+				return errors.New(err.Error(), errors.DBScanError)
 			}
 
 			// Set index and value to map.
@@ -110,7 +103,7 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 
 		if rows.Next() {
 			if err := rows.Scan(rValPtr...); err != nil {
-				return NewError(opQuery, KindDatabase, err)
+				return errors.New(err.Error(), errors.DBScanError)
 			}
 
 			// Set values to model struct.
@@ -137,8 +130,8 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 		reflect.Bool,
 		reflect.String:
 		if len(rCols) != 1 {
-			err := fmt.Errorf("Column length must be 1 but got %d", len(rCols))
-			return NewError(opQuery, KindBasic, err)
+			msg := fmt.Sprintf("Column length must be 1 but got %d", len(rCols))
+			return errors.New(msg, errors.DBColumnError)
 		}
 
 		// Generate new variable.
@@ -146,7 +139,7 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 
 		if rows.Next() {
 			if err := rows.Scan(rValPtr...); err != nil {
-				return NewError(opQuery, KindDatabase, err)
+				return errors.New(err.Error(), errors.DBScanError)
 			}
 
 			// Set values to model.
@@ -158,8 +151,7 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 		ref := reflect.ValueOf(model).Elem()
 		ref.Set(v)
 	default:
-		err := fmt.Errorf("Type %v is not supported", mt.Kind())
-		return NewError(opQuery, KindType, err)
+		return errors.New(fmt.Sprintf("Type %v is not supported", mt.Kind()), errors.InvalidTypeError)
 	}
 
 	return nil
@@ -219,8 +211,7 @@ func setValueToField(modelRef reflect.Value, index int, val string) error {
 	// Get field from model.
 	ref := modelRef.Field(index)
 	if !ref.CanSet() {
-		err := errors.New("Cannot set to field")
-		return NewError(opSetValueToField, KindBasic, err)
+		return errors.New("Cannot set to field", errors.UnchangeableError)
 	}
 
 	switch ref.Kind() {
@@ -246,15 +237,13 @@ func setValueToField(modelRef reflect.Value, index int, val string) error {
 		}
 	}
 
-	err := fmt.Errorf("Type %v is not supported", ref.Kind())
-	return NewError(opSetValueToField, KindType, err)
+	return errors.New(fmt.Sprintf("Type %v is not supported", ref.Kind()), errors.InvalidTypeError)
 }
 
 // setValueToMap inserts the pair of key and value to map.
 func setValueToMap(mapRef reflect.Value, key string, val string) error {
 	if !mapRef.CanSet() {
-		err := errors.New("Cannot set to variable")
-		return NewError(opSetValueToField, KindBasic, err)
+		return errors.New("Cannot set to field", errors.UnchangeableError)
 	}
 
 	// Generate new value of map key and value.
@@ -274,8 +263,7 @@ func setValueToMap(mapRef reflect.Value, key string, val string) error {
 // setValueToVar sets string value to variable.
 func setValueToVar(ref reflect.Value, val string) error {
 	if !ref.CanSet() {
-		err := errors.New("Cannot set to variable")
-		return NewError(opSetValueToField, KindBasic, err)
+		return errors.New("Cannot set to field", errors.UnchangeableError)
 	}
 
 	switch ref.Kind() {
@@ -296,15 +284,14 @@ func setValueToVar(ref reflect.Value, val string) error {
 		}
 	}
 
-	err := fmt.Errorf("Type %v is not supported", ref.Kind())
-	return NewError(opSetValueToVar, KindType, err)
+	return errors.New(fmt.Sprintf("Type %v is not supported", ref.Kind()), errors.InvalidTypeError)
 }
 
 func setInt(ref reflect.Value, val string) error {
 	i64, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
-		err := fmt.Errorf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
-		return NewError(opSetValueToField, KindType, err)
+		msg := fmt.Sprintf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
+		return errors.New(msg, errors.InvalidTypeError)
 	}
 	ref.SetInt(i64)
 	return nil
@@ -313,9 +300,8 @@ func setInt(ref reflect.Value, val string) error {
 func setUint(ref reflect.Value, val string) error {
 	u64, err := strconv.ParseUint(val, 10, 64)
 	if err != nil {
-		err := fmt.Errorf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
-		return NewError(opSetValueToField, KindType, err)
-
+		msg := fmt.Sprintf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
+		return errors.New(msg, errors.InvalidTypeError)
 	}
 	ref.SetUint(u64)
 	return nil
@@ -324,9 +310,8 @@ func setUint(ref reflect.Value, val string) error {
 func setFloat(ref reflect.Value, val string) error {
 	f64, err := strconv.ParseFloat(val, 64)
 	if err != nil {
-		err := fmt.Errorf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
-		return NewError(opSetValueToField, KindType, err)
-
+		msg := fmt.Sprintf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
+		return errors.New(msg, errors.InvalidTypeError)
 	}
 	ref.SetFloat(f64)
 	return nil
@@ -335,9 +320,8 @@ func setFloat(ref reflect.Value, val string) error {
 func setBool(ref reflect.Value, val string) error {
 	b, err := strconv.ParseBool(val)
 	if err != nil {
-		err := fmt.Errorf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
-		return NewError(opSetValueToField, KindType, err)
-
+		msg := fmt.Sprintf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
+		return errors.New(msg, errors.InvalidTypeError)
 	}
 	ref.SetBool(b)
 	return nil
@@ -346,8 +330,8 @@ func setBool(ref reflect.Value, val string) error {
 func setTime(ref reflect.Value, val string, layout string) error {
 	t, err := time.Parse(layout, val)
 	if err != nil {
-		err := fmt.Errorf(`Cannot parse %s to time.Time with format of %s`, val, layout)
-		return NewError(opSetValueToField, KindType, err)
+		msg := fmt.Sprintf(`Cannot parse %s to time.Time with format of %s`, val, layout)
+		return errors.New(msg, errors.InvalidFormatError)
 
 	}
 	ref.Set(reflect.ValueOf(t))

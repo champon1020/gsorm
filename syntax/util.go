@@ -1,23 +1,17 @@
 package syntax
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
-)
-
-// Op values for error handling.
-const (
-	OpBuildStmtSetForExpression internal.Op = "syntax.BuildStmtSetForExpression"
 )
 
 // BuildStmtSetForExpression make StmtSet with expr and values.
 func BuildStmtSetForExpression(expr string, vals ...interface{}) (*StmtSet, error) {
 	if strings.Count(expr, "?") != len(vals) {
-		err := errors.New("Length of values is not valid")
-		return nil, internal.NewError(OpBuildStmtSetForExpression, internal.KindBasic, err)
+		return nil, errors.New("Length of values is not valid", errors.InvalidValueError)
 	}
 
 	ss := new(StmtSet)
