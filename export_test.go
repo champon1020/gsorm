@@ -43,12 +43,9 @@ func (e *ExpectedQuery) ExportedSetStmt(s *Stmt) {
 
 // Exported values which is declared in stmt.go.
 var (
-	StmtProcessQuerySQL   = (*Stmt).processQuerySQL
-	StmtProcessCaseSQL    = (*Stmt).processCaseSQL
-	StmtProcessExecSQL    = (*Stmt).processExecSQL
-	OpStmtProcessQuerySQL = opStmtProcessQuerySQL
-	OpStmtProcessCaseSQL  = opStmtProcessCaseSQL
-	OpStmtProcessExecSQL  = opStmtProcessExecSQL
+	StmtProcessQuerySQL = (*Stmt).processQuerySQL
+	StmtProcessCaseSQL  = (*Stmt).processCaseSQL
+	StmtProcessExecSQL  = (*Stmt).processExecSQL
 )
 
 func (s *Stmt) ExportedGetCmd() syntax.Cmd {

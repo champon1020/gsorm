@@ -1,18 +1,14 @@
 package internal
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-)
 
-// Op values for error handling.
-const (
-	OpToString Op = "internal.toString"
+	"github.com/champon1020/mgorm/errors"
 )
 
 var (
@@ -47,9 +43,11 @@ func ToString(v interface{}, quotes bool) (string, error) {
 			return strconv.FormatUint(r.Uint(), 10), nil
 		case reflect.Bool:
 			return strconv.FormatBool(r.Bool()), nil
+		default:
+			return "", errors.New(fmt.Sprintf("Type %v is not supported", r.Kind()), errors.InvalidTypeError)
 		}
 	}
-	return "", NewError(OpToString, KindType, errors.New("type is invalid"))
+	return "", errors.New(fmt.Sprintf("Value %v is invalid", v), errors.InvalidValueError)
 }
 
 // SliceToString converts slice of interface{} to string separated with comma.

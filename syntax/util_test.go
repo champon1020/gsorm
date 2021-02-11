@@ -1,10 +1,10 @@
 package syntax_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/champon1020/mgorm"
+	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
@@ -78,20 +78,12 @@ func TestBuildStmtSetForExpression_Fail(t *testing.T) {
 		{
 			"lhs = ? AND rhs = ?",
 			[]interface{}{10},
-			internal.NewError(
-				syntax.OpBuildStmtSetForExpression,
-				internal.KindBasic,
-				errors.New("Length of values is not valid"),
-			),
+			errors.New("Length of values is not valid", errors.InvalidValueError),
 		},
 		{
 			"lhs = ?",
 			[]interface{}{[]string{}},
-			internal.NewError(
-				internal.OpToString,
-				internal.KindType,
-				errors.New("type is invalid"),
-			),
+			errors.New("Type slice is not supported", errors.InvalidTypeError),
 		},
 	}
 
@@ -101,15 +93,16 @@ func TestBuildStmtSetForExpression_Fail(t *testing.T) {
 			t.Errorf("Error is not occurred")
 			continue
 		}
-
-		e, ok := err.(*internal.Error)
+		actualError, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Error type is invalid")
 			continue
 		}
-
-		if diff := internal.CmpError(testCase.Error.(*internal.Error), e); diff != "" {
-			t.Errorf(diff)
+		resultError := testCase.Error.(*errors.Error)
+		if !resultError.Is(actualError) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
 		}
 	}
 }

@@ -1,27 +1,14 @@
 package mgorm
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 
+	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/cmd"
 	"github.com/champon1020/mgorm/syntax/expr"
-)
-
-// Op values.
-const (
-	opStmtProcessQuerySQL internal.Op = "mgorm.Stmt.processQuerySQL"
-	opStmtProcessCaseSQL  internal.Op = "mgorm.Stmt.processCaseSQL"
-	opStmtProcessExecSQL  internal.Op = "mgorm.Stmt.processExecSQL"
-	opColumn              internal.Op = "mgorm.Stmt.Column"
-	opVar                 internal.Op = "mgorm.Stmt.Var"
-	opString              internal.Op = "mgorm.Stmt.String"
-	opQuery               internal.Op = "mgorm.Stmt.Query"
-	opExec                internal.Op = "mgorm.Stmt.Exec"
-	opSet                 internal.Op = "mgorm.Stmt.Set"
 )
 
 // Stmt keeps the sql statement.
@@ -117,7 +104,7 @@ func (s *Stmt) Query(model interface{}) error {
 
 		rows, err := pool.db.Query(sql.String())
 		if err != nil {
-			return internal.NewError(opQuery, internal.KindDatabase, err)
+			return errors.New(err.Error(), errors.DBQueryError)
 		}
 
 		defer rows.Close()
@@ -132,7 +119,7 @@ func (s *Stmt) Query(model interface{}) error {
 
 		rows, err := pool.tx.Query(sql.String())
 		if err != nil {
-			return internal.NewError(opQuery, internal.KindDatabase, err)
+			return errors.New(err.Error(), errors.DBQueryError)
 		}
 
 		defer rows.Close()
@@ -148,8 +135,7 @@ func (s *Stmt) Query(model interface{}) error {
 			/* process */
 		}
 	default:
-		err := errors.New("Database object type must be *DB, *Tx, *MockDB or *MockTx")
-		return internal.NewError(opQuery, internal.KindRuntime, err)
+		return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 	}
 
 	return nil
@@ -168,7 +154,7 @@ func (s *Stmt) Exec() error {
 			return err
 		}
 		if _, err := pool.db.Exec(sql.String()); err != nil {
-			return internal.NewError(opExec, internal.KindDatabase, err)
+			return errors.New(err.Error(), errors.DBQueryError)
 		}
 	case *Tx:
 		sql, err := s.processExecSQL()
@@ -176,7 +162,7 @@ func (s *Stmt) Exec() error {
 			return err
 		}
 		if _, err := pool.tx.Exec(sql.String()); err != nil {
-			return internal.NewError(opExec, internal.KindDatabase, err)
+			return errors.New(err.Error(), errors.DBQueryError)
 		}
 	case Mock:
 		_, err := compareTo(pool, s)
@@ -184,8 +170,7 @@ func (s *Stmt) Exec() error {
 			return err
 		}
 	default:
-		err := errors.New("Database object type must be *DB, *Tx, *MockDB or *MockTx")
-		return internal.NewError(opQuery, internal.KindRuntime, err)
+		return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 	}
 
 	return nil
@@ -197,8 +182,7 @@ func (s *Stmt) processQuerySQL() (internal.SQL, error) {
 
 	sel, ok := s.cmd.(*cmd.Select)
 	if !ok {
-		err := errors.New("command must be SELECT")
-		return "", internal.NewError(opStmtProcessQuerySQL, internal.KindRuntime, err)
+		return "", errors.New("Command must be SELECT", errors.InvalidValueError)
 	}
 	sql.Write(sel.Build().Build())
 
@@ -222,8 +206,8 @@ func (s *Stmt) processQuerySQL() (internal.SQL, error) {
 			}
 			sql.Write(s.Build())
 		default:
-			err := fmt.Errorf("%s is not supported", reflect.TypeOf(e).Elem().String())
-			return "", internal.NewError(opStmtProcessQuerySQL, internal.KindRuntime, err)
+			msg := fmt.Sprintf("Type %s is not supported", reflect.TypeOf(e).Elem().String())
+			return "", errors.New(msg, errors.InvalidTypeError)
 		}
 	}
 
@@ -258,8 +242,8 @@ func (s *Stmt) processCaseSQL(isColumn bool) (internal.SQL, error) {
 			}
 			sql.Write(s.Build())
 		default:
-			err := fmt.Errorf("%s is not supported", reflect.TypeOf(e).Elem().String())
-			return "", internal.NewError(opStmtProcessCaseSQL, internal.KindRuntime, err)
+			msg := fmt.Sprintf("Type %s is not supported", reflect.TypeOf(e).Elem().String())
+			return "", errors.New(msg, errors.InvalidTypeError)
 		}
 	}
 	sql.Write("END")
@@ -274,8 +258,7 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 	case *cmd.Insert, *cmd.Update, *cmd.Delete:
 		sql.Write(s.cmd.Build().Build())
 	default:
-		err := errors.New("command must be INSERT, UPDATE or DELETE")
-		return "", internal.NewError(opStmtProcessExecSQL, internal.KindRuntime, err)
+		return "", errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError)
 
 	}
 
@@ -309,8 +292,7 @@ func (s *Stmt) Values(vals ...interface{}) ValuesStmt {
 func (s *Stmt) Set(vals ...interface{}) SetStmt {
 	u, ok := s.cmd.(*cmd.Update)
 	if !ok {
-		err := errors.New("SET statement can be used with UPDATE command")
-		s.addError(internal.NewError(opSet, internal.KindRuntime, err))
+		s.addError(errors.New("SET statement can be used with UPDATE command", errors.InvalidValueError))
 		return s
 	}
 	set, err := expr.NewSet(u.Columns, vals)
