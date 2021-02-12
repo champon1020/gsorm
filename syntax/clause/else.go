@@ -7,18 +7,18 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Else expression.
+// Else is ELSE clause.
 type Else struct {
 	Value    interface{}
 	IsColumn bool
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (e *Else) Name() string {
 	return "ELSE"
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (e *Else) String() string {
 	switch v := e.Value.(type) {
 	case string:
@@ -27,7 +27,7 @@ func (e *Else) String() string {
 	return fmt.Sprintf("%s(%v)", e.Name(), e.Value)
 }
 
-// Build makes ELSE statement set.
+// Build makes ELSE clause with syntax.StmtSet.
 func (e *Else) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(e.Name())

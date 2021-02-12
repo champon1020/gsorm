@@ -6,13 +6,13 @@ import (
 	"github.com/champon1020/mgorm/internal"
 )
 
-// Table expression.
+// Table is table term.
 type Table struct {
 	Name  string
 	Alias string
 }
 
-// Build make table expression as string.
+// Build makes table term with string.
 func (t *Table) Build() string {
 	s := t.Name
 	if len(t.Alias) > 0 {
@@ -22,7 +22,7 @@ func (t *Table) Build() string {
 	return s
 }
 
-// NewTable generate the new table object.
+// NewTable creates new Table instance.
 func NewTable(table string) *Table {
 	var (
 		name  string
@@ -38,13 +38,13 @@ func NewTable(table string) *Table {
 	return &Table{Name: name, Alias: alias}
 }
 
-// Column expression.
+// Column is column term.
 type Column struct {
 	Name  string
 	Alias string
 }
 
-// Build make column expression as string.
+// Build makes column term with string.
 func (c *Column) Build() string {
 	s := c.Name
 	if len(c.Alias) > 0 {
@@ -54,7 +54,7 @@ func (c *Column) Build() string {
 	return s
 }
 
-// NewColumn generate the new column object.
+// NewColumn creates new Column instance.
 func NewColumn(column string) *Column {
 	var (
 		name  string
@@ -70,13 +70,13 @@ func NewColumn(column string) *Column {
 	return &Column{Name: name, Alias: alias}
 }
 
-// Eq expression.
+// Eq is equal expression.
 type Eq struct {
 	LHS string
 	RHS interface{}
 }
 
-// Build make equal expression as string.
+// Build makes equal expression with string.
 func (e *Eq) Build() (string, error) {
 	s := e.LHS
 	s += " = "
@@ -85,7 +85,7 @@ func (e *Eq) Build() (string, error) {
 	return s, err
 }
 
-// NewEq generate the new eq object.
+// NewEq creates new Eq instance.
 func NewEq(lhs string, rhs interface{}) *Eq {
 	return &Eq{LHS: lhs, RHS: rhs}
 }

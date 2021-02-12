@@ -2,14 +2,14 @@ package syntax
 
 import "strings"
 
-// StmtSet is the statement set.
+// StmtSet is the pair of clause keyword and its values. If Parens is true, StmtSet would be enclosed by parentheses.
 type StmtSet struct {
 	Keyword string
 	Value   string
 	Parens  bool
 }
 
-// WriteKeyword write caluse to StmtSet.
+// WriteKeyword writes caluse keyword to StmtSet.
 func (ss *StmtSet) WriteKeyword(clause string) {
 	if ss.Keyword != "" {
 		ss.Keyword += " "
@@ -17,7 +17,7 @@ func (ss *StmtSet) WriteKeyword(clause string) {
 	ss.Keyword += clause
 }
 
-// WriteValue write value to StmtSet.
+// WriteValue writes value to StmtSet.
 func (ss *StmtSet) WriteValue(value string) {
 	if ss.Value != "" && value != "," && value != ")" && !strings.HasSuffix(ss.Value, "(") {
 		ss.Value += " "
@@ -25,7 +25,7 @@ func (ss *StmtSet) WriteValue(value string) {
 	ss.Value += value
 }
 
-// Build make sql string.
+// Build makes clause with string.
 func (ss *StmtSet) Build() string {
 	s := ss.Keyword
 	if ss.Parens || ss.Value != "" {

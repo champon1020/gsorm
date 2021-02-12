@@ -7,18 +7,18 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Having expression.
+// Having is HAVING clause.
 type Having struct {
 	Expr   string
 	Values []interface{}
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (h *Having) Name() string {
 	return "HAVING"
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (h *Having) String() string {
 	s := fmt.Sprintf("%q", h.Expr)
 	if len(h.Values) > 0 {
@@ -28,7 +28,7 @@ func (h *Having) String() string {
 	return fmt.Sprintf("%s(%s)", h.Name(), s)
 }
 
-// Build makes HAVING statement set.
+// Build makes HAVING clause with syntax.StmtSet.
 func (h *Having) Build() (*syntax.StmtSet, error) {
 	ss, err := syntax.BuildStmtSetForExpression(h.Expr, h.Values...)
 	if err != nil {

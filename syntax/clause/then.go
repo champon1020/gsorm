@@ -7,18 +7,18 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Then expression
+// Then is THEN clause.
 type Then struct {
 	Value    interface{}
 	IsColumn bool
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (t *Then) Name() string {
 	return "THEN"
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (t *Then) String() string {
 	switch v := t.Value.(type) {
 	case string:
@@ -27,7 +27,7 @@ func (t *Then) String() string {
 	return fmt.Sprintf("%s(%v)", t.Name(), t.Value)
 }
 
-// Build makes THEN statement set.
+// Build makes THEN clause with sytnax.StmtSet.
 func (t *Then) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(t.Name())

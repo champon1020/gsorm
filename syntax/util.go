@@ -8,7 +8,7 @@ import (
 	"github.com/champon1020/mgorm/internal"
 )
 
-// BuildStmtSetForExpression make StmtSet with expr and values.
+// BuildStmtSetForExpression makes StmtSet with expr and values.
 func BuildStmtSetForExpression(expr string, vals ...interface{}) (*StmtSet, error) {
 	if strings.Count(expr, "?") != len(vals) {
 		return nil, errors.New("Length of values is not valid", errors.InvalidValueError)

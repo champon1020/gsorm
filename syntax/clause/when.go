@@ -7,18 +7,18 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// When expression.
+// When is WHEN clause.
 type When struct {
 	Expr   string
 	Values []interface{}
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (w *When) Name() string {
 	return "WHEN"
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (w *When) String() string {
 	s := fmt.Sprintf("%q", w.Expr)
 	if len(w.Values) > 0 {
@@ -27,7 +27,7 @@ func (w *When) String() string {
 	return fmt.Sprintf("%s(%s)", w.Name(), s)
 }
 
-// Build makes WHEN statement set.
+// Build makes WHEN clause with syntax.StmtSet.
 func (w *When) Build() (*syntax.StmtSet, error) {
 	ss, err := syntax.BuildStmtSetForExpression(w.Expr, w.Values...)
 	if err != nil {

@@ -7,18 +7,18 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Where clause.
+// Where is WHERE clause.
 type Where struct {
 	Expr   string
 	Values []interface{}
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (w *Where) Name() string {
 	return "WHERE"
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (w *Where) String() string {
 	s := fmt.Sprintf("%q", w.Expr)
 	if len(w.Values) > 0 {
@@ -28,7 +28,7 @@ func (w *Where) String() string {
 	return fmt.Sprintf("%s(%s)", w.Name(), s)
 }
 
-// Build make WHERE statement set.
+// Build makes WHERE clause with syntax.StmtSet.
 func (w *Where) Build() (*syntax.StmtSet, error) {
 	ss, err := syntax.BuildStmtSetForExpression(w.Expr, w.Values...)
 	if err != nil {

@@ -6,21 +6,22 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// GroupBy expression.
+// GroupBy is GROUP BY clause.
 type GroupBy struct {
 	Columns []syntax.Column
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (g *GroupBy) Name() string {
 	return "GROUP BY"
 }
 
+// addColumn appends column to GroupBy.
 func (g *GroupBy) addColumn(col string) {
 	g.Columns = append(g.Columns, *syntax.NewColumn(col))
 }
 
-// String returns string of function call.
+// String returns function call wtih string.
 func (g *GroupBy) String() string {
 	var s string
 	for i, c := range g.Columns {
@@ -32,7 +33,7 @@ func (g *GroupBy) String() string {
 	return fmt.Sprintf("%s(%s)", g.Name(), s)
 }
 
-// Build make GROUP BY statement set.
+// Build makes GROUP BY clause with syntax.StmtSet.
 func (g *GroupBy) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(g.Name())
