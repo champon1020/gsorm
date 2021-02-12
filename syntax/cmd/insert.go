@@ -38,7 +38,7 @@ func (i *Insert) String() string {
 // Build make insert statement set.
 func (i *Insert) Build() *syntax.StmtSet {
 	ss := new(syntax.StmtSet)
-	ss.WriteClause(i.Query())
+	ss.WriteKeyword(i.Query())
 	ss.WriteValue(i.Table.Build())
 	if len(i.Columns) > 0 {
 		ss.WriteValue("(")

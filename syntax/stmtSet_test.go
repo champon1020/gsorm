@@ -9,26 +9,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStmtSet_WriteClause(t *testing.T) {
+func TestStmtSet_WriteKeyword(t *testing.T) {
 	testCases := []struct {
 		StmtSet *syntax.StmtSet
-		Clause  string
+		Keyword string
 		Result  *syntax.StmtSet
 	}{
 		{
-			&syntax.StmtSet{Clause: ""},
+			&syntax.StmtSet{Keyword: ""},
 			"clause",
-			&syntax.StmtSet{Clause: "clause"},
+			&syntax.StmtSet{Keyword: "clause"},
 		},
 		{
-			&syntax.StmtSet{Clause: "clause1"},
+			&syntax.StmtSet{Keyword: "clause1"},
 			"clause2",
-			&syntax.StmtSet{Clause: "clause1 clause2"},
+			&syntax.StmtSet{Keyword: "clause1 clause2"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		testCase.StmtSet.WriteClause(testCase.Clause)
+		testCase.StmtSet.WriteKeyword(testCase.Keyword)
 		if diff := cmp.Diff(testCase.Result, testCase.StmtSet); diff != "" {
 			internal.PrintTestDiff(t, diff)
 		}
@@ -88,15 +88,15 @@ func TestStmtSet_Build(t *testing.T) {
 		Result  string
 	}{
 		{
-			&syntax.StmtSet{Clause: "clause", Value: "value"},
+			&syntax.StmtSet{Keyword: "clause", Value: "value"},
 			"clause value",
 		},
 		{
-			&syntax.StmtSet{Clause: "clause", Value: "value", Parens: true},
+			&syntax.StmtSet{Keyword: "clause", Value: "value", Parens: true},
 			"clause (value)",
 		},
 		{
-			&syntax.StmtSet{Clause: "clause", Value: ""},
+			&syntax.StmtSet{Keyword: "clause", Value: ""},
 			"clause",
 		},
 	}

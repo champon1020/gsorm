@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/champon1020/mgorm/syntax/cmd"
-	"github.com/champon1020/mgorm/syntax/expr"
 )
 
 // New generate DB object.
@@ -109,6 +109,6 @@ func Max(db Pool, col string, alias ...string) SelectStmt {
 // When statement api.
 func When(e string, vals ...interface{}) WhenStmt {
 	stmt := new(Stmt)
-	stmt.call(expr.NewWhen(e, vals...))
+	stmt.call(clause.NewWhen(e, vals...))
 	return stmt
 }

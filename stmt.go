@@ -7,19 +7,19 @@ import (
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/champon1020/mgorm/syntax/cmd"
-	"github.com/champon1020/mgorm/syntax/expr"
 )
 
 // Stmt keeps the sql statement.
 type Stmt struct {
 	db     Pool
 	cmd    syntax.Cmd
-	called []syntax.Expr
+	called []syntax.Clause
 	errors []error
 }
 
-func (s *Stmt) call(e syntax.Expr) {
+func (s *Stmt) call(e syntax.Clause) {
 	s.called = append(s.called, e)
 }
 
@@ -30,7 +30,7 @@ func (s *Stmt) addError(err error) {
 // CaseColumn returns string without double quotes.
 // This is used for CASE WHEN ... statement
 func (s *Stmt) CaseColumn() string {
-	if _, ok := s.called[0].(*expr.When); ok {
+	if _, ok := s.called[0].(*clause.When); ok {
 		sql, err := s.processCaseSQL(true)
 		if err != nil {
 			s.addError(err)
@@ -44,7 +44,7 @@ func (s *Stmt) CaseColumn() string {
 // CaseValue returns string with double quotes.
 // This is used for CASE WHEN ... statement
 func (s *Stmt) CaseValue() string {
-	if _, ok := s.called[0].(*expr.When); ok {
+	if _, ok := s.called[0].(*clause.When); ok {
 		sql, err := s.processCaseSQL(false)
 		if err != nil {
 			s.addError(err)
@@ -188,18 +188,18 @@ func (s *Stmt) processQuerySQL() (internal.SQL, error) {
 
 	for _, e := range s.called {
 		switch e := e.(type) {
-		case *expr.From,
-			*expr.Join,
-			*expr.On,
-			*expr.Where,
-			*expr.And,
-			*expr.Or,
-			*expr.GroupBy,
-			*expr.Having,
-			*expr.OrderBy,
-			*expr.Limit,
-			*expr.Offset,
-			*expr.Union:
+		case *clause.From,
+			*clause.Join,
+			*clause.On,
+			*clause.Where,
+			*clause.And,
+			*clause.Or,
+			*clause.GroupBy,
+			*clause.Having,
+			*clause.OrderBy,
+			*clause.Limit,
+			*clause.Offset,
+			*clause.Union:
 			s, err := e.Build()
 			if err != nil {
 				return "", err
@@ -221,20 +221,20 @@ func (s *Stmt) processCaseSQL(isColumn bool) (internal.SQL, error) {
 	sql.Write("CASE")
 	for _, e := range s.called {
 		switch e := e.(type) {
-		case *expr.When:
+		case *clause.When:
 			s, err := e.Build()
 			if err != nil {
 				return "", err
 			}
 			sql.Write(s.Build())
-		case *expr.Then:
+		case *clause.Then:
 			e.IsColumn = isColumn
 			s, err := e.Build()
 			if err != nil {
 				return "", err
 			}
 			sql.Write(s.Build())
-		case *expr.Else:
+		case *clause.Else:
 			e.IsColumn = isColumn
 			s, err := e.Build()
 			if err != nil {
@@ -264,7 +264,7 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 
 	for _, e := range s.called {
 		switch e := e.(type) {
-		case *expr.Values, *expr.Set, *expr.From, *expr.Where, *expr.And, *expr.Or:
+		case *clause.Values, *clause.Set, *clause.From, *clause.Where, *clause.And, *clause.Or:
 			s, err := e.Build()
 			if err != nil {
 				return "", err
@@ -278,13 +278,13 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 
 // From calls FROM statement.
 func (s *Stmt) From(tables ...string) FromStmt {
-	s.call(expr.NewFrom(tables))
+	s.call(clause.NewFrom(tables))
 	return s
 }
 
 // Values calls VALUES statement.
 func (s *Stmt) Values(vals ...interface{}) ValuesStmt {
-	s.call(expr.NewValues(vals))
+	s.call(clause.NewValues(vals))
 	return s
 }
 
@@ -295,7 +295,7 @@ func (s *Stmt) Set(vals ...interface{}) SetStmt {
 		s.addError(errors.New("SET statement can be used with UPDATE command", errors.InvalidValueError))
 		return s
 	}
-	set, err := expr.NewSet(u.Columns, vals)
+	set, err := clause.NewSet(u.Columns, vals)
 	if err != nil {
 		s.addError(err)
 		return s
@@ -306,114 +306,114 @@ func (s *Stmt) Set(vals ...interface{}) SetStmt {
 
 // Where calls WHERE statement.
 func (s *Stmt) Where(e string, vals ...interface{}) WhereStmt {
-	s.call(expr.NewWhere(e, vals...))
+	s.call(clause.NewWhere(e, vals...))
 	return s
 }
 
 // And calls AND statement.
 func (s *Stmt) And(e string, vals ...interface{}) AndStmt {
-	s.call(expr.NewAnd(e, vals...))
+	s.call(clause.NewAnd(e, vals...))
 	return s
 }
 
 // Or calls OR statement.
 func (s *Stmt) Or(e string, vals ...interface{}) OrStmt {
-	s.call(expr.NewOr(e, vals...))
+	s.call(clause.NewOr(e, vals...))
 	return s
 }
 
 // Limit calls LIMIT statement.
 func (s *Stmt) Limit(num int) LimitStmt {
-	s.call(expr.NewLimit(num))
+	s.call(clause.NewLimit(num))
 	return s
 }
 
 // Offset calls OFFSET statement.
 func (s *Stmt) Offset(num int) OffsetStmt {
-	s.call(expr.NewOffset(num))
+	s.call(clause.NewOffset(num))
 	return s
 }
 
 // OrderBy calls ORDER BY statement.
 func (s *Stmt) OrderBy(col string) OrderByStmt {
-	s.call(expr.NewOrderBy(col, false))
+	s.call(clause.NewOrderBy(col, false))
 	return s
 }
 
 // OrderByDesc calls ORDER BY ... DESC statement.
 func (s *Stmt) OrderByDesc(col string) OrderByStmt {
-	s.call(expr.NewOrderBy(col, true))
+	s.call(clause.NewOrderBy(col, true))
 	return s
 }
 
 // Join calls (INNER) JOIN statement.
 func (s *Stmt) Join(table string) JoinStmt {
-	s.call(expr.NewJoin(table, expr.InnerJoin))
+	s.call(clause.NewJoin(table, clause.InnerJoin))
 	return s
 }
 
 // LeftJoin calls (INNER) JOIN statement.
 func (s *Stmt) LeftJoin(table string) JoinStmt {
-	s.call(expr.NewJoin(table, expr.LeftJoin))
+	s.call(clause.NewJoin(table, clause.LeftJoin))
 	return s
 }
 
 // RightJoin calls (INNER) JOIN statement.
 func (s *Stmt) RightJoin(table string) JoinStmt {
-	s.call(expr.NewJoin(table, expr.RightJoin))
+	s.call(clause.NewJoin(table, clause.RightJoin))
 	return s
 }
 
 // FullJoin calls (INNER) JOIN statement.
 func (s *Stmt) FullJoin(table string) JoinStmt {
-	s.call(expr.NewJoin(table, expr.FullJoin))
+	s.call(clause.NewJoin(table, clause.FullJoin))
 	return s
 }
 
 // On calls ON statement.
 func (s *Stmt) On(e string, vals ...interface{}) OnStmt {
-	s.call(expr.NewOn(e, vals...))
+	s.call(clause.NewOn(e, vals...))
 	return s
 }
 
 // Union calls UNION statement.
 func (s *Stmt) Union(stmt syntax.Sub) UnionStmt {
-	s.call(expr.NewUnion(stmt, false))
+	s.call(clause.NewUnion(stmt, false))
 	return s
 }
 
 // UnionAll calls UNION ALL statement.
 func (s *Stmt) UnionAll(stmt syntax.Sub) UnionStmt {
-	s.call(expr.NewUnion(stmt, true))
+	s.call(clause.NewUnion(stmt, true))
 	return s
 }
 
 // GroupBy calls GROUP BY statement.
 func (s *Stmt) GroupBy(cols ...string) GroupByStmt {
-	s.call(expr.NewGroupBy(cols))
+	s.call(clause.NewGroupBy(cols))
 	return s
 }
 
 // Having calls HAVING statement.
 func (s *Stmt) Having(e string, vals ...interface{}) HavingStmt {
-	s.call(expr.NewHaving(e, vals...))
+	s.call(clause.NewHaving(e, vals...))
 	return s
 }
 
 // When calls WHEN statement.
 func (s *Stmt) When(e string, vals ...interface{}) WhenStmt {
-	s.call(expr.NewWhen(e, vals...))
+	s.call(clause.NewWhen(e, vals...))
 	return s
 }
 
 // Then calls THEN statement.
 func (s *Stmt) Then(val interface{}) ThenStmt {
-	s.call(expr.NewThen(val))
+	s.call(clause.NewThen(val))
 	return s
 }
 
 // Else calls ELSE statement.
 func (s *Stmt) Else(val interface{}) ElseStmt {
-	s.call(expr.NewElse(val))
+	s.call(clause.NewElse(val))
 	return s
 }

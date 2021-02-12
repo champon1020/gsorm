@@ -52,25 +52,25 @@ func TestUpdate_Build(t *testing.T) {
 	}{
 		{
 			&cmd.Update{Table: syntax.Table{Name: "table"}},
-			&syntax.StmtSet{Clause: "UPDATE", Value: "table"},
+			&syntax.StmtSet{Keyword: "UPDATE", Value: "table"},
 		},
 		{
 			&cmd.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
-			&syntax.StmtSet{Clause: "UPDATE", Value: "table AS t"},
+			&syntax.StmtSet{Keyword: "UPDATE", Value: "table AS t"},
 		},
 		{
 			&cmd.Update{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []string{"column"},
 			},
-			&syntax.StmtSet{Clause: "UPDATE", Value: "table AS t"},
+			&syntax.StmtSet{Keyword: "UPDATE", Value: "table AS t"},
 		},
 		{
 			&cmd.Update{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []string{"column1", "column2"},
 			},
-			&syntax.StmtSet{Clause: "UPDATE", Value: "table AS t"},
+			&syntax.StmtSet{Keyword: "UPDATE", Value: "table AS t"},
 		},
 	}
 

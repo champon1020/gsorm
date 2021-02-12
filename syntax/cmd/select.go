@@ -36,7 +36,7 @@ func (s *Select) String() string {
 // Build make select statement set.
 func (s *Select) Build() *syntax.StmtSet {
 	ss := &syntax.StmtSet{}
-	ss.WriteClause(s.Query())
+	ss.WriteKeyword(s.Query())
 	for i, c := range s.Columns {
 		if i != 0 {
 			ss.WriteValue(",")

@@ -45,18 +45,18 @@ func TestSelect_Build(t *testing.T) {
 	}{
 		{
 			&cmd.Select{Columns: []syntax.Column{{Name: "column"}}},
-			&syntax.StmtSet{Clause: "SELECT", Value: "column"},
+			&syntax.StmtSet{Keyword: "SELECT", Value: "column"},
 		},
 		{
 			&cmd.Select{Columns: []syntax.Column{{Name: "column", Alias: "c"}}},
-			&syntax.StmtSet{Clause: "SELECT", Value: "column AS c"},
+			&syntax.StmtSet{Keyword: "SELECT", Value: "column AS c"},
 		},
 		{
 			&cmd.Select{Columns: []syntax.Column{
 				{Name: "column1", Alias: "c1"},
 				{Name: "column2", Alias: "c2"},
 			}},
-			&syntax.StmtSet{Clause: "SELECT", Value: "column1 AS c1, column2 AS c2"},
+			&syntax.StmtSet{Keyword: "SELECT", Value: "column1 AS c1, column2 AS c2"},
 		},
 	}
 
