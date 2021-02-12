@@ -3,7 +3,6 @@ package cmd_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/cmd"
 	"github.com/google/go-cmp/cmp"
@@ -63,7 +62,7 @@ func TestSelect_Build(t *testing.T) {
 	for _, testCase := range testCases {
 		res := testCase.Select.Build()
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -93,7 +92,7 @@ func TestNewSelect(t *testing.T) {
 	for _, testCase := range testCases {
 		res := cmd.NewSelect(testCase.Cols)
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

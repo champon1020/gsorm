@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/internal"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -42,14 +41,14 @@ func TestMockDB_ExpectReturn(t *testing.T) {
 			testCase.Stmt.ExportedGetCmd(),
 			eq.ExportedGetStmt().ExportedGetCmd(),
 		); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 			continue
 		}
 		if diff := cmp.Diff(
 			testCase.Stmt.ExportedGetCalled(),
 			eq.ExportedGetStmt().ExportedGetCalled(),
 		); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -88,14 +87,14 @@ func TestMockTx_ExpectReturn(t *testing.T) {
 			testCase.Stmt.ExportedGetCmd(),
 			eq.ExportedGetStmt().ExportedGetCmd(),
 		); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 			continue
 		}
 		if diff := cmp.Diff(
 			testCase.Stmt.ExportedGetCalled(),
 			eq.ExportedGetStmt().ExportedGetCalled(),
 		); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -153,7 +152,7 @@ func TestCompareTo_MockDB(t *testing.T) {
 			continue
 		}
 		if diff := cmp.Diff(testCase.ResultReturned, returned); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -211,7 +210,7 @@ func TestCompareTo_MockTx(t *testing.T) {
 			continue
 		}
 		if diff := cmp.Diff(testCase.ResultReturned, returned); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

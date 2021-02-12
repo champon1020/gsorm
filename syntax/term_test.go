@@ -3,7 +3,6 @@ package syntax_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
@@ -36,7 +35,7 @@ func TestNewTable(t *testing.T) {
 	for _, testCase := range testCases {
 		res := syntax.NewTable(testCase.TableStr)
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -68,7 +67,7 @@ func TestNewColumn(t *testing.T) {
 	for _, testCase := range testCases {
 		res := syntax.NewColumn(testCase.ColStr)
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -103,7 +102,7 @@ func TestNewEq(t *testing.T) {
 	for _, testCase := range testCases {
 		res := syntax.NewEq(testCase.LHS, testCase.RHS)
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

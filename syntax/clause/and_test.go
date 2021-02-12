@@ -3,7 +3,6 @@ package clause_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
@@ -49,7 +48,7 @@ func TestAnd_Build(t *testing.T) {
 	for _, testCase := range testCases {
 		res, _ := testCase.And.Build()
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -66,7 +65,7 @@ func TestNewAdd(t *testing.T) {
 	for _, testCase := range testCases {
 		res := clause.NewAnd(testCase.Expr, testCase.Values...)
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
