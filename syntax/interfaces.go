@@ -7,8 +7,8 @@ type Cmd interface {
 	Build() *StmtSet
 }
 
-// Expr is implemented by Where, And, and other types.
-type Expr interface {
+// Clause is implemented by Where, And, and other types.
+type Clause interface {
 	Name() string
 	String() string
 	Build() (*StmtSet, error)

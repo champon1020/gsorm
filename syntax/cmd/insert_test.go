@@ -58,32 +58,32 @@ func TestInsert_Build(t *testing.T) {
 	}{
 		{
 			&cmd.Insert{Table: syntax.Table{Name: "table"}},
-			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table"},
+			&syntax.StmtSet{Keyword: "INSERT INTO", Value: "table"},
 		},
 		{
 			&cmd.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
-			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table AS t"},
+			&syntax.StmtSet{Keyword: "INSERT INTO", Value: "table AS t"},
 		},
 		{
 			&cmd.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column"}},
 			},
-			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table AS t (column)"},
+			&syntax.StmtSet{Keyword: "INSERT INTO", Value: "table AS t (column)"},
 		},
 		{
 			&cmd.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column", Alias: "c"}},
 			},
-			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table AS t (column AS c)"},
+			&syntax.StmtSet{Keyword: "INSERT INTO", Value: "table AS t (column AS c)"},
 		},
 		{
 			&cmd.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column1", Alias: "c1"}, {Name: "column2", Alias: "c2"}},
 			},
-			&syntax.StmtSet{Clause: "INSERT INTO", Value: "table AS t (column1 AS c1, column2 AS c2)"},
+			&syntax.StmtSet{Keyword: "INSERT INTO", Value: "table AS t (column1 AS c1, column2 AS c2)"},
 		},
 	}
 

@@ -56,10 +56,10 @@ func (s *Stmt) ExportedSetCmd(cmd syntax.Cmd) {
 	s.cmd = cmd
 }
 
-func (s *Stmt) ExportedGetCalled() []syntax.Expr {
+func (s *Stmt) ExportedGetCalled() []syntax.Clause {
 	return s.called
 }
 
-func (s *Stmt) ExportedSetCalled(called []syntax.Expr) {
+func (s *Stmt) ExportedSetCalled(called []syntax.Clause) {
 	s.called = called
 }

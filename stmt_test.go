@@ -6,8 +6,8 @@ import (
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/champon1020/mgorm/syntax/cmd"
-	"github.com/champon1020/mgorm/syntax/expr"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -141,7 +141,7 @@ func TestStmt_String(t *testing.T) {
 func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 	testCases := []struct {
 		Cmd    syntax.Cmd
-		Called []syntax.Expr
+		Called []syntax.Clause
 		Error  error
 	}{
 		{
@@ -151,11 +151,11 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 		},
 		{
 			&cmd.Select{},
-			[]syntax.Expr{
-				&expr.From{},
-				&expr.When{},
+			[]syntax.Clause{
+				&clause.From{},
+				&clause.When{},
 			},
-			errors.New("Type expr.When is not supported", errors.InvalidTypeError),
+			errors.New("Type clause.When is not supported", errors.InvalidTypeError),
 		},
 	}
 
@@ -184,15 +184,15 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 
 func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
 	testCases := []struct {
-		Called []syntax.Expr
+		Called []syntax.Clause
 		Error  error
 	}{
 		{
-			[]syntax.Expr{
-				&expr.When{},
-				&expr.Where{},
+			[]syntax.Clause{
+				&clause.When{},
+				&clause.Where{},
 			},
-			errors.New("Type expr.Where is not supported", errors.InvalidTypeError),
+			errors.New("Type clause.Where is not supported", errors.InvalidTypeError),
 		},
 	}
 

@@ -4,17 +4,17 @@ import "strings"
 
 // StmtSet is the statement set.
 type StmtSet struct {
-	Clause string
-	Value  string
-	Parens bool
+	Keyword string
+	Value   string
+	Parens  bool
 }
 
-// WriteClause write caluse to StmtSet.
-func (ss *StmtSet) WriteClause(clause string) {
-	if ss.Clause != "" {
-		ss.Clause += " "
+// WriteKeyword write caluse to StmtSet.
+func (ss *StmtSet) WriteKeyword(clause string) {
+	if ss.Keyword != "" {
+		ss.Keyword += " "
 	}
-	ss.Clause += clause
+	ss.Keyword += clause
 }
 
 // WriteValue write value to StmtSet.
@@ -27,7 +27,7 @@ func (ss *StmtSet) WriteValue(value string) {
 
 // Build make sql string.
 func (ss *StmtSet) Build() string {
-	s := ss.Clause
+	s := ss.Keyword
 	if ss.Parens || ss.Value != "" {
 		s += " "
 	}

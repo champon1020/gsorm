@@ -37,7 +37,7 @@ func (u *Update) String() string {
 // Build make update statement set.
 func (u *Update) Build() *syntax.StmtSet {
 	ss := new(syntax.StmtSet)
-	ss.WriteClause(u.Query())
+	ss.WriteKeyword(u.Query())
 	ss.WriteValue(u.Table.Build())
 	return ss
 }

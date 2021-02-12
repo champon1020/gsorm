@@ -22,7 +22,7 @@ func (d *Delete) String() string {
 // Build make delete statement set.
 func (d *Delete) Build() *syntax.StmtSet {
 	ss := new(syntax.StmtSet)
-	ss.WriteClause(d.Query())
+	ss.WriteKeyword(d.Query())
 	return ss
 }
 

@@ -20,7 +20,7 @@ func TestDelete_Build(t *testing.T) {
 		Delete *cmd.Delete
 		Result *syntax.StmtSet
 	}{
-		{&cmd.Delete{}, &syntax.StmtSet{Clause: "DELETE"}},
+		{&cmd.Delete{}, &syntax.StmtSet{Keyword: "DELETE"}},
 	}
 
 	for _, testCase := range testCases {
