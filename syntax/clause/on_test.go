@@ -64,34 +64,3 @@ func TestOn_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewOn(t *testing.T) {
-	testCases := []struct {
-		Expr   string
-		Values []interface{}
-		Result *clause.On
-	}{
-		{
-			"lhs = rhs",
-			nil,
-			&clause.On{Expr: "lhs = rhs"},
-		},
-		{
-			"lhs = ?",
-			[]interface{}{10},
-			&clause.On{Expr: "lhs = ?", Values: []interface{}{10}},
-		},
-		{
-			"lhs1 = ? AND lhs2 = ?",
-			[]interface{}{10, "str"},
-			&clause.On{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewOn(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

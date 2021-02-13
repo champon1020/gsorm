@@ -63,3 +63,7 @@ func (s *Stmt) ExportedGetCalled() []syntax.Clause {
 func (s *Stmt) ExportedSetCalled(called []syntax.Clause) {
 	s.called = called
 }
+
+func (s *Stmt) ExportedGetErrors() []error {
+	return s.errors
+}

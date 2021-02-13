@@ -49,6 +49,7 @@ func TestStmt_String(t *testing.T) {
 				On("t1.column1 = t2.column1").
 				Where("lhs1 > ?", 10).
 				Or("lhs2 = ? AND lhs3 = ?", "str", true).
+				OrderBy("t1.column1").
 				UnionAll(mgorm.Select(nil, "column1", "column2 AS c2").
 					From("table3").
 					Sub()).(*mgorm.Stmt),
@@ -58,6 +59,7 @@ func TestStmt_String(t *testing.T) {
 				`ON t1.column1 = t2.column1 ` +
 				`WHERE lhs1 > 10 ` +
 				`OR (lhs2 = "str" AND lhs3 = true) ` +
+				`ORDER BY t1.column1 ` +
 				`UNION ALL ` +
 				`SELECT column1, column2 AS c2 ` +
 				`FROM table3`,
@@ -85,6 +87,18 @@ func TestStmt_String(t *testing.T) {
 				`FROM table1 AS t1 ` +
 				`FULL OUTER JOIN table2 AS t2 ` +
 				`ON t1.column1 = t2.column1`,
+		},
+		{
+			mgorm.Select(nil, mgorm.When("column1 < ?", 10).
+				Then("column1").
+				When("column1 > ?", 10).
+				Then("column2").
+				Else("column3").CaseColumn()).
+				From("table1").(*mgorm.Stmt),
+			`SELECT CASE WHEN column1 < 10 THEN column1 ` +
+				`WHEN column1 > 10 THEN column2 ` +
+				`ELSE column3 END ` +
+				`FROM table1`,
 		},
 		{
 			mgorm.Insert(nil, "table", "column1", "column2").
@@ -240,6 +254,52 @@ func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
 		actualError, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Type of error is invalid")
+			continue
+		}
+		resultError := testCase.Error.(*errors.Error)
+		if !resultError.Is(actualError) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
+		}
+	}
+}
+
+func TestStmt_Set_Fail(t *testing.T) {
+	testCases := []struct {
+		Cmd    syntax.Cmd
+		Values []interface{}
+		Error  error
+	}{
+		{
+			nil,
+			[]interface{}{10},
+			errors.New("Command is nil", errors.InvalidValueError),
+		},
+		{
+			&cmd.Select{},
+			[]interface{}{10},
+			errors.New("SET clause can be used with UPDATE command", errors.InvalidValueError),
+		},
+		{
+			&cmd.Update{Columns: []string{"lhs1", "lhs2"}},
+			[]interface{}{10},
+			errors.New("Length is different between lhs and rhs", errors.InvalidValueError),
+		},
+	}
+
+	for _, testCase := range testCases {
+		s := new(mgorm.Stmt)
+		s.ExportedSetCmd(testCase.Cmd)
+		resultStmt := s.Set(testCase.Values...).(*mgorm.Stmt)
+		errs := resultStmt.ExportedGetErrors()
+		if len(errs) == 0 {
+			t.Errorf("Error was not occurred")
+			continue
+		}
+		actualError, ok := errs[0].(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
 			continue
 		}
 		resultError := testCase.Error.(*errors.Error)

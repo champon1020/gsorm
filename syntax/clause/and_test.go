@@ -52,20 +52,3 @@ func TestAnd_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewAdd(t *testing.T) {
-	testCases := []struct {
-		Expr   string
-		Values []interface{}
-		Result *clause.And
-	}{
-		{"lhs = ?", []interface{}{"rhs"}, &clause.And{Expr: "lhs = ?", Values: []interface{}{"rhs"}}},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewAnd(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

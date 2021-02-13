@@ -64,20 +64,3 @@ func TestElse_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewElse(t *testing.T) {
-	testCases := []struct {
-		Value  interface{}
-		Result *clause.Else
-	}{
-		{10, &clause.Else{Value: 10}},
-		{"str", &clause.Else{Value: "str"}},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewElse(testCase.Value)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

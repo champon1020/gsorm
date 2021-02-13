@@ -32,8 +32,3 @@ func (o *OrderBy) Build() (*syntax.StmtSet, error) {
 	}
 	return ss, nil
 }
-
-// NewOrderBy create new offset object.
-func NewOrderBy(col string, desc bool) *OrderBy {
-	return &OrderBy{Column: col, Desc: desc}
-}

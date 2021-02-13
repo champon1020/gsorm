@@ -37,8 +37,3 @@ func (w *Where) Build() (*syntax.StmtSet, error) {
 	ss.WriteKeyword(w.Name())
 	return ss, nil
 }
-
-// NewWhere create WHERE clause object.
-func NewWhere(expr string, vals ...interface{}) *Where {
-	return &Where{Expr: expr, Values: vals}
-}

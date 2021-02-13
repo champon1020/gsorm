@@ -37,8 +37,3 @@ func (o *On) Build() (*syntax.StmtSet, error) {
 	ss.WriteKeyword(o.Name())
 	return ss, nil
 }
-
-// NewOn create On instance.
-func NewOn(expr string, vals ...interface{}) *On {
-	return &On{Expr: expr, Values: vals}
-}

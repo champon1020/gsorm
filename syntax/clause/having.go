@@ -37,8 +37,3 @@ func (h *Having) Build() (*syntax.StmtSet, error) {
 	ss.WriteKeyword(h.Name())
 	return ss, nil
 }
-
-// NewHaving creates Having instance.
-func NewHaving(expr string, vals ...interface{}) *Having {
-	return &Having{Expr: expr, Values: vals}
-}

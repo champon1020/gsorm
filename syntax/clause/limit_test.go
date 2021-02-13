@@ -48,22 +48,3 @@ func TestLimit_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewLimit(t *testing.T) {
-	testCases := []struct {
-		Num    int
-		Result *clause.Limit
-	}{
-		{
-			Num:    5,
-			Result: &clause.Limit{Num: 5},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewLimit(testCase.Num)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

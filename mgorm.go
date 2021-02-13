@@ -107,8 +107,8 @@ func Max(db Pool, col string, alias ...string) SelectStmt {
 }
 
 // When calls CASE ... END clause.
-func When(e string, vals ...interface{}) WhenStmt {
+func When(expr string, vals ...interface{}) WhenStmt {
 	stmt := new(Stmt)
-	stmt.call(clause.NewWhen(e, vals...))
+	stmt.call(&clause.When{Expr: expr, Values: vals})
 	return stmt
 }

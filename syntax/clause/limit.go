@@ -29,8 +29,3 @@ func (l *Limit) Build() (*syntax.StmtSet, error) {
 	ss.WriteValue(strconv.Itoa(l.Num))
 	return ss, nil
 }
-
-// NewLimit create new limit object.
-func NewLimit(num int) *Limit {
-	return &Limit{Num: num}
-}

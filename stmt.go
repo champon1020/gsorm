@@ -253,142 +253,169 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 
 // From calls FROM clause.
 func (s *Stmt) From(tables ...string) FromStmt {
-	s.call(clause.NewFrom(tables))
+	f := new(clause.From)
+	for _, t := range tables {
+		f.AddTable(t)
+	}
+	s.call(f)
 	return s
 }
 
 // Values calls VALUES clause.
 func (s *Stmt) Values(vals ...interface{}) ValuesStmt {
-	s.call(clause.NewValues(vals))
+	v := new(clause.Values)
+	for _, val := range vals {
+		v.AddValue(val)
+	}
+	s.call(v)
 	return s
 }
 
 // Set calls SET clause.
 func (s *Stmt) Set(vals ...interface{}) SetStmt {
+	if s.cmd == nil {
+		s.addError(errors.New("Command is nil", errors.InvalidValueError))
+		return s
+	}
 	u, ok := s.cmd.(*cmd.Update)
 	if !ok {
 		s.addError(errors.New("SET clause can be used with UPDATE command", errors.InvalidValueError))
 		return s
 	}
-	set, err := clause.NewSet(u.Columns, vals)
-	if err != nil {
-		s.addError(err)
+	if len(u.Columns) != len(vals) {
+		s.addError(errors.New("Length is different between lhs and rhs", errors.InvalidValueError))
 		return s
+	}
+	set := new(clause.Set)
+	for i := 0; i < len(u.Columns); i++ {
+		set.AddEq(u.Columns[i], vals[i])
 	}
 	s.call(set)
 	return s
 }
 
 // Where calls WHERE clause.
-func (s *Stmt) Where(e string, vals ...interface{}) WhereStmt {
-	s.call(clause.NewWhere(e, vals...))
+func (s *Stmt) Where(expr string, vals ...interface{}) WhereStmt {
+	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *Stmt) And(e string, vals ...interface{}) AndStmt {
-	s.call(clause.NewAnd(e, vals...))
+func (s *Stmt) And(expr string, vals ...interface{}) AndStmt {
+	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *Stmt) Or(e string, vals ...interface{}) OrStmt {
-	s.call(clause.NewOr(e, vals...))
+func (s *Stmt) Or(expr string, vals ...interface{}) OrStmt {
+	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }
 
 // Limit calls LIMIT clause.
 func (s *Stmt) Limit(num int) LimitStmt {
-	s.call(clause.NewLimit(num))
+	s.call(&clause.Limit{Num: num})
 	return s
 }
 
 // Offset calls OFFSET clause.
 func (s *Stmt) Offset(num int) OffsetStmt {
-	s.call(clause.NewOffset(num))
+	s.call(&clause.Offset{Num: num})
 	return s
 }
 
 // OrderBy calls ORDER BY clause.
 func (s *Stmt) OrderBy(col string) OrderByStmt {
-	s.call(clause.NewOrderBy(col, false))
+	s.call(&clause.OrderBy{Column: col, Desc: false})
 	return s
 }
 
 // OrderByDesc calls ORDER BY ... DESC clause.
 func (s *Stmt) OrderByDesc(col string) OrderByStmt {
-	s.call(clause.NewOrderBy(col, true))
+	s.call(&clause.OrderBy{Column: col, Desc: true})
 	return s
 }
 
 // Join calls (INNER) JOIN clause.
 func (s *Stmt) Join(table string) JoinStmt {
-	s.call(clause.NewJoin(table, clause.InnerJoin))
+	j := &clause.Join{Type: clause.InnerJoin}
+	j.AddTable(table)
+	s.call(j)
 	return s
 }
 
 // LeftJoin calls (INNER) JOIN clause.
 func (s *Stmt) LeftJoin(table string) JoinStmt {
-	s.call(clause.NewJoin(table, clause.LeftJoin))
+	j := &clause.Join{Type: clause.LeftJoin}
+	j.AddTable(table)
+	s.call(j)
 	return s
 }
 
 // RightJoin calls (INNER) JOIN clause.
 func (s *Stmt) RightJoin(table string) JoinStmt {
-	s.call(clause.NewJoin(table, clause.RightJoin))
+	j := &clause.Join{Type: clause.RightJoin}
+	j.AddTable(table)
+	s.call(j)
 	return s
 }
 
 // FullJoin calls (INNER) JOIN clause.
 func (s *Stmt) FullJoin(table string) JoinStmt {
-	s.call(clause.NewJoin(table, clause.FullJoin))
+	j := &clause.Join{Type: clause.FullJoin}
+	j.AddTable(table)
+	s.call(j)
 	return s
 }
 
 // On calls ON clause.
-func (s *Stmt) On(e string, vals ...interface{}) OnStmt {
-	s.call(clause.NewOn(e, vals...))
+func (s *Stmt) On(expr string, vals ...interface{}) OnStmt {
+	s.call(&clause.On{Expr: expr, Values: vals})
 	return s
 }
 
 // Union calls UNION clause.
 func (s *Stmt) Union(stmt syntax.Sub) UnionStmt {
-	s.call(clause.NewUnion(stmt, false))
+	s.call(&clause.Union{Stmt: stmt, All: false})
 	return s
 }
 
 // UnionAll calls UNION ALL clause.
 func (s *Stmt) UnionAll(stmt syntax.Sub) UnionStmt {
-	s.call(clause.NewUnion(stmt, true))
+	s.call(&clause.Union{Stmt: stmt, All: true})
 	return s
 }
 
 // GroupBy calls GROUP BY clause.
 func (s *Stmt) GroupBy(cols ...string) GroupByStmt {
-	s.call(clause.NewGroupBy(cols))
+	g := new(clause.GroupBy)
+	for _, c := range cols {
+		g.AddColumn(c)
+	}
+	s.call(g)
 	return s
 }
 
 // Having calls HAVING clause.
-func (s *Stmt) Having(e string, vals ...interface{}) HavingStmt {
-	s.call(clause.NewHaving(e, vals...))
+func (s *Stmt) Having(expr string, vals ...interface{}) HavingStmt {
+	s.call(&clause.Having{Expr: expr, Values: vals})
 	return s
 }
 
 // When calls WHEN clause.
-func (s *Stmt) When(e string, vals ...interface{}) WhenStmt {
-	s.call(clause.NewWhen(e, vals...))
+func (s *Stmt) When(expr string, vals ...interface{}) WhenStmt {
+	s.call(&clause.When{Expr: expr, Values: vals})
 	return s
 }
 
 // Then calls THEN clause.
 func (s *Stmt) Then(val interface{}) ThenStmt {
-	s.call(clause.NewThen(val))
+	s.call(&clause.Then{Value: val})
 	return s
 }
 
 // Else calls ELSE clause.
 func (s *Stmt) Else(val interface{}) ElseStmt {
-	s.call(clause.NewElse(val))
+	s.call(&clause.Else{Value: val})
 	return s
 }

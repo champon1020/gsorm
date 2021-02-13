@@ -38,8 +38,3 @@ func (o *Or) Build() (*syntax.StmtSet, error) {
 	ss.Parens = true
 	return ss, nil
 }
-
-// NewOr create OR clause object.
-func NewOr(expr string, vals ...interface{}) *Or {
-	return &Or{Expr: expr, Values: vals}
-}

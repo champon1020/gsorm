@@ -56,29 +56,3 @@ func TestOrderBy_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewOrderBy(t *testing.T) {
-	testCases := []struct {
-		Column string
-		Desc   bool
-		Result *clause.OrderBy
-	}{
-		{
-			"column",
-			false,
-			&clause.OrderBy{Column: "column", Desc: false},
-		},
-		{
-			"column",
-			true,
-			&clause.OrderBy{Column: "column", Desc: true},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewOrderBy(testCase.Column, testCase.Desc)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

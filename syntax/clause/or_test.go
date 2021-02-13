@@ -52,20 +52,3 @@ func TestOr_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewOr(t *testing.T) {
-	testCases := []struct {
-		Expr   string
-		Values []interface{}
-		Result *clause.Or
-	}{
-		{"lhs = ?", []interface{}{"rhs"}, &clause.Or{Expr: "lhs = ?", Values: []interface{}{"rhs"}}},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewOr(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

@@ -64,34 +64,3 @@ func TestHaving_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewHaving(t *testing.T) {
-	testCases := []struct {
-		Expr   string
-		Values []interface{}
-		Result *clause.Having
-	}{
-		{
-			"lhs = rhs",
-			nil,
-			&clause.Having{Expr: "lhs = rhs"},
-		},
-		{
-			"lhs = ?",
-			[]interface{}{10},
-			&clause.Having{Expr: "lhs = ?", Values: []interface{}{10}},
-		},
-		{
-			"lhs1 = ? AND lhs2 = ?",
-			[]interface{}{10, "str"},
-			&clause.Having{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewHaving(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

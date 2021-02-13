@@ -16,8 +16,8 @@ func (g *GroupBy) Name() string {
 	return "GROUP BY"
 }
 
-// addColumn appends column to GroupBy.
-func (g *GroupBy) addColumn(col string) {
+// AddColumn appends column to GroupBy.
+func (g *GroupBy) AddColumn(col string) {
 	g.Columns = append(g.Columns, *syntax.NewColumn(col))
 }
 
@@ -44,13 +44,4 @@ func (g *GroupBy) Build() (*syntax.StmtSet, error) {
 		ss.WriteValue(c.Build())
 	}
 	return ss, nil
-}
-
-// NewGroupBy creates GroupBy instance.
-func NewGroupBy(cols []string) *GroupBy {
-	g := new(GroupBy)
-	for _, c := range cols {
-		g.addColumn(c)
-	}
-	return g
 }

@@ -48,22 +48,3 @@ func TestOffset_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewOffset(t *testing.T) {
-	testCases := []struct {
-		Num    int
-		Result *clause.Offset
-	}{
-		{
-			Num:    5,
-			Result: &clause.Offset{Num: 5},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewOffset(testCase.Num)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

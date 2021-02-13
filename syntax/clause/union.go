@@ -33,8 +33,3 @@ func (u *Union) Build() (*syntax.StmtSet, error) {
 	ss.WriteValue(string(u.Stmt))
 	return ss, nil
 }
-
-// NewUnion creates Union instance.
-func NewUnion(stmt syntax.Sub, all bool) *Union {
-	return &Union{Stmt: stmt, All: all}
-}

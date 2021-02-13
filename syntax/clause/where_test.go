@@ -56,20 +56,3 @@ func TestWhere_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewWhere(t *testing.T) {
-	testCases := []struct {
-		Expr   string
-		Values []interface{}
-		Result *clause.Where
-	}{
-		{"lhs = ?", []interface{}{"rhs"}, &clause.Where{Expr: "lhs = ?", Values: []interface{}{"rhs"}}},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewWhere(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

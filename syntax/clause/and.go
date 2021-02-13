@@ -38,8 +38,3 @@ func (a *And) Build() (*syntax.StmtSet, error) {
 	ss.Parens = true
 	return ss, nil
 }
-
-// NewAnd create AND clause object.
-func NewAnd(expr string, vals ...interface{}) *And {
-	return &And{Expr: expr, Values: vals}
-}

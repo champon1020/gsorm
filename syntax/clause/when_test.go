@@ -64,34 +64,3 @@ func TestWhen_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewWhen(t *testing.T) {
-	testCases := []struct {
-		Expr   string
-		Values []interface{}
-		Result *clause.When
-	}{
-		{
-			"lhs = rhs",
-			nil,
-			&clause.When{Expr: "lhs = rhs"},
-		},
-		{
-			"lhs = ?",
-			[]interface{}{10},
-			&clause.When{Expr: "lhs = ?", Values: []interface{}{10}},
-		},
-		{
-			"lhs1 = ? AND lhs2 = ?",
-			[]interface{}{10, "str"},
-			&clause.When{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewWhen(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

@@ -28,8 +28,8 @@ func (j *Join) Name() string {
 	return string(j.Type)
 }
 
-// addTable appends table to Join.
-func (j *Join) addTable(table string) {
+// AddTable appends table to Join.
+func (j *Join) AddTable(table string) {
 	j.Table = *syntax.NewTable(table)
 }
 
@@ -44,12 +44,4 @@ func (j *Join) Build() (*syntax.StmtSet, error) {
 	ss.WriteKeyword(j.Name())
 	ss.WriteValue(j.Table.Build())
 	return ss, nil
-}
-
-// NewJoin create Join instance.
-func NewJoin(table string, typ JoinType) *Join {
-	j := new(Join)
-	j.Type = typ
-	j.addTable(table)
-	return j
 }

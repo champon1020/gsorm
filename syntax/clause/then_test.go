@@ -64,26 +64,3 @@ func TestThen_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewThen(t *testing.T) {
-	testCases := []struct {
-		Value  interface{}
-		Result *clause.Then
-	}{
-		{
-			10,
-			&clause.Then{Value: 10},
-		},
-		{
-			"str",
-			&clause.Then{Value: "str"},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewThen(testCase.Value)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

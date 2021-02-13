@@ -3,7 +3,6 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -17,8 +16,8 @@ func (s *Set) Name() string {
 	return "SET"
 }
 
-// addEq appends equal expression to Set.
-func (s *Set) addEq(lhs string, rhs interface{}) {
+// AddEq appends equal expression to Set.
+func (s *Set) AddEq(lhs string, rhs interface{}) {
 	e := syntax.NewEq(lhs, rhs)
 	s.Eqs = append(s.Eqs, *e)
 }
@@ -55,16 +54,4 @@ func (s *Set) Build() (*syntax.StmtSet, error) {
 		ss.WriteValue(e)
 	}
 	return ss, nil
-}
-
-// NewSet create new set object.
-func NewSet(lhs []string, rhs []interface{}) (*Set, error) {
-	if len(lhs) != len(rhs) {
-		return nil, errors.New("Length is different between lhs and rhs", errors.InvalidValueError)
-	}
-	s := new(Set)
-	for i := 0; i < len(lhs); i++ {
-		s.addEq(lhs[i], rhs[i])
-	}
-	return s, nil
 }

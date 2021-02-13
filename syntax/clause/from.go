@@ -16,8 +16,8 @@ func (f *From) Name() string {
 	return "FROM"
 }
 
-// addTable appends table to From.
-func (f *From) addTable(table string) {
+// AddTable appends table to From.
+func (f *From) AddTable(table string) {
 	t := syntax.NewTable(table)
 	f.Tables = append(f.Tables, *t)
 }
@@ -45,13 +45,4 @@ func (f *From) Build() (*syntax.StmtSet, error) {
 		ss.WriteValue(t.Build())
 	}
 	return ss, nil
-}
-
-// NewFrom make new from object.
-func NewFrom(tables []string) *From {
-	f := new(From)
-	for _, t := range tables {
-		f.addTable(t)
-	}
-	return f
 }

@@ -38,8 +38,3 @@ func (e *Else) Build() (*syntax.StmtSet, error) {
 	ss.WriteValue(vStr)
 	return ss, nil
 }
-
-// NewElse creates Else instance.
-func NewElse(val interface{}) *Else {
-	return &Else{Value: val}
-}

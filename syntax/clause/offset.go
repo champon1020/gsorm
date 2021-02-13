@@ -29,8 +29,3 @@ func (o *Offset) Build() (*syntax.StmtSet, error) {
 	ss.WriteValue(strconv.Itoa(o.Num))
 	return ss, nil
 }
-
-// NewOffset create new offset object.
-func NewOffset(num int) *Offset {
-	return &Offset{Num: num}
-}

@@ -36,8 +36,3 @@ func (w *When) Build() (*syntax.StmtSet, error) {
 	ss.WriteKeyword(w.Name())
 	return ss, nil
 }
-
-// NewWhen creates When instance.
-func NewWhen(expr string, vals ...interface{}) *When {
-	return &When{Expr: expr, Values: vals}
-}

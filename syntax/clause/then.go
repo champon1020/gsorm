@@ -38,8 +38,3 @@ func (t *Then) Build() (*syntax.StmtSet, error) {
 	ss.WriteValue(vStr)
 	return ss, nil
 }
-
-// NewThen creates Then instance.
-func NewThen(val interface{}) *Then {
-	return &Then{Value: val}
-}

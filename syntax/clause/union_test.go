@@ -56,29 +56,3 @@ func TestUnion_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewUnion(t *testing.T) {
-	testCases := []struct {
-		Stmt   syntax.Sub
-		All    bool
-		Result *clause.Union
-	}{
-		{
-			"SELECT * FROM table",
-			false,
-			&clause.Union{Stmt: "SELECT * FROM table", All: false},
-		},
-		{
-			"SELECT * FROM table",
-			true,
-			&clause.Union{Stmt: "SELECT * FROM table", All: true},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewUnion(testCase.Stmt, testCase.All)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}
