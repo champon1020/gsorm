@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/internal"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -109,7 +108,7 @@ func TestSelectAllEmployees(t *testing.T) {
 		}
 		if diff := cmp.Diff(testCase.Result, model); diff != "" {
 			t.Errorf("Got difference with sample %d", i)
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -194,7 +193,7 @@ func TestSelectAllSalaries(t *testing.T) {
 		}
 		if diff := cmp.Diff(testCase.Result, model); diff != "" {
 			t.Errorf("Got difference with sample %d", i)
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -279,7 +278,7 @@ func TestSelectAllTitles(t *testing.T) {
 		}
 		if diff := cmp.Diff(testCase.Result, model); diff != "" {
 			t.Errorf("Got difference with sample %d", i)
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

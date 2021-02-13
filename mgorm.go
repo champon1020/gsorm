@@ -8,50 +8,50 @@ import (
 	"github.com/champon1020/mgorm/syntax/cmd"
 )
 
-// New generate DB object.
+// New creates DB.
 func New(dn, dsn string) (*DB, error) {
 	db, err := sql.Open(dn, dsn)
 	if err != nil {
 		return nil, err
 	}
-	return &DB{db: db}, nil
+	return &DB{conn: db}, nil
 }
 
-// NewMock generate MockDB object.
+// NewMock creates MockDB.
 func NewMock() *MockDB {
 	mock := new(MockDB)
 	return mock
 }
 
-// Select statement api.
+// Select calls SELECT command.
 func Select(db Pool, cols ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	stmt.cmd = cmd.NewSelect(cols)
 	return stmt
 }
 
-// Insert statement api.
+// Insert calls INSERT command.
 func Insert(db Pool, table string, cols ...string) InsertStmt {
 	stmt := &Stmt{db: db}
 	stmt.cmd = cmd.NewInsert(table, cols)
 	return stmt
 }
 
-// Update statement api.
+// Update calls UPDATE command.
 func Update(db Pool, table string, cols ...string) UpdateStmt {
 	stmt := &Stmt{db: db}
 	stmt.cmd = cmd.NewUpdate(table, cols)
 	return stmt
 }
 
-// Delete statement api.
+// Delete calls DELETE command.
 func Delete(db Pool) DeleteStmt {
 	stmt := &Stmt{db: db}
 	stmt.cmd = cmd.NewDelete()
 	return stmt
 }
 
-// Count statement api.
+// Count calls COUNT function.
 func Count(db Pool, col string, alias ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	s := fmt.Sprintf("COUNT(%s)", col)
@@ -62,7 +62,7 @@ func Count(db Pool, col string, alias ...string) SelectStmt {
 	return stmt
 }
 
-// Avg statement api.
+// Avg calls AVG function.
 func Avg(db Pool, col string, alias ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	s := fmt.Sprintf("AVG(%s)", col)
@@ -73,7 +73,7 @@ func Avg(db Pool, col string, alias ...string) SelectStmt {
 	return stmt
 }
 
-// Sum statement api.
+// Sum calls SUM function.
 func Sum(db Pool, col string, alias ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	s := fmt.Sprintf("SUM(%s)", col)
@@ -84,7 +84,7 @@ func Sum(db Pool, col string, alias ...string) SelectStmt {
 	return stmt
 }
 
-// Min statement api.
+// Min calls MIN function.
 func Min(db Pool, col string, alias ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	s := fmt.Sprintf("MIN(%s)", col)
@@ -95,7 +95,7 @@ func Min(db Pool, col string, alias ...string) SelectStmt {
 	return stmt
 }
 
-// Max statement api.
+// Max calls MAX function.
 func Max(db Pool, col string, alias ...string) SelectStmt {
 	stmt := &Stmt{db: db}
 	s := fmt.Sprintf("MAX(%s)", col)
@@ -106,9 +106,9 @@ func Max(db Pool, col string, alias ...string) SelectStmt {
 	return stmt
 }
 
-// When statement api.
-func When(e string, vals ...interface{}) WhenStmt {
+// When calls CASE ... END clause.
+func When(expr string, vals ...interface{}) WhenStmt {
 	stmt := new(Stmt)
-	stmt.call(clause.NewWhen(e, vals...))
+	stmt.call(&clause.When{Expr: expr, Values: vals})
 	return stmt
 }

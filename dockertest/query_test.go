@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/internal"
 	"github.com/google/go-cmp/cmp"
 	"gotest.tools/v3/assert"
 )
@@ -21,7 +20,7 @@ func TestQueryWithSlice(t *testing.T) {
 	}
 	if diff := cmp.Diff(result, model); diff != "" {
 		t.Errorf("Executed SQL: %s", stmt.String())
-		internal.PrintTestDiff(t, diff)
+		t.Errorf("Differs: (-want +got)\n%s", diff)
 	}
 }
 
@@ -68,7 +67,7 @@ func TestQueryWithStruct(t *testing.T) {
 		if diff := cmp.Diff(testCase.Result, model); diff != "" {
 			t.Errorf("Got difference with sample %d", i)
 			t.Errorf("Executed SQL: %s", testCase.Stmt.String())
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -95,6 +94,6 @@ func TestQueryWithMap(t *testing.T) {
 	}
 	if diff := cmp.Diff(result, model); diff != "" {
 		t.Errorf("Executed SQL: %s", stmt.String())
-		internal.PrintTestDiff(t, diff)
+		t.Errorf("Differs: (-want +got)\n%s", diff)
 	}
 }

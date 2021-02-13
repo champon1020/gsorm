@@ -7,50 +7,42 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Values expression.
+// Values is VALUES clause.
 type Values struct {
-	Columns []interface{}
+	Values []interface{}
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (v *Values) Name() string {
 	return "VALUES"
 }
 
-func (v *Values) addColumn(val interface{}) {
-	v.Columns = append(v.Columns, val)
+// AddValue appends values to Values.
+func (v *Values) AddValue(val interface{}) {
+	v.Values = append(v.Values, val)
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (v *Values) String() string {
-	s := internal.SliceToString(v.Columns)
+	s := internal.SliceToString(v.Values)
 	return fmt.Sprintf("%s(%s)", v.Name(), s)
 }
 
-// Build make values statement set.
+// Build makes VALUES clause with sytnax.StmtSet.
 func (v *Values) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(v.Name())
 	ss.WriteValue("(")
-	for i, c := range v.Columns {
+	for i, v := range v.Values {
 		if i != 0 {
 			ss.WriteValue(",")
 		}
-		cStr, err := internal.ToString(c, true)
+		vStr, err := internal.ToString(v, true)
 		if err != nil {
 			return nil, err
 		}
-		ss.WriteValue(cStr)
+		ss.WriteValue(vStr)
 	}
 	ss.WriteValue(")")
 	return ss, nil
-}
-
-// NewValues create new values object.
-func NewValues(cols []interface{}) *Values {
-	v := new(Values)
-	for _, c := range cols {
-		v.addColumn(c)
-	}
-	return v
 }

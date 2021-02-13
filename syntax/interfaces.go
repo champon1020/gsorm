@@ -1,18 +1,18 @@
 package syntax
 
-// Cmd is implemented by Select, Insert, Update and Delete types.
+// Cmd is interface for entry commands like SELECT, INSERT, UPDATE or DELETE.
 type Cmd interface {
 	Query() string
 	String() string
 	Build() *StmtSet
 }
 
-// Clause is implemented by Where, And, and other types.
+// Clause is interface for SQL clauses.
 type Clause interface {
 	Name() string
 	String() string
 	Build() (*StmtSet, error)
 }
 
-// Sub type.
+// Sub is type of subquery like ...WHERE (SELECT ...).
 type Sub string

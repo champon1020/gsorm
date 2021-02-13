@@ -1,6 +1,7 @@
 package mgorm
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-// MockDB is the mock databse object.
+// MockDB is mock databse connection pool.
 // This structure stores mainly what query will be executed and what value will be returned.
 type MockDB struct {
 	// Expected statements.
@@ -24,6 +25,16 @@ type MockDB struct {
 // Ping is dummy function.
 func (m *MockDB) Ping() error {
 	return nil
+}
+
+// Exec is dummy function.
+func (m *MockDB) Exec(string, ...interface{}) (sql.Result, error) {
+	return nil, nil
+}
+
+// Query is dummy function.
+func (m *MockDB) Query(string, ...interface{}) (*sql.Rows, error) {
+	return nil, nil
 }
 
 // SetConnMaxLifetime is dummy function.
@@ -120,6 +131,16 @@ type MockTx struct {
 // Ping is dummy function.
 func (m *MockTx) Ping() error {
 	return nil
+}
+
+// Exec is dummy function.
+func (m *MockTx) Exec(string, ...interface{}) (sql.Result, error) {
+	return nil, nil
+}
+
+// Query is dummy function.
+func (m *MockTx) Query(string, ...interface{}) (*sql.Rows, error) {
+	return nil, nil
 }
 
 // Commit commits the transaction.

@@ -6,22 +6,23 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// From expression.
+// From is FROM clause.
 type From struct {
 	Tables []syntax.Table
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (f *From) Name() string {
 	return "FROM"
 }
 
-func (f *From) addTable(col string) {
-	c := syntax.NewTable(col)
-	f.Tables = append(f.Tables, *c)
+// AddTable appends table to From.
+func (f *From) AddTable(table string) {
+	t := syntax.NewTable(table)
+	f.Tables = append(f.Tables, *t)
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (f *From) String() string {
 	var s string
 	for i, t := range f.Tables {
@@ -33,7 +34,7 @@ func (f *From) String() string {
 	return fmt.Sprintf("%s(%s)", f.Name(), s)
 }
 
-// Build make from statement set.
+// Build makes FROM clause with syntax.StmtSet.
 func (f *From) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(f.Name())
@@ -44,13 +45,4 @@ func (f *From) Build() (*syntax.StmtSet, error) {
 		ss.WriteValue(t.Build())
 	}
 	return ss, nil
-}
-
-// NewFrom make new from object.
-func NewFrom(tables []string) *From {
-	f := new(From)
-	for _, t := range tables {
-		f.addTable(t)
-	}
-	return f
 }

@@ -250,7 +250,7 @@ func TestSetValueToMap(t *testing.T) {
 			continue
 		}
 		if diff := cmp.Diff(testCase.Result.Interface(), ref.Interface()); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

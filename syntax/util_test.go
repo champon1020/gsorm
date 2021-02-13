@@ -5,7 +5,6 @@ import (
 
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/errors"
-	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
 )
@@ -64,7 +63,7 @@ func TestBuildStmtSetForExpression(t *testing.T) {
 	for _, testCase := range testCases {
 		res, _ := syntax.BuildStmtSetForExpression(testCase.Expr, testCase.Values...)
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

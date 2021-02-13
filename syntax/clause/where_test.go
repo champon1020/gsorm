@@ -3,7 +3,6 @@ package clause_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
@@ -53,24 +52,7 @@ func TestWhere_Build(t *testing.T) {
 	for _, testCase := range testCases {
 		res, _ := testCase.Where.Build()
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-	}
-}
-
-func TestNewWhere(t *testing.T) {
-	testCases := []struct {
-		Expr   string
-		Values []interface{}
-		Result *clause.Where
-	}{
-		{"lhs = ?", []interface{}{"rhs"}, &clause.Where{Expr: "lhs = ?", Values: []interface{}{"rhs"}}},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewWhere(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

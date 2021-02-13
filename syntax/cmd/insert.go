@@ -6,27 +6,29 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Insert statement.
+// Insert is INSERT clause.
 type Insert struct {
 	Table   syntax.Table
 	Columns []syntax.Column
 }
 
-// Query returns string of clause.
+// Query returns clause keyword.
 func (i *Insert) Query() string {
 	return "INSERT INTO"
 }
 
+// addTable appends table to Insert.
 func (i *Insert) addTable(table string) {
 	i.Table = *syntax.NewTable(table)
 }
 
+// addColumn appends column to Insert.
 func (i *Insert) addColumn(col string) {
 	column := syntax.NewColumn(col)
 	i.Columns = append(i.Columns, *column)
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (i *Insert) String() string {
 	s := fmt.Sprintf("%q", i.Table.Build())
 	for _, c := range i.Columns {
@@ -35,7 +37,7 @@ func (i *Insert) String() string {
 	return fmt.Sprintf("%s(%s)", i.Query(), s)
 }
 
-// Build make insert statement set.
+// Build makes INSERT clause with sytnax.StmtSet.
 func (i *Insert) Build() *syntax.StmtSet {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(i.Query())

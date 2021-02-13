@@ -3,7 +3,6 @@ package clause_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
@@ -61,30 +60,7 @@ func TestThen_Build(t *testing.T) {
 			continue
 		}
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-	}
-}
-
-func TestNewThen(t *testing.T) {
-	testCases := []struct {
-		Value  interface{}
-		Result *clause.Then
-	}{
-		{
-			10,
-			&clause.Then{Value: 10},
-		},
-		{
-			"str",
-			&clause.Then{Value: "str"},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewThen(testCase.Value)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

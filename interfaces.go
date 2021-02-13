@@ -1,55 +1,61 @@
 package mgorm
 
 import (
+	"database/sql"
+
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Pool is database object like DB, Tx, MockDB and MockTx.
+// Pool is database connection pool like DB or Tx. This is also implemented by MockDB and MockTx.
 type Pool interface {
 	Ping() error
+	Query(string, ...interface{}) (*sql.Rows, error)
+	Exec(string, ...interface{}) (sql.Result, error)
 }
 
-// Mock is mock database interface.
+// Mock is mock database conneciton pool.
 type Mock interface {
 	Ping() error
+	Query(string, ...interface{}) (*sql.Rows, error)
+	Exec(string, ...interface{}) (sql.Result, error)
 	Complete() error
 	popExpected() expectation
 }
 
-// QueryCallable is embedded into interfaces which is callable Stmt.Query.
+// QueryCallable is embedded into clause interfaces which can call (*Stmt).Query.
 type QueryCallable interface {
 	Query(interface{}) error
 	Sub() syntax.Sub
 	String() string
 }
 
-// ExecCallable is embedded into interfaces which is callable Stmt.Exec.
+// ExecCallable is embedded into clause interfaces which can call (*Stmt).Exec.
 type ExecCallable interface {
 	Exec() error
 	String() string
 }
 
-// SelectStmt is Stmt after Select is executed.
+// SelectStmt is returned after Select is called.
 type SelectStmt interface {
 	From(...string) FromStmt
 }
 
-// InsertStmt is Stmt after Insert is executed.
+// InsertStmt is returned after Insert is called.
 type InsertStmt interface {
 	Values(...interface{}) ValuesStmt
 }
 
-// UpdateStmt is Stmt after Update is executed.
+// UpdateStmt is returned after Update is called.
 type UpdateStmt interface {
 	Set(...interface{}) SetStmt
 }
 
-// DeleteStmt is Stmt after Delete is executed.
+// DeleteStmt is returned after Delete is called.
 type DeleteStmt interface {
 	From(...string) FromStmt
 }
 
-// FromStmt is Stmt after Stmt.From is executed.
+// FromStmt is returned after (*Stmt).From is called.
 type FromStmt interface {
 	Join(string) JoinStmt
 	LeftJoin(string) JoinStmt
@@ -65,23 +71,23 @@ type FromStmt interface {
 	QueryCallable
 }
 
-// ValuesStmt is Stmt after Stmt.Values is executed.
+// ValuesStmt is returned after (*Stmt).Values is called.
 type ValuesStmt interface {
 	ExecCallable
 }
 
-// SetStmt is Stmt after Stmt.Set is executed.
+// SetStmt is returned after (*Stmt).Set is called.
 type SetStmt interface {
 	Where(string, ...interface{}) WhereStmt
 	ExecCallable
 }
 
-// JoinStmt is Stmt after Stmt.Join, Stmt.LeftJoin, RightJoin or FullJoin is executed.
+// JoinStmt is returned after (*Stmt).Join, (*Stmt).LeftJoin, (*Stmt).RightJoin or (*Stmt).FullJoin is called.
 type JoinStmt interface {
 	On(string, ...interface{}) OnStmt
 }
 
-// OnStmt is Stmt after Stmt.On is executed.
+// OnStmt is returned after (*Stmt).On is called.
 type OnStmt interface {
 	Where(string, ...interface{}) WhereStmt
 	GroupBy(...string) GroupByStmt
@@ -93,7 +99,7 @@ type OnStmt interface {
 	QueryCallable
 }
 
-// WhereStmt is Stmt after Stmt.Where is executed.
+// WhereStmt is returned after (*Stmt).Where is called.
 type WhereStmt interface {
 	And(string, ...interface{}) AndStmt
 	Or(string, ...interface{}) OrStmt
@@ -107,7 +113,7 @@ type WhereStmt interface {
 	ExecCallable
 }
 
-// AndStmt is Stmt after Stmt.And is executed.
+// AndStmt is returned after (*Stmt).And is called.
 type AndStmt interface {
 	GroupBy(...string) GroupByStmt
 	OrderBy(string) OrderByStmt
@@ -118,7 +124,7 @@ type AndStmt interface {
 	ExecCallable
 }
 
-// OrStmt is Stmt after Stmt.Or is executed.
+// OrStmt is returned after (*Stmt).Or is called.
 type OrStmt interface {
 	GroupBy(...string) GroupByStmt
 	OrderBy(string) OrderByStmt
@@ -129,7 +135,7 @@ type OrStmt interface {
 	ExecCallable
 }
 
-// GroupByStmt is Stmt after Stmt.GroupBy is executed.
+// GroupByStmt is returned after (*Stmt).GroupBy is called.
 type GroupByStmt interface {
 	Having(string, ...interface{}) HavingStmt
 	OrderBy(string) OrderByStmt
@@ -139,7 +145,7 @@ type GroupByStmt interface {
 	QueryCallable
 }
 
-// HavingStmt is Stmt after Stmt.Having is executed.
+// HavingStmt is returned after (*Stmt).Having is called.
 type HavingStmt interface {
 	OrderBy(string) OrderByStmt
 	OrderByDesc(string) OrderByStmt
@@ -148,7 +154,7 @@ type HavingStmt interface {
 	QueryCallable
 }
 
-// OrderByStmt is Stmt after Stmt.OrderBy is executed.
+// OrderByStmt is returned after (*Stmt).OrderBy is called.
 type OrderByStmt interface {
 	Limit(int) LimitStmt
 	Union(syntax.Sub) UnionStmt
@@ -156,7 +162,7 @@ type OrderByStmt interface {
 	QueryCallable
 }
 
-// LimitStmt is Stmt after Stmt.Limit is executed.
+// LimitStmt is returned after (*Stmt).Limit is called.
 type LimitStmt interface {
 	Offset(int) OffsetStmt
 	Union(syntax.Sub) UnionStmt
@@ -164,14 +170,14 @@ type LimitStmt interface {
 	QueryCallable
 }
 
-// OffsetStmt is Stmt after Stmt.Offset is executed.
+// OffsetStmt is returned after (*Stmt).Offset is called.
 type OffsetStmt interface {
 	Union(syntax.Sub) UnionStmt
 	UnionAll(syntax.Sub) UnionStmt
 	QueryCallable
 }
 
-// UnionStmt is Stmt after Stmt.Union is executed.
+// UnionStmt is returned after (*Stmt).Union is called.
 type UnionStmt interface {
 	OrderBy(string) OrderByStmt
 	OrderByDesc(string) OrderByStmt
@@ -181,12 +187,12 @@ type UnionStmt interface {
 	QueryCallable
 }
 
-// WhenStmt is Stmt after Stmt.When or mgorm.When is executed.
+// WhenStmt is returned after (*Stmt).When or mgorm.When is called.
 type WhenStmt interface {
 	Then(interface{}) ThenStmt
 }
 
-// ThenStmt is Stmt after Stmt.Then is executed.
+// ThenStmt is returned after (*Stmt).Then is called.
 type ThenStmt interface {
 	When(string, ...interface{}) WhenStmt
 	Else(interface{}) ElseStmt
@@ -194,7 +200,7 @@ type ThenStmt interface {
 	CaseValue() string
 }
 
-// ElseStmt is Stmt after Stmt.Else is executed.
+// ElseStmt is returned after (*Stmt).Else is called.
 type ElseStmt interface {
 	CaseColumn() string
 	CaseValue() string

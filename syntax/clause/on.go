@@ -7,18 +7,18 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// On expression.
+// On is ON clause.
 type On struct {
 	Expr   string
 	Values []interface{}
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (o *On) Name() string {
 	return "ON"
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (o *On) String() string {
 	s := fmt.Sprintf("%q", o.Expr)
 	if len(o.Values) > 0 {
@@ -28,7 +28,7 @@ func (o *On) String() string {
 	return fmt.Sprintf("%s(%s)", o.Name(), s)
 }
 
-// Build make ON statement set.
+// Build makes ON clause with syntax.StmtSet.
 func (o *On) Build() (*syntax.StmtSet, error) {
 	ss, err := syntax.BuildStmtSetForExpression(o.Expr, o.Values...)
 	if err != nil {
@@ -36,9 +36,4 @@ func (o *On) Build() (*syntax.StmtSet, error) {
 	}
 	ss.WriteKeyword(o.Name())
 	return ss, nil
-}
-
-// NewOn create On instance.
-func NewOn(expr string, vals ...interface{}) *On {
-	return &On{Expr: expr, Values: vals}
 }

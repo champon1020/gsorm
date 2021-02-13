@@ -7,18 +7,18 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// And clause.
+// And is AND clause.
 type And struct {
 	Expr   string
 	Values []interface{}
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (a *And) Name() string {
 	return "AND"
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (a *And) String() string {
 	s := fmt.Sprintf("%q", a.Expr)
 	if len(a.Values) > 0 {
@@ -28,7 +28,7 @@ func (a *And) String() string {
 	return fmt.Sprintf("%s(%s)", a.Name(), s)
 }
 
-// Build make AND statement set.
+// Build makes AND clause with syntax.StmtSet.
 func (a *And) Build() (*syntax.StmtSet, error) {
 	ss, err := syntax.BuildStmtSetForExpression(a.Expr, a.Values...)
 	if err != nil {
@@ -37,9 +37,4 @@ func (a *And) Build() (*syntax.StmtSet, error) {
 	ss.WriteKeyword(a.Name())
 	ss.Parens = true
 	return ss, nil
-}
-
-// NewAnd create AND clause object.
-func NewAnd(expr string, vals ...interface{}) *And {
-	return &And{Expr: expr, Values: vals}
 }

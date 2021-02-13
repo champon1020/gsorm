@@ -6,10 +6,10 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// JoinType is type of JOIN statement.
+// JoinType is type of JOIN clause.
 type JoinType string
 
-// Types of JOIN statement.
+// Types of JOIN clause.
 const (
 	InnerJoin JoinType = "INNER JOIN"
 	LeftJoin  JoinType = "LEFT JOIN"
@@ -17,38 +17,31 @@ const (
 	FullJoin  JoinType = "FULL OUTER JOIN"
 )
 
-// Join expression.
+// Join is JOIN clause.
 type Join struct {
 	Table syntax.Table
 	Type  JoinType
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (j *Join) Name() string {
 	return string(j.Type)
 }
 
-func (j *Join) addTable(table string) {
+// AddTable appends table to Join.
+func (j *Join) AddTable(table string) {
 	j.Table = *syntax.NewTable(table)
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (j *Join) String() string {
 	return fmt.Sprintf("%s(%q)", j.Name(), j.Table.Build())
 }
 
-// Build make JOIN statement set.
+// Build makes JOIN clause with syntax.StmtSet.
 func (j *Join) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(j.Name())
 	ss.WriteValue(j.Table.Build())
 	return ss, nil
-}
-
-// NewJoin create Join instance.
-func NewJoin(table string, typ JoinType) *Join {
-	j := new(Join)
-	j.Type = typ
-	j.addTable(table)
-	return j
 }

@@ -3,7 +3,6 @@ package clause_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
@@ -61,33 +60,7 @@ func TestJoin_Build(t *testing.T) {
 			continue
 		}
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-	}
-}
-
-func TestNewJoin(t *testing.T) {
-	testCases := []struct {
-		Table  string
-		Type   clause.JoinType
-		Result *clause.Join
-	}{
-		{
-			"table",
-			clause.RightJoin,
-			&clause.Join{Table: syntax.Table{Name: "table"}, Type: "RIGHT JOIN"},
-		},
-		{
-			"table AS t",
-			clause.FullJoin,
-			&clause.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: "FULL OUTER JOIN"},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewJoin(testCase.Table, testCase.Type)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

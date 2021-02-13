@@ -3,26 +3,26 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Set expression.
+// Set is SET clause.
 type Set struct {
 	Eqs []syntax.Eq
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (s *Set) Name() string {
 	return "SET"
 }
 
-func (s *Set) addEq(lhs string, rhs interface{}) {
+// AddEq appends equal expression to Set.
+func (s *Set) AddEq(lhs string, rhs interface{}) {
 	e := syntax.NewEq(lhs, rhs)
 	s.Eqs = append(s.Eqs, *e)
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (s *Set) String() string {
 	var str string
 	for i, eq := range s.Eqs {
@@ -39,7 +39,7 @@ func (s *Set) String() string {
 	return fmt.Sprintf("%s(%s)", s.Name(), str)
 }
 
-// Build make set statement set.
+// Build makes SET clause with syntax.StmtSet.
 func (s *Set) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(s.Name())
@@ -54,16 +54,4 @@ func (s *Set) Build() (*syntax.StmtSet, error) {
 		ss.WriteValue(e)
 	}
 	return ss, nil
-}
-
-// NewSet create new set object.
-func NewSet(lhs []string, rhs []interface{}) (*Set, error) {
-	if len(lhs) != len(rhs) {
-		return nil, errors.New("Length is different between lhs and rhs", errors.InvalidValueError)
-	}
-	s := new(Set)
-	for i := 0; i < len(lhs); i++ {
-		s.addEq(lhs[i], rhs[i])
-	}
-	return s, nil
 }

@@ -6,13 +6,13 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Union expression.
+// Union is UNION clause.
 type Union struct {
 	Stmt syntax.Sub
 	All  bool
 }
 
-// Name returns string of clause.
+// Name returns clause keyword.
 func (u *Union) Name() string {
 	n := "UNION"
 	if u.All {
@@ -21,20 +21,15 @@ func (u *Union) Name() string {
 	return n
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (u *Union) String() string {
 	return fmt.Sprintf("%s(%q)", u.Name(), u.Stmt)
 }
 
-// Build make UNION statement set.
+// Build makes UNION clause with syntax.StmtSet.
 func (u *Union) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(u.Name())
 	ss.WriteValue(string(u.Stmt))
 	return ss, nil
-}
-
-// NewUnion creates Union instance.
-func NewUnion(stmt syntax.Sub, all bool) *Union {
-	return &Union{Stmt: stmt, All: all}
 }

@@ -6,20 +6,20 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// Delete statement.
+// Delete is DELETE clause.
 type Delete struct{}
 
-// Query returns string of clause.
+// Query returns clause keyword.
 func (d *Delete) Query() string {
 	return "DELETE"
 }
 
-// String returns string of function call.
+// String returns function call with string.
 func (d *Delete) String() string {
 	return fmt.Sprintf("%s()", d.Query())
 }
 
-// Build make delete statement set.
+// Build makes DELETE clause with syntax.StmtSet.
 func (d *Delete) Build() *syntax.StmtSet {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Query())

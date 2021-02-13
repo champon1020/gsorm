@@ -3,7 +3,6 @@ package clause_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
@@ -61,38 +60,7 @@ func TestOn_Build(t *testing.T) {
 			continue
 		}
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-	}
-}
-
-func TestNewOn(t *testing.T) {
-	testCases := []struct {
-		Expr   string
-		Values []interface{}
-		Result *clause.On
-	}{
-		{
-			"lhs = rhs",
-			nil,
-			&clause.On{Expr: "lhs = rhs"},
-		},
-		{
-			"lhs = ?",
-			[]interface{}{10},
-			&clause.On{Expr: "lhs = ?", Values: []interface{}{10}},
-		},
-		{
-			"lhs1 = ? AND lhs2 = ?",
-			[]interface{}{10, "str"},
-			&clause.On{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewOn(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

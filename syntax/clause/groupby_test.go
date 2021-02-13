@@ -3,7 +3,6 @@ package clause_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
@@ -67,37 +66,7 @@ func TestGroupBy_Build(t *testing.T) {
 			continue
 		}
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
-		}
-	}
-}
-
-func TestNewGroupBy(t *testing.T) {
-	testCases := []struct {
-		Columns []string
-		Result  *clause.GroupBy
-	}{
-		{
-			[]string{"column"},
-			&clause.GroupBy{Columns: []syntax.Column{{Name: "column"}}},
-		},
-		{
-			[]string{"column AS c"},
-			&clause.GroupBy{Columns: []syntax.Column{{Name: "column", Alias: "c"}}},
-		},
-		{
-			[]string{"column1 AS c1", "column2 AS c2"},
-			&clause.GroupBy{Columns: []syntax.Column{
-				{Name: "column1", Alias: "c1"},
-				{Name: "column2", Alias: "c2"}},
-			},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewGroupBy(testCase.Columns)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }

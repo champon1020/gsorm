@@ -3,7 +3,6 @@ package syntax_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
@@ -30,7 +29,7 @@ func TestStmtSet_WriteKeyword(t *testing.T) {
 	for _, testCase := range testCases {
 		testCase.StmtSet.WriteKeyword(testCase.Keyword)
 		if diff := cmp.Diff(testCase.Result, testCase.StmtSet); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
@@ -76,7 +75,7 @@ func TestStmtSet_WriteValue(t *testing.T) {
 	for _, testCase := range testCases {
 		testCase.StmtSet.WriteValue(testCase.Value)
 		if diff := cmp.Diff(testCase.Result, testCase.StmtSet); diff != "" {
-			internal.PrintTestDiff(t, diff)
+			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 
