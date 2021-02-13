@@ -32,7 +32,7 @@ func (e *Error) Is(_err error) bool {
 
 // New creates error object.
 func New(msg string, code errorCode) error {
-	return &Error{Msg: msg}
+	return &Error{Msg: msg, Code: code}
 }
 
 // NewWith creates error object with options.
