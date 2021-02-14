@@ -92,18 +92,24 @@ type Tx struct {
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.
 func (tx *Tx) Ping() error {
 	if tx.db == nil {
-		return errors.New("Tx conn is nil", errors.InvalidValueError)
+		return errors.New("Tx db is nil", errors.InvalidValueError)
 	}
 	return tx.db.Ping()
 }
 
 // Exec executes a query that doesn't return rows. For example: an INSERT and UPDATE.
 func (tx *Tx) Exec(query string, args ...interface{}) (sql.Result, error) {
+	if tx.conn == nil {
+		return nil, errors.New("Tx conn is nil", errors.InvalidValueError)
+	}
 	return tx.conn.Exec(query, args...)
 }
 
 // Query executes a query that returns rows, typically a SELECT.
 func (tx *Tx) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	if tx.conn == nil {
+		return nil, errors.New("Tx conn is nil", errors.InvalidValueError)
+	}
 	return tx.conn.Query(query, args...)
 }
 

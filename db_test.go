@@ -11,8 +11,6 @@ import (
 )
 
 type SpyDB struct {
-	sql.DB
-
 	calledPing               bool
 	calledExec               bool
 	calledQuery              bool
@@ -58,6 +56,39 @@ func (d *SpyDB) Close() error {
 func (d *SpyDB) Begin() (*sql.Tx, error) {
 	d.calledBegin = true
 	return nil, nil
+}
+
+type SpyTx struct {
+	calledPing     bool
+	calledExec     bool
+	calledQuery    bool
+	calledCommit   bool
+	calledRollback bool
+}
+
+func (d *SpyTx) Ping() error {
+	d.calledPing = true
+	return nil
+}
+
+func (d *SpyTx) Exec(string, ...interface{}) (sql.Result, error) {
+	d.calledExec = true
+	return nil, nil
+}
+
+func (d *SpyTx) Query(string, ...interface{}) (*sql.Rows, error) {
+	d.calledQuery = true
+	return nil, nil
+}
+
+func (d *SpyTx) Commit() error {
+	d.calledCommit = true
+	return nil
+}
+
+func (d *SpyTx) Rollback() error {
+	d.calledRollback = true
+	return nil
 }
 
 func TestDB_Ping(t *testing.T) {
@@ -378,6 +409,200 @@ func TestDB_Begin_Fail(t *testing.T) {
 
 	// Actual process.
 	_, err := db.Begin()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+		return
+	}
+
+	// Validate if expected error was occurred.
+	actualErr, ok := err.(*errors.Error)
+	if !ok {
+		t.Errorf("Error type is invalid")
+		return
+	}
+	if !actualErr.Is(expectedErr) {
+		t.Errorf("Different error was occurred")
+		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+	}
+}
+
+func TestTx_Ping_Fail(t *testing.T) {
+	expectedErr := errors.New("Tx db is nil", errors.InvalidValueError).(*errors.Error)
+
+	// Prepare for test.
+	tx := new(mgorm.Tx)
+
+	// Actual process.
+	err := tx.Ping()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+		return
+	}
+
+	// Validate if expected error was occurred.
+	actualErr, ok := err.(*errors.Error)
+	if !ok {
+		t.Errorf("Error type is invalid")
+		return
+	}
+	if !actualErr.Is(expectedErr) {
+		t.Errorf("Different error was occurred")
+		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+	}
+}
+
+func TestTx_Exec(t *testing.T) {
+	// Prepare for test.
+	tx := new(mgorm.Tx)
+	stx := new(SpyTx)
+	tx.ExportedSetConn(stx)
+
+	// Actual process.
+	if _, err := tx.Exec(""); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+
+	// Validate if expected error was occurred.
+	assert.Equal(t, true, stx.calledExec)
+}
+
+func TestTx_Exec_Fail(t *testing.T) {
+	expectedErr := errors.New("Tx conn is nil", errors.InvalidValueError).(*errors.Error)
+
+	// Prepare for test.
+	tx := new(mgorm.Tx)
+
+	// Actual process.
+	_, err := tx.Exec("")
+	if err == nil {
+		t.Errorf("Error was not occurred")
+		return
+	}
+
+	// Validate if expected error was occurred.
+	actualErr, ok := err.(*errors.Error)
+	if !ok {
+		t.Errorf("Error type is invalid")
+		return
+	}
+	if !actualErr.Is(expectedErr) {
+		t.Errorf("Different error was occurred")
+		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+	}
+}
+
+func TestTx_Query(t *testing.T) {
+	// Prepare for test.
+	tx := new(mgorm.Tx)
+	stx := new(SpyTx)
+	tx.ExportedSetConn(stx)
+
+	// Actual process.
+	if _, err := tx.Query(""); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+
+	// Validate if expected error was occurred.
+	assert.Equal(t, true, stx.calledQuery)
+}
+
+func TestTx_Query_Fail(t *testing.T) {
+	expectedErr := errors.New("Tx conn is nil", errors.InvalidValueError).(*errors.Error)
+
+	// Prepare for test.
+	tx := new(mgorm.Tx)
+
+	// Actual process.
+	_, err := tx.Query("")
+	if err == nil {
+		t.Errorf("Error was not occurred")
+		return
+	}
+
+	// Validate if expected error was occurred.
+	actualErr, ok := err.(*errors.Error)
+	if !ok {
+		t.Errorf("Error type is invalid")
+		return
+	}
+	if !actualErr.Is(expectedErr) {
+		t.Errorf("Different error was occurred")
+		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+	}
+}
+
+func TestTx_Commit(t *testing.T) {
+	// Prepare for test.
+	tx := new(mgorm.Tx)
+	stx := new(SpyTx)
+	tx.ExportedSetConn(stx)
+
+	// Actual process.
+	if err := tx.Commit(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+
+	// Validate if expected error was occurred.
+	assert.Equal(t, true, stx.calledCommit)
+}
+
+func TestTx_Commit_Fail(t *testing.T) {
+	expectedErr := errors.New("Tx conn is nil", errors.InvalidValueError).(*errors.Error)
+
+	// Prepare for test.
+	tx := new(mgorm.Tx)
+
+	// Actual process.
+	err := tx.Commit()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+		return
+	}
+
+	// Validate if expected error was occurred.
+	actualErr, ok := err.(*errors.Error)
+	if !ok {
+		t.Errorf("Error type is invalid")
+		return
+	}
+	if !actualErr.Is(expectedErr) {
+		t.Errorf("Different error was occurred")
+		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+	}
+}
+
+func TestTx_Rollback(t *testing.T) {
+	// Prepare for test.
+	tx := new(mgorm.Tx)
+	stx := new(SpyTx)
+	tx.ExportedSetConn(stx)
+
+	// Actual process.
+	if err := tx.Rollback(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+
+	// Validate if expected error was occurred.
+	assert.Equal(t, true, stx.calledRollback)
+}
+
+func TestTx_Rollback_Fail(t *testing.T) {
+	expectedErr := errors.New("Tx conn is nil", errors.InvalidValueError).(*errors.Error)
+
+	// Prepare for test.
+	tx := new(mgorm.Tx)
+
+	// Actual process.
+	err := tx.Rollback()
 	if err == nil {
 		t.Errorf("Error was not occurred")
 		return
