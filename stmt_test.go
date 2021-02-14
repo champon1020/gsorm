@@ -239,7 +239,7 @@ func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
 	}{
 		{
 			&cmd.Select{},
-			errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidTypeError),
+			errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError),
 		},
 	}
 

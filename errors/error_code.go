@@ -9,6 +9,7 @@ const (
 	InvalidTypeError
 	InvalidFormatError
 	InvalidValueError
+	InvalidPointerError
 	UnchangeableError
 	DBColumnError
 	DBQueryError
@@ -26,6 +27,8 @@ func (e errorCode) String() string {
 		return "Invalid Format"
 	case InvalidValueError:
 		return "Invalid Value"
+	case InvalidPointerError:
+		return "Invalid Pointer"
 	case UnchangeableError:
 		return "Unchangeable"
 	case DBColumnError, DBQueryError, DBScanError:

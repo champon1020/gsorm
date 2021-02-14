@@ -110,13 +110,21 @@ func (s *Stmt) Query(model interface{}) error {
 			return err
 		}
 	case Mock:
-		returned, err := compareTo(pool, s)
-		if err != nil {
+		returned, err := pool.CompareWith(s)
+		if err != nil || returned == nil {
 			return err
 		}
-		if returned != nil {
-			/* process */
+
+		v := reflect.ValueOf(returned)
+		if v.Kind() == reflect.Ptr {
+			return errors.New("Returned value must not be pointer", errors.InvalidValueError)
 		}
+		mv := reflect.ValueOf(model)
+		if mv.Kind() != reflect.Ptr {
+			return errors.New("Model must be pointer", errors.InvalidPointerError)
+		}
+
+		mv.Elem().Set(v)
 	default:
 		return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 	}
@@ -140,7 +148,7 @@ func (s *Stmt) Exec() error {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
 	case Mock:
-		_, err := compareTo(pool, s)
+		_, err := pool.CompareWith(s)
 		if err != nil {
 			return err
 		}
@@ -149,6 +157,16 @@ func (s *Stmt) Exec() error {
 	}
 
 	return nil
+}
+
+// ExpectQuery returns *Stmt. This function is used for mock test.
+func (s *Stmt) ExpectQuery(model interface{}) *Stmt {
+	return s
+}
+
+// ExpectExec returns *Stmt. This function is used for mock test.
+func (s *Stmt) ExpectExec() *Stmt {
+	return s
 }
 
 // processQuerySQL builds SQL with called clauses.
