@@ -4,213 +4,376 @@ import (
 	"testing"
 
 	"github.com/champon1020/mgorm"
+	"github.com/champon1020/mgorm/errors"
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestMockDB_ExpectReturn(t *testing.T) {
-	testCases := []struct {
-		Stmt       *mgorm.Stmt
-		WillReturn interface{}
-	}{
-		{
-			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			"some_name",
-		},
-		{
-			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			[]string{"some_name", "any_name"},
-		},
-		{
-			mgorm.Select(nil, "emp_no", "first_name").From("employees").(*mgorm.Stmt),
-			map[int]string{0: "some_name", 1: "any_name"},
-		},
+func TestMock_Expectation(t *testing.T) {
+	expectedReturn := []int{10, 20, 30}
+
+	// Test phase.
+	mock := mgorm.NewMock()
+	mock.Expect(mgorm.Insert(nil, "table", "column1", "column2").Values(10, "str").ExpectExec())
+	mock.Expect(mgorm.Select(nil, "column1").From("table").ExpectQuery(new([]int))).Return(expectedReturn)
+
+	// Actual process.
+	if err := mgorm.Insert(mock, "table", "column1", "column2").Values(10, "str").Exec(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+	model := new([]int)
+	if err := mgorm.Select(mock, "column1").From("table").Query(model); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
 	}
 
-	for _, testCase := range testCases {
-		mock := new(mgorm.MockDB)
-		mock.ExportedPushExpected(testCase.Stmt, testCase.WillReturn)
-		mock.Expect(testCase.Stmt).Return(testCase.WillReturn)
+	// Test phase.
+	if err := mock.Complete(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
 
-		expectation := mock.ExportedPopExpected()
-		eq, ok := expectation.(*mgorm.ExpectedQuery)
+	// Validate model values.
+	if diff := cmp.Diff(*model, expectedReturn); diff != "" {
+		t.Errorf("Differs: (-want +got)\n%s", diff)
+	}
+}
+
+func TestMock_TransactionExpectation(t *testing.T) {
+	expectedReturn1 := []int{10, 20, 30}
+	expectedReturn2 := []string{"hello", "world", "!"}
+
+	// Test phase.
+	mock := mgorm.NewMock()
+	mocktx1 := mock.ExpectBegin()
+	mocktx2 := mock.ExpectBegin()
+
+	mocktx1.Expect(mgorm.Insert(nil, "table1", "column1", "column2").Values(10, "str").ExpectExec())
+	mocktx1.Expect(mgorm.Select(nil, "column1").From("table1").ExpectQuery(new([]int))).Return(expectedReturn1)
+	mocktx1.ExpectCommit()
+	mocktx2.Expect(mgorm.Insert(nil, "table2", "column1", "column2").Values(10, "str").ExpectExec())
+	mocktx2.Expect(mgorm.Select(nil, "column2").From("table2").ExpectQuery(new([]string))).Return(expectedReturn2)
+	mocktx2.ExpectRollback()
+
+	// Actual process.
+	tx1, err := mock.Begin()
+	if err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+	tx2, err := mock.Begin()
+	if err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+
+	if err := mgorm.Insert(tx1, "table1", "column1", "column2").Values(10, "str").Exec(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+	model1 := new([]int)
+	if err := mgorm.Select(tx1, "column1").From("table1").Query(model1); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+	tx1.Commit()
+
+	if err := mgorm.Insert(tx2, "table2", "column1", "column2").Values(10, "str").Exec(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+	model2 := new([]string)
+	if err := mgorm.Select(tx2, "column2").From("table2").Query(model2); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+	tx2.Rollback()
+
+	// Test phase.
+	if err := mock.Complete(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+
+	// Validate model values.
+	if diff := cmp.Diff(*model1, expectedReturn1); diff != "" {
+		t.Errorf("Differs: (-want +got)\n%s", diff)
+	}
+	if diff := cmp.Diff(*model2, expectedReturn2); diff != "" {
+		t.Errorf("Differs: (-want +got)\n%s", diff)
+	}
+}
+
+func TestMockDB_Begin_Fail(t *testing.T) {
+	expectedErr := errors.New(
+		"mgorm.(*MockDB).Begin was executed but not expected", errors.MockError).(*errors.Error)
+
+	// Test phase.
+	mock := new(mgorm.MockDB)
+
+	// Actual process.
+	_, err := mock.Begin()
+
+	// Validate if the indicated error was occurred.
+	actualErr, ok := err.(*errors.Error)
+	if !ok {
+		t.Errorf("Error type is invalid")
+		return
+	}
+	if !actualErr.Is(expectedErr) {
+		t.Errorf("Different error was occurred")
+		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+	}
+}
+
+func TestMockDB_Complete_Fail(t *testing.T) {
+	expectedErr := errors.New(`No query was executed, but `+
+		`INSERT INTO("table2", "column1", "column2").VALUES(10, "str") `+
+		`is expected`, errors.MockError).(*errors.Error)
+
+	// Test phase.
+	mock := mgorm.NewMock()
+	mock.Expect(mgorm.Insert(nil, "table1", "column1", "column2").Values(10, "str").ExpectExec())
+	mock.Expect(mgorm.Insert(nil, "table2", "column1", "column2").Values(10, "str").ExpectExec())
+
+	// Actual process.
+	if err := mgorm.Insert(mock, "table1", "column1", "column2").Values(10, "str").Exec(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+
+	// Test phase.
+	err := mock.Complete()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+		return
+	}
+	actualErr, ok := err.(*errors.Error)
+	if !ok {
+		t.Errorf("Error type is invalid")
+		return
+	}
+	if !actualErr.Is(expectedErr) {
+		t.Errorf("Different error was occurred")
+		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+	}
+}
+
+func TestMockDB_Complete_Transaction_Fail(t *testing.T) {
+	expectedErr := errors.New(`No query was executed, but `+
+		`INSERT INTO("table2", "column1", "column2").VALUES(10, "str") `+
+		`is expected`, errors.MockError).(*errors.Error)
+
+	// Test phase.
+	mock := mgorm.NewMock()
+	mocktx := mock.ExpectBegin()
+	mocktx.Expect(mgorm.Insert(nil, "table1", "column1", "column2").Values(10, "str").ExpectExec())
+	mocktx.Expect(mgorm.Insert(nil, "table2", "column1", "column2").Values(10, "str").ExpectExec())
+
+	// Actual process.
+	tx, err := mock.Begin()
+	if err != nil {
+		t.Errorf("Error was occured: %v", err)
+		return
+	}
+	if err := mgorm.Insert(tx, "table1", "column1", "column2").Values(10, "str").Exec(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+		return
+	}
+
+	// Test phase.
+	err = mock.Complete()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+		return
+	}
+	actualErr, ok := err.(*errors.Error)
+	if !ok {
+		t.Errorf("Error type is invalid")
+		return
+	}
+	if !actualErr.Is(expectedErr) {
+		t.Errorf("Different error was occurred")
+		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+	}
+}
+
+func TestMockDB_CompareWith(t *testing.T) {
+	expectedErr1 := errors.New(
+		`SELECT("column1").FROM("table") was executed but not expected`, errors.MockError).(*errors.Error)
+
+	expectedErr2 := errors.New(
+		`SELECT("column1").FROM("table") was executed `+
+			`but mgorm.(*MockDB).Begin is expected`, errors.MockError).(*errors.Error)
+
+	{
+		// Test phase.
+		mock := mgorm.NewMock()
+
+		// Actual process.
+		model := new([]int)
+		err := mgorm.Select(mock, "column1").From("table").Query(model)
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
 		if !ok {
-			t.Errorf("expectation is not ExportedQuery")
-			continue
+			t.Errorf("Error type is invalid")
+			return
 		}
-		if diff := cmp.Diff(
-			testCase.Stmt.ExportedGetCmd(),
-			eq.ExportedGetStmt().ExportedGetCmd(),
-		); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-			continue
-		}
-		if diff := cmp.Diff(
-			testCase.Stmt.ExportedGetCalled(),
-			eq.ExportedGetStmt().ExportedGetCalled(),
-		); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
+		if !actualErr.Is(expectedErr1) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr1.Error(), expectedErr1.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}
-}
+	{
+		// Test phase.
+		mock := mgorm.NewMock()
+		_ = mock.ExpectBegin()
 
-func TestMockTx_ExpectReturn(t *testing.T) {
-	testCases := []struct {
-		Stmt       *mgorm.Stmt
-		WillReturn interface{}
-	}{
-		{
-			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			"some_name",
-		},
-		{
-			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			[]string{"some_name", "any_name"},
-		},
-		{
-			mgorm.Select(nil, "emp_no", "first_name").From("employees").(*mgorm.Stmt),
-			map[int]string{0: "some_name", 1: "any_name"},
-		},
-	}
-
-	for _, testCase := range testCases {
-		mock := new(mgorm.MockTx)
-		mock.ExportedPushExpected(testCase.Stmt, testCase.WillReturn)
-		mock.Expect(testCase.Stmt).Return(testCase.WillReturn)
-
-		expectation := mock.ExportedPopExpected()
-		eq, ok := expectation.(*mgorm.ExpectedQuery)
+		// Actual process.
+		model := new([]int)
+		err := mgorm.Select(mock, "column1").From("table").Query(model)
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
 		if !ok {
-			t.Errorf("expectation is not ExportedQuery")
-			continue
+			t.Errorf("Error type is invalid")
+			return
 		}
-		if diff := cmp.Diff(
-			testCase.Stmt.ExportedGetCmd(),
-			eq.ExportedGetStmt().ExportedGetCmd(),
-		); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-			continue
-		}
-		if diff := cmp.Diff(
-			testCase.Stmt.ExportedGetCalled(),
-			eq.ExportedGetStmt().ExportedGetCalled(),
-		); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
+		if !actualErr.Is(expectedErr2) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr2.Error(), expectedErr2.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}
 }
 
-func TestCompareTo_MockDB(t *testing.T) {
-	testCases := []struct {
-		ExpectedStmts       []*mgorm.Stmt
-		ExpectedWillReturns []interface{}
-		Executed            *mgorm.Stmt
-		ResultReturned      interface{}
-	}{
-		{
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			},
-			[]interface{}{
-				nil,
-			},
-			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			nil,
-		},
-		{
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			},
-			[]interface{}{
-				"some_name",
-			},
-			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			"some_name",
-		},
-		{
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-				mgorm.Select(nil, "emp_no").From("employees").(*mgorm.Stmt),
-			},
-			[]interface{}{
-				"some_name",
-				"any_name",
-			},
-			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			"some_name",
-		},
-	}
+func TestMockTx_Commit_Fail(t *testing.T) {
+	expectedErr := errors.New(
+		"mgorm.(*MockTx).Commit was executed but not expected", errors.MockError).(*errors.Error)
 
-	for _, testCase := range testCases {
-		mock := new(mgorm.MockDB)
-		for i := 0; i < len(testCase.ExpectedStmts); i++ {
-			mock.ExportedPushExpected(testCase.ExpectedStmts[i], testCase.ExpectedWillReturns[i])
-		}
+	{
+		// Test phase.
+		mock := mgorm.NewMock()
+		_ = mock.ExpectBegin()
 
-		returned, err := mgorm.CompareTo(mock, testCase.Executed)
+		// Actual process.
+		tx, err := mock.Begin()
 		if err != nil {
-			t.Errorf("Error was occurred: %v", err)
-			continue
+			t.Errorf("Error was occured: %v", err)
+			return
 		}
-		if diff := cmp.Diff(testCase.ResultReturned, returned); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
+		err = tx.Commit()
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+	{
+		// Test phase.
+		mock := mgorm.NewMock()
+		mocktx := mock.ExpectBegin()
+		mocktx.ExpectRollback()
+
+		// Actual process.
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occured: %v", err)
+			return
+		}
+		err = tx.Commit()
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}
 }
 
-func TestCompareTo_MockTx(t *testing.T) {
-	testCases := []struct {
-		ExpectedStmts       []*mgorm.Stmt
-		ExpectedWillReturns []interface{}
-		Executed            *mgorm.Stmt
-		ResultReturned      interface{}
-	}{
-		{
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			},
-			[]interface{}{
-				nil,
-			},
-			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			nil,
-		},
-		{
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			},
-			[]interface{}{
-				"some_name",
-			},
-			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			"some_name",
-		},
-		{
-			[]*mgorm.Stmt{
-				mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-				mgorm.Select(nil, "emp_no").From("employees").(*mgorm.Stmt),
-			},
-			[]interface{}{
-				"some_name",
-				"any_name",
-			},
-			mgorm.Select(nil, "first_name").From("employees").(*mgorm.Stmt),
-			"some_name",
-		},
-	}
+func TestMockTx_Rollback_Fail(t *testing.T) {
+	expectedErr := errors.New(
+		"mgorm.(*MockTx).Rollback was executed but not expected", errors.MockError).(*errors.Error)
 
-	for _, testCase := range testCases {
-		mock := new(mgorm.MockTx)
-		for i := 0; i < len(testCase.ExpectedStmts); i++ {
-			mock.ExportedPushExpected(testCase.ExpectedStmts[i], testCase.ExpectedWillReturns[i])
-		}
+	{
+		// Test phase.
+		mock := mgorm.NewMock()
+		_ = mock.ExpectBegin()
 
-		returned, err := mgorm.CompareTo(mock, testCase.Executed)
+		// Actual process.
+		tx, err := mock.Begin()
 		if err != nil {
-			t.Errorf("Error was occurred: %v", err)
-			continue
+			t.Errorf("Error was occured: %v", err)
+			return
 		}
-		if diff := cmp.Diff(testCase.ResultReturned, returned); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
+		err = tx.Rollback()
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+	{
+		// Test phase.
+		mock := mgorm.NewMock()
+		mocktx := mock.ExpectBegin()
+		mocktx.ExpectCommit()
+
+		// Actual process.
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occured: %v", err)
+			return
+		}
+		err = tx.Rollback()
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}
 }

@@ -5,12 +5,6 @@ import (
 )
 
 // Exported values which is declared in mockdb.go.
-var (
-	CompareTo = compareTo
-)
-
-type ExpectedQuery = expectedQuery
-
 func (m *MockDB) ExportedPushExpected(s *Stmt, v interface{}) {
 	m.expected = append(m.expected, &expectedQuery{stmt: s, willReturn: v})
 }
@@ -32,6 +26,8 @@ func (m *MockTx) ExportedPopExpected() expectation {
 	}
 	return m.expected[0]
 }
+
+type ExpectedQuery = expectedQuery
 
 func (e *ExpectedQuery) ExportedGetStmt() *Stmt {
 	return e.stmt

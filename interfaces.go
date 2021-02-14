@@ -19,12 +19,13 @@ type Mock interface {
 	Query(string, ...interface{}) (*sql.Rows, error)
 	Exec(string, ...interface{}) (sql.Result, error)
 	Complete() error
-	popExpected() expectation
+	CompareWith(*Stmt) (interface{}, error)
 }
 
 // QueryCallable is embedded into clause interfaces which can call (*Stmt).Query.
 type QueryCallable interface {
 	Query(interface{}) error
+	ExpectQuery(interface{}) *Stmt
 	Sub() syntax.Sub
 	String() string
 }
@@ -32,6 +33,7 @@ type QueryCallable interface {
 // ExecCallable is embedded into clause interfaces which can call (*Stmt).Exec.
 type ExecCallable interface {
 	Exec() error
+	ExpectExec() *Stmt
 	String() string
 }
 
