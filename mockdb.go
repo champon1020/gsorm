@@ -133,10 +133,7 @@ func (m *MockDB) CompareWith(s *Stmt) (interface{}, error) {
 		msg := fmt.Sprintf("%s was executed but %s is expected", s.funcString(), expected.String())
 		return nil, errors.New(msg, errors.MockError)
 	}
-	if err := compareStmts(eq.stmt, s); err != nil {
-		return nil, err
-	}
-	return eq.willReturn, nil
+	return eq.willReturn, compareStmts(eq.stmt, s)
 }
 
 // popExpected pops expected operation.
@@ -251,10 +248,7 @@ func (m *MockTx) CompareWith(s *Stmt) (interface{}, error) {
 		msg := fmt.Sprintf("%s was executed but %s is expected", s.funcString(), expected.String())
 		return nil, errors.New(msg, errors.MockError)
 	}
-	if err := compareStmts(eq.stmt, s); err != nil {
-		return nil, err
-	}
-	return eq.willReturn, nil
+	return eq.willReturn, compareStmts(eq.stmt, s)
 }
 
 // compareStmts compares two statements. If their are different, returns error.

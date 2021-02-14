@@ -5,37 +5,9 @@ import (
 )
 
 // Exported values which is declared in mockdb.go.
-func (m *MockDB) ExportedPushExpected(s *Stmt, v interface{}) {
-	m.expected = append(m.expected, &expectedQuery{stmt: s, willReturn: v})
-}
-
-func (m *MockDB) ExportedPopExpected() expectation {
-	if len(m.expected) == 0 {
-		return nil
-	}
-	return m.expected[0]
-}
-
-func (m *MockTx) ExportedPushExpected(s *Stmt, v interface{}) {
-	m.expected = append(m.expected, &expectedQuery{stmt: s, willReturn: v})
-}
-
-func (m *MockTx) ExportedPopExpected() expectation {
-	if len(m.expected) == 0 {
-		return nil
-	}
-	return m.expected[0]
-}
-
-type ExpectedQuery = expectedQuery
-
-func (e *ExpectedQuery) ExportedGetStmt() *Stmt {
-	return e.stmt
-}
-
-func (e *ExpectedQuery) ExportedSetStmt(s *Stmt) {
-	e.stmt = s
-}
+var (
+	CompareStmts = compareStmts
+)
 
 // Exported values which is declared in stmt.go.
 var (
