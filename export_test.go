@@ -4,6 +4,15 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
+// Exported values which is declared in db.go.
+func (db *DB) ExportedSetConn(conn sqlDB) {
+	db.conn = conn
+}
+
+func (tx *Tx) ExportedSetConn(conn sqlTx) {
+	tx.conn = conn
+}
+
 // Exported values which is declared in mockdb.go.
 var (
 	CompareStmts = compareStmts

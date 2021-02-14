@@ -9,7 +9,7 @@ import (
 
 // DB is a database handle representing a pool of zero or more underlying connections. It's safe for concurrent use by multiple goroutines.
 type DB struct {
-	conn *sql.DB
+	conn sqlDB
 }
 
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.
@@ -22,11 +22,17 @@ func (db *DB) Ping() error {
 
 // Exec executes a query that doesn't return rows. For example: an INSERT and UPDATE.
 func (db *DB) Exec(query string, args ...interface{}) (sql.Result, error) {
+	if db.conn == nil {
+		return nil, errors.New("DB conn is nil", errors.InvalidValueError)
+	}
 	return db.conn.Exec(query, args...)
 }
 
 // Query executes a query that returns rows, typically a SELECT.
 func (db *DB) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	if db.conn == nil {
+		return nil, errors.New("DB conn is nil", errors.InvalidValueError)
+	}
 	return db.conn.Query(query, args...)
 }
 
@@ -67,9 +73,12 @@ func (db *DB) Close() error {
 
 // Begin starts a transaction. The default isolation level is dependent on the driver.
 func (db *DB) Begin() (*Tx, error) {
+	if db.conn == nil {
+		return nil, errors.New("DB conn is nil", errors.InvalidValueError)
+	}
 	tx, err := db.conn.Begin()
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err.Error(), errors.DBBeginError)
 	}
 	return &Tx{db: db, conn: tx}, nil
 }
@@ -77,24 +86,30 @@ func (db *DB) Begin() (*Tx, error) {
 // Tx is an in-progress database transaction.
 type Tx struct {
 	db   *DB
-	conn *sql.Tx
+	conn sqlTx
 }
 
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.
 func (tx *Tx) Ping() error {
 	if tx.db == nil {
-		return errors.New("Tx conn is nil", errors.InvalidValueError)
+		return errors.New("Tx db is nil", errors.InvalidValueError)
 	}
 	return tx.db.Ping()
 }
 
 // Exec executes a query that doesn't return rows. For example: an INSERT and UPDATE.
 func (tx *Tx) Exec(query string, args ...interface{}) (sql.Result, error) {
+	if tx.conn == nil {
+		return nil, errors.New("Tx conn is nil", errors.InvalidValueError)
+	}
 	return tx.conn.Exec(query, args...)
 }
 
 // Query executes a query that returns rows, typically a SELECT.
 func (tx *Tx) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	if tx.conn == nil {
+		return nil, errors.New("Tx conn is nil", errors.InvalidValueError)
+	}
 	return tx.conn.Query(query, args...)
 }
 
