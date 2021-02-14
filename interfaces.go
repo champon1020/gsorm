@@ -2,24 +2,40 @@ package mgorm
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/champon1020/mgorm/syntax"
 )
 
 // Pool is database connection pool like DB or Tx. This is also implemented by MockDB and MockTx.
 type Pool interface {
-	Ping() error
 	Query(string, ...interface{}) (*sql.Rows, error)
 	Exec(string, ...interface{}) (sql.Result, error)
 }
 
 // Mock is mock database conneciton pool.
 type Mock interface {
-	Ping() error
-	Query(string, ...interface{}) (*sql.Rows, error)
-	Exec(string, ...interface{}) (sql.Result, error)
+	Pool
 	Complete() error
 	CompareWith(*Stmt) (interface{}, error)
+}
+
+// sqlDB is interface for sql.DB.
+type sqlDB interface {
+	Pool
+	Ping() error
+	SetConnMaxLifetime(n time.Duration)
+	SetMaxIdleConns(n int)
+	SetMaxOpenConns(n int)
+	Close() error
+	Begin() (*sql.Tx, error)
+}
+
+// sqlTx is interface for sql.Tx.
+type sqlTx interface {
+	Pool
+	Commit() error
+	Rollback() error
 }
 
 // QueryCallable is embedded into clause interfaces which can call (*Stmt).Query.

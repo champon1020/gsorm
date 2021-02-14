@@ -13,6 +13,7 @@ const (
 	UnchangeableError
 	DBColumnError
 	DBQueryError
+	DBBeginError
 	DBScanError
 	MockError
 )
