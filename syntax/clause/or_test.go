@@ -52,3 +52,11 @@ func TestOr_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestOr_Build_Fail(t *testing.T) {
+	a := &clause.Or{Expr: "column = ?"}
+	_, err := a.Build()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+	}
+}

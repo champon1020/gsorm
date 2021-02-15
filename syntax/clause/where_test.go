@@ -56,3 +56,11 @@ func TestWhere_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestWhere_Build_Fail(t *testing.T) {
+	a := &clause.Where{Expr: "column = ?"}
+	_, err := a.Build()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+	}
+}

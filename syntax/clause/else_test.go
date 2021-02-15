@@ -64,3 +64,11 @@ func TestElse_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestElse_Build_Fail(t *testing.T) {
+	a := &clause.Else{Value: []int{10}}
+	_, err := a.Build()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+	}
+}
