@@ -64,3 +64,11 @@ func TestHaving_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestHaving_Build_Fail(t *testing.T) {
+    a := &clause.Having{Expr: "column = ?"}
+    _, err := a.Build()
+    if err == nil {
+        t.Errorf("Error was not occurred")
+    }
+}

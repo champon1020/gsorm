@@ -64,3 +64,11 @@ func TestWhen_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestWhen_Build_Fail(t *testing.T) {
+	a := &clause.When{Expr: "column = ?"}
+	_, err := a.Build()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+	}
+}

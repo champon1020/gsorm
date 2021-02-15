@@ -64,3 +64,11 @@ func TestThen_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestThen_Build_Fail(t *testing.T) {
+	a := &clause.Then{Value: []int{10}}
+	_, err := a.Build()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+	}
+}
