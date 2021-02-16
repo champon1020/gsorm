@@ -224,3 +224,70 @@ type ElseStmt interface {
 	CaseValue() string
 	QueryCallable
 }
+
+// MigrationCallable is embedded into clause interfaces which can call (*MigStmt).Migration.
+type MigrationCallable interface {
+	Migration() error
+	String() string
+}
+
+// CreateDBMig is returned after CreateDB is called.
+type CreateDBMig interface {
+	MigrationCallable
+}
+
+// CreateTableMig is returned after CreateTable is called.
+type CreateTableMig interface {
+	Column(string, string) ColumnMig
+}
+
+// ColumnMig is returned after (*MigStmt).Column is called.
+type ColumnMig interface {
+	Column() ColumnMig
+	NotNull() NotNullMig
+	AutoInc() AutoIncMig
+	Default(interface{}) DefaultMig
+	PK() PKMig
+	FK(string, string) FKMig
+	MigrationCallable
+}
+
+// NotNullMig is returned after (*MigStmt).NotNull is called.
+type NotNullMig interface {
+	Column() ColumnMig
+	AutoInc() AutoIncMig
+	Default(interface{}) DefaultMig
+	PK() PKMig
+	FK(string, string) FKMig
+	MigrationCallable
+}
+
+// AutoIncMig is returned after (*MigStmt).AutoInc is called.
+type AutoIncMig interface {
+	Column() ColumnMig
+	Default(interface{}) DefaultMig
+	PK() PKMig
+	FK(string, string) FKMig
+	MigrationCallable
+}
+
+// DefaultMig is returned after (*MigStmt).Default is called.
+type DefaultMig interface {
+	Column() ColumnMig
+	PK() PKMig
+	FK(string, string) FKMig
+	MigrationCallable
+}
+
+// PKMig is returned after (*MigStmt).PK is called.
+type PKMig interface {
+	Column() ColumnMig
+	FK(string, string) FKMig
+	MigrationCallable
+}
+
+// FKMig is returned after (*MigStmt).FK is called.
+type FKMig interface {
+	Column() ColumnMig
+	MigrationCallable
+}
