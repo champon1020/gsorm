@@ -5,9 +5,6 @@ import (
 
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/errors"
-	"github.com/champon1020/mgorm/syntax"
-	"github.com/champon1020/mgorm/syntax/clause"
-	"github.com/champon1020/mgorm/syntax/cmd"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -229,161 +226,308 @@ func TestStmt_String(t *testing.T) {
 	}
 }
 
-func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
-	testCases := []struct {
-		Cmd    syntax.Cmd
-		Called []syntax.Clause
-		Error  error
-	}{
-		{
-			&cmd.Delete{},
-			nil,
-			errors.New("Command must be SELECT", errors.InvalidValueError),
-		},
-		{
-			&cmd.Select{},
-			[]syntax.Clause{
-				&clause.From{},
-				&clause.When{},
-			},
-			errors.New("Type clause.When is not supported", errors.InvalidTypeError),
-		},
-	}
+func TestStmt_CaseColumn_Fail(t *testing.T) {
+	{
+		expectedErr := errors.New(
+			"Command must be clause.When when CaseColumn is used", errors.InvalidValueError).(*errors.Error)
 
-	for _, testCase := range testCases {
-		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCmd(testCase.Cmd)
-		stmt.ExportedSetCalled(testCase.Called)
-		_, err := mgorm.StmtProcessQuerySQL(stmt)
+		// Prepare for test.
+		s := mgorm.Select(nil, "*").(*mgorm.Stmt)
+
+		// Actual process.
+		s.CaseColumn()
+
+		// Validate error.
+		errs := s.ExportedGetErrors()
+		if len(errs) == 0 {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := errs[0].(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+	{
+		expectedErr := errors.New(
+			"Command must be clause.When when CaseColumn is used", errors.InvalidValueError).(*errors.Error)
+
+		// Prepare for test.
+		s := mgorm.Select(nil, "*").From("employees").(*mgorm.Stmt)
+
+		// Actual process.
+		s.CaseColumn()
+
+		// Validate error.
+		errs := s.ExportedGetErrors()
+		if len(errs) == 0 {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := errs[0].(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+}
+
+func TestStmt_CaseValue_Fail(t *testing.T) {
+	{
+		expectedErr := errors.New(
+			"Command must be clause.When when CaseValue is used", errors.InvalidValueError).(*errors.Error)
+
+		// Prepare for test.
+		s := mgorm.Select(nil, "*").(*mgorm.Stmt)
+
+		// Actual process.
+		s.CaseValue()
+
+		// Validate error.
+		errs := s.ExportedGetErrors()
+		if len(errs) == 0 {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := errs[0].(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+	{
+		expectedErr := errors.New(
+			"Command must be clause.When when CaseValue is used", errors.InvalidValueError).(*errors.Error)
+
+		// Prepare for test.
+		s := mgorm.Select(nil, "*").From("employees").(*mgorm.Stmt)
+
+		// Actual process.
+		s.CaseValue()
+
+		// Validate error.
+		errs := s.ExportedGetErrors()
+		if len(errs) == 0 {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := errs[0].(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+}
+
+func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
+	{
+		expectedErr := errors.New("Command must be SELECT", errors.InvalidValueError).(*errors.Error)
+
+		// Prepare for test.
+		s := mgorm.Update(nil, "column1", "column2").Set(10, "str").(*mgorm.Stmt)
+
+		// Actual process.
+		_, err := mgorm.StmtProcessQuerySQL(s)
+
+		// Validate error.
 		if err == nil {
 			t.Errorf("Error was not occurred")
-			continue
+			return
 		}
-		actualError, ok := err.(*errors.Error)
+		actualErr, ok := err.(*errors.Error)
 		if !ok {
-			t.Errorf("Type of error is invalid")
-			continue
+			t.Errorf("Error type is invalid")
+			return
 		}
-		resultError := testCase.Error.(*errors.Error)
-		if !resultError.Is(actualError) {
+		if !actualErr.Is(expectedErr) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+	{
+		expectedErr := errors.New(
+			`Type clause.When is not supported`, errors.InvalidTypeError).(*errors.Error)
+
+		// Prepare for test.
+		s := mgorm.Select(nil, "").(*mgorm.Stmt).When("").(*mgorm.Stmt)
+
+		// Actual process.
+		_, err := mgorm.StmtProcessQuerySQL(s)
+
+		// Validate error.
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}
 }
 
 func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
-	testCases := []struct {
-		Called []syntax.Clause
-		Error  error
-	}{
-		{
-			[]syntax.Clause{
-				&clause.When{},
-				&clause.Where{},
-			},
-			errors.New("Type clause.Where is not supported", errors.InvalidTypeError),
-		},
-	}
+	expectedErr := errors.New(
+		"Type clause.From is not supported", errors.InvalidTypeError).(*errors.Error)
 
-	for _, testCase := range testCases {
-		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCalled(testCase.Called)
-		_, err := mgorm.StmtProcessCaseSQL(stmt, false)
-		if err == nil {
-			t.Errorf("Error was not occurred")
-			continue
-		}
-		actualError, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Type of error is invalid")
-			continue
-		}
-		resultError := testCase.Error.(*errors.Error)
-		if !resultError.Is(actualError) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
-		}
+	// Prepare for test.
+	s := mgorm.Select(nil, "").From("").(*mgorm.Stmt)
+
+	// Actual process
+	_, err := mgorm.StmtProcessCaseSQL(s, false)
+
+	// Validate error.
+	if err == nil {
+		t.Errorf("Error was not occurred")
+		return
+	}
+	actualErr, ok := err.(*errors.Error)
+	if !ok {
+		t.Errorf("Error type is invalid")
+		return
+	}
+	if !actualErr.Is(expectedErr) {
+		t.Errorf("Different error was occurred")
+		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 	}
 }
 
-func TestStmt_PrcessExecSQL_Fail(t *testing.T) {
-	testCases := []struct {
-		Cmd   syntax.Cmd
-		Error error
-	}{
-		{
-			&cmd.Select{},
-			errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError),
-		},
-	}
+func TestStmt_ProcessExecSQL_Fail(t *testing.T) {
+	{
+		expectedErr := errors.New(
+			"Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError).(*errors.Error)
 
-	for _, testCase := range testCases {
-		stmt := new(mgorm.Stmt)
-		stmt.ExportedSetCmd(testCase.Cmd)
-		_, err := mgorm.StmtProcessExecSQL(stmt)
+		// Prepare for test.
+		s := mgorm.Select(nil, "").(*mgorm.Stmt)
+
+		// Actual process.
+		_, err := mgorm.StmtProcessExecSQL(s)
+
+		// Validate error.
 		if err == nil {
 			t.Errorf("Error was not occurred")
-			continue
+			return
 		}
-		actualError, ok := err.(*errors.Error)
+		actualErr, ok := err.(*errors.Error)
 		if !ok {
-			t.Errorf("Type of error is invalid")
-			continue
+			t.Errorf("Error type is invalid")
+			return
 		}
-		resultError := testCase.Error.(*errors.Error)
-		if !resultError.Is(actualError) {
+		if !actualErr.Is(expectedErr) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+	{
+		expectedErr := errors.New(
+			"Type clause.When is not supported", errors.InvalidTypeError).(*errors.Error)
+
+		// Prepare for test.
+		s := mgorm.Insert(nil, "").(*mgorm.Stmt).When("").(*mgorm.Stmt)
+
+		// Actual process.
+		_, err := mgorm.StmtProcessExecSQL(s)
+
+		// Validate error.
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}
 }
 
 func TestStmt_Set_Fail(t *testing.T) {
-	testCases := []struct {
-		Cmd    syntax.Cmd
-		Values []interface{}
-		Error  error
-	}{
-		{
-			nil,
-			[]interface{}{10},
-			errors.New("Command is nil", errors.InvalidValueError),
-		},
-		{
-			&cmd.Select{},
-			[]interface{}{10},
-			errors.New("SET clause can be used with UPDATE command", errors.InvalidValueError),
-		},
-		{
-			&cmd.Update{Columns: []string{"lhs1", "lhs2"}},
-			[]interface{}{10},
-			errors.New("Length is different between lhs and rhs", errors.InvalidValueError),
-		},
-	}
+	{
+		expectedErr := errors.New("Command is nil", errors.InvalidValueError).(*errors.Error)
 
-	for _, testCase := range testCases {
+		// Prepare for test.
 		s := new(mgorm.Stmt)
-		s.ExportedSetCmd(testCase.Cmd)
-		resultStmt := s.Set(testCase.Values...).(*mgorm.Stmt)
-		errs := resultStmt.ExportedGetErrors()
+
+		// Actual process.
+		s.Set("")
+
+		// Validate error.
+		errs := s.ExportedGetErrors()
 		if len(errs) == 0 {
 			t.Errorf("Error was not occurred")
-			continue
+			return
 		}
-		actualError, ok := errs[0].(*errors.Error)
+		actualErr, ok := errs[0].(*errors.Error)
 		if !ok {
 			t.Errorf("Error type is invalid")
-			continue
+			return
 		}
-		resultError := testCase.Error.(*errors.Error)
-		if !resultError.Is(actualError) {
+		if !actualErr.Is(expectedErr) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+	{
+		expectedErr := errors.New(
+			"SET clause can be used with UPDATE command", errors.InvalidValueError).(*errors.Error)
+
+		// Prepare for test.
+		s := mgorm.Select(nil, "").(*mgorm.Stmt).Set("").(*mgorm.Stmt)
+
+		// Actual process.
+		s.Set("")
+
+		// Validate error.
+		errs := s.ExportedGetErrors()
+		if len(errs) == 0 {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := errs[0].(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}
 }

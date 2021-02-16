@@ -31,6 +31,10 @@ func (s *Stmt) addError(err error) {
 
 // CaseColumn returns string without double quotes. This is used for CASE WHEN ... statement.
 func (s *Stmt) CaseColumn() string {
+	if len(s.called) == 0 {
+		s.addError(errors.New("Command must be clause.When when CaseColumn is used", errors.InvalidValueError))
+		return ""
+	}
 	_, ok := s.called[0].(*clause.When)
 	if !ok {
 		s.addError(errors.New("Command must be clause.When when CaseColumn is used", errors.InvalidValueError))
@@ -46,9 +50,13 @@ func (s *Stmt) CaseColumn() string {
 
 // CaseValue returns string with double quotes. This is used for CASE WHEN ... statement.
 func (s *Stmt) CaseValue() string {
+	if len(s.called) == 0 {
+		s.addError(errors.New("Command must be clause.When when CaseValue is used", errors.InvalidValueError))
+		return ""
+	}
 	_, ok := s.called[0].(*clause.When)
 	if !ok {
-		s.addError(errors.New("Command must be clause.When when CaseColumn is used", errors.InvalidValueError))
+		s.addError(errors.New("Command must be clause.When when CaseValue is used", errors.InvalidValueError))
 		return ""
 	}
 	sql, err := s.processCaseSQL(false)
@@ -267,6 +275,9 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 				return "", err
 			}
 			sql.Write(s.Build())
+		default:
+			msg := fmt.Sprintf("Type %s is not supported", reflect.TypeOf(e).Elem().String())
+			return "", errors.New(msg, errors.InvalidTypeError)
 		}
 	}
 
