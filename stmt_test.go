@@ -13,142 +13,219 @@ import (
 
 func TestStmt_String(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
-		Result string
+		Stmt     *mgorm.Stmt
+		Expected string
 	}{
 		{
-			mgorm.Select(nil, "column1", "column2 AS c2").
-				From("table1 AS t1").
-				Join("table2 AS t2").
-				On("t1.column1 = t2.column1").
-				Where("lhs1 > ?", 10).
-				And("lhs2 = ? OR lhs3 = ?", "str", true).
-				OrderByDesc("t1.column1").
+			mgorm.Select(nil, "emp_no").
+				From("employees").
+				Where("emp_no = ?", 10001).(*mgorm.Stmt),
+			`SELECT emp_no FROM employees WHERE emp_no = 10001`,
+		},
+		{
+			mgorm.Select(nil, "emp_no", "first_name", "last_name").
+				From("employees").
+				Where("emp_no <= ?", 10005).
+				And("first_name = ? OR last_name = ?", "Georgi", "Bamford").(*mgorm.Stmt),
+			`SELECT emp_no, first_name, last_name FROM employees ` +
+				`WHERE emp_no <= 10005 ` +
+				`AND (first_name = "Georgi" OR last_name = "Bamford")`,
+		},
+		{
+			mgorm.Select(nil, "emp_no", "first_name", "last_name").
+				From("employees").
+				Where("emp_no <= ?", 10002).
+				Or("first_name = ? AND last_name = ?", "Saniya", "Kalloufi").(*mgorm.Stmt),
+			`SELECT emp_no, first_name, last_name FROM employees ` +
+				`WHERE emp_no <= 10002 ` +
+				`OR (first_name = "Saniya" AND last_name = "Kalloufi")`,
+		},
+		{
+			mgorm.Select(nil, "emp_no").
+				From("employees").
+				Where("emp_no IN ?",
+					mgorm.Select(nil, "DISTINCT emp_no").
+						From("salaries").
+						Where("salary < ?", 60000).Sub()).(*mgorm.Stmt),
+			`SELECT emp_no FROM employees ` +
+				`WHERE emp_no IN ` +
+				`(SELECT DISTINCT emp_no FROM salaries WHERE salary < 60000)`,
+		},
+		{
+			mgorm.Select(nil, "emp_no").
+				From("employees").
+				Where("emp_no BETWEEN ? AND ?", 10002, 10004).(*mgorm.Stmt),
+			`SELECT emp_no FROM employees WHERE emp_no BETWEEN 10002 AND 10004`,
+		},
+		{
+			mgorm.Select(nil, "first_name").
+				From("employees").
+				Where("first_name LIKE ?", "S%").(*mgorm.Stmt),
+			`SELECT first_name FROM employees WHERE first_name LIKE "S%"`,
+		},
+		{
+			mgorm.Select(nil, "emp_no").
+				From("employees").
+				Where("emp_no IN (?, ?)", 10002, 10004).(*mgorm.Stmt),
+			`SELECT emp_no FROM employees WHERE emp_no IN (10002, 10004)`,
+		},
+		{
+			mgorm.Select(nil, "first_name").
+				From("employees").
+				OrderBy("first_name").(*mgorm.Stmt),
+			`SELECT first_name FROM employees ORDER BY first_name`,
+		},
+		{
+			mgorm.Select(nil, "first_name").
+				From("employees").
+				OrderByDesc("first_name").(*mgorm.Stmt),
+			`SELECT first_name FROM employees ORDER BY first_name DESC`,
+		},
+		{
+			mgorm.Select(nil, "emp_no").
+				From("employees").
+				Limit(5).(*mgorm.Stmt),
+			`SELECT emp_no FROM employees LIMIT 5`,
+		},
+		{
+			mgorm.Select(nil, "emp_no").
+				From("employees").
 				Limit(5).
-				Offset(6).
-				Union(mgorm.Select(nil, "column1", "column2 AS c2").
-					From("table3").
-					Sub()).(*mgorm.Stmt),
-			`SELECT column1, column2 AS c2 ` +
-				`FROM table1 AS t1 ` +
-				`INNER JOIN table2 AS t2 ` +
-				`ON t1.column1 = t2.column1 ` +
-				`WHERE lhs1 > 10 ` +
-				`AND (lhs2 = "str" OR lhs3 = true) ` +
-				`ORDER BY t1.column1 DESC ` +
-				`LIMIT 5 ` +
-				`OFFSET 6 ` +
+				Offset(3).(*mgorm.Stmt),
+			`SELECT emp_no FROM employees LIMIT 5 OFFSET 3`,
+		},
+		{
+			mgorm.Select(nil, "e.emp_no", "t.title").
+				From("employees AS e").
+				Join("titles AS t").
+				On("e.emp_no = t.emp_no").
+				Limit(5).(*mgorm.Stmt),
+			`SELECT e.emp_no, t.title FROM employees AS e ` +
+				`INNER JOIN titles AS t ` +
+				`ON e.emp_no = t.emp_no ` +
+				`LIMIT 5`,
+		},
+		{
+			mgorm.Select(nil, "e.emp_no", "t.title").
+				From("employees AS e").
+				LeftJoin("titles AS t").
+				On("e.emp_no = t.emp_no").
+				OrderByDesc("e.emp_no").
+				Limit(5).(*mgorm.Stmt),
+			`SELECT e.emp_no, t.title FROM employees AS e ` +
+				`LEFT JOIN titles AS t ` +
+				`ON e.emp_no = t.emp_no ` +
+				`ORDER BY e.emp_no DESC ` +
+				`LIMIT 5`,
+		},
+		{
+			mgorm.Select(nil, "t.title", "e.emp_no").
+				From("titles AS t").
+				RightJoin("employees AS e").
+				On("t.emp_no = e.emp_no").
+				OrderByDesc("e.emp_no").
+				Limit(5).(*mgorm.Stmt),
+			`SELECT t.title, e.emp_no FROM titles AS t ` +
+				`RIGHT JOIN employees AS e ` +
+				`ON t.emp_no = e.emp_no ` +
+				`ORDER BY e.emp_no DESC ` +
+				`LIMIT 5`,
+		},
+		{
+			mgorm.Select(nil, "title", "COUNT(title)").
+				From("titles").
+				GroupBy("title").(*mgorm.Stmt),
+			`SELECT title, COUNT(title) FROM titles GROUP BY title`,
+		},
+		{
+			mgorm.Select(nil, "title", "COUNT(title)").
+				From("titles").
+				GroupBy("title").
+				Having("COUNT(title) != ?", 1).(*mgorm.Stmt),
+			`SELECT title, COUNT(title) FROM titles ` +
+				`GROUP BY title ` +
+				`HAVING COUNT(title) != 1`,
+		},
+		{
+			mgorm.Select(nil, "hire_date AS date").
+				From("employees").
+				Union(mgorm.Select(nil, "from_date AS date").
+					From("salaries").
+					Sub()).
+				Limit(5).(*mgorm.Stmt),
+			`SELECT hire_date AS date FROM employees ` +
 				`UNION ` +
-				`SELECT column1, column2 AS c2 ` +
-				`FROM table3`,
+				`SELECT from_date AS date FROM salaries ` +
+				`LIMIT 5`,
 		},
 		{
-			mgorm.Select(nil, "column1", "column2 AS c2").
-				From("table1 AS t1").
-				LeftJoin("table2 AS t2").
-				On("t1.column1 = t2.column1").
-				Where("lhs1 > ?", 10).
-				Or("lhs2 = ? AND lhs3 = ?", "str", true).
-				OrderBy("t1.column1").
-				UnionAll(mgorm.Select(nil, "column1", "column2 AS c2").
-					From("table3").
-					Sub()).(*mgorm.Stmt),
-			`SELECT column1, column2 AS c2 ` +
-				`FROM table1 AS t1 ` +
-				`LEFT JOIN table2 AS t2 ` +
-				`ON t1.column1 = t2.column1 ` +
-				`WHERE lhs1 > 10 ` +
-				`OR (lhs2 = "str" AND lhs3 = true) ` +
-				`ORDER BY t1.column1 ` +
+			mgorm.Select(nil, "from_date AS date").
+				From("salaries").
+				UnionAll(mgorm.Select(nil, "from_date AS date").
+					From("titles").
+					Sub()).
+				Limit(5).(*mgorm.Stmt),
+			`SELECT from_date AS date FROM salaries ` +
 				`UNION ALL ` +
-				`SELECT column1, column2 AS c2 ` +
-				`FROM table3`,
+				`SELECT from_date AS date FROM titles ` +
+				`LIMIT 5`,
 		},
 		{
-			mgorm.Select(nil, "COUNT(column1)").
-				From("table1 AS t1").
-				RightJoin("table2 AS t2").
-				On("t1.column1 = t2.column1").
-				GroupBy("column1").
-				Having("column1 > ?", 10).(*mgorm.Stmt),
-			`SELECT COUNT(column1) ` +
-				`FROM table1 AS t1 ` +
-				`RIGHT JOIN table2 AS t2 ` +
-				`ON t1.column1 = t2.column1 ` +
-				`GROUP BY column1 ` +
-				`HAVING column1 > 10`,
+			mgorm.Select(nil, mgorm.When("gender = ?", "M").
+				Then("first_name").
+				Else("last_name").CaseColumn()).
+				From("employees").
+				OrderBy("emp_no").(*mgorm.Stmt),
+			`SELECT CASE ` +
+				`WHEN gender = "M" THEN first_name ` +
+				`ELSE last_name ` +
+				`END ` +
+				`FROM employees ` +
+				`ORDER BY emp_no`,
 		},
 		{
-			mgorm.Select(nil, "column1").
-				From("table1 AS t1").
-				FullJoin("table2 AS t2").
-				On("t1.column1 = t2.column1").(*mgorm.Stmt),
-			`SELECT column1 ` +
-				`FROM table1 AS t1 ` +
-				`FULL OUTER JOIN table2 AS t2 ` +
-				`ON t1.column1 = t2.column1`,
+			mgorm.Select(nil, mgorm.When("gender = ?", "M").
+				Then("MAN").
+				Else("WOMAN").CaseValue()).
+				From("employees").
+				OrderBy("emp_no").(*mgorm.Stmt),
+			`SELECT CASE ` +
+				`WHEN gender = "M" THEN "MAN" ` +
+				`ELSE "WOMAN" ` +
+				`END ` +
+				`FROM employees ` +
+				`ORDER BY emp_no`,
 		},
 		{
-			mgorm.Select(nil, mgorm.When("column1 < ?", 10).
-				Then("column1").
-				When("column1 > ?", 10).
-				Then("column2").
-				Else("column3").CaseColumn()).
-				From("table1").(*mgorm.Stmt),
-			`SELECT CASE WHEN column1 < 10 THEN column1 ` +
-				`WHEN column1 > 10 THEN column2 ` +
-				`ELSE column3 END ` +
-				`FROM table1`,
+			mgorm.Min(nil, "emp_no").From("employees").(*mgorm.Stmt),
+			`SELECT MIN(emp_no) FROM employees`,
 		},
 		{
-			mgorm.Insert(nil, "table", "column1", "column2").
-				Values(10, "str").(*mgorm.Stmt),
-			`INSERT INTO table (column1, column2) ` +
-				`VALUES (10, "str")`,
+			mgorm.Max(nil, "emp_no").From("employees").(*mgorm.Stmt),
+			`SELECT MAX(emp_no) FROM employees`,
 		},
 		{
-			mgorm.Update(nil, "table", "column1", "column2").
-				Set(10, "str").
-				Where("lhs = ?", 10).(*mgorm.Stmt),
-			`UPDATE table ` +
-				`SET column1 = 10, column2 = "str" ` +
-				`WHERE lhs = 10`,
+			mgorm.Count(nil, "emp_no").From("salaries").(*mgorm.Stmt),
+			`SELECT COUNT(emp_no) FROM salaries`,
 		},
 		{
-			mgorm.Delete(nil).
-				From("table").(*mgorm.Stmt),
-			`DELETE FROM table`,
+			mgorm.Sum(nil, "salary").From("salaries").(*mgorm.Stmt),
+			`SELECT SUM(salary) FROM salaries`,
 		},
 		{
-			mgorm.Count(nil, "column", "c").
-				From("table").(*mgorm.Stmt),
-			`SELECT COUNT(column) AS c FROM table`,
-		},
-		{
-			mgorm.Avg(nil, "column", "c").
-				From("table").(*mgorm.Stmt),
-			`SELECT AVG(column) AS c FROM table`,
-		},
-		{
-			mgorm.Sum(nil, "column", "c").
-				From("table").(*mgorm.Stmt),
-			`SELECT SUM(column) AS c FROM table`,
-		},
-		{
-			mgorm.Max(nil, "column", "c").
-				From("table").(*mgorm.Stmt),
-			`SELECT MAX(column) AS c FROM table`,
-		},
-		{
-			mgorm.Min(nil, "column", "c").
-				From("table").(*mgorm.Stmt),
-			`SELECT MIN(column) AS c FROM table`,
+			mgorm.Avg(nil, "salary").From("salaries").(*mgorm.Stmt),
+			`SELECT AVG(salary) FROM salaries`,
 		},
 	}
 
 	for _, testCase := range testCases {
-		res := testCase.Stmt.String()
-		assert.Equal(t, testCase.Result, res)
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			return
+		}
+		assert.Equal(t, testCase.Expected, actual)
 	}
 }
 
