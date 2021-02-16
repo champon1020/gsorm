@@ -31,28 +31,40 @@ func (s *Stmt) addError(err error) {
 
 // CaseColumn returns string without double quotes. This is used for CASE WHEN ... statement.
 func (s *Stmt) CaseColumn() string {
-	if _, ok := s.called[0].(*clause.When); ok {
-		sql, err := s.processCaseSQL(true)
-		if err != nil {
-			s.addError(err)
-			return ""
-		}
-		return sql.String()
+	if len(s.called) == 0 {
+		s.addError(errors.New("Command must be clause.When when CaseColumn is used", errors.InvalidValueError))
+		return ""
 	}
-	return s.String()
+	_, ok := s.called[0].(*clause.When)
+	if !ok {
+		s.addError(errors.New("Command must be clause.When when CaseColumn is used", errors.InvalidValueError))
+		return ""
+	}
+	sql, err := s.processCaseSQL(true)
+	if err != nil {
+		s.addError(err)
+		return ""
+	}
+	return sql.String()
 }
 
 // CaseValue returns string with double quotes. This is used for CASE WHEN ... statement.
 func (s *Stmt) CaseValue() string {
-	if _, ok := s.called[0].(*clause.When); ok {
-		sql, err := s.processCaseSQL(false)
-		if err != nil {
-			s.addError(err)
-			return ""
-		}
-		return sql.String()
+	if len(s.called) == 0 {
+		s.addError(errors.New("Command must be clause.When when CaseValue is used", errors.InvalidValueError))
+		return ""
 	}
-	return s.String()
+	_, ok := s.called[0].(*clause.When)
+	if !ok {
+		s.addError(errors.New("Command must be clause.When when CaseValue is used", errors.InvalidValueError))
+		return ""
+	}
+	sql, err := s.processCaseSQL(false)
+	if err != nil {
+		s.addError(err)
+		return ""
+	}
+	return sql.String()
 }
 
 // Sub returns Stmt.String with syntax.Sub type. This is used for UNION or WHERE with SELECT clause.
@@ -263,6 +275,9 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 				return "", err
 			}
 			sql.Write(s.Build())
+		default:
+			msg := fmt.Sprintf("Type %s is not supported", reflect.TypeOf(e).Elem().String())
+			return "", errors.New(msg, errors.InvalidTypeError)
 		}
 	}
 
