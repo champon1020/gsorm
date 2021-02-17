@@ -241,6 +241,15 @@ type CreateTableMig interface {
 	Column(string, string) ColumnMig
 }
 
+type AlterTableMig interface {
+	Rename(string) RenameMig
+	Add(string, string) AddMig
+	Change(string, string, string) ChangeMig
+	Modify(string, string) ModifyMig
+	Drop(string) DropMig
+	Charset(string) CharsetMig
+}
+
 // ColumnMig is returned after (*MigStmt).Column is called.
 type ColumnMig interface {
 	Column(string, string) ColumnMig
@@ -248,6 +257,33 @@ type ColumnMig interface {
 	AutoInc() AutoIncMig
 	Default(interface{}) DefaultMig
 	Cons(string) ConsMig
+	MigrationCallable
+}
+
+// RenameMig is returned after (*MigStmt).Rename is called.
+type RenameMig interface {
+	MigrationCallable
+}
+
+// AddMig is returned after (*MigStmt).Add is called.
+type AddMig interface {
+}
+
+// ChangeMig is returned after (*MigStmt).Change is called.
+type ChangeMig interface {
+}
+
+// ModifyMig is returned after (*MigStmt).Modify is called.
+type ModifyMig interface {
+}
+
+// DropMig is returned after (*MigStmt).Drop is called.
+type DropMig interface {
+	MigrationCallable
+}
+
+// CharsetMig is returned after (*MigStmt).Charset is called.
+type CharsetMig interface {
 	MigrationCallable
 }
 

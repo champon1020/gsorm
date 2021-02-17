@@ -182,6 +182,42 @@ func (m *MigStmt) Column(col string, typ string) ColumnMig {
 	return m
 }
 
+// Rename calls RENAME TO clause.
+func (m *MigStmt) Rename(table string) RenameMig {
+	m.call(&mig.Rename{Table: table})
+	return m
+}
+
+// Add calls ADD clause.
+func (m *MigStmt) Add(col string, typ string) AddMig {
+	m.call(&mig.Add{Column: col, Type: typ})
+	return m
+}
+
+// Chnage calls CHANGE clause.
+func (m *MigStmt) Change(col string, dest string, typ string) ChangeMig {
+	m.call(&mig.Change{Column: col, Dest: dest, Type: typ})
+	return m
+}
+
+// Modify calls MODIFY clause.
+func (m *MigStmt) Modify(col string, typ string) ModifyMig {
+	m.call(&mig.Modify{Column: col, Type: typ})
+	return m
+}
+
+// Drop calls DROP clause.
+func (m *MigStmt) Drop(col string) DropMig {
+	m.call(&mig.Drop{Column: col})
+	return m
+}
+
+// Charset calls CHARSET clause.
+func (m *MigStmt) Charset(format string) CharsetMig {
+	m.call(&mig.Charset{Format: format})
+	return m
+}
+
 // NotNull calls NOT NULL option.
 func (m *MigStmt) NotNull() NotNullMig {
 	m.call(&mig.NotNull{})
