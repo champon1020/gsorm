@@ -28,7 +28,7 @@ func (ss *StmtSet) WriteValue(value string) {
 // Build makes clause with string.
 func (ss *StmtSet) Build() string {
 	s := ss.Keyword
-	if ss.Parens || ss.Value != "" {
+	if s != "" && (ss.Parens || ss.Value != "") {
 		s += " "
 	}
 	if ss.Parens {
