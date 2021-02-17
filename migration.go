@@ -1,6 +1,8 @@
 package mgorm
 
 import (
+	"strings"
+
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
@@ -69,9 +71,11 @@ func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
 		sql.Write(cmd.Build().Build())
 	case *mig.CreateTable:
 		sql.Write(cmd.Build().Build())
+		sql.Write("(")
 		for len(m.called) > 0 {
 			m.processCreateTableSQL(&sql)
 		}
+		sql.Write(")")
 	default:
 		/* handle error */
 	}
@@ -87,7 +91,7 @@ func (m *MigStmt) processCreateTableSQL(sql *internal.SQL) error {
 
 	switch e.(type) {
 	case *mig.Column:
-		if sql.Len() > 0 {
+		if !strings.HasSuffix(sql.String(), "(") {
 			sql.Write(",")
 		}
 		s, err := e.Build()

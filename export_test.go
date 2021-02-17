@@ -9,6 +9,11 @@ func (tx *Tx) ExportedSetConn(conn sqlTx) {
 	tx.conn = conn
 }
 
+// Exported values which is declared in migration.go.
+func (m *MigStmt) ExportedGetErrors() []error {
+	return m.errors
+}
+
 // Exported values which is declared in mockdb.go.
 var (
 	CompareStmts = compareStmts

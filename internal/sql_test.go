@@ -31,6 +31,8 @@ func TestSQL_Write(t *testing.T) {
 		{"test", "add", "test add"},
 		{"", "add", "add"},
 		{"(test", ")", "(test)"},
+		{"test", ",", "test,"},
+		{"(", "test", "(test"},
 	}
 
 	for _, testCase := range testCases {

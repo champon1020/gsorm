@@ -114,6 +114,14 @@ func When(expr string, vals ...interface{}) WhenStmt {
 	return stmt
 }
 
+// CreateDB calls CREATE DATABASE command.
+func CreateDB(pool Pool, dbName string) CreateDBMig {
+	return &MigStmt{
+		pool: pool,
+		cmd:  &mig.CreateDB{DBName: dbName},
+	}
+}
+
 // CreateTable calls CREATE TABLE command.
 func CreateTable(pool Pool, table string) CreateTableMig {
 	return &MigStmt{

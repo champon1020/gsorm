@@ -1,6 +1,10 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"fmt"
+
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // Ref is REFERENCES clause.
 type Ref struct {
@@ -17,9 +21,6 @@ func (r *Ref) Name() string {
 func (r *Ref) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(r.Name())
-	ss.WriteValue(r.Table)
-	ss.WriteValue("(")
-	ss.WriteValue(r.Column)
-	ss.WriteValue(")")
+	ss.WriteValue(fmt.Sprintf("%s(%s)", r.Table, r.Column))
 	return ss, nil
 }
