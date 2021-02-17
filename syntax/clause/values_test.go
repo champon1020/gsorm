@@ -2,7 +2,6 @@ package clause_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
@@ -62,7 +61,7 @@ func TestValues_Build_Fail(t *testing.T) {
 	testCases := []struct {
 		Values *clause.Values
 	}{
-		{&clause.Values{Values: []interface{}{time.Now()}}},
+		{&clause.Values{Values: []interface{}{nil}}},
 	}
 
 	for _, testCase := range testCases {

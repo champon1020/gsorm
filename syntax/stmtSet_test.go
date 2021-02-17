@@ -98,6 +98,14 @@ func TestStmtSet_Build(t *testing.T) {
 			&syntax.StmtSet{Keyword: "clause", Value: ""},
 			"clause",
 		},
+		{
+			&syntax.StmtSet{Value: "value"},
+			"value",
+		},
+		{
+			&syntax.StmtSet{Value: "value", Parens: true},
+			"(value)",
+		},
 	}
 
 	for _, testCase := range testCases {

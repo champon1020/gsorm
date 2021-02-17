@@ -41,8 +41,15 @@ func ToString(v interface{}, quotes bool) (string, error) {
 			return strconv.FormatInt(r.Int(), 10), nil
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 			return strconv.FormatUint(r.Uint(), 10), nil
+		case reflect.Float32, reflect.Float64:
+			return strconv.FormatFloat(r.Float(), 'f', -1, 64), nil
 		case reflect.Bool:
 			return strconv.FormatBool(r.Bool()), nil
+		case reflect.Struct:
+			t, ok := v.(time.Time)
+			if ok {
+				return t.Format("2006-01-02 15:04:05"), nil
+			}
 		default:
 			return "", errors.New(fmt.Sprintf("Type %v is not supported", r.Kind()), errors.InvalidTypeError)
 		}
