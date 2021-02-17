@@ -2,23 +2,23 @@ package mig
 
 import "github.com/champon1020/mgorm/syntax"
 
-// PrimaryKey is PRIMARY KEY clause.
-type PrimaryKey struct {
+// PK is PRIMARY KEY clause.
+type PK struct {
 	Columns []string
 }
 
 // Name returns clause keyword.
-func (p *PrimaryKey) Name() string {
+func (p *PK) Name() string {
 	return "PRIMARY KEY"
 }
 
-// AddColumns appends columns to PrimaryKey.
-func (p *PrimaryKey) AddColumns(col ...string) {
+// AddColumns appends columns to PK.
+func (p *PK) AddColumns(col ...string) {
 	p.Columns = append(p.Columns, col...)
 }
 
 // Build makes PRIMARY KEY clause with syntax.StmtSet.
-func (p *PrimaryKey) Build() (*syntax.StmtSet, error) {
+func (p *PK) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(p.Name())
 	ss.WriteValue("(")

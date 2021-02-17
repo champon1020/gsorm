@@ -6,6 +6,7 @@ import (
 
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/champon1020/mgorm/syntax/cmd"
+	"github.com/champon1020/mgorm/syntax/mig"
 )
 
 // New creates DB.
@@ -111,4 +112,12 @@ func When(expr string, vals ...interface{}) WhenStmt {
 	stmt := new(Stmt)
 	stmt.call(&clause.When{Expr: expr, Values: vals})
 	return stmt
+}
+
+// CreateTable calls CREATE TABLE command.
+func CreateTable(pool Pool, table string) CreateTableMig {
+	return &MigStmt{
+		pool: pool,
+		cmd:  &mig.CreateTable{Table: table},
+	}
 }

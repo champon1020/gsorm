@@ -1,7 +1,9 @@
 package mgorm
 
 import (
+	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/mgorm/syntax/mig"
 )
 
 // MigStmt stores information about database migration query.
@@ -22,34 +24,200 @@ func (m *MigStmt) throw(e error) {
 	m.errors = append(m.errors, e)
 }
 
-func (m *MigStmt) String() string {
-	return ""
+// nextCalled returns pops head of called.
+func (m *MigStmt) nextCalled() syntax.MigClause {
+	if len(m.called) == 0 {
+		return nil
+	}
+	defer m.popCalled()
+	return m.called[0]
 }
 
+// popCalled removes head of called.
+func (m *MigStmt) popCalled() {
+	m.called = m.called[1:]
+}
+
+// String returns query with string.
+func (m *MigStmt) String() string {
+	sql, err := m.processMigrationSQL()
+	if err != nil {
+		return ""
+	}
+	return sql.String()
+}
+
+// Migration executes database migration.
 func (m *MigStmt) Migration() error {
+	if len(m.errors) > 0 {
+		return m.errors[0]
+	}
+
+	_, err := m.processMigrationSQL()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (m *MigStmt) Column() ColumnMig {
+func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
+	var sql internal.SQL
+
+	switch cmd := m.cmd.(type) {
+	case *mig.CreateDB:
+		sql.Write(cmd.Build().Build())
+	case *mig.CreateTable:
+		sql.Write(cmd.Build().Build())
+		for len(m.called) > 0 {
+			m.processCreateTableSQL(&sql)
+		}
+	default:
+		/* handle error */
+	}
+
+	return sql, nil
+}
+
+func (m *MigStmt) processCreateTableSQL(sql *internal.SQL) error {
+	e := m.nextCalled()
+	if e == nil {
+		/* handle error */
+	}
+
+	switch e.(type) {
+	case *mig.Column:
+		if sql.Len() > 0 {
+			sql.Write(",")
+		}
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+	case *mig.NotNull,
+		*mig.AutoInc,
+		*mig.Default:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+	case *mig.Constraint:
+		if sql.Len() > 0 {
+			sql.Write(",")
+		}
+
+		// Write CONSTRAINT.
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+
+		// Write PK/FK.
+		m.processKeySQL(sql)
+	default:
+		/* handle error */
+	}
+	return nil
+}
+
+func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
+	e := m.nextCalled()
+	if e == nil {
+		/* handle error */
+	}
+
+	switch e.(type) {
+	case *mig.PK:
+		// Write PRIMARY KEY.
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+	case *mig.FK:
+		// Write FOREIGN KEY.
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+
+		// Write REFERENCES.
+		m.processRefSQL(sql)
+	default:
+		/* handle error */
+	}
+	return nil
+}
+
+func (m *MigStmt) processRefSQL(sql *internal.SQL) error {
+	e := m.nextCalled()
+	if e == nil {
+		/* handle error */
+	}
+
+	switch e.(type) {
+	case *mig.Ref:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+	default:
+		/* handle error */
+	}
+	return nil
+}
+
+// Column calls table column definition.
+func (m *MigStmt) Column(col string, typ string) ColumnMig {
+	m.call(&mig.Column{Col: col, Type: typ})
 	return m
 }
 
+// NotNull calls NOT NULL option.
 func (m *MigStmt) NotNull() NotNullMig {
+	m.call(&mig.NotNull{})
 	return m
 }
 
+// AutoInc calls AUTO_INCREMENT option.
 func (m *MigStmt) AutoInc() AutoIncMig {
+	m.call(&mig.AutoInc{})
 	return m
 }
 
+// Default calls DEFAULT option.
 func (m *MigStmt) Default(val interface{}) DefaultMig {
+	m.call(&mig.Default{Value: val})
 	return m
 }
 
-func (m *MigStmt) PK() PKMig {
+// Cons calls CONSTRAINT option.
+func (m *MigStmt) Cons(key string) ConsMig {
+	m.call(&mig.Constraint{Key: key})
 	return m
 }
 
-func (m *MigStmt) FK(refCol string, refTable string) FKMig {
+// PK calls PRIMARY KEY keyword.
+func (m *MigStmt) PK(col string) PKMig {
+	p := new(mig.PK)
+	p.AddColumns(col)
+	m.call(p)
+	return m
+}
+
+// FK calls FOREIGN KEY keyword.
+func (m *MigStmt) FK(col string) FKMig {
+	m.call(&mig.FK{Column: col})
+	return m
+}
+
+// Ref calls REFERENCES keyword.
+func (m *MigStmt) Ref(table string, col string) RefMig {
+	m.call(&mig.Ref{Table: table, Column: col})
 	return m
 }

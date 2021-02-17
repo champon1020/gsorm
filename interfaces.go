@@ -243,51 +243,56 @@ type CreateTableMig interface {
 
 // ColumnMig is returned after (*MigStmt).Column is called.
 type ColumnMig interface {
-	Column() ColumnMig
+	Column(string, string) ColumnMig
 	NotNull() NotNullMig
 	AutoInc() AutoIncMig
 	Default(interface{}) DefaultMig
-	PK() PKMig
-	FK(string, string) FKMig
+	Cons(string) ConsMig
 	MigrationCallable
 }
 
 // NotNullMig is returned after (*MigStmt).NotNull is called.
 type NotNullMig interface {
-	Column() ColumnMig
+	Column(string, string) ColumnMig
 	AutoInc() AutoIncMig
 	Default(interface{}) DefaultMig
-	PK() PKMig
-	FK(string, string) FKMig
+	Cons(string) ConsMig
 	MigrationCallable
 }
 
 // AutoIncMig is returned after (*MigStmt).AutoInc is called.
 type AutoIncMig interface {
-	Column() ColumnMig
-	Default(interface{}) DefaultMig
-	PK() PKMig
-	FK(string, string) FKMig
+	Column(string, string) ColumnMig
+	Cons(string) ConsMig
 	MigrationCallable
 }
 
 // DefaultMig is returned after (*MigStmt).Default is called.
 type DefaultMig interface {
-	Column() ColumnMig
-	PK() PKMig
-	FK(string, string) FKMig
+	Column(string, string) ColumnMig
+	Cons(string) ConsMig
 	MigrationCallable
+}
+
+// ConsMig is returned after (*MigStmt).Cons is called.
+type ConsMig interface {
+	PK(string) PKMig
+	FK(string) FKMig
 }
 
 // PKMig is returned after (*MigStmt).PK is called.
 type PKMig interface {
-	Column() ColumnMig
-	FK(string, string) FKMig
+	Cons(string) ConsMig
 	MigrationCallable
 }
 
 // FKMig is returned after (*MigStmt).FK is called.
 type FKMig interface {
-	Column() ColumnMig
+	Ref(string, string) RefMig
+}
+
+// RefMig is returned after (*MigStmt).Ref is called.
+type RefMig interface {
+	Cons(string) ConsMig
 	MigrationCallable
 }
