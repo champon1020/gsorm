@@ -1,8 +1,11 @@
 package mgorm
 
 import (
+	"fmt"
+	"reflect"
 	"strings"
 
+	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
@@ -77,7 +80,8 @@ func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
 		}
 		sql.Write(")")
 	default:
-		/* handle error */
+		msg := fmt.Sprintf("Type %v is not supported for migration", reflect.TypeOf(cmd).String())
+		return "", errors.New(msg, errors.InvalidTypeError)
 	}
 
 	return sql, nil
@@ -86,10 +90,11 @@ func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
 func (m *MigStmt) processCreateTableSQL(sql *internal.SQL) error {
 	e := m.nextCalled()
 	if e == nil {
-		/* handle error */
+		msg := "Called claues have already been processed but SQL is not completed."
+		return errors.New(msg, errors.InvalidSyntaxError)
 	}
 
-	switch e.(type) {
+	switch e := e.(type) {
 	case *mig.Column:
 		if !strings.HasSuffix(sql.String(), "(") {
 			sql.Write(",")
@@ -122,7 +127,8 @@ func (m *MigStmt) processCreateTableSQL(sql *internal.SQL) error {
 		// Write PK/FK.
 		m.processKeySQL(sql)
 	default:
-		/* handle error */
+		msg := fmt.Sprintf("Type %v is not supported for migration", reflect.TypeOf(e).String())
+		return errors.New(msg, errors.InvalidTypeError)
 	}
 	return nil
 }
@@ -130,10 +136,11 @@ func (m *MigStmt) processCreateTableSQL(sql *internal.SQL) error {
 func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
 	e := m.nextCalled()
 	if e == nil {
-		/* handle error */
+		msg := "Called claues have already been processed but SQL is not completed."
+		return errors.New(msg, errors.InvalidSyntaxError)
 	}
 
-	switch e.(type) {
+	switch e := e.(type) {
 	case *mig.PK:
 		// Write PRIMARY KEY.
 		s, err := e.Build()
@@ -152,7 +159,8 @@ func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
 		// Write REFERENCES.
 		m.processRefSQL(sql)
 	default:
-		/* handle error */
+		msg := fmt.Sprintf("Type %v is not supported for migration", reflect.TypeOf(e).String())
+		return errors.New(msg, errors.InvalidTypeError)
 	}
 	return nil
 }
@@ -160,10 +168,11 @@ func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
 func (m *MigStmt) processRefSQL(sql *internal.SQL) error {
 	e := m.nextCalled()
 	if e == nil {
-		/* handle error */
+		msg := "Called claues have already been processed but SQL is not completed."
+		return errors.New(msg, errors.InvalidSyntaxError)
 	}
 
-	switch e.(type) {
+	switch e := e.(type) {
 	case *mig.Ref:
 		s, err := e.Build()
 		if err != nil {
@@ -171,7 +180,8 @@ func (m *MigStmt) processRefSQL(sql *internal.SQL) error {
 		}
 		sql.Write(s.Build())
 	default:
-		/* handle error */
+		msg := fmt.Sprintf("Type %v is not supported for migration", reflect.TypeOf(e).String())
+		return errors.New(msg, errors.InvalidTypeError)
 	}
 	return nil
 }
