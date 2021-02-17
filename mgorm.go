@@ -129,3 +129,11 @@ func CreateTable(pool Pool, table string) CreateTableMig {
 		cmd:  &mig.CreateTable{Table: table},
 	}
 }
+
+// AlterTable calls ALTER TABLE command.
+func AlterTable(pool Pool, table string) AlterTableMig {
+	return &MigStmt{
+		pool: pool,
+		cmd:  &mig.AlterTable{Table: table},
+	}
+}
