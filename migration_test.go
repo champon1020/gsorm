@@ -96,6 +96,14 @@ func TestMigStmt_String(t *testing.T) {
 			`ALTER TABLE sample ` +
 				`DROP CONSTRAINT PK_id`,
 		},
+		{
+			mgorm.CreateIndex(nil, "idx_id").On("sample", "id").(*mgorm.MigStmt),
+			`CREATE INDEX idx_id ON sample (id)`,
+		},
+		{
+			mgorm.AlterTable(nil, "sample").DropIndex("idx_id").(*mgorm.MigStmt),
+			`ALTER TABLE sample DROP INDEX idx_id`,
+		},
 	}
 
 	for _, testCase := range testCases {

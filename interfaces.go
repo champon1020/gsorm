@@ -251,6 +251,7 @@ type DropTableMig interface {
 	MigrationCallable
 }
 
+// AlterTableMig is returned after AlterTable is called.
 type AlterTableMig interface {
 	Rename(string) RenameMig
 	Add(string, string) AddMig
@@ -260,6 +261,17 @@ type AlterTableMig interface {
 	Charset(string) CharsetMig
 	AddCons(string) AddConsMig
 	DropCons(string) DropConsMig
+	DropIndex(string) DropIndexMig
+}
+
+// CreateIndexMig is returned after CreateIndex is called.
+type CreateIndexMig interface {
+	On(string, ...string) OnMig
+}
+
+// OnMig is returned after (*MigStmt).ON is called.
+type OnMig interface {
+	MigrationCallable
 }
 
 // ColumnMig is returned after (*MigStmt).Column is called.
@@ -313,6 +325,11 @@ type DropMig interface {
 
 // DropConsMig is returned after (*MigStmt).DropCons is called.
 type DropConsMig interface {
+	MigrationCallable
+}
+
+// DropIndexMig is returned after (*MigStmt).DropIndex is called.
+type DropIndexMig interface {
 	MigrationCallable
 }
 
