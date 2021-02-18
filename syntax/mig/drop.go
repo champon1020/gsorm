@@ -73,3 +73,21 @@ func (d *DropConstraint) Build() (*syntax.StmtSet, error) {
 	ss.WriteValue(d.Key)
 	return ss, nil
 }
+
+// DropIndex is DROP INDEX
+type DropIndex struct {
+	IdxName string
+}
+
+// Query returns caluse keyword.
+func (d *DropIndex) Name() string {
+	return "DROP INDEX"
+}
+
+// Build makes DROP INDEX clause with syntax.StmtSet.
+func (d *DropIndex) Build() (*syntax.StmtSet, error) {
+	ss := new(syntax.StmtSet)
+	ss.WriteKeyword(d.Name())
+	ss.WriteValue(d.IdxName)
+	return ss, nil
+}

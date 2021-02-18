@@ -95,6 +95,15 @@ func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
 			}
 		}
 		return sql, nil
+	case *mig.CreateIndex:
+		sql.Write(cmd.Build().Build())
+		for len(m.called) > 0 {
+			err := m.processCreateIndexSQL(&sql)
+			if err != nil {
+				return "", err
+			}
+		}
+		return sql, nil
 	}
 
 	msg := fmt.Sprintf("Type %v is not supported for migration", reflect.TypeOf(m.cmd).String())
@@ -152,6 +161,7 @@ func (m *MigStmt) processAlterTableSQL(sql *internal.SQL) error {
 	case *mig.Rename,
 		*mig.Drop,
 		*mig.DropConstraint,
+		*mig.DropIndex,
 		*mig.Charset:
 		s, err := e.Build()
 		if err != nil {
@@ -184,6 +194,28 @@ func (m *MigStmt) processAlterTableSQL(sql *internal.SQL) error {
 	}
 
 	msg := fmt.Sprintf("Type %v is not supported for ALTER TABLE", reflect.TypeOf(e).String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+func (m *MigStmt) processCreateIndexSQL(sql *internal.SQL) error {
+	e := m.headClause()
+	if e == nil {
+		msg := "Called claues have already been processed but SQL is not completed."
+		return errors.New(msg, errors.InvalidSyntaxError)
+	}
+
+	switch e := e.(type) {
+	case *mig.On:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		m.advanceClause()
+		return nil
+	}
+
+	msg := fmt.Sprintf("Type %v is not supported for CREATE INDEX", reflect.TypeOf(e).String())
 	return errors.New(msg, errors.InvalidTypeError)
 }
 
@@ -271,6 +303,12 @@ func (m *MigStmt) processRefSQL(sql *internal.SQL) error {
 	return errors.New(msg, errors.InvalidTypeError)
 }
 
+// On calls ON clause.
+func (m *MigStmt) On(table string, cols ...string) OnMig {
+	m.call(&mig.On{Table: table, Columns: cols})
+	return m
+}
+
 // Column calls table column definition.
 func (m *MigStmt) Column(col, typ string) ColumnMig {
 	m.call(&mig.Column{Col: col, Type: typ})
@@ -316,6 +354,12 @@ func (m *MigStmt) Drop(col string) DropMig {
 // DropCons calls DROP CONSTRAINT clause.
 func (m *MigStmt) DropCons(key string) DropConsMig {
 	m.call(&mig.DropConstraint{Key: key})
+	return m
+}
+
+// DropIndex calls DROP INDEX clause.
+func (m *MigStmt) DropIndex(idx string) DropIndexMig {
+	m.call(&mig.DropIndex{IdxName: idx})
 	return m
 }
 

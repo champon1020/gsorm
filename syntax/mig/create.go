@@ -37,3 +37,21 @@ func (c *CreateTable) Build() *syntax.StmtSet {
 	ss.WriteValue(c.Table)
 	return ss
 }
+
+// CreateIndex is CREATE INDEX clause.
+type CreateIndex struct {
+	IdxName string
+}
+
+// Query returns clause keyword.
+func (c *CreateIndex) Query() string {
+	return "CREATE INDEX"
+}
+
+// Build makes CREATE INDEX clause with syntax.StmtSet.
+func (c *CreateIndex) Build() *syntax.StmtSet {
+	ss := new(syntax.StmtSet)
+	ss.WriteKeyword(c.Query())
+	ss.WriteValue(c.IdxName)
+	return ss
+}

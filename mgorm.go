@@ -153,3 +153,11 @@ func AlterTable(pool Pool, table string) AlterTableMig {
 		cmd:  &mig.AlterTable{Table: table},
 	}
 }
+
+// CreateIndex calls CREATE INDEX command.
+func CreateIndex(pool Pool, idx string) CreateIndexMig {
+	return &MigStmt{
+		pool: pool,
+		cmd:  &mig.CreateIndex{IdxName: idx},
+	}
+}
