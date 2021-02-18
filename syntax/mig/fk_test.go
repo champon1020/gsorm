@@ -14,8 +14,12 @@ func TestFK_Build(t *testing.T) {
 		Expected *syntax.StmtSet
 	}{
 		{
-			&mig.FK{Column: "column"},
+			&mig.FK{Columns: []string{"column"}},
 			&syntax.StmtSet{Keyword: "FOREIGN KEY", Value: "(column)"},
+		},
+		{
+			&mig.FK{Columns: []string{"column1", "column2"}},
+			&syntax.StmtSet{Keyword: "FOREIGN KEY", Value: "(column1, column2)"},
 		},
 	}
 

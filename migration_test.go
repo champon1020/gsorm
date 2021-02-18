@@ -25,13 +25,17 @@ func TestMigStmt_String(t *testing.T) {
 			mgorm.CreateTable(nil, "sample").
 				Column("id", "INT").NotNull().AutoInc().
 				Column("name", "VARCHAR(64)").NotNull().Default("champon").
+				Cons("CHK_id").Check("id < ?", 10000).
+				Cons("UC_id").Unique("id").
 				Cons("PK_id").PK("id").
-				Cons("FK_category_id").FK("category_id").Ref("category", "id").(*mgorm.MigStmt),
+				Cons("FK_sample2_id").FK("sample2_id").Ref("sample2", "id").(*mgorm.MigStmt),
 			`CREATE TABLE sample (` +
 				`id INT NOT NULL AUTO_INCREMENT, ` +
 				`name VARCHAR(64) NOT NULL DEFAULT "champon", ` +
+				`CONSTRAINT CHK_id CHECK (id < 10000), ` +
+				`CONSTRAINT UC_id UNIQUE (id), ` +
 				`CONSTRAINT PK_id PRIMARY KEY (id), ` +
-				`CONSTRAINT FK_category_id FOREIGN KEY (category_id) REFERENCES category(id)` +
+				`CONSTRAINT FK_sample2_id FOREIGN KEY (sample2_id) REFERENCES sample2(id)` +
 				`)`,
 		},
 		{
@@ -73,6 +77,18 @@ func TestMigStmt_String(t *testing.T) {
 				AddCons("FK_id").FK("category_id").Ref("category", "id").(*mgorm.MigStmt),
 			`ALTER TABLE sample ` +
 				`ADD CONSTRAINT FK_id FOREIGN KEY (category_id) REFERENCES category(id)`,
+		},
+		{
+			mgorm.AlterTable(nil, "sample").
+				AddCons("CHK_id").Check("id < ?", 10000).(*mgorm.MigStmt),
+			`ALTER TABLE sample ` +
+				`ADD CONSTRAINT CHK_id CHECK (id < 10000)`,
+		},
+		{
+			mgorm.AlterTable(nil, "sample").
+				AddCons("UC_id").Unique("id").(*mgorm.MigStmt),
+			`ALTER TABLE sample ` +
+				`ADD CONSTRAINT UC_id UNIQUE (id)`,
 		},
 		{
 			mgorm.AlterTable(nil, "sample").

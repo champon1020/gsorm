@@ -286,8 +286,10 @@ type AddMig interface {
 
 // AddConsMig is returned after (*MigStmt).AddCons is called.
 type AddConsMig interface {
-	PK(string) PKMig
-	FK(string) FKMig
+	Check(string, ...interface{}) CheckMig
+	Unique(...string) UniqueMig
+	PK(...string) PKMig
+	FK(...string) FKMig
 }
 
 // ChangeMig is returned after (*MigStmt).Change is called.
@@ -344,8 +346,22 @@ type DefaultMig interface {
 
 // ConsMig is returned after (*MigStmt).Cons is called.
 type ConsMig interface {
-	PK(string) PKMig
-	FK(string) FKMig
+	Check(string, ...interface{}) CheckMig
+	Unique(...string) UniqueMig
+	PK(...string) PKMig
+	FK(...string) FKMig
+}
+
+// CheckMig is returned after (*MigStmt).Check is called.
+type CheckMig interface {
+	Cons(string) ConsMig
+	MigrationCallable
+}
+
+// UniqueMig is returned after (*MigStmt).Unique is called.
+type UniqueMig interface {
+	Cons(string) ConsMig
+	MigrationCallable
 }
 
 // PKMig is returned after (*MigStmt).PK is called.
