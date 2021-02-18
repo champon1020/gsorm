@@ -14,8 +14,12 @@ func TestMigStmt_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateDB(nil, "sample").(*mgorm.MigStmt),
-			`CREATE DATABASE sample`,
+			mgorm.CreateDB(nil, "sampledb").(*mgorm.MigStmt),
+			`CREATE DATABASE sampledb`,
+		},
+		{
+			mgorm.DropDB(nil, "sampledb").(*mgorm.MigStmt),
+			`DROP DATABASE sampledb`,
 		},
 		{
 			mgorm.CreateTable(nil, "sample").
@@ -29,6 +33,10 @@ func TestMigStmt_String(t *testing.T) {
 				`CONSTRAINT PK_id PRIMARY KEY (id), ` +
 				`CONSTRAINT FK_category_id FOREIGN KEY (category_id) REFERENCES category(id)` +
 				`)`,
+		},
+		{
+			mgorm.DropTable(nil, "sample").(*mgorm.MigStmt),
+			`DROP TABLE sample`,
 		},
 		{
 			mgorm.AlterTable(nil, "sample").

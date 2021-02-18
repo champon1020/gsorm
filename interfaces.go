@@ -236,9 +236,19 @@ type CreateDBMig interface {
 	MigrationCallable
 }
 
+// DropDBMig is returned after DropDB is called.
+type DropDBMig interface {
+	MigrationCallable
+}
+
 // CreateTableMig is returned after CreateTable is called.
 type CreateTableMig interface {
 	Column(string, string) ColumnMig
+}
+
+// DropTableMig is returned after DropTable is called.
+type DropTableMig interface {
+	MigrationCallable
 }
 
 type AlterTableMig interface {

@@ -122,11 +122,27 @@ func CreateDB(pool Pool, dbName string) CreateDBMig {
 	}
 }
 
+// DropDB calls DROP DATABASE command.
+func DropDB(pool Pool, dbName string) DropDBMig {
+	return &MigStmt{
+		pool: pool,
+		cmd:  &mig.DropDB{DBName: dbName},
+	}
+}
+
 // CreateTable calls CREATE TABLE command.
 func CreateTable(pool Pool, table string) CreateTableMig {
 	return &MigStmt{
 		pool: pool,
 		cmd:  &mig.CreateTable{Table: table},
+	}
+}
+
+// DropTable calls DROP TABLE command.
+func DropTable(pool Pool, table string) DropTableMig {
+	return &MigStmt{
+		pool: pool,
+		cmd:  &mig.DropTable{Table: table},
 	}
 }
 
