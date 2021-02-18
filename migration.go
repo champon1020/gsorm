@@ -72,7 +72,7 @@ func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
 	var sql internal.SQL
 
 	switch cmd := m.cmd.(type) {
-	case *mig.CreateDB:
+	case *mig.CreateDB, *mig.DropDB, *mig.DropTable:
 		sql.Write(cmd.Build().Build())
 		return sql, nil
 	case *mig.CreateTable:

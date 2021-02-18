@@ -2,21 +2,57 @@ package mig
 
 import "github.com/champon1020/mgorm/syntax"
 
+// DropDB is DROP DATABASE clause.
+type DropDB struct {
+	DBName string
+}
+
+// Query returns clause keyword.
+func (d *DropDB) Query() string {
+	return "DROP DATABASE"
+}
+
+// BUild makes DROP DATABASE clause with syntax.StmtSet.
+func (d *DropDB) Build() *syntax.StmtSet {
+	ss := new(syntax.StmtSet)
+	ss.WriteKeyword(d.Query())
+	ss.WriteValue(d.DBName)
+	return ss
+}
+
+// DropTable is DROP TABLE clause.
+type DropTable struct {
+	Table string
+}
+
+// Query returns clause keyword.
+func (d *DropTable) Query() string {
+	return "DROP TABLE"
+}
+
+// Build makes DROP TABLE clause with syntax.StmtSet.
+func (d *DropTable) Build() *syntax.StmtSet {
+	ss := new(syntax.StmtSet)
+	ss.WriteKeyword(d.Query())
+	ss.WriteValue(d.Table)
+	return ss
+}
+
 // Drop is DROP clause.
 type Drop struct {
 	Column string
 }
 
 // Name returns clause keyword.
-func (a *Drop) Name() string {
+func (d *Drop) Name() string {
 	return "DROP"
 }
 
 // Build makes DROP clause with syntax.StmtSet.
-func (a *Drop) Build() (*syntax.StmtSet, error) {
+func (d *Drop) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(a.Name())
-	ss.WriteValue(a.Column)
+	ss.WriteKeyword(d.Name())
+	ss.WriteValue(d.Column)
 	return ss, nil
 }
 
@@ -31,9 +67,9 @@ func (d *DropConstraint) Name() string {
 }
 
 // Build makes DROP CONSTRAINT clause with syntax.StmtSet.
-func (a *DropConstraint) Build() (*syntax.StmtSet, error) {
+func (d *DropConstraint) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(a.Name())
-	ss.WriteValue(a.Key)
+	ss.WriteKeyword(d.Name())
+	ss.WriteValue(d.Key)
 	return ss, nil
 }
