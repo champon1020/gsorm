@@ -241,6 +241,17 @@ type CreateTableMig interface {
 	Column(string, string) ColumnMig
 }
 
+type AlterTableMig interface {
+	Rename(string) RenameMig
+	Add(string, string) AddMig
+	Change(string, string, string) ChangeMig
+	Modify(string, string) ModifyMig
+	Drop(string) DropMig
+	Charset(string) CharsetMig
+	AddCons(string) AddConsMig
+	DropCons(string) DropConsMig
+}
+
 // ColumnMig is returned after (*MigStmt).Column is called.
 type ColumnMig interface {
 	Column(string, string) ColumnMig
@@ -248,6 +259,53 @@ type ColumnMig interface {
 	AutoInc() AutoIncMig
 	Default(interface{}) DefaultMig
 	Cons(string) ConsMig
+	MigrationCallable
+}
+
+// RenameMig is returned after (*MigStmt).Rename is called.
+type RenameMig interface {
+	MigrationCallable
+}
+
+// AddMig is returned after (*MigStmt).Add is called.
+type AddMig interface {
+	NotNull() NotNullMig
+	AutoInc() AutoIncMig
+	Default(interface{}) DefaultMig
+}
+
+// AddConsMig is returned after (*MigStmt).AddCons is called.
+type AddConsMig interface {
+	PK(string) PKMig
+	FK(string) FKMig
+}
+
+// ChangeMig is returned after (*MigStmt).Change is called.
+type ChangeMig interface {
+	NotNull() NotNullMig
+	AutoInc() AutoIncMig
+	Default(interface{}) DefaultMig
+}
+
+// ModifyMig is returned after (*MigStmt).Modify is called.
+type ModifyMig interface {
+	NotNull() NotNullMig
+	AutoInc() AutoIncMig
+	Default(interface{}) DefaultMig
+}
+
+// DropMig is returned after (*MigStmt).Drop is called.
+type DropMig interface {
+	MigrationCallable
+}
+
+// DropConsMig is returned after (*MigStmt).DropCons is called.
+type DropConsMig interface {
+	MigrationCallable
+}
+
+// CharsetMig is returned after (*MigStmt).Charset is called.
+type CharsetMig interface {
 	MigrationCallable
 }
 

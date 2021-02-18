@@ -1,8 +1,11 @@
 package mgorm
 
 import (
+	"fmt"
+	"reflect"
 	"strings"
 
+	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
@@ -26,17 +29,16 @@ func (m *MigStmt) throw(e error) {
 	m.errors = append(m.errors, e)
 }
 
-// nextCalled returns pops head of called.
-func (m *MigStmt) nextCalled() syntax.MigClause {
+// headClause returns first element of called.
+func (m *MigStmt) headClause() syntax.MigClause {
 	if len(m.called) == 0 {
 		return nil
 	}
-	defer m.popCalled()
 	return m.called[0]
 }
 
-// popCalled removes head of called.
-func (m *MigStmt) popCalled() {
+// advanceClause slides slice of called.
+func (m *MigStmt) advanceClause() {
 	m.called = m.called[1:]
 }
 
@@ -44,6 +46,7 @@ func (m *MigStmt) popCalled() {
 func (m *MigStmt) String() string {
 	sql, err := m.processMigrationSQL()
 	if err != nil {
+		m.throw(err)
 		return ""
 	}
 	return sql.String()
@@ -60,6 +63,8 @@ func (m *MigStmt) Migration() error {
 		return err
 	}
 
+	/* process */
+
 	return nil
 }
 
@@ -69,27 +74,41 @@ func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
 	switch cmd := m.cmd.(type) {
 	case *mig.CreateDB:
 		sql.Write(cmd.Build().Build())
+		return sql, nil
 	case *mig.CreateTable:
 		sql.Write(cmd.Build().Build())
 		sql.Write("(")
 		for len(m.called) > 0 {
-			m.processCreateTableSQL(&sql)
+			err := m.processCreateTableSQL(&sql)
+			if err != nil {
+				return "", err
+			}
 		}
 		sql.Write(")")
-	default:
-		/* handle error */
+		return sql, nil
+	case *mig.AlterTable:
+		sql.Write(cmd.Build().Build())
+		for len(m.called) > 0 {
+			err := m.processAlterTableSQL(&sql)
+			if err != nil {
+				return "", err
+			}
+		}
+		return sql, nil
 	}
 
-	return sql, nil
+	msg := fmt.Sprintf("Type %v is not supported for migration", reflect.TypeOf(m.cmd).String())
+	return "", errors.New(msg, errors.InvalidTypeError)
 }
 
 func (m *MigStmt) processCreateTableSQL(sql *internal.SQL) error {
-	e := m.nextCalled()
+	e := m.headClause()
 	if e == nil {
-		/* handle error */
+		msg := "Called claues have already been processed but SQL is not completed."
+		return errors.New(msg, errors.InvalidSyntaxError)
 	}
 
-	switch e.(type) {
+	switch e := e.(type) {
 	case *mig.Column:
 		if !strings.HasSuffix(sql.String(), "(") {
 			sql.Write(",")
@@ -99,6 +118,83 @@ func (m *MigStmt) processCreateTableSQL(sql *internal.SQL) error {
 			return err
 		}
 		sql.Write(s.Build())
+		m.advanceClause()
+		return nil
+	case *mig.NotNull,
+		*mig.AutoInc,
+		*mig.Default:
+		return m.processColumnOptSQL(sql)
+	case *mig.Constraint:
+		if !strings.HasSuffix(sql.String(), "(") {
+			sql.Write(",")
+		}
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		m.advanceClause()
+		return m.processKeySQL(sql)
+	}
+
+	msg := fmt.Sprintf("Type %v is not supported for CREATE TABLE", reflect.TypeOf(e).String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+func (m *MigStmt) processAlterTableSQL(sql *internal.SQL) error {
+	e := m.headClause()
+	if e == nil {
+		msg := "Called claues have already been processed but SQL is not completed."
+		return errors.New(msg, errors.InvalidSyntaxError)
+	}
+
+	switch e := e.(type) {
+	case *mig.Rename,
+		*mig.Drop,
+		*mig.DropConstraint,
+		*mig.Charset:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		m.advanceClause()
+		return nil
+	case *mig.AddConstraint:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		m.advanceClause()
+		return m.processKeySQL(sql)
+	case *mig.Add, *mig.Change, *mig.Modify:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		m.advanceClause()
+		return m.processColumnOptSQL(sql)
+	case *mig.NotNull,
+		*mig.AutoInc,
+		*mig.Default,
+		*mig.Constraint:
+		return m.processColumnOptSQL(sql)
+	}
+
+	msg := fmt.Sprintf("Type %v is not supported for ALTER TABLE", reflect.TypeOf(e).String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+func (m *MigStmt) processColumnOptSQL(sql *internal.SQL) error {
+	e := m.headClause()
+	if e == nil {
+		msg := "Called claues have already been processed but SQL is not completed."
+		return errors.New(msg, errors.InvalidSyntaxError)
+	}
+
+	switch e := e.(type) {
 	case *mig.NotNull,
 		*mig.AutoInc,
 		*mig.Default:
@@ -107,33 +203,33 @@ func (m *MigStmt) processCreateTableSQL(sql *internal.SQL) error {
 			return err
 		}
 		sql.Write(s.Build())
+		m.advanceClause()
+		return nil
 	case *mig.Constraint:
-		if sql.Len() > 0 {
-			sql.Write(",")
-		}
-
 		// Write CONSTRAINT.
 		s, err := e.Build()
 		if err != nil {
 			return err
 		}
 		sql.Write(s.Build())
+		m.advanceClause()
 
 		// Write PK/FK.
-		m.processKeySQL(sql)
-	default:
-		/* handle error */
+		return m.processKeySQL(sql)
 	}
-	return nil
+
+	msg := fmt.Sprintf("Type %v is not supported for column option", reflect.TypeOf(e).String())
+	return errors.New(msg, errors.InvalidTypeError)
 }
 
 func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
-	e := m.nextCalled()
+	e := m.headClause()
 	if e == nil {
-		/* handle error */
+		msg := "Called claues have already been processed but SQL is not completed."
+		return errors.New(msg, errors.InvalidSyntaxError)
 	}
 
-	switch e.(type) {
+	switch e := e.(type) {
 	case *mig.PK:
 		// Write PRIMARY KEY.
 		s, err := e.Build()
@@ -141,6 +237,8 @@ func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
 			return err
 		}
 		sql.Write(s.Build())
+		m.advanceClause()
+		return nil
 	case *mig.FK:
 		// Write FOREIGN KEY.
 		s, err := e.Build()
@@ -148,37 +246,89 @@ func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
 			return err
 		}
 		sql.Write(s.Build())
+		m.advanceClause()
 
 		// Write REFERENCES.
-		m.processRefSQL(sql)
-	default:
-		/* handle error */
+		return m.processRefSQL(sql)
 	}
-	return nil
+
+	msg := fmt.Sprintf("Type %v is not supported for CONSTRAINT", reflect.TypeOf(e).String())
+	return errors.New(msg, errors.InvalidTypeError)
 }
 
 func (m *MigStmt) processRefSQL(sql *internal.SQL) error {
-	e := m.nextCalled()
+	e := m.headClause()
 	if e == nil {
-		/* handle error */
+		msg := "Called claues have already been processed but SQL is not completed."
+		return errors.New(msg, errors.InvalidSyntaxError)
 	}
 
-	switch e.(type) {
+	switch e := e.(type) {
 	case *mig.Ref:
 		s, err := e.Build()
 		if err != nil {
 			return err
 		}
 		sql.Write(s.Build())
-	default:
-		/* handle error */
+		m.advanceClause()
+		return nil
 	}
-	return nil
+
+	msg := fmt.Sprintf("Type %v is not supported for CONSTRAINT KEY", reflect.TypeOf(e).String())
+	return errors.New(msg, errors.InvalidTypeError)
 }
 
 // Column calls table column definition.
-func (m *MigStmt) Column(col string, typ string) ColumnMig {
+func (m *MigStmt) Column(col, typ string) ColumnMig {
 	m.call(&mig.Column{Col: col, Type: typ})
+	return m
+}
+
+// Rename calls RENAME TO clause.
+func (m *MigStmt) Rename(table string) RenameMig {
+	m.call(&mig.Rename{Table: table})
+	return m
+}
+
+// Add calls ADD clause.
+func (m *MigStmt) Add(col, typ string) AddMig {
+	m.call(&mig.Add{Column: col, Type: typ})
+	return m
+}
+
+// AddCons calls ADD CONSTRAINT clause.
+func (m *MigStmt) AddCons(key string) AddConsMig {
+	m.call(&mig.AddConstraint{Key: key})
+	return m
+}
+
+// Chnage calls CHANGE clause.
+func (m *MigStmt) Change(col, dest, typ string) ChangeMig {
+	m.call(&mig.Change{Column: col, Dest: dest, Type: typ})
+	return m
+}
+
+// Modify calls MODIFY clause.
+func (m *MigStmt) Modify(col, typ string) ModifyMig {
+	m.call(&mig.Modify{Column: col, Type: typ})
+	return m
+}
+
+// Drop calls DROP clause.
+func (m *MigStmt) Drop(col string) DropMig {
+	m.call(&mig.Drop{Column: col})
+	return m
+}
+
+// DropCons calls DROP CONSTRAINT clause.
+func (m *MigStmt) DropCons(key string) DropConsMig {
+	m.call(&mig.DropConstraint{Key: key})
+	return m
+}
+
+// Charset calls CHARSET clause.
+func (m *MigStmt) Charset(format string) CharsetMig {
+	m.call(&mig.Charset{Format: format})
 	return m
 }
 
@@ -221,7 +371,7 @@ func (m *MigStmt) FK(col string) FKMig {
 }
 
 // Ref calls REFERENCES keyword.
-func (m *MigStmt) Ref(table string, col string) RefMig {
+func (m *MigStmt) Ref(table, col string) RefMig {
 	m.call(&mig.Ref{Table: table, Column: col})
 	return m
 }

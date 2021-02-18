@@ -15,7 +15,7 @@ func New(dn, dsn string) (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &DB{conn: db}, nil
+	return &DB{conn: db, driver: dn}, nil
 }
 
 // NewMock creates MockDB.
@@ -127,5 +127,13 @@ func CreateTable(pool Pool, table string) CreateTableMig {
 	return &MigStmt{
 		pool: pool,
 		cmd:  &mig.CreateTable{Table: table},
+	}
+}
+
+// AlterTable calls ALTER TABLE command.
+func AlterTable(pool Pool, table string) AlterTableMig {
+	return &MigStmt{
+		pool: pool,
+		cmd:  &mig.AlterTable{Table: table},
 	}
 }
