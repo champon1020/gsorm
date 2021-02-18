@@ -248,6 +248,8 @@ type AlterTableMig interface {
 	Modify(string, string) ModifyMig
 	Drop(string) DropMig
 	Charset(string) CharsetMig
+	AddCons(string) AddConsMig
+	DropCons(string) DropConsMig
 }
 
 // ColumnMig is returned after (*MigStmt).Column is called.
@@ -267,18 +269,38 @@ type RenameMig interface {
 
 // AddMig is returned after (*MigStmt).Add is called.
 type AddMig interface {
+	NotNull() NotNullMig
+	AutoInc() AutoIncMig
+	Default(interface{}) DefaultMig
+}
+
+// AddConsMig is returned after (*MigStmt).AddCons is called.
+type AddConsMig interface {
+	PK(string) PKMig
+	FK(string) FKMig
 }
 
 // ChangeMig is returned after (*MigStmt).Change is called.
 type ChangeMig interface {
+	NotNull() NotNullMig
+	AutoInc() AutoIncMig
+	Default(interface{}) DefaultMig
 }
 
 // ModifyMig is returned after (*MigStmt).Modify is called.
 type ModifyMig interface {
+	NotNull() NotNullMig
+	AutoInc() AutoIncMig
+	Default(interface{}) DefaultMig
 }
 
 // DropMig is returned after (*MigStmt).Drop is called.
 type DropMig interface {
+	MigrationCallable
+}
+
+// DropConsMig is returned after (*MigStmt).DropCons is called.
+type DropConsMig interface {
 	MigrationCallable
 }
 

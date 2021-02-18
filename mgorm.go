@@ -15,7 +15,7 @@ func New(dn, dsn string) (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &DB{conn: db}, nil
+	return &DB{conn: db, driver: dn}, nil
 }
 
 // NewMock creates MockDB.

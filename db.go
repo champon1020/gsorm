@@ -9,7 +9,8 @@ import (
 
 // DB is a database handle representing a pool of zero or more underlying connections. It's safe for concurrent use by multiple goroutines.
 type DB struct {
-	conn sqlDB
+	conn   sqlDB
+	driver string
 }
 
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.

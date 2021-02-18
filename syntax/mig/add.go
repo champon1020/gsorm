@@ -21,3 +21,21 @@ func (a *Add) Build() (*syntax.StmtSet, error) {
 	ss.WriteValue(a.Type)
 	return ss, nil
 }
+
+// AddCons is ADD CONSTRAINT clause.
+type AddConstraint struct {
+	Key string
+}
+
+// Name returns clause keyword.
+func (a *AddConstraint) Name() string {
+	return "ADD CONSTRAINT"
+}
+
+// Build makes ADD CONSTRAINT clause with syntax.StmtSet.
+func (a *AddConstraint) Build() (*syntax.StmtSet, error) {
+	ss := new(syntax.StmtSet)
+	ss.WriteKeyword(a.Name())
+	ss.WriteValue(a.Key)
+	return ss, nil
+}

@@ -19,3 +19,21 @@ func (a *Drop) Build() (*syntax.StmtSet, error) {
 	ss.WriteValue(a.Column)
 	return ss, nil
 }
+
+// Drop is DROP CONSTRAINT clause.
+type DropConstraint struct {
+	Key string
+}
+
+// Name returns clause keyword.
+func (d *DropConstraint) Name() string {
+	return "DROP CONSTRAINT"
+}
+
+// Build makes DROP CONSTRAINT clause with syntax.StmtSet.
+func (a *DropConstraint) Build() (*syntax.StmtSet, error) {
+	ss := new(syntax.StmtSet)
+	ss.WriteKeyword(a.Name())
+	ss.WriteValue(a.Key)
+	return ss, nil
+}
