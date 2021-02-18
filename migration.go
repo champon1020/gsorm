@@ -134,7 +134,7 @@ func (m *MigStmt) processCreateTableSQL(sql *internal.SQL) error {
 		}
 		sql.Write(s.Build())
 		m.advanceClause()
-		return m.processKeySQL(sql)
+		return m.processConstraintSQL(sql)
 	}
 
 	msg := fmt.Sprintf("Type %v is not supported for CREATE TABLE", reflect.TypeOf(e).String())
@@ -167,7 +167,7 @@ func (m *MigStmt) processAlterTableSQL(sql *internal.SQL) error {
 		}
 		sql.Write(s.Build())
 		m.advanceClause()
-		return m.processKeySQL(sql)
+		return m.processConstraintSQL(sql)
 	case *mig.Add, *mig.Change, *mig.Modify:
 		s, err := e.Build()
 		if err != nil {
@@ -206,23 +206,20 @@ func (m *MigStmt) processColumnOptSQL(sql *internal.SQL) error {
 		m.advanceClause()
 		return nil
 	case *mig.Constraint:
-		// Write CONSTRAINT.
 		s, err := e.Build()
 		if err != nil {
 			return err
 		}
 		sql.Write(s.Build())
 		m.advanceClause()
-
-		// Write PK/FK.
-		return m.processKeySQL(sql)
+		return m.processConstraintSQL(sql)
 	}
 
 	msg := fmt.Sprintf("Type %v is not supported for column option", reflect.TypeOf(e).String())
 	return errors.New(msg, errors.InvalidTypeError)
 }
 
-func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
+func (m *MigStmt) processConstraintSQL(sql *internal.SQL) error {
 	e := m.headClause()
 	if e == nil {
 		msg := "Called claues have already been processed but SQL is not completed."
@@ -230,8 +227,7 @@ func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
 	}
 
 	switch e := e.(type) {
-	case *mig.PK, *mig.Unique:
-		// Write PRIMARY KEY.
+	case *mig.PK, *mig.Unique, *mig.Check:
 		s, err := e.Build()
 		if err != nil {
 			return err
@@ -240,15 +236,12 @@ func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
 		m.advanceClause()
 		return nil
 	case *mig.FK:
-		// Write FOREIGN KEY.
 		s, err := e.Build()
 		if err != nil {
 			return err
 		}
 		sql.Write(s.Build())
 		m.advanceClause()
-
-		// Write REFERENCES.
 		return m.processRefSQL(sql)
 	}
 
@@ -353,6 +346,12 @@ func (m *MigStmt) Default(val interface{}) DefaultMig {
 // Cons calls CONSTRAINT option.
 func (m *MigStmt) Cons(key string) ConsMig {
 	m.call(&mig.Constraint{Key: key})
+	return m
+}
+
+// Check calls CHECK keyword.
+func (m *MigStmt) Check(expr string, values ...interface{}) CheckMig {
+	m.call(&mig.Check{Expr: expr, Values: values})
 	return m
 }
 

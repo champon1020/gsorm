@@ -31,3 +31,25 @@ func BuildStmtSetForExpression(expr string, vals ...interface{}) (*StmtSet, erro
 	ss.WriteValue(fmt.Sprintf(strings.ReplaceAll(expr, "?", "%s"), values...))
 	return ss, nil
 }
+
+// BuildForExpression makes StmtSet with expr and values.
+func BuildForExpression(expr string, vals ...interface{}) (string, error) {
+	if strings.Count(expr, "?") != len(vals) {
+		return "", errors.New("Length of values is not valid", errors.InvalidValueError)
+	}
+
+	values := []interface{}{}
+	for _, v := range vals {
+		if sel, ok := v.(Sub); ok {
+			values = append(values, fmt.Sprintf("(%s)", sel))
+			continue
+		}
+		vStr, err := internal.ToString(v, true)
+		if err != nil {
+			return "", err
+		}
+		values = append(values, vStr)
+	}
+
+	return fmt.Sprintf(strings.ReplaceAll(expr, "?", "%s"), values...), nil
+}
