@@ -230,7 +230,7 @@ func (m *MigStmt) processKeySQL(sql *internal.SQL) error {
 	}
 
 	switch e := e.(type) {
-	case *mig.PK:
+	case *mig.PK, *mig.Unique:
 		// Write PRIMARY KEY.
 		s, err := e.Build()
 		if err != nil {
@@ -356,17 +356,21 @@ func (m *MigStmt) Cons(key string) ConsMig {
 	return m
 }
 
+// Unique calls UNIQUE keyword.
+func (m *MigStmt) Unique(cols ...string) UniqueMig {
+	m.call(&mig.Unique{Columns: cols})
+	return m
+}
+
 // PK calls PRIMARY KEY keyword.
-func (m *MigStmt) PK(col string) PKMig {
-	p := new(mig.PK)
-	p.AddColumns(col)
-	m.call(p)
+func (m *MigStmt) PK(cols ...string) PKMig {
+	m.call(&mig.PK{Columns: cols})
 	return m
 }
 
 // FK calls FOREIGN KEY keyword.
-func (m *MigStmt) FK(col string) FKMig {
-	m.call(&mig.FK{Column: col})
+func (m *MigStmt) FK(cols ...string) FKMig {
+	m.call(&mig.FK{Columns: cols})
 	return m
 }
 
