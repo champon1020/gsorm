@@ -119,7 +119,7 @@ func (d *DropFK) Keyword() string {
 func (d *DropFK) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())
-	ss.WriteKeyword(d.Key)
+	ss.WriteValue(d.Key)
 	return ss, nil
 }
 
@@ -141,6 +141,6 @@ func (d *DropUC) Keyword() string {
 func (d *DropUC) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())
-	ss.WriteKeyword(d.Key)
+	ss.WriteValue(d.Key)
 	return ss, nil
 }

@@ -60,6 +60,12 @@ func TestMigStmt_String(t *testing.T) {
 		},
 		{
 			mgorm.AlterTable(mysql, "sample").
+				DropColumn("id").(*mgorm.MigStmt),
+			`ALTER TABLE sample ` +
+				`DROP COLUMN id`,
+		},
+		{
+			mgorm.AlterTable(mysql, "sample").
 				RenameColumn("name", "first_name").(*mgorm.MigStmt),
 			`ALTER TABLE sample ` +
 				`RENAME COLUMN name TO first_name`,
