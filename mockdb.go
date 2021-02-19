@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm/errors"
+	"github.com/champon1020/mgorm/internal"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -20,6 +21,10 @@ type MockDB struct {
 
 	// How many times transaction has begun.
 	txItr int
+}
+
+func (m *MockDB) getDriver() internal.SQLDriver {
+	return 0
 }
 
 // Ping is dummy function.
@@ -153,6 +158,10 @@ type MockTx struct {
 
 	// Expected statements.
 	expected []expectation
+}
+
+func (m *MockTx) getDriver() internal.SQLDriver {
+	return 0
 }
 
 // Ping is dummy function.

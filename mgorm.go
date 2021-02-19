@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/champon1020/mgorm/syntax/cmd"
 	"github.com/champon1020/mgorm/syntax/mig"
@@ -15,7 +17,10 @@ func New(dn, dsn string) (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &DB{conn: db, driver: dn}, nil
+	if dn == "psql" {
+		return &DB{conn: db, driver: internal.PSQL}, nil
+	}
+	return &DB{conn: db, driver: internal.MySQL}, nil
 }
 
 // NewMock creates MockDB.
@@ -117,47 +122,70 @@ func When(expr string, vals ...interface{}) WhenStmt {
 // CreateDB calls CREATE DATABASE command.
 func CreateDB(pool Pool, dbName string) CreateDBMig {
 	return &MigStmt{
-		pool: pool,
-		cmd:  &mig.CreateDB{DBName: dbName},
+		pool:   pool,
+		driver: pool.getDriver(),
+		cmd:    &mig.CreateDB{DBName: dbName},
 	}
 }
 
 // DropDB calls DROP DATABASE command.
 func DropDB(pool Pool, dbName string) DropDBMig {
 	return &MigStmt{
-		pool: pool,
-		cmd:  &mig.DropDB{DBName: dbName},
+		pool:   pool,
+		driver: pool.getDriver(),
+		cmd:    &mig.DropDB{DBName: dbName},
 	}
 }
 
 // CreateTable calls CREATE TABLE command.
 func CreateTable(pool Pool, table string) CreateTableMig {
 	return &MigStmt{
-		pool: pool,
-		cmd:  &mig.CreateTable{Table: table},
+		pool:   pool,
+		driver: pool.getDriver(),
+		cmd:    &mig.CreateTable{Table: table},
 	}
 }
 
 // DropTable calls DROP TABLE command.
 func DropTable(pool Pool, table string) DropTableMig {
 	return &MigStmt{
-		pool: pool,
-		cmd:  &mig.DropTable{Table: table},
+		pool:   pool,
+		driver: pool.getDriver(),
+		cmd:    &mig.DropTable{Table: table},
 	}
 }
 
 // AlterTable calls ALTER TABLE command.
 func AlterTable(pool Pool, table string) AlterTableMig {
 	return &MigStmt{
-		pool: pool,
-		cmd:  &mig.AlterTable{Table: table},
+		pool:   pool,
+		driver: pool.getDriver(),
+		cmd:    &mig.AlterTable{Table: table},
 	}
 }
 
 // CreateIndex calls CREATE INDEX command.
 func CreateIndex(pool Pool, idx string) CreateIndexMig {
 	return &MigStmt{
-		pool: pool,
-		cmd:  &mig.CreateIndex{IdxName: idx},
+		pool:   pool,
+		driver: pool.getDriver(),
+		cmd:    &mig.CreateIndex{IdxName: idx},
+	}
+}
+
+// DropIndex calls DROP INDEX command.
+func DropIndex(pool Pool, table string, idx string) DropIndexMig {
+	if pool.getDriver() == internal.MySQL {
+		return &MigStmt{
+			pool:   pool,
+			driver: pool.getDriver(),
+			cmd:    &mig.AlterTable{Table: table},
+			called: []syntax.MigClause{&mig.DropIndex{IdxName: idx}},
+		}
+	}
+	return &MigStmt{
+		pool:   pool,
+		driver: pool.getDriver(),
+		cmd:    &mig.DropIndex{IdxName: idx},
 	}
 }

@@ -10,15 +10,15 @@ type Default struct {
 	Value interface{}
 }
 
-// Name returns clause keyword.
-func (d *Default) Name() string {
+// Keyword returns clause keyword.
+func (d *Default) Keyword() string {
 	return "DEFAULT"
 }
 
 // Build makes DEFAULT clause with syntax.StmtSet.
 func (d *Default) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(d.Name())
+	ss.WriteKeyword(d.Keyword())
 	vStr, err := internal.ToString(d.Value, true)
 	if err != nil {
 		return nil, err

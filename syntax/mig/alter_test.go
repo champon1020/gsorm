@@ -20,7 +20,11 @@ func TestAlterTable_Build(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.AlterTable.Build()
+		actual, err := testCase.AlterTable.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}

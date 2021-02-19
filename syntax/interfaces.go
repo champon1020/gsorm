@@ -14,16 +14,9 @@ type Clause interface {
 	Build() (*StmtSet, error)
 }
 
-// MigCmd is interface for entry commands about database migration
-// like CREATE DATABASE or CREATE TABLE and so on.
-type MigCmd interface {
-	Query() string
-	Build() *StmtSet
-}
-
 // MigClause is interface for SQL clauses about database migration.
 type MigClause interface {
-	Name() string
+	Keyword() string
 	Build() (*StmtSet, error)
 }
 

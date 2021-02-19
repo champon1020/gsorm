@@ -1,41 +1,43 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/syntax"
+)
 
-// Add is ADD clause.
-type Add struct {
+// AddColumn is ADD clause.
+type AddColumn struct {
 	Column string
 	Type   string
 }
 
-// Name returns clause keyword.
-func (a *Add) Name() string {
-	return "ADD"
+// Keyword returns clause keyword.
+func (a *AddColumn) Keyword() string {
+	return "ADD COLUMN"
 }
 
-// Build makes ADD clause with syntax.StmtSet.
-func (a *Add) Build() (*syntax.StmtSet, error) {
+// Build makes ADD COLUMN clause with syntax.StmtSet.
+func (a *AddColumn) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(a.Name())
+	ss.WriteKeyword(a.Keyword())
 	ss.WriteValue(a.Column)
 	ss.WriteValue(a.Type)
 	return ss, nil
 }
 
 // AddCons is ADD CONSTRAINT clause.
-type AddConstraint struct {
+type AddCons struct {
 	Key string
 }
 
 // Name returns clause keyword.
-func (a *AddConstraint) Name() string {
+func (a *AddCons) Keyword() string {
 	return "ADD CONSTRAINT"
 }
 
 // Build makes ADD CONSTRAINT clause with syntax.StmtSet.
-func (a *AddConstraint) Build() (*syntax.StmtSet, error) {
+func (a *AddCons) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(a.Name())
+	ss.WriteKeyword(a.Keyword())
 	ss.WriteValue(a.Key)
 	return ss, nil
 }
