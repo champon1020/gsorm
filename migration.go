@@ -161,8 +161,7 @@ func (m *MigStmt) processAlterTableSQL(sql *internal.SQL) error {
 	case *mig.Rename,
 		*mig.Drop,
 		*mig.DropConstraint,
-		*mig.DropIndex,
-		*mig.Charset:
+		*mig.DropIndex:
 		s, err := e.Build()
 		if err != nil {
 			return err
@@ -259,7 +258,7 @@ func (m *MigStmt) processConstraintSQL(sql *internal.SQL) error {
 	}
 
 	switch e := e.(type) {
-	case *mig.PK, *mig.Unique, *mig.Check:
+	case *mig.PK, *mig.Unique:
 		s, err := e.Build()
 		if err != nil {
 			return err
@@ -363,12 +362,6 @@ func (m *MigStmt) DropIndex(idx string) DropIndexMig {
 	return m
 }
 
-// Charset calls CHARSET clause.
-func (m *MigStmt) Charset(format string) CharsetMig {
-	m.call(&mig.Charset{Format: format})
-	return m
-}
-
 // NotNull calls NOT NULL option.
 func (m *MigStmt) NotNull() NotNullMig {
 	m.call(&mig.NotNull{})
@@ -390,12 +383,6 @@ func (m *MigStmt) Default(val interface{}) DefaultMig {
 // Cons calls CONSTRAINT option.
 func (m *MigStmt) Cons(key string) ConsMig {
 	m.call(&mig.Constraint{Key: key})
-	return m
-}
-
-// Check calls CHECK keyword.
-func (m *MigStmt) Check(expr string, values ...interface{}) CheckMig {
-	m.call(&mig.Check{Expr: expr, Values: values})
 	return m
 }
 

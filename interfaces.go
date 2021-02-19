@@ -258,7 +258,6 @@ type AlterTableMig interface {
 	Change(string, string, string) ChangeMig
 	Modify(string, string) ModifyMig
 	Drop(string) DropMig
-	Charset(string) CharsetMig
 	AddCons(string) AddConsMig
 	DropCons(string) DropConsMig
 	DropIndex(string) DropIndexMig
@@ -298,7 +297,6 @@ type AddMig interface {
 
 // AddConsMig is returned after (*MigStmt).AddCons is called.
 type AddConsMig interface {
-	Check(string, ...interface{}) CheckMig
 	Unique(...string) UniqueMig
 	PK(...string) PKMig
 	FK(...string) FKMig
@@ -333,11 +331,6 @@ type DropIndexMig interface {
 	MigrationCallable
 }
 
-// CharsetMig is returned after (*MigStmt).Charset is called.
-type CharsetMig interface {
-	MigrationCallable
-}
-
 // NotNullMig is returned after (*MigStmt).NotNull is called.
 type NotNullMig interface {
 	Column(string, string) ColumnMig
@@ -363,16 +356,9 @@ type DefaultMig interface {
 
 // ConsMig is returned after (*MigStmt).Cons is called.
 type ConsMig interface {
-	Check(string, ...interface{}) CheckMig
 	Unique(...string) UniqueMig
 	PK(...string) PKMig
 	FK(...string) FKMig
-}
-
-// CheckMig is returned after (*MigStmt).Check is called.
-type CheckMig interface {
-	Cons(string) ConsMig
-	MigrationCallable
 }
 
 // UniqueMig is returned after (*MigStmt).Unique is called.
