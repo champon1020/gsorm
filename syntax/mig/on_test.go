@@ -8,19 +8,23 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestAlterTable_Build(t *testing.T) {
+func TestOn_Build(t *testing.T) {
 	testCases := []struct {
-		AlterTable *mig.AlterTable
-		Expected   *syntax.StmtSet
+		On       *mig.On
+		Expected *syntax.StmtSet
 	}{
 		{
-			&mig.AlterTable{Table: "table"},
-			&syntax.StmtSet{Keyword: "ALTER TABLE", Value: "table"},
+			&mig.On{Table: "table", Columns: []string{"column"}},
+			&syntax.StmtSet{Keyword: "ON", Value: "table (column)"},
+		},
+		{
+			&mig.On{Table: "table", Columns: []string{"column1", "column2"}},
+			&syntax.StmtSet{Keyword: "ON", Value: "table (column1, column2)"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		actual, err := testCase.AlterTable.Build()
+		actual, err := testCase.On.Build()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue

@@ -5,12 +5,18 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm/errors"
+	"github.com/champon1020/mgorm/internal"
 )
 
 // DB is a database handle representing a pool of zero or more underlying connections. It's safe for concurrent use by multiple goroutines.
 type DB struct {
 	conn   sqlDB
-	driver string
+	driver internal.SQLDriver
+}
+
+// getDriver returns sql driver.
+func (db *DB) getDriver() internal.SQLDriver {
+	return db.driver
 }
 
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.
@@ -88,6 +94,10 @@ func (db *DB) Begin() (*Tx, error) {
 type Tx struct {
 	db   *DB
 	conn sqlTx
+}
+
+func (tx *Tx) getDriver() internal.SQLDriver {
+	return tx.db.driver
 }
 
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.

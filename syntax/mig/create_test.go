@@ -20,7 +20,11 @@ func TestCreateDB_Build(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.CreateDB.Build()
+		actual, err := testCase.CreateDB.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
@@ -39,7 +43,34 @@ func TestCreateTable_Build(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.CreateTable.Build()
+		actual, err := testCase.CreateTable.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
+		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
+			t.Errorf("Differs: (-want +got)\n%s", diff)
+		}
+	}
+}
+
+func TestCreateIndex_Build(t *testing.T) {
+	testCases := []struct {
+		CreateIndex *mig.CreateIndex
+		Expected    *syntax.StmtSet
+	}{
+		{
+			&mig.CreateIndex{IdxName: "idx"},
+			&syntax.StmtSet{Keyword: "CREATE INDEX", Value: "idx"},
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual, err := testCase.CreateIndex.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}

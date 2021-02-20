@@ -8,15 +8,15 @@ type On struct {
 	Columns []string
 }
 
-// Name returns clause keyword.
-func (o *On) Name() string {
+// Keyword returns clause keyword.
+func (o *On) Keyword() string {
 	return "ON"
 }
 
 // Build makes ON clause with syntax.StmtSet.
 func (o *On) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(o.Name())
+	ss.WriteKeyword(o.Keyword())
 	ss.WriteValue(o.Table)
 	ss.WriteValue("(")
 	for i, c := range o.Columns {

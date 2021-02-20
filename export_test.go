@@ -1,8 +1,14 @@
 package mgorm
 
+import "github.com/champon1020/mgorm/internal"
+
 // Exported values which is declared in db.go.
 func (db *DB) ExportedSetConn(conn sqlDB) {
 	db.conn = conn
+}
+
+func (db *DB) ExportedSetDriver(driver internal.SQLDriver) {
+	db.driver = driver
 }
 
 func (tx *Tx) ExportedSetConn(conn sqlTx) {

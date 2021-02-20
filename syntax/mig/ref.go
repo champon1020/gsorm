@@ -12,15 +12,15 @@ type Ref struct {
 	Column string
 }
 
-// Name returns clause keyword.
-func (r *Ref) Name() string {
+// Keyword returns clause keyword.
+func (r *Ref) Keyword() string {
 	return "REFERENCES"
 }
 
 // Build makes REFERENCES clause with syntax.StmtSet.
 func (r *Ref) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(r.Name())
+	ss.WriteKeyword(r.Keyword())
 	ss.WriteValue(fmt.Sprintf("%s(%s)", r.Table, r.Column))
 	return ss, nil
 }

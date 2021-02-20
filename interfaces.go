@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 )
 
 // Pool is database connection pool like DB or Tx. This is also implemented by MockDB and MockTx.
 type Pool interface {
+	getDriver() internal.SQLDriver
 	Query(string, ...interface{}) (*sql.Rows, error)
 	Exec(string, ...interface{}) (sql.Result, error)
 }
@@ -22,7 +24,8 @@ type Mock interface {
 
 // sqlDB is interface for sql.DB.
 type sqlDB interface {
-	Pool
+	Query(string, ...interface{}) (*sql.Rows, error)
+	Exec(string, ...interface{}) (sql.Result, error)
 	Ping() error
 	SetConnMaxLifetime(n time.Duration)
 	SetMaxIdleConns(n int)
@@ -33,7 +36,8 @@ type sqlDB interface {
 
 // sqlTx is interface for sql.Tx.
 type sqlTx interface {
-	Pool
+	Query(string, ...interface{}) (*sql.Rows, error)
+	Exec(string, ...interface{}) (sql.Result, error)
 	Commit() error
 	Rollback() error
 }
@@ -254,14 +258,13 @@ type DropTableMig interface {
 // AlterTableMig is returned after AlterTable is called.
 type AlterTableMig interface {
 	Rename(string) RenameMig
-	Add(string, string) AddMig
-	Change(string, string, string) ChangeMig
-	Modify(string, string) ModifyMig
-	Drop(string) DropMig
-	Charset(string) CharsetMig
+	AddColumn(string, string) AddColumnMig
+	RenameColumn(string, string) RenameColumnMig
+	DropColumn(string) DropColumnMig
 	AddCons(string) AddConsMig
-	DropCons(string) DropConsMig
-	DropIndex(string) DropIndexMig
+	DropPK(string) DropPKMig
+	DropFK(string) DropFKMig
+	DropUC(string) DropUCMig
 }
 
 // CreateIndexMig is returned after CreateIndex is called.
@@ -269,18 +272,13 @@ type CreateIndexMig interface {
 	On(string, ...string) OnMig
 }
 
-// OnMig is returned after (*MigStmt).ON is called.
-type OnMig interface {
+// DropIndexMig is returned after DropIndex is called.
+type DropIndexMig interface {
 	MigrationCallable
 }
 
-// ColumnMig is returned after (*MigStmt).Column is called.
-type ColumnMig interface {
-	Column(string, string) ColumnMig
-	NotNull() NotNullMig
-	AutoInc() AutoIncMig
-	Default(interface{}) DefaultMig
-	Cons(string) ConsMig
+// OnMig is returned after (*MigStmt).ON is called.
+type OnMig interface {
 	MigrationCallable
 }
 
@@ -289,52 +287,52 @@ type RenameMig interface {
 	MigrationCallable
 }
 
-// AddMig is returned after (*MigStmt).Add is called.
-type AddMig interface {
+// AddColumnMig is returned after (*MigStmt).AddColumn is called.
+type AddColumnMig interface {
 	NotNull() NotNullMig
-	AutoInc() AutoIncMig
+	AutoInc() AutoIncMig // Only MySQL
 	Default(interface{}) DefaultMig
+}
+
+// DropClumnMig is returned after (*MigStmt).DropColumn is called.
+type DropColumnMig interface {
+	MigrationCallable
+}
+
+// RenameColumnMig is returned after (*MigStmt).RenameColumn is called.
+type RenameColumnMig interface {
+	MigrationCallable
 }
 
 // AddConsMig is returned after (*MigStmt).AddCons is called.
 type AddConsMig interface {
-	Check(string, ...interface{}) CheckMig
-	Unique(...string) UniqueMig
+	UC(...string) UCMig
 	PK(...string) PKMig
 	FK(...string) FKMig
 }
 
-// ChangeMig is returned after (*MigStmt).Change is called.
-type ChangeMig interface {
+// DropPKMig is returned after (*MigStmt).DropPK is called.
+type DropPKMig interface {
+	MigrationCallable
+}
+
+// DropFKMig is returned after (*MigStmt).DropFK is called.
+type DropFKMig interface {
+	MigrationCallable
+}
+
+// DropUCMig is returned after (*MigStmt).DropUC is called.
+type DropUCMig interface {
+	MigrationCallable
+}
+
+// ColumnMig is returned after (*MigStmt).Column is called.
+type ColumnMig interface {
+	Column(string, string) ColumnMig
 	NotNull() NotNullMig
-	AutoInc() AutoIncMig
+	AutoInc() AutoIncMig // Only MySQL
 	Default(interface{}) DefaultMig
-}
-
-// ModifyMig is returned after (*MigStmt).Modify is called.
-type ModifyMig interface {
-	NotNull() NotNullMig
-	AutoInc() AutoIncMig
-	Default(interface{}) DefaultMig
-}
-
-// DropMig is returned after (*MigStmt).Drop is called.
-type DropMig interface {
-	MigrationCallable
-}
-
-// DropConsMig is returned after (*MigStmt).DropCons is called.
-type DropConsMig interface {
-	MigrationCallable
-}
-
-// DropIndexMig is returned after (*MigStmt).DropIndex is called.
-type DropIndexMig interface {
-	MigrationCallable
-}
-
-// CharsetMig is returned after (*MigStmt).Charset is called.
-type CharsetMig interface {
+	Cons(string) ConsMig
 	MigrationCallable
 }
 
@@ -363,20 +361,13 @@ type DefaultMig interface {
 
 // ConsMig is returned after (*MigStmt).Cons is called.
 type ConsMig interface {
-	Check(string, ...interface{}) CheckMig
-	Unique(...string) UniqueMig
+	UC(...string) UCMig
 	PK(...string) PKMig
 	FK(...string) FKMig
 }
 
-// CheckMig is returned after (*MigStmt).Check is called.
-type CheckMig interface {
-	Cons(string) ConsMig
-	MigrationCallable
-}
-
-// UniqueMig is returned after (*MigStmt).Unique is called.
-type UniqueMig interface {
+// UCMig is returned after (*MigStmt).UC is called.
+type UCMig interface {
 	Cons(string) ConsMig
 	MigrationCallable
 }

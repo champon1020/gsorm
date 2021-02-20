@@ -2,20 +2,20 @@ package mig
 
 import "github.com/champon1020/mgorm/syntax"
 
-// Constraint is CONSTRAINT clause.
-type Constraint struct {
+// Cons is CONSTRAINT clause.
+type Cons struct {
 	Key string
 }
 
-// Name returns clause keyword.
-func (c *Constraint) Name() string {
+// Keyword returns clause keyword.
+func (c *Cons) Keyword() string {
 	return "CONSTRAINT"
 }
 
 // Build makes CONSTRAINT clasue with syntax.StmtSet.
-func (c *Constraint) Build() (*syntax.StmtSet, error) {
+func (c *Cons) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(c.Name())
+	ss.WriteKeyword(c.Keyword())
 	ss.WriteValue(c.Key)
 	return ss, nil
 }

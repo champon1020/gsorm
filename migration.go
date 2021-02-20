@@ -14,7 +14,8 @@ import (
 // MigStmt stores information about database migration query.
 type MigStmt struct {
 	pool   Pool
-	cmd    syntax.MigCmd
+	driver internal.SQLDriver
+	cmd    syntax.MigClause
 	called []syntax.MigClause
 	errors []error
 }
@@ -58,25 +59,42 @@ func (m *MigStmt) Migration() error {
 		return m.errors[0]
 	}
 
-	_, err := m.processMigrationSQL()
-	if err != nil {
-		return err
+	switch pool := m.pool.(type) {
+	case *DB, *Tx:
+		sql, err := m.processMigrationSQL()
+		if err != nil {
+			return err
+		}
+		if _, err := pool.Exec(sql.String()); err != nil {
+			return errors.New(err.Error(), errors.DBQueryError)
+		}
+	case *MockDB, *MockTx:
+		return nil
 	}
 
-	/* process */
-
-	return nil
+	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
 func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
 	var sql internal.SQL
 
 	switch cmd := m.cmd.(type) {
-	case *mig.CreateDB, *mig.DropDB, *mig.DropTable:
-		sql.Write(cmd.Build().Build())
+	case *mig.CreateDB,
+		*mig.DropDB,
+		*mig.DropTable,
+		*mig.DropIndex:
+		s, err := cmd.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.Write(s.Build())
 		return sql, nil
 	case *mig.CreateTable:
-		sql.Write(cmd.Build().Build())
+		s, err := cmd.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.Write(s.Build())
 		sql.Write("(")
 		for len(m.called) > 0 {
 			err := m.processCreateTableSQL(&sql)
@@ -87,7 +105,11 @@ func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
 		sql.Write(")")
 		return sql, nil
 	case *mig.AlterTable:
-		sql.Write(cmd.Build().Build())
+		s, err := cmd.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.Write(s.Build())
 		for len(m.called) > 0 {
 			err := m.processAlterTableSQL(&sql)
 			if err != nil {
@@ -96,7 +118,11 @@ func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
 		}
 		return sql, nil
 	case *mig.CreateIndex:
-		sql.Write(cmd.Build().Build())
+		s, err := cmd.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.Write(s.Build())
 		for len(m.called) > 0 {
 			err := m.processCreateIndexSQL(&sql)
 			if err != nil {
@@ -133,7 +159,7 @@ func (m *MigStmt) processCreateTableSQL(sql *internal.SQL) error {
 		*mig.AutoInc,
 		*mig.Default:
 		return m.processColumnOptSQL(sql)
-	case *mig.Constraint:
+	case *mig.Cons:
 		if !strings.HasSuffix(sql.String(), "(") {
 			sql.Write(",")
 		}
@@ -159,10 +185,12 @@ func (m *MigStmt) processAlterTableSQL(sql *internal.SQL) error {
 
 	switch e := e.(type) {
 	case *mig.Rename,
-		*mig.Drop,
-		*mig.DropConstraint,
-		*mig.DropIndex,
-		*mig.Charset:
+		*mig.RenameColumn,
+		*mig.DropColumn,
+		*mig.DropPK,
+		*mig.DropFK,
+		*mig.DropUC,
+		*mig.DropIndex:
 		s, err := e.Build()
 		if err != nil {
 			return err
@@ -170,7 +198,7 @@ func (m *MigStmt) processAlterTableSQL(sql *internal.SQL) error {
 		sql.Write(s.Build())
 		m.advanceClause()
 		return nil
-	case *mig.AddConstraint:
+	case *mig.AddCons:
 		s, err := e.Build()
 		if err != nil {
 			return err
@@ -178,19 +206,20 @@ func (m *MigStmt) processAlterTableSQL(sql *internal.SQL) error {
 		sql.Write(s.Build())
 		m.advanceClause()
 		return m.processConstraintSQL(sql)
-	case *mig.Add, *mig.Change, *mig.Modify:
+	case *mig.AddColumn:
 		s, err := e.Build()
 		if err != nil {
 			return err
 		}
 		sql.Write(s.Build())
 		m.advanceClause()
-		return m.processColumnOptSQL(sql)
-	case *mig.NotNull,
-		*mig.AutoInc,
-		*mig.Default,
-		*mig.Constraint:
-		return m.processColumnOptSQL(sql)
+		for len(m.called) > 0 {
+			err = m.processColumnOptSQL(sql)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
 	}
 
 	msg := fmt.Sprintf("Type %v is not supported for ALTER TABLE", reflect.TypeOf(e).String())
@@ -228,7 +257,6 @@ func (m *MigStmt) processColumnOptSQL(sql *internal.SQL) error {
 
 	switch e := e.(type) {
 	case *mig.NotNull,
-		*mig.AutoInc,
 		*mig.Default:
 		s, err := e.Build()
 		if err != nil {
@@ -237,14 +265,17 @@ func (m *MigStmt) processColumnOptSQL(sql *internal.SQL) error {
 		sql.Write(s.Build())
 		m.advanceClause()
 		return nil
-	case *mig.Constraint:
+	case *mig.AutoInc:
+		if m.driver == internal.PSQL {
+			return errors.New("AUTO_INCREMENT clause is not allowed in PostgreSQL", errors.InvalidSyntaxError)
+		}
 		s, err := e.Build()
 		if err != nil {
 			return err
 		}
 		sql.Write(s.Build())
 		m.advanceClause()
-		return m.processConstraintSQL(sql)
+		return nil
 	}
 
 	msg := fmt.Sprintf("Type %v is not supported for column option", reflect.TypeOf(e).String())
@@ -259,7 +290,7 @@ func (m *MigStmt) processConstraintSQL(sql *internal.SQL) error {
 	}
 
 	switch e := e.(type) {
-	case *mig.PK, *mig.Unique, *mig.Check:
+	case *mig.PK, *mig.UC:
 		s, err := e.Build()
 		if err != nil {
 			return err
@@ -309,63 +340,57 @@ func (m *MigStmt) On(table string, cols ...string) OnMig {
 	return m
 }
 
-// Column calls table column definition.
-func (m *MigStmt) Column(col, typ string) ColumnMig {
-	m.call(&mig.Column{Col: col, Type: typ})
-	return m
-}
-
 // Rename calls RENAME TO clause.
 func (m *MigStmt) Rename(table string) RenameMig {
 	m.call(&mig.Rename{Table: table})
 	return m
 }
 
-// Add calls ADD clause.
-func (m *MigStmt) Add(col, typ string) AddMig {
-	m.call(&mig.Add{Column: col, Type: typ})
+// AddColumn calls ADD COLUMN clause.
+func (m *MigStmt) AddColumn(col, typ string) AddColumnMig {
+	m.call(&mig.AddColumn{Column: col, Type: typ})
+	return m
+}
+
+// DropColumn calls DROP COLUMN clause.
+func (m *MigStmt) DropColumn(col string) DropColumnMig {
+	m.call(&mig.DropColumn{Column: col})
+	return m
+}
+
+// RenameColumn calls RENAME COLUMN clause.
+func (m *MigStmt) RenameColumn(col, dest string) RenameColumnMig {
+	m.call(&mig.RenameColumn{Column: col, Dest: dest})
 	return m
 }
 
 // AddCons calls ADD CONSTRAINT clause.
 func (m *MigStmt) AddCons(key string) AddConsMig {
-	m.call(&mig.AddConstraint{Key: key})
+	m.call(&mig.AddCons{Key: key})
 	return m
 }
 
-// Chnage calls CHANGE clause.
-func (m *MigStmt) Change(col, dest, typ string) ChangeMig {
-	m.call(&mig.Change{Column: col, Dest: dest, Type: typ})
+// DropPK calls DROP PRIMARY KEY | DROP CONSTRAINT clause.
+func (m *MigStmt) DropPK(key string) DropPKMig {
+	m.call(&mig.DropPK{Driver: m.driver, Key: key})
 	return m
 }
 
-// Modify calls MODIFY clause.
-func (m *MigStmt) Modify(col, typ string) ModifyMig {
-	m.call(&mig.Modify{Column: col, Type: typ})
+// DropFK calls DROP FOREIGN KEY | DROP CONSTRAINT clause.
+func (m *MigStmt) DropFK(key string) DropFKMig {
+	m.call(&mig.DropFK{Driver: m.driver, Key: key})
 	return m
 }
 
-// Drop calls DROP clause.
-func (m *MigStmt) Drop(col string) DropMig {
-	m.call(&mig.Drop{Column: col})
+// DropUC calls DROP INDEX | DROP CONSTRAINT clause.
+func (m *MigStmt) DropUC(key string) DropUCMig {
+	m.call(&mig.DropUC{Driver: m.driver, Key: key})
 	return m
 }
 
-// DropCons calls DROP CONSTRAINT clause.
-func (m *MigStmt) DropCons(key string) DropConsMig {
-	m.call(&mig.DropConstraint{Key: key})
-	return m
-}
-
-// DropIndex calls DROP INDEX clause.
-func (m *MigStmt) DropIndex(idx string) DropIndexMig {
-	m.call(&mig.DropIndex{IdxName: idx})
-	return m
-}
-
-// Charset calls CHARSET clause.
-func (m *MigStmt) Charset(format string) CharsetMig {
-	m.call(&mig.Charset{Format: format})
+// Column calls table column definition.
+func (m *MigStmt) Column(col, typ string) ColumnMig {
+	m.call(&mig.Column{Col: col, Type: typ})
 	return m
 }
 
@@ -375,7 +400,7 @@ func (m *MigStmt) NotNull() NotNullMig {
 	return m
 }
 
-// AutoInc calls AUTO_INCREMENT option.
+// AutoInc calls AUTO_INCREMENT option. (only MySQL)
 func (m *MigStmt) AutoInc() AutoIncMig {
 	m.call(&mig.AutoInc{})
 	return m
@@ -389,19 +414,13 @@ func (m *MigStmt) Default(val interface{}) DefaultMig {
 
 // Cons calls CONSTRAINT option.
 func (m *MigStmt) Cons(key string) ConsMig {
-	m.call(&mig.Constraint{Key: key})
+	m.call(&mig.Cons{Key: key})
 	return m
 }
 
-// Check calls CHECK keyword.
-func (m *MigStmt) Check(expr string, values ...interface{}) CheckMig {
-	m.call(&mig.Check{Expr: expr, Values: values})
-	return m
-}
-
-// Unique calls UNIQUE keyword.
-func (m *MigStmt) Unique(cols ...string) UniqueMig {
-	m.call(&mig.Unique{Columns: cols})
+// UC calls UNIQUE keyword.
+func (m *MigStmt) UC(cols ...string) UCMig {
+	m.call(&mig.UC{Columns: cols})
 	return m
 }
 

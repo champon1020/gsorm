@@ -8,19 +8,23 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestConstraint_Build(t *testing.T) {
+func TestUC_Build(t *testing.T) {
 	testCases := []struct {
-		Constraint *mig.Constraint
-		Expected   *syntax.StmtSet
+		UC       *mig.UC
+		Expected *syntax.StmtSet
 	}{
 		{
-			&mig.Constraint{Key: "key_name"},
-			&syntax.StmtSet{Keyword: "CONSTRAINT", Value: "key_name"},
+			&mig.UC{Columns: []string{"column"}},
+			&syntax.StmtSet{Keyword: "UNIQUE", Value: "(column)"},
+		},
+		{
+			&mig.UC{Columns: []string{"column1", "column2"}},
+			&syntax.StmtSet{Keyword: "UNIQUE", Value: "(column1, column2)"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		actual, err := testCase.Constraint.Build()
+		actual, err := testCase.UC.Build()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
