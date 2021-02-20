@@ -59,14 +59,20 @@ func (m *MigStmt) Migration() error {
 		return m.errors[0]
 	}
 
-	_, err := m.processMigrationSQL()
-	if err != nil {
-		return err
+	switch pool := m.pool.(type) {
+	case *DB, *Tx:
+		sql, err := m.processMigrationSQL()
+		if err != nil {
+			return err
+		}
+		if _, err := pool.Exec(sql.String()); err != nil {
+			return errors.New(err.Error(), errors.DBQueryError)
+		}
+	case *MockDB, *MockTx:
+		return nil
 	}
 
-	/* process */
-
-	return nil
+	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
 func (m *MigStmt) processMigrationSQL() (internal.SQL, error) {
