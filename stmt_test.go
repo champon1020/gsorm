@@ -43,7 +43,7 @@ func TestStmt_String(t *testing.T) {
 				Where("emp_no IN ?",
 					mgorm.Select(nil, "DISTINCT emp_no").
 						From("salaries").
-						Where("salary < ?", 60000).Sub()).(*mgorm.Stmt),
+						Where("salary < ?", 60000)).(*mgorm.Stmt),
 			`SELECT emp_no FROM employees ` +
 				`WHERE emp_no IN ` +
 				`(SELECT DISTINCT emp_no FROM salaries WHERE salary < 60000)`,
@@ -147,8 +147,7 @@ func TestStmt_String(t *testing.T) {
 			mgorm.Select(nil, "hire_date AS date").
 				From("employees").
 				Union(mgorm.Select(nil, "from_date AS date").
-					From("salaries").
-					Sub()).
+					From("salaries")).
 				Limit(5).(*mgorm.Stmt),
 			`SELECT hire_date AS date FROM employees ` +
 				`UNION ` +
@@ -159,39 +158,12 @@ func TestStmt_String(t *testing.T) {
 			mgorm.Select(nil, "from_date AS date").
 				From("salaries").
 				UnionAll(mgorm.Select(nil, "from_date AS date").
-					From("titles").
-					Sub()).
+					From("titles")).
 				Limit(5).(*mgorm.Stmt),
 			`SELECT from_date AS date FROM salaries ` +
 				`UNION ALL ` +
 				`SELECT from_date AS date FROM titles ` +
 				`LIMIT 5`,
-		},
-		{
-			mgorm.Select(nil, mgorm.When("gender = ?", "M").
-				Then("first_name").
-				Else("last_name").CaseColumn()).
-				From("employees").
-				OrderBy("emp_no").(*mgorm.Stmt),
-			`SELECT CASE ` +
-				`WHEN gender = "M" THEN first_name ` +
-				`ELSE last_name ` +
-				`END ` +
-				`FROM employees ` +
-				`ORDER BY emp_no`,
-		},
-		{
-			mgorm.Select(nil, mgorm.When("gender = ?", "M").
-				Then("MAN").
-				Else("WOMAN").CaseValue()).
-				From("employees").
-				OrderBy("emp_no").(*mgorm.Stmt),
-			`SELECT CASE ` +
-				`WHEN gender = "M" THEN "MAN" ` +
-				`ELSE "WOMAN" ` +
-				`END ` +
-				`FROM employees ` +
-				`ORDER BY emp_no`,
 		},
 		{
 			mgorm.Min(nil, "emp_no").From("employees").(*mgorm.Stmt),
@@ -223,120 +195,6 @@ func TestStmt_String(t *testing.T) {
 			return
 		}
 		assert.Equal(t, testCase.Expected, actual)
-	}
-}
-
-func TestStmt_CaseColumn_Fail(t *testing.T) {
-	{
-		expectedErr := errors.New(
-			"Command must be clause.When when CaseColumn is used", errors.InvalidValueError).(*errors.Error)
-
-		// Prepare for test.
-		s := mgorm.Select(nil, "*").(*mgorm.Stmt)
-
-		// Actual process.
-		s.CaseColumn()
-
-		// Validate error.
-		errs := s.ExportedGetErrors()
-		if len(errs) == 0 {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := errs[0].(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
-		}
-		if !actualErr.Is(expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
-	}
-	{
-		expectedErr := errors.New(
-			"Command must be clause.When when CaseColumn is used", errors.InvalidValueError).(*errors.Error)
-
-		// Prepare for test.
-		s := mgorm.Select(nil, "*").From("employees").(*mgorm.Stmt)
-
-		// Actual process.
-		s.CaseColumn()
-
-		// Validate error.
-		errs := s.ExportedGetErrors()
-		if len(errs) == 0 {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := errs[0].(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
-		}
-		if !actualErr.Is(expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
-	}
-}
-
-func TestStmt_CaseValue_Fail(t *testing.T) {
-	{
-		expectedErr := errors.New(
-			"Command must be clause.When when CaseValue is used", errors.InvalidValueError).(*errors.Error)
-
-		// Prepare for test.
-		s := mgorm.Select(nil, "*").(*mgorm.Stmt)
-
-		// Actual process.
-		s.CaseValue()
-
-		// Validate error.
-		errs := s.ExportedGetErrors()
-		if len(errs) == 0 {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := errs[0].(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
-		}
-		if !actualErr.Is(expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
-	}
-	{
-		expectedErr := errors.New(
-			"Command must be clause.When when CaseValue is used", errors.InvalidValueError).(*errors.Error)
-
-		// Prepare for test.
-		s := mgorm.Select(nil, "*").From("employees").(*mgorm.Stmt)
-
-		// Actual process.
-		s.CaseValue()
-
-		// Validate error.
-		errs := s.ExportedGetErrors()
-		if len(errs) == 0 {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := errs[0].(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
-		}
-		if !actualErr.Is(expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
 	}
 }
 

@@ -6,73 +6,70 @@ import (
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/syntax"
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestBuildStmtSetForExpression(t *testing.T) {
+func TestBuildForExpression(t *testing.T) {
 	testCases := []struct {
-		Expr   string
-		Values []interface{}
-		Result *syntax.StmtSet
+		Expr     string
+		Values   []interface{}
+		Expected string
 	}{
 		{
 			`lhs = "rhs"`,
 			[]interface{}{},
-			&syntax.StmtSet{Value: `lhs = "rhs"`},
+			`lhs = "rhs"`,
 		},
 		{
 			"lhs = ?",
 			[]interface{}{"rhs"},
-			&syntax.StmtSet{Value: `lhs = "rhs"`},
+			`lhs = "rhs"`,
 		},
 		{
 			"NOT lhs = ?",
 			[]interface{}{"rhs"},
-			&syntax.StmtSet{Value: `NOT lhs = "rhs"`},
+			`NOT lhs = "rhs"`,
 		},
 		{
 			"lhs1 = ? AND lhs2 = ?",
 			[]interface{}{"rhs", 100},
-			&syntax.StmtSet{Value: `lhs1 = "rhs" AND lhs2 = 100`},
+			`lhs1 = "rhs" AND lhs2 = 100`,
 		},
 		{
 			"IN lhs (?, ?, ?)",
 			[]interface{}{"rhs", 100, true},
-			&syntax.StmtSet{Value: `IN lhs ("rhs", 100, true)`},
+			`IN lhs ("rhs", 100, true)`,
 		},
 		{
 			"lhs LIKE %%?%%",
 			[]interface{}{"rhs"},
-			&syntax.StmtSet{Value: `lhs LIKE %"rhs"%`},
+			`lhs LIKE %"rhs"%`,
 		},
 		{
 			"lhs BETWEEN ? AND ?",
 			[]interface{}{10, 100},
-			&syntax.StmtSet{Value: "lhs BETWEEN 10 AND 100"},
+			"lhs BETWEEN 10 AND 100",
 		},
 		{
 			"IN ?",
 			[]interface{}{mgorm.Select(nil, "*").
 				From("table").
-				Where("lhs = ?", "rhs").
-				Sub()},
-			&syntax.StmtSet{Value: `IN (SELECT * FROM table WHERE lhs = "rhs")`},
+				Where("lhs = ?", "rhs")},
+			`IN (SELECT * FROM table WHERE lhs = "rhs")`,
 		},
 	}
 
 	for _, testCase := range testCases {
-		res, _ := syntax.BuildStmtSetForExpression(testCase.Expr, testCase.Values...)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
+		actual, _ := syntax.BuildForExpression(testCase.Expr, testCase.Values...)
+		assert.Equal(t, testCase.Expected, actual)
 	}
 }
 
-func TestBuildStmtSetForExpression_Fail(t *testing.T) {
+func TestBuildForExpression_Fail(t *testing.T) {
 	testCases := []struct {
-		Expr   string
-		Values []interface{}
-		Error  error
+		Expr          string
+		Values        []interface{}
+		ExpectedError error
 	}{
 		{
 			"lhs = ? AND rhs = ?",
@@ -87,7 +84,7 @@ func TestBuildStmtSetForExpression_Fail(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		_, err := syntax.BuildStmtSetForExpression(testCase.Expr, testCase.Values...)
+		_, err := syntax.BuildForExpression(testCase.Expr, testCase.Values...)
 		if err == nil {
 			t.Errorf("Error is not occurred")
 			continue
@@ -97,7 +94,7 @@ func TestBuildStmtSetForExpression_Fail(t *testing.T) {
 			t.Errorf("Error type is invalid")
 			continue
 		}
-		resultError := testCase.Error.(*errors.Error)
+		resultError := testCase.ExpectedError.(*errors.Error)
 		if !resultError.Is(actualError) {
 			t.Errorf("Different error was occurred")
 			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)

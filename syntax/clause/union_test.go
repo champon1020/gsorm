@@ -3,6 +3,7 @@ package clause_test
 import (
 	"testing"
 
+	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
@@ -15,11 +16,11 @@ func TestUnion_String(t *testing.T) {
 		Result string
 	}{
 		{
-			&clause.Union{Stmt: "SELECT * FROM table"},
+			&clause.Union{Stmt: mgorm.Select(nil, "*").From("table")},
 			`UNION("SELECT * FROM table")`,
 		},
 		{
-			&clause.Union{Stmt: "SELECT * FROM table", All: true},
+			&clause.Union{Stmt: mgorm.Select(nil, "*").From("table"), All: true},
 			`UNION ALL("SELECT * FROM table")`,
 		},
 	}
@@ -36,11 +37,11 @@ func TestUnion_Build(t *testing.T) {
 		Result *syntax.StmtSet
 	}{
 		{
-			&clause.Union{Stmt: "SELECT * FROM table"},
+			&clause.Union{Stmt: mgorm.Select(nil, "*").From("table")},
 			&syntax.StmtSet{Keyword: "UNION", Value: "SELECT * FROM table"},
 		},
 		{
-			&clause.Union{Stmt: "SELECT * FROM table", All: true},
+			&clause.Union{Stmt: mgorm.Select(nil, "*").From("table"), All: true},
 			&syntax.StmtSet{Keyword: "UNION ALL", Value: "SELECT * FROM table"},
 		},
 	}

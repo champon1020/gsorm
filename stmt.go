@@ -14,7 +14,7 @@ import (
 // Stmt stores information about query.
 type Stmt struct {
 	db     Pool
-	cmd    syntax.Cmd
+	cmd    syntax.Clause
 	called []syntax.Clause
 	errors []error
 }
@@ -29,65 +29,33 @@ func (s *Stmt) addError(err error) {
 	s.errors = append(s.errors, err)
 }
 
-// CaseColumn returns string without double quotes. This is used for CASE WHEN ... statement.
-func (s *Stmt) CaseColumn() string {
-	if len(s.called) == 0 {
-		s.addError(errors.New("Command must be clause.When when CaseColumn is used", errors.InvalidValueError))
-		return ""
-	}
-	_, ok := s.called[0].(*clause.When)
-	if !ok {
-		s.addError(errors.New("Command must be clause.When when CaseColumn is used", errors.InvalidValueError))
-		return ""
-	}
-	sql, err := s.processCaseSQL(true)
-	if err != nil {
-		s.addError(err)
-		return ""
-	}
-	return sql.String()
-}
-
-// CaseValue returns string with double quotes. This is used for CASE WHEN ... statement.
-func (s *Stmt) CaseValue() string {
-	if len(s.called) == 0 {
-		s.addError(errors.New("Command must be clause.When when CaseValue is used", errors.InvalidValueError))
-		return ""
-	}
-	_, ok := s.called[0].(*clause.When)
-	if !ok {
-		s.addError(errors.New("Command must be clause.When when CaseValue is used", errors.InvalidValueError))
-		return ""
-	}
-	sql, err := s.processCaseSQL(false)
-	if err != nil {
-		s.addError(err)
-		return ""
-	}
-	return sql.String()
-}
-
-// Sub returns Stmt.String with syntax.Sub type. This is used for UNION or WHERE with SELECT clause.
-func (s *Stmt) Sub() syntax.Sub {
-	return syntax.Sub(s.String())
-}
-
 // String returns query with string.
 func (s *Stmt) String() string {
-	if _, ok := s.cmd.(*cmd.Select); ok {
+	switch s.cmd.(type) {
+	case *cmd.Select:
 		sql, err := s.processQuerySQL()
+		if err != nil {
+			s.addError(err)
+			return err.Error()
+		}
+		return sql.String()
+	case *cmd.Insert, *cmd.Update, *cmd.Delete:
+		sql, err := s.processExecSQL()
+		if err != nil {
+			s.addError(err)
+			return err.Error()
+		}
+		return sql.String()
+	case *clause.When:
+		sql, err := s.processCaseSQL(false)
 		if err != nil {
 			s.addError(err)
 			return ""
 		}
 		return sql.String()
 	}
-	sql, err := s.processExecSQL()
-	if err != nil {
-		s.addError(err)
-		return ""
-	}
-	return sql.String()
+
+	return "Error was occurred"
 }
 
 // stmtFuncString returns called function like "SELECT(...).FROM(...).WHERE(...).QUERY(...)".
@@ -189,7 +157,11 @@ func (s *Stmt) processQuerySQL() (internal.SQL, error) {
 	if !ok {
 		return "", errors.New("Command must be SELECT", errors.InvalidValueError)
 	}
-	sql.Write(sel.Build().Build())
+	ss, err := sel.Build()
+	if err != nil {
+		return "", err
+	}
+	sql.Write(ss.Build())
 
 	for _, e := range s.called {
 		switch e := e.(type) {
@@ -259,9 +231,13 @@ func (s *Stmt) processCaseSQL(isColumn bool) (internal.SQL, error) {
 func (s *Stmt) processExecSQL() (internal.SQL, error) {
 	var sql internal.SQL
 
-	switch s.cmd.(type) {
+	switch cmd := s.cmd.(type) {
 	case *cmd.Insert, *cmd.Update, *cmd.Delete:
-		sql.Write(s.cmd.Build().Build())
+		ss, err := cmd.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.Write(ss.Build())
 	default:
 		return "", errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError)
 
@@ -408,13 +384,13 @@ func (s *Stmt) On(expr string, vals ...interface{}) OnStmt {
 }
 
 // Union calls UNION clause.
-func (s *Stmt) Union(stmt syntax.Sub) UnionStmt {
+func (s *Stmt) Union(stmt syntax.Stmt) UnionStmt {
 	s.call(&clause.Union{Stmt: stmt, All: false})
 	return s
 }
 
 // UnionAll calls UNION ALL clause.
-func (s *Stmt) UnionAll(stmt syntax.Sub) UnionStmt {
+func (s *Stmt) UnionAll(stmt syntax.Stmt) UnionStmt {
 	s.call(&clause.Union{Stmt: stmt, All: true})
 	return s
 }

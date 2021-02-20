@@ -12,8 +12,8 @@ type Update struct {
 	Columns []string
 }
 
-// Query returns clause keyword.
-func (u *Update) Query() string {
+// Name returns clause keyword.
+func (u *Update) Name() string {
 	return "UPDATE"
 }
 
@@ -33,15 +33,15 @@ func (u *Update) String() string {
 	for _, c := range u.Columns {
 		s += fmt.Sprintf(", %q", c)
 	}
-	return fmt.Sprintf("%s(%s)", u.Query(), s)
+	return fmt.Sprintf("%s(%s)", u.Name(), s)
 }
 
 // Build makes UPDATE clause with syntax.StmtSet.
-func (u *Update) Build() *syntax.StmtSet {
+func (u *Update) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(u.Query())
+	ss.WriteKeyword(u.Name())
 	ss.WriteValue(u.Table.Build())
-	return ss
+	return ss, nil
 }
 
 // NewUpdate create new update object.

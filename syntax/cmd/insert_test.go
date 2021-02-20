@@ -87,8 +87,12 @@ func TestInsert_Build(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := testCase.Insert.Build()
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
+		actual, err := testCase.Insert.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
+		if diff := cmp.Diff(testCase.Result, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}

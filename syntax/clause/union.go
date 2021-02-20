@@ -8,7 +8,7 @@ import (
 
 // Union is UNION clause.
 type Union struct {
-	Stmt syntax.Sub
+	Stmt syntax.Stmt
 	All  bool
 }
 
@@ -30,6 +30,6 @@ func (u *Union) String() string {
 func (u *Union) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(u.Name())
-	ss.WriteValue(string(u.Stmt))
+	ss.WriteValue(u.Stmt.String())
 	return ss, nil
 }

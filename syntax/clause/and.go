@@ -30,10 +30,11 @@ func (a *And) String() string {
 
 // Build makes AND clause with syntax.StmtSet.
 func (a *And) Build() (*syntax.StmtSet, error) {
-	ss, err := syntax.BuildStmtSetForExpression(a.Expr, a.Values...)
+	s, err := syntax.BuildForExpression(a.Expr, a.Values...)
 	if err != nil {
 		return nil, err
 	}
+	ss := &syntax.StmtSet{Value: s}
 	ss.WriteKeyword(a.Name())
 	ss.Parens = true
 	return ss, nil

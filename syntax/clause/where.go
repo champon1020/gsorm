@@ -30,10 +30,11 @@ func (w *Where) String() string {
 
 // Build makes WHERE clause with syntax.StmtSet.
 func (w *Where) Build() (*syntax.StmtSet, error) {
-	ss, err := syntax.BuildStmtSetForExpression(w.Expr, w.Values...)
+	s, err := syntax.BuildForExpression(w.Expr, w.Values...)
 	if err != nil {
 		return nil, err
 	}
+	ss := &syntax.StmtSet{Value: s}
 	ss.WriteKeyword(w.Name())
 	return ss, nil
 }

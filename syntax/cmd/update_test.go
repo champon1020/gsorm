@@ -74,8 +74,12 @@ func TestUpdate_Build(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := testCase.Update.Build()
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
+		actual, err := testCase.Update.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
+		if diff := cmp.Diff(testCase.Result, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
