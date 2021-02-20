@@ -3,6 +3,7 @@ package internal_test
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
@@ -188,5 +189,86 @@ func TestMapValueType(t *testing.T) {
 	for _, testCase := range testCases {
 		typ := internal.MapValueType(reflect.TypeOf(testCase.MapRef))
 		assert.Equal(t, testCase.Result, typ)
+	}
+}
+
+func TestMapOfColumnsToFields(t *testing.T) {
+	type Model1 struct {
+		ID        int
+		Name      string
+		BirthDate time.Time
+	}
+
+	type Model2 struct {
+		ID   int
+		Name string `mgorm:"first_name"`
+	}
+
+	testCases := []struct {
+		Columns   []string
+		ModelType reflect.Type
+		Result    map[int]int
+	}{
+		{
+			Columns:   []string{"id", "name", "birth_date"},
+			ModelType: reflect.TypeOf(Model1{}),
+			Result:    map[int]int{0: 0, 1: 1, 2: 2},
+		},
+		{
+			Columns:   []string{"name", "birth_date", "id"},
+			ModelType: reflect.TypeOf(Model1{}),
+			Result:    map[int]int{0: 1, 1: 2, 2: 0},
+		},
+		{
+			Columns:   []string{"first_name", "id"},
+			ModelType: reflect.TypeOf(Model2{}),
+			Result:    map[int]int{0: 1, 1: 0},
+		},
+		{
+			Columns:   []string{"first_name", "first_name", "id"},
+			ModelType: reflect.TypeOf(Model2{}),
+			Result:    map[int]int{0: 1, 1: 1, 2: 0},
+		},
+		{
+			Columns:   []string{},
+			ModelType: reflect.TypeOf(Model2{}),
+			Result:    map[int]int{},
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := internal.MapOfColumnsToFields(testCase.Columns, testCase.ModelType)
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
+func TestColumnNameFromTag(t *testing.T) {
+	type Model1 struct {
+		UID int `mgorm:"id"`
+	}
+	m1 := new(Model1)
+
+	type Model2 struct {
+		UID int
+	}
+	m2 := new(Model2)
+
+	type Model3 struct {
+		StudentName string
+	}
+	m3 := new(Model3)
+
+	testCases := []struct {
+		Struct reflect.StructField
+		Result string
+	}{
+		{reflect.TypeOf(m1).Elem().Field(0), "id"},
+		{reflect.TypeOf(m2).Elem().Field(0), "uid"},
+		{reflect.TypeOf(m3).Elem().Field(0), "student_name"},
+	}
+
+	for _, testCase := range testCases {
+		cn := internal.ColumnNameFromTag(testCase.Struct)
+		assert.Equal(t, testCase.Result, cn)
 	}
 }

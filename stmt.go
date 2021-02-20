@@ -197,7 +197,7 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 		sql.Write(ss.Build())
 
 		if s.model != nil {
-
+			/* process */
 		}
 
 		for _, e := range s.called {
@@ -231,6 +231,46 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 	}
 
 	return "", errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError)
+}
+
+func (s *Stmt) processInsertModelSQL(cols []string, model interface{}, sql *internal.SQL) error {
+	ref := reflect.ValueOf(model)
+	if ref.Kind() != reflect.Ptr {
+		return errors.New("Model must be pointer", errors.InvalidValueError)
+	}
+	ref = ref.Elem()
+
+	switch ref.Kind() {
+	case reflect.Slice, reflect.Array:
+		typ := reflect.TypeOf(ref.Elem().Interface())
+		if ref.Elem().Kind() == reflect.Struct {
+			// Get index map.
+			indC2F := internal.MapOfColumnsToFields(cols, typ)
+
+			for i := 0; i < ref.Len(); i++ {
+				if i > 0 {
+					sql.Write(",")
+				}
+				sql.Write("(")
+				for j := 0; j < len(cols); j++ {
+					if j > 0 {
+						sql.Write(",")
+					}
+					vStr, err := internal.ToString(ref.Elem().Field(indC2F[i]).Interface(), true)
+					if err != nil {
+						return err
+					}
+					sql.Write(vStr)
+				}
+				sql.Write(")")
+			}
+		}
+		return nil
+	case reflect.Map:
+	}
+
+	msg := fmt.Sprintf("Type %s is not supported for Model", reflect.TypeOf(model).String())
+	return errors.New(msg, errors.InvalidTypeError)
 }
 
 func (s *Stmt) processInsertSQL(e syntax.Clause, sql *internal.SQL) error {
