@@ -61,8 +61,7 @@ func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) 
 			From("employees").
 			Where("emp_no IN ?", mgorm.Select(db, "emp_no").
 				From("dept_manager").
-				Where("dept_no = ?", "d001").
-				Sub(),
+				Where("dept_no = ?", "d001"),
 			),
 
 		// SELECT * FROM employees LIMIT 5;
@@ -111,8 +110,7 @@ func QuerySamples(db *mgorm.DB, model interface{}, i int) (string, bool, error) 
 		mgorm.Select(db, "emp_no", "first_name").
 			From("employees").
 			Union(mgorm.Select(nil, "emp_no", "first_name").
-				From("v_full_employees").
-				Sub(),
+				From("v_full_employees"),
 			),
 
 		// SELECT COUNT(first_name) AS res_int, last_name FROM employees GROUP BY last_name;

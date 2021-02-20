@@ -1,4 +1,4 @@
-package cmd
+package clause
 
 import (
 	"fmt"
@@ -11,8 +11,8 @@ type Select struct {
 	Columns []syntax.Column
 }
 
-// Query returns clause keyword.
-func (s *Select) Query() string {
+// Name returns clause keyword.
+func (s *Select) Name() string {
 	return "SELECT"
 }
 
@@ -31,20 +31,20 @@ func (s *Select) String() string {
 		}
 		str += fmt.Sprintf("%q", c.Build())
 	}
-	return fmt.Sprintf("%s(%s)", s.Query(), str)
+	return fmt.Sprintf("%s(%s)", s.Name(), str)
 }
 
 // Build makes SELECT clause with syntax.StmtSet.
-func (s *Select) Build() *syntax.StmtSet {
+func (s *Select) Build() (*syntax.StmtSet, error) {
 	ss := &syntax.StmtSet{}
-	ss.WriteKeyword(s.Query())
+	ss.WriteKeyword(s.Name())
 	for i, c := range s.Columns {
 		if i != 0 {
 			ss.WriteValue(",")
 		}
 		ss.WriteValue(c.Build())
 	}
-	return ss
+	return ss, nil
 }
 
 // NewSelect create new select object.

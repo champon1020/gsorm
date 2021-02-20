@@ -30,10 +30,11 @@ func (o *On) String() string {
 
 // Build makes ON clause with syntax.StmtSet.
 func (o *On) Build() (*syntax.StmtSet, error) {
-	ss, err := syntax.BuildStmtSetForExpression(o.Expr, o.Values...)
+	s, err := syntax.BuildForExpression(o.Expr, o.Values...)
 	if err != nil {
 		return nil, err
 	}
+	ss := &syntax.StmtSet{Value: s}
 	ss.WriteKeyword(o.Name())
 	return ss, nil
 }

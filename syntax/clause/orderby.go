@@ -8,8 +8,7 @@ import (
 
 // OrderBy is ORDER BY clause.
 type OrderBy struct {
-	Column string
-	Desc   bool
+	Columns []string
 }
 
 // Name returns clause keyword.
@@ -19,16 +18,18 @@ func (o *OrderBy) Name() string {
 
 // String returns function call with string.
 func (o *OrderBy) String() string {
-	return fmt.Sprintf("%s(%q, %v)", o.Name(), o.Column, o.Desc)
+	return fmt.Sprintf("%s(%q)", o.Name(), o.Columns)
 }
 
 // Build makes ORDER BY clause with sytnax.StmtSet.
 func (o *OrderBy) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(o.Name())
-	ss.WriteValue(o.Column)
-	if o.Desc {
-		ss.WriteValue("DESC")
+	for i, c := range o.Columns {
+		if i > 0 {
+			ss.WriteValue(",")
+		}
+		ss.WriteValue(c)
 	}
 	return ss, nil
 }

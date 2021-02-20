@@ -1,36 +1,36 @@
-package cmd_test
+package clause_test
 
 import (
 	"testing"
 
 	"github.com/champon1020/mgorm/syntax"
-	"github.com/champon1020/mgorm/syntax/cmd"
+	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestUpdate_String(t *testing.T) {
 	testCases := []struct {
-		Update *cmd.Update
+		Update *clause.Update
 		Result string
 	}{
 		{
-			&cmd.Update{Table: syntax.Table{Name: "table"}},
+			&clause.Update{Table: syntax.Table{Name: "table"}},
 			`UPDATE("table")`,
 		},
 		{
-			&cmd.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
+			&clause.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
 			`UPDATE("table AS t")`,
 		},
 		{
-			&cmd.Update{
+			&clause.Update{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []string{"column"},
 			},
 			`UPDATE("table AS t", "column")`,
 		},
 		{
-			&cmd.Update{
+			&clause.Update{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []string{"column1", "column2"},
 			},
@@ -46,26 +46,26 @@ func TestUpdate_String(t *testing.T) {
 
 func TestUpdate_Build(t *testing.T) {
 	testCases := []struct {
-		Update *cmd.Update
+		Update *clause.Update
 		Result *syntax.StmtSet
 	}{
 		{
-			&cmd.Update{Table: syntax.Table{Name: "table"}},
+			&clause.Update{Table: syntax.Table{Name: "table"}},
 			&syntax.StmtSet{Keyword: "UPDATE", Value: "table"},
 		},
 		{
-			&cmd.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
+			&clause.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
 			&syntax.StmtSet{Keyword: "UPDATE", Value: "table AS t"},
 		},
 		{
-			&cmd.Update{
+			&clause.Update{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []string{"column"},
 			},
 			&syntax.StmtSet{Keyword: "UPDATE", Value: "table AS t"},
 		},
 		{
-			&cmd.Update{
+			&clause.Update{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []string{"column1", "column2"},
 			},
@@ -74,8 +74,12 @@ func TestUpdate_Build(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := testCase.Update.Build()
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
+		actual, err := testCase.Update.Build()
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
+		if diff := cmp.Diff(testCase.Result, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
@@ -85,22 +89,22 @@ func TestNewUpdate(t *testing.T) {
 	testCases := []struct {
 		Table   string
 		Columns []string
-		Result  *cmd.Update
+		Result  *clause.Update
 	}{
 		{
 			"table",
 			[]string{},
-			&cmd.Update{Table: syntax.Table{Name: "table"}, Columns: []string{}},
+			&clause.Update{Table: syntax.Table{Name: "table"}, Columns: []string{}},
 		},
 		{
 			"table AS t",
 			[]string{},
-			&cmd.Update{Table: syntax.Table{Name: "table", Alias: "t"}, Columns: []string{}},
+			&clause.Update{Table: syntax.Table{Name: "table", Alias: "t"}, Columns: []string{}},
 		},
 		{
 			"table AS t",
 			[]string{"column"},
-			&cmd.Update{
+			&clause.Update{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []string{"column"},
 			},
@@ -108,7 +112,7 @@ func TestNewUpdate(t *testing.T) {
 		{
 			"table AS t",
 			[]string{"column1", "column2"},
-			&cmd.Update{
+			&clause.Update{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []string{"column1", "column2"},
 			},
@@ -116,7 +120,7 @@ func TestNewUpdate(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := cmd.NewUpdate(testCase.Table, testCase.Columns)
+		res := clause.NewUpdate(testCase.Table, testCase.Columns)
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}

@@ -43,7 +43,7 @@ func TestStmt_String(t *testing.T) {
 				Where("emp_no IN ?",
 					mgorm.Select(nil, "DISTINCT emp_no").
 						From("salaries").
-						Where("salary < ?", 60000).Sub()).(*mgorm.Stmt),
+						Where("salary < ?", 60000)).(*mgorm.Stmt),
 			`SELECT emp_no FROM employees ` +
 				`WHERE emp_no IN ` +
 				`(SELECT DISTINCT emp_no FROM salaries WHERE salary < 60000)`,
@@ -75,8 +75,8 @@ func TestStmt_String(t *testing.T) {
 		{
 			mgorm.Select(nil, "first_name").
 				From("employees").
-				OrderByDesc("first_name").(*mgorm.Stmt),
-			`SELECT first_name FROM employees ORDER BY first_name DESC`,
+				OrderBy("first_name", "last_name DESC").(*mgorm.Stmt),
+			`SELECT first_name FROM employees ORDER BY first_name, last_name DESC`,
 		},
 		{
 			mgorm.Select(nil, "emp_no").
@@ -107,12 +107,12 @@ func TestStmt_String(t *testing.T) {
 				From("employees AS e").
 				LeftJoin("titles AS t").
 				On("e.emp_no = t.emp_no").
-				OrderByDesc("e.emp_no").
+				OrderBy("e.emp_no DESC", "title").
 				Limit(5).(*mgorm.Stmt),
 			`SELECT e.emp_no, t.title FROM employees AS e ` +
 				`LEFT JOIN titles AS t ` +
 				`ON e.emp_no = t.emp_no ` +
-				`ORDER BY e.emp_no DESC ` +
+				`ORDER BY e.emp_no DESC, title ` +
 				`LIMIT 5`,
 		},
 		{
@@ -120,12 +120,12 @@ func TestStmt_String(t *testing.T) {
 				From("titles AS t").
 				RightJoin("employees AS e").
 				On("t.emp_no = e.emp_no").
-				OrderByDesc("e.emp_no").
+				OrderBy("e.emp_no DESC", "title").
 				Limit(5).(*mgorm.Stmt),
 			`SELECT t.title, e.emp_no FROM titles AS t ` +
 				`RIGHT JOIN employees AS e ` +
 				`ON t.emp_no = e.emp_no ` +
-				`ORDER BY e.emp_no DESC ` +
+				`ORDER BY e.emp_no DESC, title ` +
 				`LIMIT 5`,
 		},
 		{
@@ -147,8 +147,7 @@ func TestStmt_String(t *testing.T) {
 			mgorm.Select(nil, "hire_date AS date").
 				From("employees").
 				Union(mgorm.Select(nil, "from_date AS date").
-					From("salaries").
-					Sub()).
+					From("salaries")).
 				Limit(5).(*mgorm.Stmt),
 			`SELECT hire_date AS date FROM employees ` +
 				`UNION ` +
@@ -159,39 +158,12 @@ func TestStmt_String(t *testing.T) {
 			mgorm.Select(nil, "from_date AS date").
 				From("salaries").
 				UnionAll(mgorm.Select(nil, "from_date AS date").
-					From("titles").
-					Sub()).
+					From("titles")).
 				Limit(5).(*mgorm.Stmt),
 			`SELECT from_date AS date FROM salaries ` +
 				`UNION ALL ` +
 				`SELECT from_date AS date FROM titles ` +
 				`LIMIT 5`,
-		},
-		{
-			mgorm.Select(nil, mgorm.When("gender = ?", "M").
-				Then("first_name").
-				Else("last_name").CaseColumn()).
-				From("employees").
-				OrderBy("emp_no").(*mgorm.Stmt),
-			`SELECT CASE ` +
-				`WHEN gender = "M" THEN first_name ` +
-				`ELSE last_name ` +
-				`END ` +
-				`FROM employees ` +
-				`ORDER BY emp_no`,
-		},
-		{
-			mgorm.Select(nil, mgorm.When("gender = ?", "M").
-				Then("MAN").
-				Else("WOMAN").CaseValue()).
-				From("employees").
-				OrderBy("emp_no").(*mgorm.Stmt),
-			`SELECT CASE ` +
-				`WHEN gender = "M" THEN "MAN" ` +
-				`ELSE "WOMAN" ` +
-				`END ` +
-				`FROM employees ` +
-				`ORDER BY emp_no`,
 		},
 		{
 			mgorm.Min(nil, "emp_no").From("employees").(*mgorm.Stmt),
@@ -226,120 +198,6 @@ func TestStmt_String(t *testing.T) {
 	}
 }
 
-func TestStmt_CaseColumn_Fail(t *testing.T) {
-	{
-		expectedErr := errors.New(
-			"Command must be clause.When when CaseColumn is used", errors.InvalidValueError).(*errors.Error)
-
-		// Prepare for test.
-		s := mgorm.Select(nil, "*").(*mgorm.Stmt)
-
-		// Actual process.
-		s.CaseColumn()
-
-		// Validate error.
-		errs := s.ExportedGetErrors()
-		if len(errs) == 0 {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := errs[0].(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
-		}
-		if !actualErr.Is(expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
-	}
-	{
-		expectedErr := errors.New(
-			"Command must be clause.When when CaseColumn is used", errors.InvalidValueError).(*errors.Error)
-
-		// Prepare for test.
-		s := mgorm.Select(nil, "*").From("employees").(*mgorm.Stmt)
-
-		// Actual process.
-		s.CaseColumn()
-
-		// Validate error.
-		errs := s.ExportedGetErrors()
-		if len(errs) == 0 {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := errs[0].(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
-		}
-		if !actualErr.Is(expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
-	}
-}
-
-func TestStmt_CaseValue_Fail(t *testing.T) {
-	{
-		expectedErr := errors.New(
-			"Command must be clause.When when CaseValue is used", errors.InvalidValueError).(*errors.Error)
-
-		// Prepare for test.
-		s := mgorm.Select(nil, "*").(*mgorm.Stmt)
-
-		// Actual process.
-		s.CaseValue()
-
-		// Validate error.
-		errs := s.ExportedGetErrors()
-		if len(errs) == 0 {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := errs[0].(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
-		}
-		if !actualErr.Is(expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
-	}
-	{
-		expectedErr := errors.New(
-			"Command must be clause.When when CaseValue is used", errors.InvalidValueError).(*errors.Error)
-
-		// Prepare for test.
-		s := mgorm.Select(nil, "*").From("employees").(*mgorm.Stmt)
-
-		// Actual process.
-		s.CaseValue()
-
-		// Validate error.
-		errs := s.ExportedGetErrors()
-		if len(errs) == 0 {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := errs[0].(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
-		}
-		if !actualErr.Is(expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
-	}
-}
-
 func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 	{
 		expectedErr := errors.New("Command must be SELECT", errors.InvalidValueError).(*errors.Error)
@@ -368,10 +226,10 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			`Type clause.When is not supported`, errors.InvalidTypeError).(*errors.Error)
+			`Type clause.Values is not supported`, errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
-		s := mgorm.Select(nil, "").(*mgorm.Stmt).When("").(*mgorm.Stmt)
+		s := mgorm.Select(nil, "").(*mgorm.Stmt).Values("").(*mgorm.Stmt)
 
 		// Actual process.
 		_, err := mgorm.StmtProcessQuerySQL(s)
@@ -391,33 +249,6 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
 			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
-	}
-}
-
-func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
-	expectedErr := errors.New(
-		"Type clause.From is not supported", errors.InvalidTypeError).(*errors.Error)
-
-	// Prepare for test.
-	s := mgorm.Select(nil, "").From("").(*mgorm.Stmt)
-
-	// Actual process
-	_, err := mgorm.StmtProcessCaseSQL(s, false)
-
-	// Validate error.
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
-		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 	}
 }
 
@@ -450,10 +281,10 @@ func TestStmt_ProcessExecSQL_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			"Type clause.When is not supported", errors.InvalidTypeError).(*errors.Error)
+			"Type clause.Join is not supported", errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
-		s := mgorm.Insert(nil, "").(*mgorm.Stmt).When("").(*mgorm.Stmt)
+		s := mgorm.Insert(nil, "").(*mgorm.Stmt).Join("").(*mgorm.Stmt)
 
 		// Actual process.
 		_, err := mgorm.StmtProcessExecSQL(s)
