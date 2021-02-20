@@ -188,36 +188,91 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 	var sql internal.SQL
 
 	switch cmd := s.cmd.(type) {
-	case *clause.Insert, *clause.Update, *clause.Delete:
+	case *clause.Insert:
 		ss, err := cmd.Build()
 		if err != nil {
 			return "", err
 		}
 		sql.Write(ss.Build())
-	default:
-		return "", errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError)
-	}
-
-	for _, e := range s.called {
-		switch e := e.(type) {
-		case *clause.Values,
-			*clause.Set,
-			*clause.From,
-			*clause.Where,
-			*clause.And,
-			*clause.Or:
-			s, err := e.Build()
-			if err != nil {
+		for _, e := range s.called {
+			if err := s.processInsertSQL(e, &sql); err != nil {
 				return "", err
 			}
-			sql.Write(s.Build())
-		default:
-			msg := fmt.Sprintf("Type %s is not supported", reflect.TypeOf(e).Elem().String())
-			return "", errors.New(msg, errors.InvalidTypeError)
 		}
+	case *clause.Update:
+		ss, err := cmd.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.Write(ss.Build())
+		for _, e := range s.called {
+			if err := s.processUpdateSQL(e, &sql); err != nil {
+				return "", err
+			}
+		}
+	case *clause.Delete:
+		ss, err := cmd.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.Write(ss.Build())
+		for _, e := range s.called {
+			if err := s.processDeleteSQL(e, &sql); err != nil {
+				return "", err
+			}
+		}
+		return sql, nil
 	}
 
-	return sql, nil
+	return "", errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError)
+}
+
+func (s *Stmt) processInsertSQL(e syntax.Clause, sql *internal.SQL) error {
+	switch e := e.(type) {
+	case *clause.Values:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		return nil
+	}
+
+	msg := fmt.Sprintf("Type %s is not supported for INSERT", reflect.TypeOf(e).Elem().String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+func (s *Stmt) processUpdateSQL(e syntax.Clause, sql *internal.SQL) error {
+	switch e := e.(type) {
+	case *clause.Set,
+		*clause.Where,
+		*clause.And,
+		*clause.Or:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		return nil
+	}
+
+	msg := fmt.Sprintf("Type %s is not supported for UPDATE", reflect.TypeOf(e).Elem().String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+func (s *Stmt) processDeleteSQL(e syntax.Clause, sql *internal.SQL) error {
+	switch e := e.(type) {
+	case *clause.From:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		return nil
+	}
+
+	msg := fmt.Sprintf("Type %s is not supported for DELETE", reflect.TypeOf(e).Elem().String())
+	return errors.New(msg, errors.InvalidTypeError)
 }
 
 // From calls FROM clause.

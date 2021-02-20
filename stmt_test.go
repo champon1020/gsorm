@@ -281,7 +281,7 @@ func TestStmt_ProcessExecSQL_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			"Type clause.Join is not supported", errors.InvalidTypeError).(*errors.Error)
+			"Type clause.Join is not supported for INSERT", errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
 		s := mgorm.Insert(nil, "").(*mgorm.Stmt).Join("").(*mgorm.Stmt)
