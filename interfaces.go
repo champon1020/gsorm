@@ -84,8 +84,7 @@ type FromStmt interface {
 	FullJoin(string) JoinStmt
 	Where(string, ...interface{}) WhereStmt
 	GroupBy(...string) GroupByStmt
-	OrderBy(string) OrderByStmt
-	OrderByDesc(string) OrderByStmt
+	OrderBy(...string) OrderByStmt
 	Limit(int) LimitStmt
 	Union(syntax.Stmt) UnionStmt
 	UnionAll(syntax.Stmt) UnionStmt
@@ -112,8 +111,7 @@ type JoinStmt interface {
 type OnStmt interface {
 	Where(string, ...interface{}) WhereStmt
 	GroupBy(...string) GroupByStmt
-	OrderBy(string) OrderByStmt
-	OrderByDesc(string) OrderByStmt
+	OrderBy(...string) OrderByStmt
 	Limit(int) LimitStmt
 	Union(syntax.Stmt) UnionStmt
 	UnionAll(syntax.Stmt) UnionStmt
@@ -125,8 +123,7 @@ type WhereStmt interface {
 	And(string, ...interface{}) AndStmt
 	Or(string, ...interface{}) OrStmt
 	GroupBy(...string) GroupByStmt
-	OrderBy(string) OrderByStmt
-	OrderByDesc(string) OrderByStmt
+	OrderBy(...string) OrderByStmt
 	Limit(int) LimitStmt
 	Union(syntax.Stmt) UnionStmt
 	UnionAll(syntax.Stmt) UnionStmt
@@ -137,8 +134,7 @@ type WhereStmt interface {
 // AndStmt is returned after (*Stmt).And is called.
 type AndStmt interface {
 	GroupBy(...string) GroupByStmt
-	OrderBy(string) OrderByStmt
-	OrderByDesc(string) OrderByStmt
+	OrderBy(...string) OrderByStmt
 	Union(syntax.Stmt) UnionStmt
 	UnionAll(syntax.Stmt) UnionStmt
 	QueryCallable
@@ -148,8 +144,7 @@ type AndStmt interface {
 // OrStmt is returned after (*Stmt).Or is called.
 type OrStmt interface {
 	GroupBy(...string) GroupByStmt
-	OrderBy(string) OrderByStmt
-	OrderByDesc(string) OrderByStmt
+	OrderBy(...string) OrderByStmt
 	Union(syntax.Stmt) UnionStmt
 	UnionAll(syntax.Stmt) UnionStmt
 	QueryCallable
@@ -159,8 +154,7 @@ type OrStmt interface {
 // GroupByStmt is returned after (*Stmt).GroupBy is called.
 type GroupByStmt interface {
 	Having(string, ...interface{}) HavingStmt
-	OrderBy(string) OrderByStmt
-	OrderByDesc(string) OrderByStmt
+	OrderBy(...string) OrderByStmt
 	Union(syntax.Stmt) UnionStmt
 	UnionAll(syntax.Stmt) UnionStmt
 	QueryCallable
@@ -168,8 +162,7 @@ type GroupByStmt interface {
 
 // HavingStmt is returned after (*Stmt).Having is called.
 type HavingStmt interface {
-	OrderBy(string) OrderByStmt
-	OrderByDesc(string) OrderByStmt
+	OrderBy(...string) OrderByStmt
 	Union(syntax.Stmt) UnionStmt
 	UnionAll(syntax.Stmt) UnionStmt
 	QueryCallable
@@ -200,28 +193,10 @@ type OffsetStmt interface {
 
 // UnionStmt is returned after (*Stmt).Union is called.
 type UnionStmt interface {
-	OrderBy(string) OrderByStmt
-	OrderByDesc(string) OrderByStmt
+	OrderBy(...string) OrderByStmt
 	Limit(int) LimitStmt
 	Union(syntax.Stmt) UnionStmt
 	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-}
-
-// WhenStmt is returned after (*Stmt).When or mgorm.When is called.
-type WhenStmt interface {
-	Then(interface{}) ThenStmt
-}
-
-// ThenStmt is returned after (*Stmt).Then is called.
-type ThenStmt interface {
-	When(string, ...interface{}) WhenStmt
-	Else(interface{}) ElseStmt
-	QueryCallable
-}
-
-// ElseStmt is returned after (*Stmt).Else is called.
-type ElseStmt interface {
 	QueryCallable
 }
 

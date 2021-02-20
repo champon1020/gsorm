@@ -15,12 +15,12 @@ func TestOrderBy_String(t *testing.T) {
 		Result  string
 	}{
 		{
-			&clause.OrderBy{Column: "column"},
-			`ORDER BY("column", false)`,
+			&clause.OrderBy{Columns: []string{"column"}},
+			`ORDER BY(["column"])`,
 		},
 		{
-			&clause.OrderBy{Column: "column", Desc: true},
-			`ORDER BY("column", true)`,
+			&clause.OrderBy{Columns: []string{"column1", "column2 DESC"}},
+			`ORDER BY(["column1" "column2 DESC"])`,
 		},
 	}
 
@@ -36,12 +36,12 @@ func TestOrderBy_Build(t *testing.T) {
 		Result  *syntax.StmtSet
 	}{
 		{
-			&clause.OrderBy{Column: "column"},
+			&clause.OrderBy{Columns: []string{"column"}},
 			&syntax.StmtSet{Keyword: "ORDER BY", Value: "column"},
 		},
 		{
-			&clause.OrderBy{Column: "column", Desc: true},
-			&syntax.StmtSet{Keyword: "ORDER BY", Value: "column DESC"},
+			&clause.OrderBy{Columns: []string{"column1", "column2 DESC"}},
+			&syntax.StmtSet{Keyword: "ORDER BY", Value: "column1, column2 DESC"},
 		},
 	}
 

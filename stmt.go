@@ -294,16 +294,17 @@ func (s *Stmt) Offset(num int) OffsetStmt {
 }
 
 // OrderBy calls ORDER BY clause.
-func (s *Stmt) OrderBy(col string) OrderByStmt {
-	s.call(&clause.OrderBy{Column: col, Desc: false})
+func (s *Stmt) OrderBy(cols ...string) OrderByStmt {
+	s.call(&clause.OrderBy{Columns: cols})
 	return s
 }
 
+/*
 // OrderByDesc calls ORDER BY ... DESC clause.
 func (s *Stmt) OrderByDesc(col string) OrderByStmt {
 	s.call(&clause.OrderBy{Column: col, Desc: true})
 	return s
-}
+}*/
 
 // Join calls (INNER) JOIN clause.
 func (s *Stmt) Join(table string) JoinStmt {

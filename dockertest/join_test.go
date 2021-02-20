@@ -43,7 +43,7 @@ func TestJoin(t *testing.T) {
 				From("employees AS e").
 				LeftJoin("titles AS t").
 				On("e.emp_no = t.emp_no").
-				OrderByDesc("e.emp_no").
+				OrderBy("e.emp_no DESC", "title").
 				Limit(5).(*mgorm.Stmt),
 			&[]EmployeeWithTitle{
 				{EmpNo: 10010},
@@ -62,7 +62,7 @@ func TestJoin(t *testing.T) {
 				From("titles AS t").
 				RightJoin("employees AS e").
 				On("t.emp_no = e.emp_no").
-				OrderByDesc("e.emp_no").
+				OrderBy("e.emp_no DESC", "title").
 				Limit(5).(*mgorm.Stmt),
 			&[]EmployeeWithTitle{
 				{EmpNo: 10010},

@@ -75,8 +75,8 @@ func TestStmt_String(t *testing.T) {
 		{
 			mgorm.Select(nil, "first_name").
 				From("employees").
-				OrderByDesc("first_name").(*mgorm.Stmt),
-			`SELECT first_name FROM employees ORDER BY first_name DESC`,
+				OrderBy("first_name", "last_name DESC").(*mgorm.Stmt),
+			`SELECT first_name FROM employees ORDER BY first_name, last_name DESC`,
 		},
 		{
 			mgorm.Select(nil, "emp_no").
@@ -107,12 +107,12 @@ func TestStmt_String(t *testing.T) {
 				From("employees AS e").
 				LeftJoin("titles AS t").
 				On("e.emp_no = t.emp_no").
-				OrderByDesc("e.emp_no").
+				OrderBy("e.emp_no DESC", "title").
 				Limit(5).(*mgorm.Stmt),
 			`SELECT e.emp_no, t.title FROM employees AS e ` +
 				`LEFT JOIN titles AS t ` +
 				`ON e.emp_no = t.emp_no ` +
-				`ORDER BY e.emp_no DESC ` +
+				`ORDER BY e.emp_no DESC, title ` +
 				`LIMIT 5`,
 		},
 		{
@@ -120,12 +120,12 @@ func TestStmt_String(t *testing.T) {
 				From("titles AS t").
 				RightJoin("employees AS e").
 				On("t.emp_no = e.emp_no").
-				OrderByDesc("e.emp_no").
+				OrderBy("e.emp_no DESC", "title").
 				Limit(5).(*mgorm.Stmt),
 			`SELECT t.title, e.emp_no FROM titles AS t ` +
 				`RIGHT JOIN employees AS e ` +
 				`ON t.emp_no = e.emp_no ` +
-				`ORDER BY e.emp_no DESC ` +
+				`ORDER BY e.emp_no DESC, title ` +
 				`LIMIT 5`,
 		},
 		{
