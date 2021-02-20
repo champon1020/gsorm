@@ -226,10 +226,10 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			`Type clause.When is not supported`, errors.InvalidTypeError).(*errors.Error)
+			`Type clause.Values is not supported`, errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
-		s := mgorm.Select(nil, "").(*mgorm.Stmt).When("").(*mgorm.Stmt)
+		s := mgorm.Select(nil, "").(*mgorm.Stmt).Values("").(*mgorm.Stmt)
 
 		// Actual process.
 		_, err := mgorm.StmtProcessQuerySQL(s)
@@ -249,33 +249,6 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
 			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
-	}
-}
-
-func TestStmt_ProcessCaseSQL_Fail(t *testing.T) {
-	expectedErr := errors.New(
-		"Type clause.From is not supported", errors.InvalidTypeError).(*errors.Error)
-
-	// Prepare for test.
-	s := mgorm.Select(nil, "").From("").(*mgorm.Stmt)
-
-	// Actual process
-	_, err := mgorm.StmtProcessCaseSQL(s, false)
-
-	// Validate error.
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
-		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 	}
 }
 
@@ -308,10 +281,10 @@ func TestStmt_ProcessExecSQL_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			"Type clause.When is not supported", errors.InvalidTypeError).(*errors.Error)
+			"Type clause.Join is not supported", errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
-		s := mgorm.Insert(nil, "").(*mgorm.Stmt).When("").(*mgorm.Stmt)
+		s := mgorm.Insert(nil, "").(*mgorm.Stmt).Join("").(*mgorm.Stmt)
 
 		// Actual process.
 		_, err := mgorm.StmtProcessExecSQL(s)

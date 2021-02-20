@@ -8,7 +8,6 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
-	"github.com/champon1020/mgorm/syntax/cmd"
 )
 
 // Stmt stores information about query.
@@ -32,25 +31,18 @@ func (s *Stmt) addError(err error) {
 // String returns query with string.
 func (s *Stmt) String() string {
 	switch s.cmd.(type) {
-	case *cmd.Select:
+	case *clause.Select:
 		sql, err := s.processQuerySQL()
 		if err != nil {
 			s.addError(err)
 			return err.Error()
 		}
 		return sql.String()
-	case *cmd.Insert, *cmd.Update, *cmd.Delete:
+	case *clause.Insert, *clause.Update, *clause.Delete:
 		sql, err := s.processExecSQL()
 		if err != nil {
 			s.addError(err)
 			return err.Error()
-		}
-		return sql.String()
-	case *clause.When:
-		sql, err := s.processCaseSQL(false)
-		if err != nil {
-			s.addError(err)
-			return ""
 		}
 		return sql.String()
 	}
@@ -153,7 +145,7 @@ func (s *Stmt) ExpectExec() *Stmt {
 func (s *Stmt) processQuerySQL() (internal.SQL, error) {
 	var sql internal.SQL
 
-	sel, ok := s.cmd.(*cmd.Select)
+	sel, ok := s.cmd.(*clause.Select)
 	if !ok {
 		return "", errors.New("Command must be SELECT", errors.InvalidValueError)
 	}
@@ -191,48 +183,12 @@ func (s *Stmt) processQuerySQL() (internal.SQL, error) {
 	return sql, nil
 }
 
-// processCaseSQL builds SQL with called clauses.
-// isColumn flag indicates whether this is called from (*Stmt).CaseColumn() or not.
-func (s *Stmt) processCaseSQL(isColumn bool) (internal.SQL, error) {
-	var sql internal.SQL
-	sql.Write("CASE")
-	for _, e := range s.called {
-		switch e := e.(type) {
-		case *clause.When:
-			s, err := e.Build()
-			if err != nil {
-				return "", err
-			}
-			sql.Write(s.Build())
-		case *clause.Then:
-			e.IsColumn = isColumn
-			s, err := e.Build()
-			if err != nil {
-				return "", err
-			}
-			sql.Write(s.Build())
-		case *clause.Else:
-			e.IsColumn = isColumn
-			s, err := e.Build()
-			if err != nil {
-				return "", err
-			}
-			sql.Write(s.Build())
-		default:
-			msg := fmt.Sprintf("Type %s is not supported", reflect.TypeOf(e).Elem().String())
-			return "", errors.New(msg, errors.InvalidTypeError)
-		}
-	}
-	sql.Write("END")
-	return sql, nil
-}
-
 // processQuerySQL builds SQL with called clauses.
 func (s *Stmt) processExecSQL() (internal.SQL, error) {
 	var sql internal.SQL
 
 	switch cmd := s.cmd.(type) {
-	case *cmd.Insert, *cmd.Update, *cmd.Delete:
+	case *clause.Insert, *clause.Update, *clause.Delete:
 		ss, err := cmd.Build()
 		if err != nil {
 			return "", err
@@ -240,12 +196,16 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 		sql.Write(ss.Build())
 	default:
 		return "", errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError)
-
 	}
 
 	for _, e := range s.called {
 		switch e := e.(type) {
-		case *clause.Values, *clause.Set, *clause.From, *clause.Where, *clause.And, *clause.Or:
+		case *clause.Values,
+			*clause.Set,
+			*clause.From,
+			*clause.Where,
+			*clause.And,
+			*clause.Or:
 			s, err := e.Build()
 			if err != nil {
 				return "", err
@@ -286,7 +246,7 @@ func (s *Stmt) Set(vals ...interface{}) SetStmt {
 		s.addError(errors.New("Command is nil", errors.InvalidValueError))
 		return s
 	}
-	u, ok := s.cmd.(*cmd.Update)
+	u, ok := s.cmd.(*clause.Update)
 	if !ok {
 		s.addError(errors.New("SET clause can be used with UPDATE command", errors.InvalidValueError))
 		return s
@@ -408,23 +368,5 @@ func (s *Stmt) GroupBy(cols ...string) GroupByStmt {
 // Having calls HAVING clause.
 func (s *Stmt) Having(expr string, vals ...interface{}) HavingStmt {
 	s.call(&clause.Having{Expr: expr, Values: vals})
-	return s
-}
-
-// When calls WHEN clause.
-func (s *Stmt) When(expr string, vals ...interface{}) WhenStmt {
-	s.call(&clause.When{Expr: expr, Values: vals})
-	return s
-}
-
-// Then calls THEN clause.
-func (s *Stmt) Then(val interface{}) ThenStmt {
-	s.call(&clause.Then{Value: val})
-	return s
-}
-
-// Else calls ELSE clause.
-func (s *Stmt) Else(val interface{}) ElseStmt {
-	s.call(&clause.Else{Value: val})
 	return s
 }

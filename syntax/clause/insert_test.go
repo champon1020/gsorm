@@ -1,43 +1,43 @@
-package cmd_test
+package clause_test
 
 import (
 	"testing"
 
 	"github.com/champon1020/mgorm/syntax"
-	"github.com/champon1020/mgorm/syntax/cmd"
+	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInsert_String(t *testing.T) {
 	testCases := []struct {
-		Insert *cmd.Insert
+		Insert *clause.Insert
 		Result string
 	}{
 		{
-			&cmd.Insert{Table: syntax.Table{Name: "table"}},
+			&clause.Insert{Table: syntax.Table{Name: "table"}},
 			`INSERT INTO("table")`,
 		},
 		{
-			&cmd.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
+			&clause.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
 			`INSERT INTO("table AS t")`,
 		},
 		{
-			&cmd.Insert{
+			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column"}},
 			},
 			`INSERT INTO("table AS t", "column")`,
 		},
 		{
-			&cmd.Insert{
+			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column", Alias: "c"}},
 			},
 			`INSERT INTO("table AS t", "column AS c")`,
 		},
 		{
-			&cmd.Insert{
+			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column1", Alias: "c1"}, {Name: "column2", Alias: "c2"}},
 			},
@@ -52,33 +52,33 @@ func TestInsert_String(t *testing.T) {
 
 func TestInsert_Build(t *testing.T) {
 	testCases := []struct {
-		Insert *cmd.Insert
+		Insert *clause.Insert
 		Result *syntax.StmtSet
 	}{
 		{
-			&cmd.Insert{Table: syntax.Table{Name: "table"}},
+			&clause.Insert{Table: syntax.Table{Name: "table"}},
 			&syntax.StmtSet{Keyword: "INSERT INTO", Value: "table"},
 		},
 		{
-			&cmd.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
+			&clause.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
 			&syntax.StmtSet{Keyword: "INSERT INTO", Value: "table AS t"},
 		},
 		{
-			&cmd.Insert{
+			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column"}},
 			},
 			&syntax.StmtSet{Keyword: "INSERT INTO", Value: "table AS t (column)"},
 		},
 		{
-			&cmd.Insert{
+			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column", Alias: "c"}},
 			},
 			&syntax.StmtSet{Keyword: "INSERT INTO", Value: "table AS t (column AS c)"},
 		},
 		{
-			&cmd.Insert{
+			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column1", Alias: "c1"}, {Name: "column2", Alias: "c2"}},
 			},
@@ -102,22 +102,22 @@ func TestNewInsert(t *testing.T) {
 	testCases := []struct {
 		Table  string
 		Cols   []string
-		Result *cmd.Insert
+		Result *clause.Insert
 	}{
 		{
 			"table",
 			[]string{},
-			&cmd.Insert{Table: syntax.Table{Name: "table"}},
+			&clause.Insert{Table: syntax.Table{Name: "table"}},
 		},
 		{
 			"table AS t",
 			[]string{},
-			&cmd.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
+			&clause.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
 		},
 		{
 			"table AS t",
 			[]string{"column"},
-			&cmd.Insert{
+			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column"}},
 			},
@@ -125,7 +125,7 @@ func TestNewInsert(t *testing.T) {
 		{
 			"table AS t",
 			[]string{"column AS c"},
-			&cmd.Insert{
+			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column", Alias: "c"}},
 			},
@@ -133,7 +133,7 @@ func TestNewInsert(t *testing.T) {
 		{
 			"table AS t",
 			[]string{"column1 AS c1", "column2 AS c2"},
-			&cmd.Insert{
+			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column1", Alias: "c1"}, {Name: "column2", Alias: "c2"}},
 			},
@@ -141,7 +141,7 @@ func TestNewInsert(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := cmd.NewInsert(testCase.Table, testCase.Cols)
+		res := clause.NewInsert(testCase.Table, testCase.Cols)
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}

@@ -7,7 +7,6 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
-	"github.com/champon1020/mgorm/syntax/cmd"
 	"github.com/champon1020/mgorm/syntax/mig"
 )
 
@@ -32,28 +31,28 @@ func NewMock() *MockDB {
 // Select calls SELECT command.
 func Select(db Pool, cols ...string) SelectStmt {
 	stmt := &Stmt{db: db}
-	stmt.cmd = cmd.NewSelect(cols)
+	stmt.cmd = clause.NewSelect(cols)
 	return stmt
 }
 
 // Insert calls INSERT command.
 func Insert(db Pool, table string, cols ...string) InsertStmt {
 	stmt := &Stmt{db: db}
-	stmt.cmd = cmd.NewInsert(table, cols)
+	stmt.cmd = clause.NewInsert(table, cols)
 	return stmt
 }
 
 // Update calls UPDATE command.
 func Update(db Pool, table string, cols ...string) UpdateStmt {
 	stmt := &Stmt{db: db}
-	stmt.cmd = cmd.NewUpdate(table, cols)
+	stmt.cmd = clause.NewUpdate(table, cols)
 	return stmt
 }
 
 // Delete calls DELETE command.
 func Delete(db Pool) DeleteStmt {
 	stmt := &Stmt{db: db}
-	stmt.cmd = cmd.NewDelete()
+	stmt.cmd = clause.NewDelete()
 	return stmt
 }
 
@@ -64,7 +63,7 @@ func Count(db Pool, col string, alias ...string) SelectStmt {
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}
-	stmt.cmd = cmd.NewSelect([]string{s})
+	stmt.cmd = clause.NewSelect([]string{s})
 	return stmt
 }
 
@@ -75,7 +74,7 @@ func Avg(db Pool, col string, alias ...string) SelectStmt {
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}
-	stmt.cmd = cmd.NewSelect([]string{s})
+	stmt.cmd = clause.NewSelect([]string{s})
 	return stmt
 }
 
@@ -86,7 +85,7 @@ func Sum(db Pool, col string, alias ...string) SelectStmt {
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}
-	stmt.cmd = cmd.NewSelect([]string{s})
+	stmt.cmd = clause.NewSelect([]string{s})
 	return stmt
 }
 
@@ -97,7 +96,7 @@ func Min(db Pool, col string, alias ...string) SelectStmt {
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}
-	stmt.cmd = cmd.NewSelect([]string{s})
+	stmt.cmd = clause.NewSelect([]string{s})
 	return stmt
 }
 
@@ -108,14 +107,7 @@ func Max(db Pool, col string, alias ...string) SelectStmt {
 	if len(alias) > 0 {
 		s = fmt.Sprintf("%s AS %s", s, alias[0])
 	}
-	stmt.cmd = cmd.NewSelect([]string{s})
-	return stmt
-}
-
-// When calls CASE ... END clause.
-func When(expr string, vals ...interface{}) WhenStmt {
-	stmt := new(Stmt)
-	stmt.call(&clause.When{Expr: expr, Values: vals})
+	stmt.cmd = clause.NewSelect([]string{s})
 	return stmt
 }
 
