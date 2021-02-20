@@ -15,6 +15,7 @@ type Stmt struct {
 	db     Pool
 	cmd    syntax.Clause
 	called []syntax.Clause
+	model  interface{}
 	errors []error
 }
 
@@ -194,6 +195,11 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 			return "", err
 		}
 		sql.Write(ss.Build())
+
+		if s.model != nil {
+
+		}
+
 		for _, e := range s.called {
 			if err := s.processInsertSQL(e, &sql); err != nil {
 				return "", err
@@ -273,6 +279,12 @@ func (s *Stmt) processDeleteSQL(e syntax.Clause, sql *internal.SQL) error {
 
 	msg := fmt.Sprintf("Type %s is not supported for DELETE", reflect.TypeOf(e).Elem().String())
 	return errors.New(msg, errors.InvalidTypeError)
+}
+
+// Model sets model to Stmt.
+func (s *Stmt) Model(model interface{}) ModelStmt {
+	s.model = model
+	return s
 }
 
 // From calls FROM clause.
