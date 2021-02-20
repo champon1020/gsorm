@@ -207,12 +207,13 @@ func (m *MigStmt) processAlterTableSQL(sql *internal.SQL) error {
 		}
 		sql.Write(s.Build())
 		m.advanceClause()
-		return m.processColumnOptSQL(sql)
-	case *mig.NotNull,
-		*mig.AutoInc,
-		*mig.Default,
-		*mig.Cons:
-		return m.processColumnOptSQL(sql)
+		for len(m.called) > 0 {
+			err = m.processColumnOptSQL(sql)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
 	}
 
 	msg := fmt.Sprintf("Type %v is not supported for ALTER TABLE", reflect.TypeOf(e).String())
@@ -250,7 +251,6 @@ func (m *MigStmt) processColumnOptSQL(sql *internal.SQL) error {
 
 	switch e := e.(type) {
 	case *mig.NotNull,
-		*mig.AutoInc,
 		*mig.Default:
 		s, err := e.Build()
 		if err != nil {
@@ -259,14 +259,17 @@ func (m *MigStmt) processColumnOptSQL(sql *internal.SQL) error {
 		sql.Write(s.Build())
 		m.advanceClause()
 		return nil
-	case *mig.Cons:
+	case *mig.AutoInc:
+		if m.driver == internal.PSQL {
+			return errors.New("AUTO_INCREMENT clause is not allowed in PostgreSQL", errors.InvalidSyntaxError)
+		}
 		s, err := e.Build()
 		if err != nil {
 			return err
 		}
 		sql.Write(s.Build())
 		m.advanceClause()
-		return m.processConstraintSQL(sql)
+		return nil
 	}
 
 	msg := fmt.Sprintf("Type %v is not supported for column option", reflect.TypeOf(e).String())
