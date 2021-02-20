@@ -174,7 +174,7 @@ func MapOfColumnsToFields(cols []string, modelTyp reflect.Type) map[int]int {
 	return indR2M
 }
 
-// columnNameFromTag gets column name from struct field tag.
+// ColumnNameFromTag gets column name from struct field tag.
 func ColumnNameFromTag(sf reflect.StructField) string {
 	if sf.Tag.Get("mgorm") == "" {
 		return ConvertToSnakeCase(sf.Name)

@@ -176,7 +176,7 @@ func (s *Stmt) processQuerySQL() (internal.SQL, error) {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("Type %s is not supported", reflect.TypeOf(e).Elem().String())
+			msg := fmt.Sprintf("Type %s is not supported for SELECT", reflect.TypeOf(e).Elem().String())
 			return "", errors.New(msg, errors.InvalidTypeError)
 		}
 	}
@@ -197,7 +197,18 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 		sql.Write(ss.Build())
 
 		if s.model != nil {
-			/* process */
+			cols := []string{}
+			for _, c := range cmd.Columns {
+				if c.Alias != "" {
+					cols = append(cols, c.Alias)
+					continue
+				}
+				cols = append(cols, c.Name)
+			}
+			if err := s.processInsertModelSQL(cols, s.model, &sql); err != nil {
+				return "", err
+			}
+			return sql, nil
 		}
 
 		for _, e := range s.called {
@@ -205,6 +216,7 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 				return "", err
 			}
 		}
+		return sql, nil
 	case *clause.Update:
 		ss, err := cmd.Build()
 		if err != nil {
@@ -216,6 +228,7 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 				return "", err
 			}
 		}
+		return sql, nil
 	case *clause.Delete:
 		ss, err := cmd.Build()
 		if err != nil {
@@ -240,13 +253,15 @@ func (s *Stmt) processInsertModelSQL(cols []string, model interface{}, sql *inte
 	}
 	ref = ref.Elem()
 
+	sql.Write("VALUES")
 	switch ref.Kind() {
 	case reflect.Slice, reflect.Array:
-		typ := reflect.TypeOf(ref.Elem().Interface())
-		if ref.Elem().Kind() == reflect.Struct {
-			// Get index map.
-			indC2F := internal.MapOfColumnsToFields(cols, typ)
+		// Type of slice element.
+		typ := reflect.TypeOf(ref.Interface()).Elem()
 
+		// If undelying type of slice element is struct.
+		if typ.Kind() == reflect.Struct {
+			idxC2F := internal.MapOfColumnsToFields(cols, typ)
 			for i := 0; i < ref.Len(); i++ {
 				if i > 0 {
 					sql.Write(",")
@@ -256,7 +271,7 @@ func (s *Stmt) processInsertModelSQL(cols []string, model interface{}, sql *inte
 					if j > 0 {
 						sql.Write(",")
 					}
-					vStr, err := internal.ToString(ref.Elem().Field(indC2F[i]).Interface(), true)
+					vStr, err := internal.ToString(ref.Index(i).Field(idxC2F[j]).Interface(), true)
 					if err != nil {
 						return err
 					}
@@ -264,9 +279,54 @@ func (s *Stmt) processInsertModelSQL(cols []string, model interface{}, sql *inte
 				}
 				sql.Write(")")
 			}
+			return nil
+		}
+
+		for i := 0; i < ref.Len(); i++ {
+			if i > 0 {
+				sql.Write(",")
+			}
+			vStr, err := internal.ToString(ref.Index(i).Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(fmt.Sprintf("(%s)", vStr))
 		}
 		return nil
+	case reflect.Struct:
+		idxC2F := internal.MapOfColumnsToFields(cols, reflect.TypeOf(ref.Interface()))
+		sql.Write("(")
+		for j := 0; j < len(cols); j++ {
+			if j > 0 {
+				sql.Write(",")
+			}
+			vStr, err := internal.ToString(ref.Field(idxC2F[j]).Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(vStr)
+		}
+		sql.Write(")")
+		return nil
 	case reflect.Map:
+		r := ref.MapRange()
+		fst := true
+		for r.Next() {
+			if !fst {
+				sql.Write(",")
+			}
+			key, err := internal.ToString(r.Key().Interface(), true)
+			if err != nil {
+				return err
+			}
+			val, err := internal.ToString(r.Value().Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(fmt.Sprintf("(%s, %s)", key, val))
+			fst = false
+		}
+		return nil
 	}
 
 	msg := fmt.Sprintf("Type %s is not supported for Model", reflect.TypeOf(model).String())
