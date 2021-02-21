@@ -223,6 +223,17 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 			return "", err
 		}
 		sql.Write(ss.Build())
+
+		if s.model != nil {
+			cols := []string{}
+			for _, c := range cmd.Columns {
+				cols = append(cols, c)
+			}
+			if err := s.processUpdateModelSQL(cols, s.model, &sql); err != nil {
+				return "", err
+			}
+		}
+
 		for _, e := range s.called {
 			if err := s.processUpdateSQL(e, &sql); err != nil {
 				return "", err
@@ -329,7 +340,78 @@ func (s *Stmt) processInsertModelSQL(cols []string, model interface{}, sql *inte
 		return nil
 	}
 
-	msg := fmt.Sprintf("Type %s is not supported for Model", reflect.TypeOf(model).String())
+	msg := fmt.Sprintf("Type %s is not supported for Model with INSERT", reflect.TypeOf(model).String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+func (s *Stmt) processUpdateModelSQL(cols []string, model interface{}, sql *internal.SQL) error {
+	ref := reflect.ValueOf(model)
+	if ref.Kind() != reflect.Ptr {
+		return errors.New("Model must be pointer", errors.InvalidValueError)
+	}
+	ref = ref.Elem()
+
+	sql.Write("SET")
+	switch ref.Kind() {
+	case reflect.Struct:
+		idxC2F := internal.MapOfColumnsToFields(cols, reflect.TypeOf(ref.Interface()))
+		for i, c := range cols {
+			if i > 0 {
+				sql.Write(",")
+			}
+			vStr, err := internal.ToString(ref.Field(idxC2F[i]).Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(fmt.Sprintf("%s = %s", c, vStr))
+		}
+		return nil
+	case reflect.Map:
+		if len(cols) != 2 {
+			msg := fmt.Sprintf("If you set map to Model, number of columns must be 2, not %d", len(cols))
+			return errors.New(msg, errors.InvalidSyntaxError)
+		}
+		r := ref.MapRange()
+		for r.Next() {
+			key, err := internal.ToString(r.Key().Interface(), true)
+			if err != nil {
+				return err
+			}
+			val, err := internal.ToString(r.Value().Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(fmt.Sprintf("%s = %s, %s = %s", cols[0], key, cols[1], val))
+			break
+		}
+		return nil
+	case reflect.Int,
+		reflect.Int8,
+		reflect.Int16,
+		reflect.Int32,
+		reflect.Int64,
+		reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64,
+		reflect.Float32,
+		reflect.Float64,
+		reflect.Bool,
+		reflect.String:
+		if len(cols) != 1 {
+			msg := fmt.Sprintf("If you set variable to Model, number of columns must be 1, not %d", len(cols))
+			return errors.New(msg, errors.InvalidSyntaxError)
+		}
+		vStr, err := internal.ToString(ref.Interface(), true)
+		if err != nil {
+			return err
+		}
+		sql.Write(fmt.Sprintf("%s = %s", cols[0], vStr))
+		return nil
+	}
+
+	msg := fmt.Sprintf("Type %s is not supported for Model with UPDATE", reflect.TypeOf(model).String())
 	return errors.New(msg, errors.InvalidTypeError)
 }
 
@@ -423,8 +505,8 @@ func (s *Stmt) Set(vals ...interface{}) SetStmt {
 		return s
 	}
 	set := new(clause.Set)
-	for i := 0; i < len(u.Columns); i++ {
-		set.AddEq(u.Columns[i], vals[i])
+	for i, c := range u.Columns {
+		set.AddEq(c, vals[i])
 	}
 	s.call(set)
 	return s

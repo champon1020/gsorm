@@ -224,6 +224,14 @@ func TestStmt_ExecSQLString(t *testing.T) {
 			mgorm.Insert(nil, "sample", "id").Model(&model3).(*mgorm.Stmt),
 			`INSERT INTO sample (id) VALUES (10000), (10001)`,
 		},
+		{
+			mgorm.Update(nil, "sample", "id", "first_name").Model(&model1).Where("id = ?", 20000).(*mgorm.Stmt),
+			`UPDATE sample SET id = 10000, first_name = "Taro" WHERE id = 20000`,
+		},
+		{
+			mgorm.Update(nil, "sample", "id").Model(10000).Where("id = ?", 20000).(*mgorm.Stmt),
+			`UPDATE sample SET id = 10000 WHERE id = 20000`,
+		},
 	}
 
 	for _, testCase := range testCases {
