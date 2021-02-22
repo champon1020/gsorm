@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
 )
 
 // Pool is database connection pool like DB or Tx. This is also implemented by MockDB and MockTx.
@@ -45,167 +44,15 @@ type sqlTx interface {
 // QueryCallable is embedded into clause interfaces which can call (*Stmt).Query.
 type QueryCallable interface {
 	Query(interface{}) error
-	ExpectQuery(interface{}) *Stmt
+	ExpectQuery(interface{}) *SelectStmt
 	String() string
 }
 
 // ExecCallable is embedded into clause interfaces which can call (*Stmt).Exec.
 type ExecCallable interface {
 	Exec() error
-	ExpectExec() *Stmt
+	//ExpectExec() *Stmt
 	String() string
-}
-
-// SelectStmt is returned after Select is called.
-type SelectStmt interface {
-	From(...string) FromStmt
-}
-
-// InsertStmt is returned after Insert is called.
-type InsertStmt interface {
-	Values(...interface{}) ValuesStmt
-	Model(interface{}) ModelStmt
-}
-
-// UpdateStmt is returned after Update is called.
-type UpdateStmt interface {
-	Set(...interface{}) SetStmt
-	Model(interface{}) ModelStmt
-}
-
-// DeleteStmt is returned after Delete is called.
-type DeleteStmt interface {
-	From(...string) FromStmt
-}
-
-// ModelStmt is returned after (*Stmt).Model is called.
-type ModelStmt interface {
-	Where(string, ...interface{}) WhereStmt
-	ExecCallable
-}
-
-// FromStmt is returned after (*Stmt).From is called.
-type FromStmt interface {
-	Join(string) JoinStmt
-	LeftJoin(string) JoinStmt
-	RightJoin(string) JoinStmt
-	FullJoin(string) JoinStmt
-	Where(string, ...interface{}) WhereStmt
-	GroupBy(...string) GroupByStmt
-	OrderBy(...string) OrderByStmt
-	Limit(int) LimitStmt
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-}
-
-// ValuesStmt is returned after (*Stmt).Values is called.
-type ValuesStmt interface {
-	ExecCallable
-}
-
-// SetStmt is returned after (*Stmt).Set is called.
-type SetStmt interface {
-	Where(string, ...interface{}) WhereStmt
-	ExecCallable
-}
-
-// JoinStmt is returned after (*Stmt).Join, (*Stmt).LeftJoin, (*Stmt).RightJoin or (*Stmt).FullJoin is called.
-type JoinStmt interface {
-	On(string, ...interface{}) OnStmt
-}
-
-// OnStmt is returned after (*Stmt).On is called.
-type OnStmt interface {
-	Where(string, ...interface{}) WhereStmt
-	GroupBy(...string) GroupByStmt
-	OrderBy(...string) OrderByStmt
-	Limit(int) LimitStmt
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-}
-
-// WhereStmt is returned after (*Stmt).Where is called.
-type WhereStmt interface {
-	And(string, ...interface{}) AndStmt
-	Or(string, ...interface{}) OrStmt
-	GroupBy(...string) GroupByStmt
-	OrderBy(...string) OrderByStmt
-	Limit(int) LimitStmt
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-	ExecCallable
-}
-
-// AndStmt is returned after (*Stmt).And is called.
-type AndStmt interface {
-	GroupBy(...string) GroupByStmt
-	OrderBy(...string) OrderByStmt
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-	ExecCallable
-}
-
-// OrStmt is returned after (*Stmt).Or is called.
-type OrStmt interface {
-	GroupBy(...string) GroupByStmt
-	OrderBy(...string) OrderByStmt
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-	ExecCallable
-}
-
-// GroupByStmt is returned after (*Stmt).GroupBy is called.
-type GroupByStmt interface {
-	Having(string, ...interface{}) HavingStmt
-	OrderBy(...string) OrderByStmt
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-}
-
-// HavingStmt is returned after (*Stmt).Having is called.
-type HavingStmt interface {
-	OrderBy(...string) OrderByStmt
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-}
-
-// OrderByStmt is returned after (*Stmt).OrderBy is called.
-type OrderByStmt interface {
-	Limit(int) LimitStmt
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-}
-
-// LimitStmt is returned after (*Stmt).Limit is called.
-type LimitStmt interface {
-	Offset(int) OffsetStmt
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-}
-
-// OffsetStmt is returned after (*Stmt).Offset is called.
-type OffsetStmt interface {
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
-}
-
-// UnionStmt is returned after (*Stmt).Union is called.
-type UnionStmt interface {
-	OrderBy(...string) OrderByStmt
-	Limit(int) LimitStmt
-	Union(syntax.Stmt) UnionStmt
-	UnionAll(syntax.Stmt) UnionStmt
-	QueryCallable
 }
 
 // MigrationCallable is embedded into clause interfaces which can call (*MigStmt).Migration.

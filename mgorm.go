@@ -29,86 +29,90 @@ func NewMock() *MockDB {
 }
 
 // Select calls SELECT command.
-func Select(db Pool, cols ...string) SelectStmt {
-	stmt := &Stmt{db: db}
-	stmt.cmd = clause.NewSelect(cols)
-	return stmt
+func Select(p Pool, cols ...string) MgormSelect {
+	s := new(SelectStmt)
+	s.db = p
+	s.cmd = clause.NewSelect(cols)
+	return s
 }
 
 // Insert calls INSERT command.
-func Insert(db Pool, table string, cols ...string) InsertStmt {
-	stmt := &Stmt{db: db}
-	stmt.cmd = clause.NewInsert(table, cols)
-	return stmt
+func Insert(p Pool, table string, cols ...string) MgormInsert {
+	s := new(InsertStmt)
+	s.db = p
+	s.cmd = clause.NewInsert(table, cols)
+	return s
 }
 
 // Update calls UPDATE command.
-func Update(db Pool, table string, cols ...string) UpdateStmt {
-	stmt := &Stmt{db: db}
-	stmt.cmd = clause.NewUpdate(table, cols)
-	return stmt
+func Update(p Pool, table string, cols ...string) MgormUpdate {
+	s := new(UpdateStmt)
+	s.db = p
+	s.cmd = clause.NewUpdate(table, cols)
+	return s
 }
 
 // Delete calls DELETE command.
-func Delete(db Pool) DeleteStmt {
-	stmt := &Stmt{db: db}
-	stmt.cmd = clause.NewDelete()
-	return stmt
+func Delete(p Pool) MgormDelete {
+	s := new(DeleteStmt)
+	s.db = p
+	s.cmd = clause.NewDelete()
+	return s
 }
 
 // Count calls COUNT function.
-func Count(db Pool, col string, alias ...string) SelectStmt {
-	stmt := &Stmt{db: db}
-	s := fmt.Sprintf("COUNT(%s)", col)
+func Count(p Pool, col string, alias ...string) MgormSelect {
+	c := fmt.Sprintf("COUNT(%s)", col)
 	if len(alias) > 0 {
-		s = fmt.Sprintf("%s AS %s", s, alias[0])
+		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	stmt.cmd = clause.NewSelect([]string{s})
-	return stmt
+	s := &SelectStmt{cmd: clause.NewSelect([]string{c})}
+	s.db = p
+	return s
 }
 
 // Avg calls AVG function.
-func Avg(db Pool, col string, alias ...string) SelectStmt {
-	stmt := &Stmt{db: db}
-	s := fmt.Sprintf("AVG(%s)", col)
+func Avg(p Pool, col string, alias ...string) MgormSelect {
+	c := fmt.Sprintf("AVG(%s)", col)
 	if len(alias) > 0 {
-		s = fmt.Sprintf("%s AS %s", s, alias[0])
+		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	stmt.cmd = clause.NewSelect([]string{s})
-	return stmt
+	s := &SelectStmt{cmd: clause.NewSelect([]string{c})}
+	s.db = p
+	return s
 }
 
 // Sum calls SUM function.
-func Sum(db Pool, col string, alias ...string) SelectStmt {
-	stmt := &Stmt{db: db}
-	s := fmt.Sprintf("SUM(%s)", col)
+func Sum(p Pool, col string, alias ...string) MgormSelect {
+	c := fmt.Sprintf("SUM(%s)", col)
 	if len(alias) > 0 {
-		s = fmt.Sprintf("%s AS %s", s, alias[0])
+		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	stmt.cmd = clause.NewSelect([]string{s})
-	return stmt
+	s := &SelectStmt{cmd: clause.NewSelect([]string{c})}
+	s.db = p
+	return s
 }
 
 // Min calls MIN function.
-func Min(db Pool, col string, alias ...string) SelectStmt {
-	stmt := &Stmt{db: db}
-	s := fmt.Sprintf("MIN(%s)", col)
+func Min(p Pool, col string, alias ...string) MgormSelect {
+	c := fmt.Sprintf("MIN(%s)", col)
 	if len(alias) > 0 {
-		s = fmt.Sprintf("%s AS %s", s, alias[0])
+		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	stmt.cmd = clause.NewSelect([]string{s})
-	return stmt
+	s := &SelectStmt{cmd: clause.NewSelect([]string{c})}
+	s.db = p
+	return s
 }
 
 // Max calls MAX function.
-func Max(db Pool, col string, alias ...string) SelectStmt {
-	stmt := &Stmt{db: db}
-	s := fmt.Sprintf("MAX(%s)", col)
+func Max(p Pool, col string, alias ...string) MgormSelect {
+	c := fmt.Sprintf("MAX(%s)", col)
 	if len(alias) > 0 {
-		s = fmt.Sprintf("%s AS %s", s, alias[0])
+		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	stmt.cmd = clause.NewSelect([]string{s})
-	return stmt
+	s := &SelectStmt{cmd: clause.NewSelect([]string{c})}
+	s.db = p
+	return s
 }
 
 // CreateDB calls CREATE DATABASE command.
