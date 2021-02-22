@@ -39,20 +39,20 @@ func TestQueryWithVar(t *testing.T) {
 
 func TestQueryWithStruct(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *Employee
 	}{
 		// SELECT emp_no FROM employees LIMIT 1;
 		{
 			mgorm.Select(db, "emp_no").
 				From("employees").
-				Limit(1).(*mgorm.Stmt),
+				Limit(1).(*mgorm.SelectStmt),
 			&Employee{EmpNo: 10001},
 		},
 
 		// SELECT emp_no FROM employees;
 		{
-			mgorm.Select(db, "emp_no").From("employees").(*mgorm.Stmt),
+			mgorm.Select(db, "emp_no").From("employees").(*mgorm.SelectStmt),
 			&Employee{EmpNo: 10001},
 		},
 	}

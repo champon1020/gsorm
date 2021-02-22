@@ -10,7 +10,7 @@ import (
 
 func UnionTest(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *[]time.Time
 	}{
 		// SELECT hire_date AS date FROM employees
@@ -23,7 +23,7 @@ func UnionTest(t *testing.T) {
 				Union(mgorm.Select(nil, "from_date AS date").
 					From("salaries"),
 				).
-				Limit(5).(*mgorm.Stmt),
+				Limit(5).(*mgorm.SelectStmt),
 			&[]time.Time{
 				time.Date(1985, time.February, 16, 0, 0, 0, 0, time.UTC),
 				time.Date(1985, time.November, 21, 0, 0, 0, 0, time.UTC),
@@ -43,7 +43,7 @@ func UnionTest(t *testing.T) {
 				UnionAll(mgorm.Select(nil, "from_date AS date").
 					From("titles"),
 				).
-				Limit(5).(*mgorm.Stmt),
+				Limit(5).(*mgorm.SelectStmt),
 			&[]time.Time{
 				time.Date(1985, time.February, 18, 0, 0, 0, 0, time.UTC),
 				time.Date(1986, time.February, 18, 0, 0, 0, 0, time.UTC),

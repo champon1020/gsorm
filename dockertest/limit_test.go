@@ -9,14 +9,14 @@ import (
 
 func TestSelectLimit(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *[]Employee
 	}{
 		// SELECT emp_no FROM employees LIMIT 5;
 		{
 			mgorm.Select(db, "emp_no").
 				From("employees").
-				Limit(5).(*mgorm.Stmt),
+				Limit(5).(*mgorm.SelectStmt),
 			&[]Employee{
 				{EmpNo: 10001},
 				{EmpNo: 10002},
@@ -31,7 +31,7 @@ func TestSelectLimit(t *testing.T) {
 			mgorm.Select(db, "emp_no").
 				From("employees").
 				Limit(5).
-				Offset(3).(*mgorm.Stmt),
+				Offset(3).(*mgorm.SelectStmt),
 			&[]Employee{
 				{EmpNo: 10004},
 				{EmpNo: 10005},

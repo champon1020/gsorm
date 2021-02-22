@@ -14,7 +14,7 @@ type EmployeeWithTitle struct {
 
 func TestJoin(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *[]EmployeeWithTitle
 	}{
 		// SELECT e.emp_no, t.title FROM employees AS e
@@ -25,7 +25,7 @@ func TestJoin(t *testing.T) {
 				From("employees AS e").
 				Join("titles AS t").
 				On("e.emp_no = t.emp_no").
-				Limit(5).(*mgorm.Stmt),
+				Limit(5).(*mgorm.SelectStmt),
 			&[]EmployeeWithTitle{
 				{EmpNo: 10001, Title: "Senior Engineer"},
 				{EmpNo: 10002, Title: "Staff"},
@@ -44,7 +44,7 @@ func TestJoin(t *testing.T) {
 				LeftJoin("titles AS t").
 				On("e.emp_no = t.emp_no").
 				OrderBy("e.emp_no DESC", "title").
-				Limit(5).(*mgorm.Stmt),
+				Limit(5).(*mgorm.SelectStmt),
 			&[]EmployeeWithTitle{
 				{EmpNo: 10010},
 				{EmpNo: 10009},
@@ -63,7 +63,7 @@ func TestJoin(t *testing.T) {
 				RightJoin("employees AS e").
 				On("t.emp_no = e.emp_no").
 				OrderBy("e.emp_no DESC", "title").
-				Limit(5).(*mgorm.Stmt),
+				Limit(5).(*mgorm.SelectStmt),
 			&[]EmployeeWithTitle{
 				{EmpNo: 10010},
 				{EmpNo: 10009},

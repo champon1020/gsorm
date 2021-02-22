@@ -10,11 +10,11 @@ import (
 
 func TestSelectAllEmployees(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *[]Employee
 	}{
 		{
-			mgorm.Select(db, "*").From("employees").(*mgorm.Stmt),
+			mgorm.Select(db, "*").From("employees").(*mgorm.SelectStmt),
 			&[]Employee{
 				{
 					EmpNo:     10001,
@@ -115,11 +115,11 @@ func TestSelectAllEmployees(t *testing.T) {
 
 func TestSelectAllSalaries(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *[]Salary
 	}{
 		{
-			mgorm.Select(db, "*").From("salaries").(*mgorm.Stmt),
+			mgorm.Select(db, "*").From("salaries").(*mgorm.SelectStmt),
 			&[]Salary{
 				{
 					EmpNo:    10001,
@@ -200,11 +200,11 @@ func TestSelectAllSalaries(t *testing.T) {
 
 func TestSelectAllTitles(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *[]Title
 	}{
 		{
-			mgorm.Select(db, "*").From("titles").(*mgorm.Stmt),
+			mgorm.Select(db, "*").From("titles").(*mgorm.SelectStmt),
 			&[]Title{
 				{
 					EmpNo:    10001,
