@@ -34,11 +34,11 @@ type DeleteOr interface {
 
 // DeleteStmt is DELETE statement.
 type DeleteStmt struct {
-	Stmt
+	stmt
 	cmd *clause.Delete
 }
 
-func (s *UpdateStmt) funcString() string {
+func (s *DeleteStmt) funcString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
 		str += fmt.Sprintf(".%s", e.String())
@@ -70,12 +70,10 @@ func (s *DeleteStmt) Exec() error {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
 	case Mock:
-		/*
-			_, err := pool.CompareWith(s)
-			if err != nil {
-				return err
-			}
-		*/
+		_, err := pool.CompareWith(s)
+		if err != nil {
+			return err
+		}
 	default:
 		return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 	}

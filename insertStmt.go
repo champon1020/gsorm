@@ -24,7 +24,7 @@ type InsertValues interface {
 
 // InsertStmt is INSERT statement.
 type InsertStmt struct {
-	Stmt
+	stmt
 	cmd *clause.Insert
 }
 
@@ -37,7 +37,7 @@ func (s *InsertStmt) String() string {
 	return sql.String()
 }
 
-func (s *UpdateStmt) funcString() string {
+func (s *InsertStmt) funcString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
 		str += fmt.Sprintf(".%s", e.String())

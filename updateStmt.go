@@ -40,7 +40,7 @@ type UpdateOr interface {
 
 // UpdateStmt is UPDATE STATEMENT.
 type UpdateStmt struct {
-	Stmt
+	stmt
 	cmd *clause.Update
 }
 
@@ -76,12 +76,10 @@ func (s *UpdateStmt) Exec() error {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
 	case Mock:
-		/*
-			_, err := pool.CompareWith(s)
-			if err != nil {
-				return err
-			}
-		*/
+		_, err := pool.CompareWith(s)
+		if err != nil {
+			return err
+		}
 	default:
 		return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 	}

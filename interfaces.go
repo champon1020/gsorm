@@ -18,7 +18,7 @@ type Pool interface {
 type Mock interface {
 	Pool
 	Complete() error
-	CompareWith(*Stmt) (interface{}, error)
+	CompareWith(Stmt) (interface{}, error)
 }
 
 // sqlDB is interface for sql.DB.

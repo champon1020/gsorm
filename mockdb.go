@@ -100,7 +100,7 @@ func (m *MockDB) ExpectBegin() *MockTx {
 }
 
 // Expect appends expected statement.
-func (m *MockDB) Expect(s *Stmt) *MockDB {
+func (m *MockDB) Expect(s Stmt) *MockDB {
 	m.expected = append(m.expected, &expectedQuery{stmt: s})
 	return m
 }
@@ -127,7 +127,7 @@ func (m *MockDB) Complete() error {
 }
 
 // CompareWith compares expected statement with executed statement.
-func (m *MockDB) CompareWith(s *Stmt) (interface{}, error) {
+func (m *MockDB) CompareWith(s Stmt) (interface{}, error) {
 	expected := m.popExpected()
 	if expected == nil {
 		msg := fmt.Sprintf("%s was executed but not expected", s.funcString())
@@ -224,7 +224,7 @@ func (m *MockTx) ExpectRollback() {
 }
 
 // Expect appends expected statement.
-func (m *MockTx) Expect(s *Stmt) *MockTx {
+func (m *MockTx) Expect(s Stmt) *MockTx {
 	m.expected = append(m.expected, &expectedQuery{stmt: s})
 	return m
 }
@@ -246,7 +246,7 @@ func (m *MockTx) Complete() error {
 }
 
 // CompareWith compares expected statement with executed statement.
-func (m *MockTx) CompareWith(s *Stmt) (interface{}, error) {
+func (m *MockTx) CompareWith(s Stmt) (interface{}, error) {
 	expected := m.popExpected()
 	if expected == nil {
 		msg := fmt.Sprintf("%s was executed but not expected", s.funcString())
@@ -261,13 +261,15 @@ func (m *MockTx) CompareWith(s *Stmt) (interface{}, error) {
 }
 
 // compareStmts compares two statements. If their are different, returns error.
-func compareStmts(expected *Stmt, actual *Stmt) error {
-	if len(expected.called) != len(actual.called) {
+func compareStmts(expected Stmt, actual Stmt) error {
+	expectedCalled := expected.getCalled()
+	actualCalled := actual.getCalled()
+	if len(expectedCalled) != len(actualCalled) {
 		msg := fmt.Sprintf("%s was executed but %s is expected", actual.funcString(), expected.funcString())
 		return errors.New(msg, errors.MockError)
 	}
-	for i, e := range expected.called {
-		if diff := cmp.Diff(actual.called[i], e); diff != "" {
+	for i, e := range expectedCalled {
+		if diff := cmp.Diff(actualCalled[i], e); diff != "" {
 			msg := fmt.Sprintf("%s was executed but %s is expected", actual.funcString(), expected.funcString())
 			return errors.New(msg, errors.MockError)
 		}
@@ -292,7 +294,7 @@ func (e *expectedOp) completed() bool {
 
 // expectedQuery is expectation of executing query.
 type expectedQuery struct {
-	stmt       *Stmt
+	stmt       Stmt
 	willReturn interface{}
 	expectedOp
 }

@@ -125,7 +125,7 @@ type SelectUnion interface {
 
 // SelectStmt is SELECT statement.
 type SelectStmt struct {
-	Stmt
+	stmt
 	cmd *clause.Select
 }
 
@@ -139,7 +139,7 @@ func (s *SelectStmt) String() string {
 	return sql.String()
 }
 
-func (s *UpdateStmt) funcString() string {
+func (s *SelectStmt) funcString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
 		str += fmt.Sprintf(".%s", e.String())
@@ -169,23 +169,21 @@ func (s *SelectStmt) Query(model interface{}) error {
 			return err
 		}
 	case Mock:
-		/*
-			returned, err := pool.CompareWith(s)
-			if err != nil || returned == nil {
-				return err
-			}
+		returned, err := pool.CompareWith(s)
+		if err != nil || returned == nil {
+			return err
+		}
 
-			v := reflect.ValueOf(returned)
-			if v.Kind() == reflect.Ptr {
-				return errors.New("Returned value must not be pointer", errors.InvalidValueError)
-			}
-			mv := reflect.ValueOf(model)
-			if mv.Kind() != reflect.Ptr {
-				return errors.New("Model must be pointer", errors.InvalidPointerError)
-			}
+		v := reflect.ValueOf(returned)
+		if v.Kind() == reflect.Ptr {
+			return errors.New("Returned value must not be pointer", errors.InvalidValueError)
+		}
+		mv := reflect.ValueOf(model)
+		if mv.Kind() != reflect.Ptr {
+			return errors.New("Model must be pointer", errors.InvalidPointerError)
+		}
 
-			mv.Elem().Set(v)
-		*/
+		mv.Elem().Set(v)
 	default:
 		return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 	}
