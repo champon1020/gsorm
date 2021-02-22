@@ -16,25 +16,30 @@ type MgormUpdate interface {
 
 type UpdateModel interface {
 	Where(string, ...interface{}) UpdateWhere
+	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
 type UpdateSet interface {
 	Where(string, ...interface{}) UpdateWhere
+	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
 type UpdateWhere interface {
 	And(string, ...interface{}) UpdateAnd
 	Or(string, ...interface{}) UpdateOr
+	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
 type UpdateAnd interface {
+	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
 type UpdateOr interface {
+	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
@@ -61,6 +66,10 @@ func (s *UpdateStmt) funcString() string {
 	return str
 }
 
+func (s *UpdateStmt) ExpectExec() *UpdateStmt {
+	return s
+}
+
 func (s *UpdateStmt) Exec() error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
@@ -69,23 +78,6 @@ func (s *UpdateStmt) Exec() error {
 	switch pool := s.db.(type) {
 	case *DB, *Tx:
 		var sql internal.SQL
-
-		ss, err := s.cmd.Build()
-		if err != nil {
-			return err
-		}
-		sql.Write(ss.Build())
-
-		if s.model != nil {
-			cols := []string{}
-			for _, c := range s.cmd.Columns {
-				cols = append(cols, c)
-			}
-			if err := s.processModelSQL(cols, s.model, &sql); err != nil {
-				return err
-			}
-		}
-
 		if err := s.processSQL(&sql); err != nil {
 			return err
 		}
@@ -105,6 +97,29 @@ func (s *UpdateStmt) Exec() error {
 }
 
 func (s *UpdateStmt) processSQL(sql *internal.SQL) error {
+	ss, err := s.cmd.Build()
+	if err != nil {
+		return err
+	}
+	sql.Write(ss.Build())
+
+	if s.model != nil {
+		cols := []string{}
+		for _, c := range s.cmd.Columns {
+			cols = append(cols, c)
+		}
+		if err := s.processSQLWithModel(cols, s.model, sql); err != nil {
+			return err
+		}
+	}
+
+	if err = s.processSQLWithClauses(sql); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *UpdateStmt) processSQLWithClauses(sql *internal.SQL) error {
 	for _, e := range s.called {
 		switch e := e.(type) {
 		case *clause.Set,
@@ -124,7 +139,7 @@ func (s *UpdateStmt) processSQL(sql *internal.SQL) error {
 	return nil
 }
 
-func (s *UpdateStmt) processModelSQL(cols []string, model interface{}, sql *internal.SQL) error {
+func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
 	ref := reflect.ValueOf(model)
 	switch ref.Kind() {
 	case reflect.Int,
@@ -201,11 +216,6 @@ func (s *UpdateStmt) processModelSQL(cols []string, model interface{}, sql *inte
 // Model sets model to Stmt.
 func (s *UpdateStmt) Model(model interface{}) UpdateModel {
 	s.model = model
-	return s
-}
-
-// ExpectExec returns *Stmt. This function is used for mock test.
-func (s *UpdateStmt) ExpectExec() *UpdateStmt {
 	return s
 }
 

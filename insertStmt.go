@@ -15,10 +15,12 @@ type MgormInsert interface {
 }
 
 type InsertModel interface {
+	ExpectExec() *InsertStmt
 	ExecCallable
 }
 
 type InsertValues interface {
+	ExpectExec() *InsertStmt
 	ExecCallable
 }
 
@@ -45,6 +47,10 @@ func (s *InsertStmt) funcString() string {
 	return str
 }
 
+func (s *InsertStmt) ExpectExec() *InsertStmt {
+	return s
+}
+
 func (s *InsertStmt) Exec() error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
@@ -53,30 +59,9 @@ func (s *InsertStmt) Exec() error {
 	switch pool := s.db.(type) {
 	case *DB, *Tx:
 		var sql internal.SQL
-		ss, err := s.cmd.Build()
-		if err != nil {
+		if err := s.processSQL(&sql); err != nil {
 			return err
 		}
-		sql.Write(ss.Build())
-
-		if s.model != nil {
-			cols := []string{}
-			for _, c := range s.cmd.Columns {
-				if c.Alias != "" {
-					cols = append(cols, c.Alias)
-					continue
-				}
-				cols = append(cols, c.Name)
-			}
-			if err := s.processModelSQL(cols, s.model, &sql); err != nil {
-				return err
-			}
-		} else {
-			if err := s.processSQL(&sql); err != nil {
-				return err
-			}
-		}
-
 		if _, err := pool.Exec(sql.String()); err != nil {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
@@ -93,6 +78,33 @@ func (s *InsertStmt) Exec() error {
 }
 
 func (s *InsertStmt) processSQL(sql *internal.SQL) error {
+	ss, err := s.cmd.Build()
+	if err != nil {
+		return err
+	}
+	sql.Write(ss.Build())
+
+	if s.model != nil {
+		cols := []string{}
+		for _, c := range s.cmd.Columns {
+			if c.Alias != "" {
+				cols = append(cols, c.Alias)
+				continue
+			}
+			cols = append(cols, c.Name)
+		}
+		if err := s.processSQLWithModel(cols, s.model, sql); err != nil {
+			return err
+		}
+	} else {
+		if err := s.processSQLWithClauses(sql); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *InsertStmt) processSQLWithClauses(sql *internal.SQL) error {
 	for _, e := range s.called {
 		switch e := e.(type) {
 		case *clause.Values:
@@ -109,7 +121,7 @@ func (s *InsertStmt) processSQL(sql *internal.SQL) error {
 	return nil
 }
 
-func (s *InsertStmt) processModelSQL(cols []string, model interface{}, sql *internal.SQL) error {
+func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
 	ref := reflect.ValueOf(model)
 	if ref.Kind() != reflect.Ptr {
 		return errors.New("Model must be pointer", errors.InvalidValueError)

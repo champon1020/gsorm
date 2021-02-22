@@ -51,7 +51,6 @@ type QueryCallable interface {
 // ExecCallable is embedded into clause interfaces which can call (*Stmt).Exec.
 type ExecCallable interface {
 	Exec() error
-	//ExpectExec() *Stmt
 	String() string
 }
 

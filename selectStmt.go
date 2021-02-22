@@ -147,6 +147,11 @@ func (s *SelectStmt) funcString() string {
 	return str
 }
 
+// ExpectQuery returns *Stmt. This function is used for mock test.
+func (s *SelectStmt) ExpectQuery(model interface{}) *SelectStmt {
+	return s
+}
+
 func (s *SelectStmt) Query(model interface{}) error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
@@ -226,11 +231,6 @@ func (s *SelectStmt) processSQL() (internal.SQL, error) {
 	}
 
 	return sql, nil
-}
-
-// ExpectQuery returns *Stmt. This function is used for mock test.
-func (s *SelectStmt) ExpectQuery(model interface{}) *SelectStmt {
-	return s
 }
 
 // From calls FROM clause.

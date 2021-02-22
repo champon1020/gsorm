@@ -15,20 +15,24 @@ type MgormDelete interface {
 
 type DeleteFrom interface {
 	Where(string, ...interface{}) DeleteWhere
+	ExpectExec() *DeleteStmt
 	ExecCallable
 }
 
 type DeleteWhere interface {
 	And(string, ...interface{}) DeleteAnd
 	Or(string, ...interface{}) DeleteOr
+	ExpectExec() *DeleteStmt
 	ExecCallable
 }
 
 type DeleteAnd interface {
+	ExpectExec() *DeleteStmt
 	ExecCallable
 }
 
 type DeleteOr interface {
+	ExpectExec() *DeleteStmt
 	ExecCallable
 }
 
@@ -36,6 +40,15 @@ type DeleteOr interface {
 type DeleteStmt struct {
 	stmt
 	cmd *clause.Delete
+}
+
+func (s *DeleteStmt) String() string {
+	var sql internal.SQL
+	if err := s.processSQL(&sql); err != nil {
+		s.throw(err)
+		return err.Error()
+	}
+	return sql.String()
 }
 
 func (s *DeleteStmt) funcString() string {
@@ -46,13 +59,8 @@ func (s *DeleteStmt) funcString() string {
 	return str
 }
 
-func (s *DeleteStmt) String() string {
-	var sql internal.SQL
-	if err := s.processSQL(&sql); err != nil {
-		s.throw(err)
-		return err.Error()
-	}
-	return sql.String()
+func (s *DeleteStmt) ExpectExec() *DeleteStmt {
+	return s
 }
 
 func (s *DeleteStmt) Exec() error {
