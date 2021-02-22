@@ -35,7 +35,7 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 
 		if mt.Elem().Kind() == reflect.Struct {
 			// Get index map.
-			indR2M := mapOfColumnsToFields(rCols, mt.Elem())
+			indR2M := MapOfColumnsToFields(rCols, mt.Elem())
 
 			for rows.Next() {
 				if err := rows.Scan(rValPtr...); err != nil {
@@ -99,7 +99,7 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 		v := reflect.New(mt).Elem()
 
 		// Get index map.
-		indR2M := mapOfColumnsToFields(rCols, mt)
+		indR2M := MapOfColumnsToFields(rCols, mt)
 
 		if rows.Next() {
 			if err := rows.Scan(rValPtr...); err != nil {
@@ -155,28 +155,6 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 	}
 
 	return nil
-}
-
-// mapOfColumnsToFields returns map to localize between column and field.
-func mapOfColumnsToFields(cols []string, modelTyp reflect.Type) map[int]int {
-	indR2M := make(map[int]int)
-	for i, c := range cols {
-		for j := 0; j < modelTyp.NumField(); j++ {
-			if c != columnNameFromTag(modelTyp.Field(j)) {
-				continue
-			}
-			indR2M[i] = j
-		}
-	}
-	return indR2M
-}
-
-// columnNameFromTag gets column name from struct field tag.
-func columnNameFromTag(sf reflect.StructField) string {
-	if sf.Tag.Get("mgorm") == "" {
-		return ConvertToSnakeCase(sf.Name)
-	}
-	return sf.Tag.Get("mgorm")
 }
 
 // setValuesToModel sets values to model fields.

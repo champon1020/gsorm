@@ -15,6 +15,7 @@ type Stmt struct {
 	db     Pool
 	cmd    syntax.Clause
 	called []syntax.Clause
+	model  interface{}
 	errors []error
 }
 
@@ -175,7 +176,7 @@ func (s *Stmt) processQuerySQL() (internal.SQL, error) {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("Type %s is not supported", reflect.TypeOf(e).Elem().String())
+			msg := fmt.Sprintf("Type %s is not supported for SELECT", reflect.TypeOf(e).Elem().String())
 			return "", errors.New(msg, errors.InvalidTypeError)
 		}
 	}
@@ -188,36 +189,287 @@ func (s *Stmt) processExecSQL() (internal.SQL, error) {
 	var sql internal.SQL
 
 	switch cmd := s.cmd.(type) {
-	case *clause.Insert, *clause.Update, *clause.Delete:
+	case *clause.Insert:
 		ss, err := cmd.Build()
 		if err != nil {
 			return "", err
 		}
 		sql.Write(ss.Build())
-	default:
-		return "", errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError)
-	}
 
-	for _, e := range s.called {
-		switch e := e.(type) {
-		case *clause.Values,
-			*clause.Set,
-			*clause.From,
-			*clause.Where,
-			*clause.And,
-			*clause.Or:
-			s, err := e.Build()
-			if err != nil {
+		if s.model != nil {
+			cols := []string{}
+			for _, c := range cmd.Columns {
+				if c.Alias != "" {
+					cols = append(cols, c.Alias)
+					continue
+				}
+				cols = append(cols, c.Name)
+			}
+			if err := s.processInsertModelSQL(cols, s.model, &sql); err != nil {
 				return "", err
 			}
-			sql.Write(s.Build())
-		default:
-			msg := fmt.Sprintf("Type %s is not supported", reflect.TypeOf(e).Elem().String())
-			return "", errors.New(msg, errors.InvalidTypeError)
+			return sql, nil
 		}
+
+		for _, e := range s.called {
+			if err := s.processInsertSQL(e, &sql); err != nil {
+				return "", err
+			}
+		}
+		return sql, nil
+	case *clause.Update:
+		ss, err := cmd.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.Write(ss.Build())
+
+		if s.model != nil {
+			cols := []string{}
+			for _, c := range cmd.Columns {
+				cols = append(cols, c)
+			}
+			if err := s.processUpdateModelSQL(cols, s.model, &sql); err != nil {
+				return "", err
+			}
+		}
+
+		for _, e := range s.called {
+			if err := s.processUpdateSQL(e, &sql); err != nil {
+				return "", err
+			}
+		}
+		return sql, nil
+	case *clause.Delete:
+		ss, err := cmd.Build()
+		if err != nil {
+			return "", err
+		}
+		sql.Write(ss.Build())
+		for _, e := range s.called {
+			if err := s.processDeleteSQL(e, &sql); err != nil {
+				return "", err
+			}
+		}
+		return sql, nil
 	}
 
-	return sql, nil
+	return "", errors.New("Command must be INSERT, UPDATE or DELETE", errors.InvalidValueError)
+}
+
+func (s *Stmt) processInsertModelSQL(cols []string, model interface{}, sql *internal.SQL) error {
+	ref := reflect.ValueOf(model)
+	if ref.Kind() != reflect.Ptr {
+		return errors.New("Model must be pointer", errors.InvalidValueError)
+	}
+	ref = ref.Elem()
+
+	sql.Write("VALUES")
+	switch ref.Kind() {
+	case reflect.Slice, reflect.Array:
+		// Type of slice element.
+		typ := reflect.TypeOf(ref.Interface()).Elem()
+
+		// If undelying type of slice element is struct.
+		if typ.Kind() == reflect.Struct {
+			idxC2F := internal.MapOfColumnsToFields(cols, typ)
+			for i := 0; i < ref.Len(); i++ {
+				if i > 0 {
+					sql.Write(",")
+				}
+				sql.Write("(")
+				for j := 0; j < len(cols); j++ {
+					if j > 0 {
+						sql.Write(",")
+					}
+					vStr, err := internal.ToString(ref.Index(i).Field(idxC2F[j]).Interface(), true)
+					if err != nil {
+						return err
+					}
+					sql.Write(vStr)
+				}
+				sql.Write(")")
+			}
+			return nil
+		}
+
+		for i := 0; i < ref.Len(); i++ {
+			if i > 0 {
+				sql.Write(",")
+			}
+			vStr, err := internal.ToString(ref.Index(i).Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(fmt.Sprintf("(%s)", vStr))
+		}
+		return nil
+	case reflect.Struct:
+		idxC2F := internal.MapOfColumnsToFields(cols, reflect.TypeOf(ref.Interface()))
+		sql.Write("(")
+		for j := 0; j < len(cols); j++ {
+			if j > 0 {
+				sql.Write(",")
+			}
+			vStr, err := internal.ToString(ref.Field(idxC2F[j]).Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(vStr)
+		}
+		sql.Write(")")
+		return nil
+	case reflect.Map:
+		r := ref.MapRange()
+		fst := true
+		for r.Next() {
+			if !fst {
+				sql.Write(",")
+			}
+			key, err := internal.ToString(r.Key().Interface(), true)
+			if err != nil {
+				return err
+			}
+			val, err := internal.ToString(r.Value().Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(fmt.Sprintf("(%s, %s)", key, val))
+			fst = false
+		}
+		return nil
+	}
+
+	msg := fmt.Sprintf("Type %s is not supported for Model with INSERT", reflect.TypeOf(model).String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+func (s *Stmt) processUpdateModelSQL(cols []string, model interface{}, sql *internal.SQL) error {
+	ref := reflect.ValueOf(model)
+	switch ref.Kind() {
+	case reflect.Int,
+		reflect.Int8,
+		reflect.Int16,
+		reflect.Int32,
+		reflect.Int64,
+		reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64,
+		reflect.Float32,
+		reflect.Float64,
+		reflect.Bool,
+		reflect.String:
+		if len(cols) != 1 {
+			msg := fmt.Sprintf("If you set variable to Model, number of columns must be 1, not %d", len(cols))
+			return errors.New(msg, errors.InvalidSyntaxError)
+		}
+		vStr, err := internal.ToString(ref.Interface(), true)
+		if err != nil {
+			return err
+		}
+		sql.Write(fmt.Sprintf("SET %s = %s", cols[0], vStr))
+		return nil
+	}
+
+	if ref.Kind() != reflect.Ptr {
+		return errors.New("Model must be pointer", errors.InvalidValueError)
+	}
+	ref = ref.Elem()
+
+	sql.Write("SET")
+	switch ref.Kind() {
+	case reflect.Struct:
+		idxC2F := internal.MapOfColumnsToFields(cols, reflect.TypeOf(ref.Interface()))
+		for i, c := range cols {
+			if i > 0 {
+				sql.Write(",")
+			}
+			vStr, err := internal.ToString(ref.Field(idxC2F[i]).Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(fmt.Sprintf("%s = %s", c, vStr))
+		}
+		return nil
+	case reflect.Map:
+		if len(cols) != 2 {
+			msg := fmt.Sprintf("If you set map to Model, number of columns must be 2, not %d", len(cols))
+			return errors.New(msg, errors.InvalidSyntaxError)
+		}
+		r := ref.MapRange()
+		for r.Next() {
+			key, err := internal.ToString(r.Key().Interface(), true)
+			if err != nil {
+				return err
+			}
+			val, err := internal.ToString(r.Value().Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(fmt.Sprintf("%s = %s, %s = %s", cols[0], key, cols[1], val))
+			break
+		}
+		return nil
+	}
+
+	msg := fmt.Sprintf("Type %s is not supported for Model with UPDATE", reflect.TypeOf(model).String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+func (s *Stmt) processInsertSQL(e syntax.Clause, sql *internal.SQL) error {
+	switch e := e.(type) {
+	case *clause.Values:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		return nil
+	}
+
+	msg := fmt.Sprintf("Type %s is not supported for INSERT", reflect.TypeOf(e).Elem().String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+func (s *Stmt) processUpdateSQL(e syntax.Clause, sql *internal.SQL) error {
+	switch e := e.(type) {
+	case *clause.Set,
+		*clause.Where,
+		*clause.And,
+		*clause.Or:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		return nil
+	}
+
+	msg := fmt.Sprintf("Type %s is not supported for UPDATE", reflect.TypeOf(e).Elem().String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+func (s *Stmt) processDeleteSQL(e syntax.Clause, sql *internal.SQL) error {
+	switch e := e.(type) {
+	case *clause.From:
+		s, err := e.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(s.Build())
+		return nil
+	}
+
+	msg := fmt.Sprintf("Type %s is not supported for DELETE", reflect.TypeOf(e).Elem().String())
+	return errors.New(msg, errors.InvalidTypeError)
+}
+
+// Model sets model to Stmt.
+func (s *Stmt) Model(model interface{}) ModelStmt {
+	s.model = model
+	return s
 }
 
 // From calls FROM clause.
@@ -256,8 +508,8 @@ func (s *Stmt) Set(vals ...interface{}) SetStmt {
 		return s
 	}
 	set := new(clause.Set)
-	for i := 0; i < len(u.Columns); i++ {
-		set.AddEq(u.Columns[i], vals[i])
+	for i, c := range u.Columns {
+		set.AddEq(c, vals[i])
 	}
 	s.call(set)
 	return s

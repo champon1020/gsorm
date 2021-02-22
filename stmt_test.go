@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStmt_String(t *testing.T) {
+func TestStmt_QuerySQLString(t *testing.T) {
 	testCases := []struct {
 		Stmt     *mgorm.Stmt
 		Expected string
@@ -192,7 +192,54 @@ func TestStmt_String(t *testing.T) {
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
-			return
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestStmt_ExecSQLString(t *testing.T) {
+	type Model struct {
+		ID   int
+		Name string `mgorm:"first_name"`
+	}
+
+	model1 := Model{ID: 10000, Name: "Taro"}
+	model2 := []Model{{ID: 10000, Name: "Taro"}, {ID: 10001, Name: "Hanako"}}
+	model3 := []int{10000, 10001}
+
+	testCases := []struct {
+		Stmt     *mgorm.Stmt
+		Expected string
+	}{
+		{
+			mgorm.Insert(nil, "sample", "name AS first_name", "id").Model(&model1).(*mgorm.Stmt),
+			`INSERT INTO sample (name AS first_name, id) VALUES ("Taro", 10000)`,
+		},
+		{
+			mgorm.Insert(nil, "sample", "name AS first_name", "id").Model(&model2).(*mgorm.Stmt),
+			`INSERT INTO sample (name AS first_name, id) VALUES ("Taro", 10000), ("Hanako", 10001)`,
+		},
+		{
+			mgorm.Insert(nil, "sample", "id").Model(&model3).(*mgorm.Stmt),
+			`INSERT INTO sample (id) VALUES (10000), (10001)`,
+		},
+		{
+			mgorm.Update(nil, "sample", "id", "first_name").Model(&model1).Where("id = ?", 20000).(*mgorm.Stmt),
+			`UPDATE sample SET id = 10000, first_name = "Taro" WHERE id = 20000`,
+		},
+		{
+			mgorm.Update(nil, "sample", "id").Model(10000).Where("id = ?", 20000).(*mgorm.Stmt),
+			`UPDATE sample SET id = 10000 WHERE id = 20000`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
 		}
 		assert.Equal(t, testCase.Expected, actual)
 	}
@@ -226,7 +273,7 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			`Type clause.Values is not supported`, errors.InvalidTypeError).(*errors.Error)
+			`Type clause.Values is not supported for SELECT`, errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
 		s := mgorm.Select(nil, "").(*mgorm.Stmt).Values("").(*mgorm.Stmt)
@@ -281,7 +328,7 @@ func TestStmt_ProcessExecSQL_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			"Type clause.Join is not supported", errors.InvalidTypeError).(*errors.Error)
+			"Type clause.Join is not supported for INSERT", errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
 		s := mgorm.Insert(nil, "").(*mgorm.Stmt).Join("").(*mgorm.Stmt)

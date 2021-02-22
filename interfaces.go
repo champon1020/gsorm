@@ -64,16 +64,24 @@ type SelectStmt interface {
 // InsertStmt is returned after Insert is called.
 type InsertStmt interface {
 	Values(...interface{}) ValuesStmt
+	Model(interface{}) ModelStmt
 }
 
 // UpdateStmt is returned after Update is called.
 type UpdateStmt interface {
 	Set(...interface{}) SetStmt
+	Model(interface{}) ModelStmt
 }
 
 // DeleteStmt is returned after Delete is called.
 type DeleteStmt interface {
 	From(...string) FromStmt
+}
+
+// ModelStmt is returned after (*Stmt).Model is called.
+type ModelStmt interface {
+	Where(string, ...interface{}) WhereStmt
+	ExecCallable
 }
 
 // FromStmt is returned after (*Stmt).From is called.
