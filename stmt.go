@@ -346,6 +346,33 @@ func (s *Stmt) processInsertModelSQL(cols []string, model interface{}, sql *inte
 
 func (s *Stmt) processUpdateModelSQL(cols []string, model interface{}, sql *internal.SQL) error {
 	ref := reflect.ValueOf(model)
+	switch ref.Kind() {
+	case reflect.Int,
+		reflect.Int8,
+		reflect.Int16,
+		reflect.Int32,
+		reflect.Int64,
+		reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64,
+		reflect.Float32,
+		reflect.Float64,
+		reflect.Bool,
+		reflect.String:
+		if len(cols) != 1 {
+			msg := fmt.Sprintf("If you set variable to Model, number of columns must be 1, not %d", len(cols))
+			return errors.New(msg, errors.InvalidSyntaxError)
+		}
+		vStr, err := internal.ToString(ref.Interface(), true)
+		if err != nil {
+			return err
+		}
+		sql.Write(fmt.Sprintf("SET %s = %s", cols[0], vStr))
+		return nil
+	}
+
 	if ref.Kind() != reflect.Ptr {
 		return errors.New("Model must be pointer", errors.InvalidValueError)
 	}
@@ -384,30 +411,6 @@ func (s *Stmt) processUpdateModelSQL(cols []string, model interface{}, sql *inte
 			sql.Write(fmt.Sprintf("%s = %s, %s = %s", cols[0], key, cols[1], val))
 			break
 		}
-		return nil
-	case reflect.Int,
-		reflect.Int8,
-		reflect.Int16,
-		reflect.Int32,
-		reflect.Int64,
-		reflect.Uint,
-		reflect.Uint8,
-		reflect.Uint16,
-		reflect.Uint32,
-		reflect.Uint64,
-		reflect.Float32,
-		reflect.Float64,
-		reflect.Bool,
-		reflect.String:
-		if len(cols) != 1 {
-			msg := fmt.Sprintf("If you set variable to Model, number of columns must be 1, not %d", len(cols))
-			return errors.New(msg, errors.InvalidSyntaxError)
-		}
-		vStr, err := internal.ToString(ref.Interface(), true)
-		if err != nil {
-			return err
-		}
-		sql.Write(fmt.Sprintf("%s = %s", cols[0], vStr))
 		return nil
 	}
 
