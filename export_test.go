@@ -27,10 +27,12 @@ var (
 
 // Exported values which is declared in stmt.go.
 var (
-	StmtProcessQuerySQL = (*Stmt).processQuerySQL
-	StmtProcessExecSQL  = (*Stmt).processExecSQL
+	SelectStmtProcessSQL = (*SelectStmt).processSQL
+	InsertStmtProcessSQL = (*InsertStmt).processSQL
+	UpdateStmtProcessSQL = (*UpdateStmt).processSQL
+	DeleteStmtProcessSQL = (*DeleteStmt).processSQL
 )
 
-func (s *Stmt) ExportedGetErrors() []error {
+func (s *stmt) ExportedGetErrors() []error {
 	return s.errors
 }

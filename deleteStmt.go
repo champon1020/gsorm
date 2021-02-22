@@ -47,8 +47,8 @@ func (s *DeleteStmt) funcString() string {
 }
 
 func (s *DeleteStmt) String() string {
-	sql, err := s.processSQL()
-	if err != nil {
+	var sql internal.SQL
+	if err := s.processSQL(&sql); err != nil {
 		s.throw(err)
 		return err.Error()
 	}
@@ -62,47 +62,46 @@ func (s *DeleteStmt) Exec() error {
 
 	switch pool := s.db.(type) {
 	case *DB, *Tx:
-		sql, err := s.processSQL()
+		var sql internal.SQL
+		ss, err := s.cmd.Build()
 		if err != nil {
+			return err
+		}
+		sql.Write(ss.Build())
+
+		if err := s.processSQL(&sql); err != nil {
 			return err
 		}
 		if _, err := pool.Exec(sql.String()); err != nil {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
+		return nil
 	case Mock:
 		_, err := pool.CompareWith(s)
 		if err != nil {
 			return err
 		}
-	default:
-		return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+		return nil
 	}
 
-	return nil
+	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
-func (s *DeleteStmt) processSQL() (internal.SQL, error) {
-	var sql internal.SQL
-
-	ss, err := s.cmd.Build()
-	if err != nil {
-		return "", err
-	}
-	sql.Write(ss.Build())
+func (s *DeleteStmt) processSQL(sql *internal.SQL) error {
 	for _, e := range s.called {
 		switch e := e.(type) {
 		case *clause.From:
 			s, err := e.Build()
 			if err != nil {
-				return "", err
+				return err
 			}
 			sql.Write(s.Build())
 		default:
 			msg := fmt.Sprintf("Type %s is not supported for DELETE", reflect.TypeOf(e).Elem().String())
-			return "", errors.New(msg, errors.InvalidTypeError)
+			return errors.New(msg, errors.InvalidTypeError)
 		}
 	}
-	return sql, nil
+	return nil
 }
 
 // From calls FROM clause.

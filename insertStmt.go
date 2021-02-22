@@ -29,8 +29,8 @@ type InsertStmt struct {
 }
 
 func (s *InsertStmt) String() string {
-	sql, err := s.processSQL()
-	if err != nil {
+	var sql internal.SQL
+	if err := s.processSQL(&sql); err != nil {
 		s.throw(err)
 		return err.Error()
 	}
@@ -52,65 +52,61 @@ func (s *InsertStmt) Exec() error {
 
 	switch pool := s.db.(type) {
 	case *DB, *Tx:
-		sql, err := s.processSQL()
+		var sql internal.SQL
+		ss, err := s.cmd.Build()
 		if err != nil {
 			return err
 		}
+		sql.Write(ss.Build())
+
+		if s.model != nil {
+			cols := []string{}
+			for _, c := range s.cmd.Columns {
+				if c.Alias != "" {
+					cols = append(cols, c.Alias)
+					continue
+				}
+				cols = append(cols, c.Name)
+			}
+			if err := s.processModelSQL(cols, s.model, &sql); err != nil {
+				return err
+			}
+		} else {
+			if err := s.processSQL(&sql); err != nil {
+				return err
+			}
+		}
+
 		if _, err := pool.Exec(sql.String()); err != nil {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
+		return nil
 	case Mock:
-		/*
-			_, err := pool.CompareWith(s)
-			if err != nil {
-				return err
-			}
-		*/
-	default:
-		return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+		_, err := pool.CompareWith(s)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
-	return nil
+	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
-func (s *InsertStmt) processSQL() (internal.SQL, error) {
-	var sql internal.SQL
-
-	ss, err := s.cmd.Build()
-	if err != nil {
-		return "", err
-	}
-	sql.Write(ss.Build())
-
-	if s.model != nil {
-		cols := []string{}
-		for _, c := range s.cmd.Columns {
-			if c.Alias != "" {
-				cols = append(cols, c.Alias)
-				continue
-			}
-			cols = append(cols, c.Name)
-		}
-		if err := s.processModelSQL(cols, s.model, &sql); err != nil {
-			return "", err
-		}
-		return sql, nil
-	}
-
+func (s *InsertStmt) processSQL(sql *internal.SQL) error {
 	for _, e := range s.called {
 		switch e := e.(type) {
 		case *clause.Values:
 			s, err := e.Build()
 			if err != nil {
-				return "", err
+				return err
 			}
 			sql.Write(s.Build())
 		default:
 			msg := fmt.Sprintf("Type %s is not supported for INSERT", reflect.TypeOf(e).Elem().String())
-			return "", errors.New(msg, errors.InvalidTypeError)
+			return errors.New(msg, errors.InvalidTypeError)
 		}
 	}
-	return sql, nil
+	return nil
 }
 
 func (s *InsertStmt) processModelSQL(cols []string, model interface{}, sql *internal.SQL) error {
