@@ -1,6 +1,9 @@
 package mgorm
 
-import "github.com/champon1020/mgorm/internal"
+import (
+	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // Exported values which is declared in db.go.
 func (db *DB) ExportedSetConn(conn sqlDB) {
@@ -35,4 +38,8 @@ var (
 
 func (s *stmt) ExportedGetErrors() []error {
 	return s.errors
+}
+
+func (s *UpdateStmt) ExportedSetCalled(c ...syntax.Clause) {
+	s.called = append(s.called, c...)
 }

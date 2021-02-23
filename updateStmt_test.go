@@ -5,6 +5,8 @@ import (
 
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/errors"
+	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -70,6 +72,155 @@ func TestUpdateStmt_String(t *testing.T) {
 			continue
 		}
 		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestUpdateStmt_ProcessSQLWithClauses_Fail(t *testing.T) {
+	{
+		expectedErr := errors.New(
+			"Type clause.Join is not supported for UPDATE", errors.InvalidTypeError).(*errors.Error)
+
+		// Prepare for test.
+		s := mgorm.Update(nil, "", "").(*mgorm.UpdateStmt)
+		s.ExportedSetCalled(&clause.Join{})
+
+		// Actual process.
+		var sql internal.SQL
+		err := mgorm.UpdateStmtProcessSQL(s, &sql)
+
+		// Validate error.
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+}
+
+func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
+	{
+		expectedErr := errors.New(
+			"If you set variable to Model, number of columns must be 1, not 2",
+			errors.InvalidSyntaxError).(*errors.Error)
+
+		// Prepare for test.
+		s := mgorm.Update(nil, "table", "column1", "column2").Model(1000).(*mgorm.UpdateStmt)
+
+		// Actual process.
+		var sql internal.SQL
+		err := mgorm.UpdateStmtProcessSQL(s, &sql)
+
+		// Validate error.
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+	{
+		expectedErr := errors.New(
+			"Model must be pointer", errors.InvalidValueError).(*errors.Error)
+
+		// Prepare for test.
+		model := make(map[string]interface{})
+		s := mgorm.Update(nil, "table", "column").Model(model).(*mgorm.UpdateStmt)
+
+		// Actual process.
+		var sql internal.SQL
+		err := mgorm.UpdateStmtProcessSQL(s, &sql)
+
+		// Validate error.
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+	{
+		expectedErr := errors.New(
+			"Column names must be included in some of map keys", errors.InvalidSyntaxError).(*errors.Error)
+
+		// Prepare for test.
+		model := map[string]interface{}{
+			"id":   1000,
+			"name": "Taro",
+		}
+		s := mgorm.Update(nil, "sample", "id", "first_name").Model(&model).(*mgorm.UpdateStmt)
+
+		// Actual process.
+		var sql internal.SQL
+		err := mgorm.UpdateStmtProcessSQL(s, &sql)
+
+		// Validate error.
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
+	}
+	{
+		expectedErr := errors.New(
+			"Type *[]int is not supported for Model with UPDATE", errors.InvalidTypeError).(*errors.Error)
+
+		// Prepare for test.
+		model := []int{1000}
+		s := mgorm.Update(nil, "sample", "id", "first_name").Model(&model).(*mgorm.UpdateStmt)
+
+		// Actual process.
+		var sql internal.SQL
+		err := mgorm.UpdateStmtProcessSQL(s, &sql)
+
+		// Validate error.
+		if err == nil {
+			t.Errorf("Error was not occurred")
+			return
+		}
+		actualErr, ok := err.(*errors.Error)
+		if !ok {
+			t.Errorf("Error type is invalid")
+			return
+		}
+		if !actualErr.Is(expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		}
 	}
 }
 
