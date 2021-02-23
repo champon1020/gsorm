@@ -201,6 +201,21 @@ func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *
 			sql.Write(fmt.Sprintf("(%s, %s)", key, val))
 			fst = false
 		}
+
+		for i, c := range cols {
+			if i > 0 {
+				sql.Write(",")
+			}
+			v := ref.MapIndex(reflect.ValueOf(c))
+			if !v.IsValid() {
+				return errors.New("Column names must be included in some of map keys", errors.InvalidSyntaxError)
+			}
+			vStr, err := internal.ToString(v.Interface(), true)
+			if err != nil {
+				return err
+			}
+			sql.Write(fmt.Sprintf("%s = %s", c, vStr))
+		}
 		return nil
 	}
 

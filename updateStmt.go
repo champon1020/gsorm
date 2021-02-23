@@ -189,22 +189,19 @@ func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *
 		}
 		return nil
 	case reflect.Map:
-		if len(cols) != 2 {
-			msg := fmt.Sprintf("If you set map to Model, number of columns must be 2, not %d", len(cols))
-			return errors.New(msg, errors.InvalidSyntaxError)
-		}
-		r := ref.MapRange()
-		for r.Next() {
-			key, err := internal.ToString(r.Key().Interface(), true)
+		for i, c := range cols {
+			if i > 0 {
+				sql.Write(",")
+			}
+			v := ref.MapIndex(reflect.ValueOf(c))
+			if !v.IsValid() {
+				return errors.New("Column names must be included in some of map keys", errors.InvalidSyntaxError)
+			}
+			vStr, err := internal.ToString(v.Interface(), true)
 			if err != nil {
 				return err
 			}
-			val, err := internal.ToString(r.Value().Interface(), true)
-			if err != nil {
-				return err
-			}
-			sql.Write(fmt.Sprintf("%s = %s, %s = %s", cols[0], key, cols[1], val))
-			break
+			sql.Write(fmt.Sprintf("%s = %s", c, vStr))
 		}
 		return nil
 	}
@@ -226,7 +223,7 @@ func (s *UpdateStmt) Set(vals ...interface{}) UpdateSet {
 		return s
 	}
 	if len(s.cmd.Columns) != len(vals) {
-		s.throw(errors.New("Length is different between lhs and rhs", errors.InvalidValueError))
+		s.throw(errors.New("Length is different between columns and values", errors.InvalidValueError))
 		return s
 	}
 	set := new(clause.Set)
