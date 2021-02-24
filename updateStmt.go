@@ -74,7 +74,7 @@ func (s *UpdateStmt) funcString() string {
 	return str
 }
 
-// ExpectExec returns *UpdateStmt. This function is used fopr mock test.
+// ExpectExec returns *UpdateStmt. This function is used for mock test.
 func (s *UpdateStmt) ExpectExec() *UpdateStmt {
 	return s
 }
