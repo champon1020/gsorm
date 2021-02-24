@@ -9,16 +9,19 @@ import (
 	"github.com/champon1020/mgorm/syntax/clause"
 )
 
+// MgormDelete is interface for returned value of mgorm.Delete.
 type MgormDelete interface {
 	From(...string) DeleteFrom
 }
 
+// DeleteFrom is interface for returned value of (*DeleteStmt).From.
 type DeleteFrom interface {
 	Where(string, ...interface{}) DeleteWhere
 	ExpectExec() *DeleteStmt
 	ExecCallable
 }
 
+// DeleteWhere is interface for returned value of (*DeleteStmt).Where.
 type DeleteWhere interface {
 	And(string, ...interface{}) DeleteAnd
 	Or(string, ...interface{}) DeleteOr
@@ -26,11 +29,13 @@ type DeleteWhere interface {
 	ExecCallable
 }
 
+// DeleteAnd is interface for returned value of (*DeleteStmt).And.
 type DeleteAnd interface {
 	ExpectExec() *DeleteStmt
 	ExecCallable
 }
 
+// DeleteOr is interface for returned value of (*DeleteOr).Or.
 type DeleteOr interface {
 	ExpectExec() *DeleteStmt
 	ExecCallable
@@ -42,6 +47,7 @@ type DeleteStmt struct {
 	cmd *clause.Delete
 }
 
+// String returns SQL statement with string.
 func (s *DeleteStmt) String() string {
 	var sql internal.SQL
 	if err := s.processSQL(&sql); err != nil {
@@ -51,6 +57,7 @@ func (s *DeleteStmt) String() string {
 	return sql.String()
 }
 
+// funcString returns function call as string.
 func (s *DeleteStmt) funcString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
@@ -59,10 +66,13 @@ func (s *DeleteStmt) funcString() string {
 	return str
 }
 
+// ExpectExec returns *DeleteStmt. This function is used for mock test.
 func (s *DeleteStmt) ExpectExec() *DeleteStmt {
 	return s
 }
 
+// Exec executed SQL statement without mapping to model.
+// If type of conn is mgorm.MockDB, compare statements between called and expected.
 func (s *DeleteStmt) Exec() error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
@@ -89,6 +99,7 @@ func (s *DeleteStmt) Exec() error {
 	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
+// processSQL builds SQL statement.
 func (s *DeleteStmt) processSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
