@@ -40,6 +40,10 @@ func (s *stmt) ExportedGetErrors() []error {
 	return s.errors
 }
 
+func (s *DeleteStmt) ExportedSetCalled(c ...syntax.Clause) {
+	s.called = append(s.called, c...)
+}
+
 func (s *InsertStmt) ExportedSetCalled(c ...syntax.Clause) {
 	s.called = append(s.called, c...)
 }

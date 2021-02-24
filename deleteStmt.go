@@ -71,12 +71,6 @@ func (s *DeleteStmt) Exec() error {
 	switch pool := s.db.(type) {
 	case *DB, *Tx:
 		var sql internal.SQL
-		ss, err := s.cmd.Build()
-		if err != nil {
-			return err
-		}
-		sql.Write(ss.Build())
-
 		if err := s.processSQL(&sql); err != nil {
 			return err
 		}
@@ -96,9 +90,18 @@ func (s *DeleteStmt) Exec() error {
 }
 
 func (s *DeleteStmt) processSQL(sql *internal.SQL) error {
+	ss, err := s.cmd.Build()
+	if err != nil {
+		return err
+	}
+	sql.Write(ss.Build())
+
 	for _, e := range s.called {
 		switch e := e.(type) {
-		case *clause.From:
+		case *clause.From,
+			*clause.Where,
+			*clause.And,
+			*clause.Or:
 			s, err := e.Build()
 			if err != nil {
 				return err
