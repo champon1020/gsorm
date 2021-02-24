@@ -6,6 +6,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      MGORM_CI: "true"
     services:
       mysql-mock:
         image: gcr.io/mgorm-305807/mysql-mock
