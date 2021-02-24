@@ -20,6 +20,7 @@ type InsertModel interface {
 }
 
 type InsertValues interface {
+	Values(...interface{}) InsertValues
 	ExpectExec() *InsertStmt
 	ExecCallable
 }
@@ -105,12 +106,17 @@ func (s *InsertStmt) processSQL(sql *internal.SQL) error {
 }
 
 func (s *InsertStmt) processSQLWithClauses(sql *internal.SQL) error {
-	for _, e := range s.called {
+	for i, e := range s.called {
 		switch e := e.(type) {
 		case *clause.Values:
 			s, err := e.Build()
 			if err != nil {
 				return err
+			}
+			if i > 0 {
+				sql.Write(",")
+				sql.Write(s.BuildValue())
+				continue
 			}
 			sql.Write(s.Build())
 		default:

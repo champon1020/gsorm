@@ -31,6 +31,13 @@ func (ss *StmtSet) Build() string {
 	if s != "" && (ss.Parens || ss.Value != "") {
 		s += " "
 	}
+	s += ss.BuildValue()
+	return s
+}
+
+// BuildValue makes clause value with string.
+func (ss *StmtSet) BuildValue() string {
+	var s string
 	if ss.Parens {
 		s += "("
 	}
