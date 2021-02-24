@@ -9,23 +9,27 @@ import (
 	"github.com/champon1020/mgorm/syntax/clause"
 )
 
+// MgormUpdate is interface for returned value of mgorm.Update.
 type MgormUpdate interface {
 	Model(interface{}) UpdateModel
 	Set(...interface{}) UpdateSet
 }
 
+// UpdateModel is interface for returned value of (*UpdateStmt).Model.
 type UpdateModel interface {
 	Where(string, ...interface{}) UpdateWhere
 	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
+// UpdateSet is interface for returned value of (*UpdateStmt).Set.
 type UpdateSet interface {
 	Where(string, ...interface{}) UpdateWhere
 	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
+// UpdateWhere is interface for returned value of (*UpdateStmt).Where.
 type UpdateWhere interface {
 	And(string, ...interface{}) UpdateAnd
 	Or(string, ...interface{}) UpdateOr
@@ -33,22 +37,25 @@ type UpdateWhere interface {
 	ExecCallable
 }
 
+// UpdateAnd is interface for returned value of (*UpdateStmt).And.
 type UpdateAnd interface {
 	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
+// UpdateOr is interface for returned value of (*UpdateStmt).Or.
 type UpdateOr interface {
 	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
-// UpdateStmt is UPDATE STATEMENT.
+// UpdateStmt is UPDATE statement..
 type UpdateStmt struct {
 	stmt
 	cmd *clause.Update
 }
 
+// String returns SQL statement with string.
 func (s *UpdateStmt) String() string {
 	var sql internal.SQL
 	if err := s.processSQL(&sql); err != nil {
@@ -58,6 +65,7 @@ func (s *UpdateStmt) String() string {
 	return sql.String()
 }
 
+// funcString returns function call as string.
 func (s *UpdateStmt) funcString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
@@ -66,10 +74,13 @@ func (s *UpdateStmt) funcString() string {
 	return str
 }
 
+// ExpectExec returns *UpdateStmt. This function is used fopr mock test.
 func (s *UpdateStmt) ExpectExec() *UpdateStmt {
 	return s
 }
 
+// Exec executes SQL statement without mapping to model.
+// If type of conn is mgorm.MockDB, compare statements between called and expected.
 func (s *UpdateStmt) Exec() error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
@@ -96,6 +107,7 @@ func (s *UpdateStmt) Exec() error {
 	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
+// processSQL builds SQL statement.
 func (s *UpdateStmt) processSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
@@ -119,6 +131,7 @@ func (s *UpdateStmt) processSQL(sql *internal.SQL) error {
 	return nil
 }
 
+// processSQLWithClauses builds SQL statement from called clauses.
 func (s *UpdateStmt) processSQLWithClauses(sql *internal.SQL) error {
 	for _, e := range s.called {
 		switch e := e.(type) {
@@ -139,6 +152,7 @@ func (s *UpdateStmt) processSQLWithClauses(sql *internal.SQL) error {
 	return nil
 }
 
+// processSQLWithModel builds SQL statement from model.
 func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
 	ref := reflect.ValueOf(model)
 	switch ref.Kind() {
@@ -210,7 +224,7 @@ func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *
 	return errors.New(msg, errors.InvalidTypeError)
 }
 
-// Model sets model to Stmt.
+// Model sets model to UpdateStmt.
 func (s *UpdateStmt) Model(model interface{}) UpdateModel {
 	s.model = model
 	return s
