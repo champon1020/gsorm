@@ -104,7 +104,7 @@ func (s *UpdateStmt) Exec() error {
 		return nil
 	}
 
-	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
 // processSQL builds SQL statement.
@@ -145,7 +145,7 @@ func (s *UpdateStmt) processSQLWithClauses(sql *internal.SQL) error {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("Type %s is not supported for UPDATE", reflect.TypeOf(e).Elem().String())
+			msg := fmt.Sprintf("%s is not supported for UPDATE statement", reflect.TypeOf(e).Elem().String())
 			return errors.New(msg, errors.InvalidTypeError)
 		}
 	}
@@ -183,7 +183,7 @@ func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *
 	}
 
 	if ref.Kind() != reflect.Ptr {
-		return errors.New("Model must be pointer", errors.InvalidValueError)
+		return errors.New("If model is not variable, model must be pointer", errors.InvalidValueError)
 	}
 	ref = ref.Elem()
 
@@ -209,7 +209,7 @@ func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *
 			}
 			v := ref.MapIndex(reflect.ValueOf(c))
 			if !v.IsValid() {
-				return errors.New("Column names must be included in some of map keys", errors.InvalidSyntaxError)
+				return errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError)
 			}
 			vStr, err := internal.ToString(v.Interface(), true)
 			if err != nil {
@@ -220,7 +220,7 @@ func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *
 		return nil
 	}
 
-	msg := fmt.Sprintf("Type %s is not supported for Model with UPDATE", reflect.TypeOf(model).String())
+	msg := fmt.Sprintf("Type %s is not supported for (*UpdateStmt).Model", reflect.TypeOf(model).String())
 	return errors.New(msg, errors.InvalidTypeError)
 }
 
@@ -233,11 +233,11 @@ func (s *UpdateStmt) Model(model interface{}) UpdateModel {
 // Set calls SET clause.
 func (s *UpdateStmt) Set(vals ...interface{}) UpdateSet {
 	if s.cmd == nil {
-		s.throw(errors.New("Command is nil", errors.InvalidValueError))
+		s.throw(errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError))
 		return s
 	}
 	if len(s.cmd.Columns) != len(vals) {
-		s.throw(errors.New("Length is different between columns and values", errors.InvalidValueError))
+		s.throw(errors.New("Number of values is not equal to that of columns", errors.InvalidValueError))
 		return s
 	}
 	set := new(clause.Set)

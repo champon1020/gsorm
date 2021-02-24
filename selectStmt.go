@@ -230,8 +230,8 @@ func (s *SelectStmt) processSQL(sql *internal.SQL) error {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("Type %s is not supported for SELECT", reflect.TypeOf(e).Elem().String())
-			return errors.New(msg, errors.InvalidTypeError)
+			msg := fmt.Sprintf("%s is not supported for SELECT statement", reflect.TypeOf(e).Elem().String())
+			return errors.New(msg, errors.InvalidSyntaxError)
 		}
 	}
 

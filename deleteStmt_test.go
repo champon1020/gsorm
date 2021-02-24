@@ -52,7 +52,7 @@ func TestDeleteStmt_String(t *testing.T) {
 func TestDeleteStmt_ProcessSQL_Fail(t *testing.T) {
 	{
 		expectedErr := errors.New(
-			"Type clause.Join is not supported for DELETE", errors.InvalidTypeError).(*errors.Error)
+			"clause.Join is not supported for DELETE statement", errors.InvalidSyntaxError).(*errors.Error)
 
 		// Prepare for test.
 		s := mgorm.Delete(nil).(*mgorm.DeleteStmt)

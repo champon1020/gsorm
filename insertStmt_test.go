@@ -95,7 +95,7 @@ func TestInsertStmt_String(t *testing.T) {
 func TestInsertStmt_ProcessSQLWithClauses_Fail(t *testing.T) {
 	{
 		expectedErr := errors.New(
-			"Type clause.Set is not supported for INSERT", errors.InvalidTypeError).(*errors.Error)
+			"clause.Set is not supported for INSERT statement", errors.InvalidSyntaxError).(*errors.Error)
 
 		// Prepare for test.
 		s := mgorm.Insert(nil, "", "").(*mgorm.InsertStmt)
@@ -153,7 +153,7 @@ func TestInsertStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			"Column names must be included in some of map keys", errors.InvalidSyntaxError).(*errors.Error)
+			"Column names must be included in one of map keys", errors.InvalidSyntaxError).(*errors.Error)
 
 		// Prepare for test.
 		model := make(map[string]interface{})
@@ -181,7 +181,7 @@ func TestInsertStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			"Type *int is not supported for Model with INSERT", errors.InvalidTypeError).(*errors.Error)
+			"Type *int is not supported for (*InsertStmt).Model", errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
 		model := 10000

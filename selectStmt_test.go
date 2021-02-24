@@ -203,7 +203,7 @@ func TestSelectStmt_String(t *testing.T) {
 func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 	{
 		expectedErr := errors.New(
-			`Type clause.Values is not supported for SELECT`, errors.InvalidTypeError).(*errors.Error)
+			`clause.Values is not supported for SELECT statement`, errors.InvalidSyntaxError).(*errors.Error)
 
 		// Prepare for test.
 		s := mgorm.Select(nil, "").(*mgorm.SelectStmt)

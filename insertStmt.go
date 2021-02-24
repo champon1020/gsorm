@@ -83,7 +83,7 @@ func (s *InsertStmt) Exec() error {
 		return nil
 	}
 
-	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
 // processSQL builds SQL statement.
@@ -131,8 +131,8 @@ func (s *InsertStmt) processSQLWithClauses(sql *internal.SQL) error {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("Type %s is not supported for INSERT", reflect.TypeOf(e).Elem().String())
-			return errors.New(msg, errors.InvalidTypeError)
+			msg := fmt.Sprintf("%s is not supported for INSERT statement", reflect.TypeOf(e).Elem().String())
+			return errors.New(msg, errors.InvalidSyntaxError)
 		}
 	}
 	return nil
@@ -209,7 +209,7 @@ func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *
 			}
 			v := ref.MapIndex(reflect.ValueOf(c))
 			if !v.IsValid() {
-				return errors.New("Column names must be included in some of map keys", errors.InvalidSyntaxError)
+				return errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError)
 			}
 			vStr, err := internal.ToString(v.Interface(), true)
 			if err != nil {
@@ -221,7 +221,7 @@ func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *
 		return nil
 	}
 
-	msg := fmt.Sprintf("Type %s is not supported for Model with INSERT", reflect.TypeOf(model).String())
+	msg := fmt.Sprintf("Type %s is not supported for (*InsertStmt).Model", reflect.TypeOf(model).String())
 	return errors.New(msg, errors.InvalidTypeError)
 }
 

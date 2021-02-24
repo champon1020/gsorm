@@ -96,7 +96,7 @@ func (s *DeleteStmt) Exec() error {
 		return nil
 	}
 
-	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
 // processSQL builds SQL statement.
@@ -119,8 +119,8 @@ func (s *DeleteStmt) processSQL(sql *internal.SQL) error {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("Type %s is not supported for DELETE", reflect.TypeOf(e).Elem().String())
-			return errors.New(msg, errors.InvalidTypeError)
+			msg := fmt.Sprintf("%s is not supported for DELETE statement", reflect.TypeOf(e).Elem().String())
+			return errors.New(msg, errors.InvalidSyntaxError)
 		}
 	}
 	return nil

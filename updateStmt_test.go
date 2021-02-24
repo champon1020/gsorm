@@ -78,7 +78,7 @@ func TestUpdateStmt_String(t *testing.T) {
 func TestUpdateStmt_ProcessSQLWithClauses_Fail(t *testing.T) {
 	{
 		expectedErr := errors.New(
-			"Type clause.Join is not supported for UPDATE", errors.InvalidTypeError).(*errors.Error)
+			"clause.Join is not supported for UPDATE statement", errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
 		s := mgorm.Update(nil, "", "").(*mgorm.UpdateStmt)
@@ -137,7 +137,7 @@ func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			"Model must be pointer", errors.InvalidValueError).(*errors.Error)
+			"If model is not variable, model must be pointer", errors.InvalidValueError).(*errors.Error)
 
 		// Prepare for test.
 		model := make(map[string]interface{})
@@ -165,7 +165,7 @@ func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			"Column names must be included in some of map keys", errors.InvalidSyntaxError).(*errors.Error)
+			"Column names must be included in one of map keys", errors.InvalidSyntaxError).(*errors.Error)
 
 		// Prepare for test.
 		model := map[string]interface{}{
@@ -196,7 +196,7 @@ func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			"Type *[]int is not supported for Model with UPDATE", errors.InvalidTypeError).(*errors.Error)
+			"Type *[]int is not supported for (*UpdateStmt).Model", errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
 		model := []int{1000}
@@ -226,7 +226,7 @@ func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 
 func TestUpdateStmt_Set_Fail(t *testing.T) {
 	{
-		expectedErr := errors.New("Command is nil", errors.InvalidValueError).(*errors.Error)
+		expectedErr := errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError).(*errors.Error)
 
 		// Prepare for test.
 		s := new(mgorm.UpdateStmt)
@@ -253,7 +253,7 @@ func TestUpdateStmt_Set_Fail(t *testing.T) {
 	}
 	{
 		expectedErr := errors.New(
-			"Length is different between columns and values", errors.InvalidValueError).(*errors.Error)
+			"Number of values is not equal to that of columns", errors.InvalidValueError).(*errors.Error)
 
 		// Actual process.
 		s := mgorm.Update(nil, "sample", "id").Set(10, "Taro").(*mgorm.UpdateStmt)
