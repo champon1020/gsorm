@@ -97,10 +97,11 @@ func (s *InsertStmt) processSQL(sql *internal.SQL) error {
 		if err := s.processSQLWithModel(cols, s.model, sql); err != nil {
 			return err
 		}
-	} else {
-		if err := s.processSQLWithClauses(sql); err != nil {
-			return err
-		}
+		return nil
+	}
+
+	if err := s.processSQLWithClauses(sql); err != nil {
+		return err
 	}
 	return nil
 }
