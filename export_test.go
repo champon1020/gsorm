@@ -1,6 +1,9 @@
 package mgorm
 
-import "github.com/champon1020/mgorm/internal"
+import (
+	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // Exported values which is declared in db.go.
 func (db *DB) ExportedSetConn(conn sqlDB) {
@@ -27,10 +30,28 @@ var (
 
 // Exported values which is declared in stmt.go.
 var (
-	StmtProcessQuerySQL = (*Stmt).processQuerySQL
-	StmtProcessExecSQL  = (*Stmt).processExecSQL
+	SelectStmtProcessSQL = (*SelectStmt).processSQL
+	InsertStmtProcessSQL = (*InsertStmt).processSQL
+	UpdateStmtProcessSQL = (*UpdateStmt).processSQL
+	DeleteStmtProcessSQL = (*DeleteStmt).processSQL
 )
 
-func (s *Stmt) ExportedGetErrors() []error {
+func (s *stmt) ExportedGetErrors() []error {
 	return s.errors
+}
+
+func (s *DeleteStmt) ExportedSetCalled(c ...syntax.Clause) {
+	s.called = append(s.called, c...)
+}
+
+func (s *InsertStmt) ExportedSetCalled(c ...syntax.Clause) {
+	s.called = append(s.called, c...)
+}
+
+func (s *SelectStmt) ExportedSetCalled(c ...syntax.Clause) {
+	s.called = append(s.called, c...)
+}
+
+func (s *UpdateStmt) ExportedSetCalled(c ...syntax.Clause) {
+	s.called = append(s.called, c...)
 }

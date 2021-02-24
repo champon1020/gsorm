@@ -9,14 +9,14 @@ import (
 
 func TestOrderBy(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *[]Employee
 	}{
 		// SELECT * FROM first_name ORDER BY first_name;
 		{
 			mgorm.Select(db, "first_name").
 				From("employees").
-				OrderBy("first_name").(*mgorm.Stmt),
+				OrderBy("first_name").(*mgorm.SelectStmt),
 			&[]Employee{
 				{FirstName: "Anneke"},
 				{FirstName: "Bezalel"},
@@ -35,7 +35,7 @@ func TestOrderBy(t *testing.T) {
 		{
 			mgorm.Select(db, "first_name").
 				From("employees").
-				OrderBy("first_name DESC").(*mgorm.Stmt),
+				OrderBy("first_name DESC").(*mgorm.SelectStmt),
 			&[]Employee{
 				{FirstName: "Tzvetan"},
 				{FirstName: "Sumant"},

@@ -9,14 +9,14 @@ import (
 
 func TestGroupBy(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result map[string]int
 	}{
 		// SELECT title, COUNT(title) FROM titles GROUP BY title;
 		{
 			mgorm.Select(db, "title", "COUNT(title)").
 				From("titles").
-				GroupBy("title").(*mgorm.Stmt),
+				GroupBy("title").(*mgorm.SelectStmt),
 			map[string]int{
 				"Engineer":        1,
 				"Senior Engineer": 4,
@@ -30,7 +30,7 @@ func TestGroupBy(t *testing.T) {
 			mgorm.Select(db, "title", "COUNT(title)").
 				From("titles").
 				GroupBy("title").
-				Having("COUNT(title) != ?", 1).(*mgorm.Stmt),
+				Having("COUNT(title) != ?", 1).(*mgorm.SelectStmt),
 			map[string]int{
 				"Senior Engineer": 4,
 				"Senior Staff":    2,

@@ -473,19 +473,19 @@ func TestMockTx_CompareWith(t *testing.T) {
 
 func TestCompareStmts(t *testing.T) {
 	testCases := []struct {
-		ExpectedStmt  *mgorm.Stmt
-		ActualStmt    *mgorm.Stmt
+		ExpectedStmt  *mgorm.SelectStmt
+		ActualStmt    *mgorm.SelectStmt
 		ExpectedError error
 	}{
 		{
-			mgorm.Select(nil, "column1").From("table").(*mgorm.Stmt),
-			mgorm.Select(nil, "column1").From("table").Where("column1 = ?", 10).(*mgorm.Stmt),
+			mgorm.Select(nil, "column1").From("table").(*mgorm.SelectStmt),
+			mgorm.Select(nil, "column1").From("table").Where("column1 = ?", 10).(*mgorm.SelectStmt),
 			errors.New(`SELECT("column1").FROM("table").WHERE("column1 = ?", 10) was executed `+
 				`but SELECT("column1").FROM("table") is expected`, errors.MockError),
 		},
 		{
-			mgorm.Select(nil, "column1").From("table").Where("column1 = ?", 10).(*mgorm.Stmt),
-			mgorm.Select(nil, "column1").From("table").Where("column1 = ?", 100).(*mgorm.Stmt),
+			mgorm.Select(nil, "column1").From("table").Where("column1 = ?", 10).(*mgorm.SelectStmt),
+			mgorm.Select(nil, "column1").From("table").Where("column1 = ?", 100).(*mgorm.SelectStmt),
 			errors.New(`SELECT("column1").FROM("table").WHERE("column1 = ?", 100) was executed `+
 				`but SELECT("column1").FROM("table").WHERE("column1 = ?", 10) is expected`, errors.MockError),
 		},

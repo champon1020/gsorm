@@ -9,14 +9,14 @@ import (
 
 func TestSelectWhere(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *[]Employee
 	}{
 		// SELECT emp_no FROM employees WHERE emp_no = 10001;
 		{
 			mgorm.Select(db, "emp_no").
 				From("employees").
-				Where("emp_no = ?", 10001).(*mgorm.Stmt),
+				Where("emp_no = ?", 10001).(*mgorm.SelectStmt),
 			&[]Employee{
 				{EmpNo: 10001},
 			},
@@ -28,7 +28,7 @@ func TestSelectWhere(t *testing.T) {
 			mgorm.Select(db, "emp_no", "first_name", "last_name").
 				From("employees").
 				Where("emp_no <= ?", 10005).
-				And("first_name = ? OR last_name = ?", "Georgi", "Bamford").(*mgorm.Stmt),
+				And("first_name = ? OR last_name = ?", "Georgi", "Bamford").(*mgorm.SelectStmt),
 			&[]Employee{
 				{
 					EmpNo:     10001,
@@ -49,7 +49,7 @@ func TestSelectWhere(t *testing.T) {
 			mgorm.Select(db, "emp_no", "first_name", "last_name").
 				From("employees").
 				Where("emp_no <= ?", 10002).
-				Or("first_name = ? AND last_name = ?", "Saniya", "Kalloufi").(*mgorm.Stmt),
+				Or("first_name = ? AND last_name = ?", "Saniya", "Kalloufi").(*mgorm.SelectStmt),
 			&[]Employee{
 				{
 					EmpNo:     10001,
@@ -78,7 +78,7 @@ func TestSelectWhere(t *testing.T) {
 					mgorm.Select(nil, "DISTINCT emp_no").
 						From("salaries").
 						Where("salary < ?", 60000),
-				).(*mgorm.Stmt),
+				).(*mgorm.SelectStmt),
 			&[]Employee{
 				{EmpNo: 10004},
 				{EmpNo: 10007},
@@ -89,7 +89,7 @@ func TestSelectWhere(t *testing.T) {
 		{
 			mgorm.Select(db, "emp_no").
 				From("employees").
-				Where("emp_no BETWEEN ? AND ?", 10002, 10004).(*mgorm.Stmt),
+				Where("emp_no BETWEEN ? AND ?", 10002, 10004).(*mgorm.SelectStmt),
 			&[]Employee{
 				{EmpNo: 10002},
 				{EmpNo: 10003},
@@ -101,7 +101,7 @@ func TestSelectWhere(t *testing.T) {
 		{
 			mgorm.Select(db, "first_name").
 				From("employees").
-				Where("first_name LIKE ?", "S%").(*mgorm.Stmt),
+				Where("first_name LIKE ?", "S%").(*mgorm.SelectStmt),
 			&[]Employee{
 				{FirstName: "Saniya"},
 				{FirstName: "Sumant"},
@@ -112,7 +112,7 @@ func TestSelectWhere(t *testing.T) {
 		{
 			mgorm.Select(db, "emp_no").
 				From("employees").
-				Where("emp_no IN (?, ?)", 10002, 10004).(*mgorm.Stmt),
+				Where("emp_no IN (?, ?)", 10002, 10004).(*mgorm.SelectStmt),
 			&[]Employee{
 				{EmpNo: 10002},
 				{EmpNo: 10004},

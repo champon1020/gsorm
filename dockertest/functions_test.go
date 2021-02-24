@@ -9,13 +9,13 @@ import (
 
 func TestMaxMin(t *testing.T) {
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *Employee
 	}{
 		// SELECT MIN(emp_no) FROM employees;
 		{
 			mgorm.Min(db, "emp_no").
-				From("employees").(*mgorm.Stmt),
+				From("employees").(*mgorm.SelectStmt),
 			&Employee{
 				EmpNo: 10001,
 			},
@@ -24,7 +24,7 @@ func TestMaxMin(t *testing.T) {
 		// SELECT MAX(emp_no) FROM employees;
 		{
 			mgorm.Max(db, "emp_no").
-				From("employees").(*mgorm.Stmt),
+				From("employees").(*mgorm.SelectStmt),
 			&Employee{
 				EmpNo: 10010,
 			},
@@ -53,20 +53,20 @@ func TestCountSum(t *testing.T) {
 	)
 
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *int
 	}{
 		// SELECT COUNT(emp_no) FROM salaries;
 		{
 			mgorm.Count(db, "emp_no").
-				From("salaries").(*mgorm.Stmt),
+				From("salaries").(*mgorm.SelectStmt),
 			&cnt,
 		},
 
 		// SELECT SUM(salary) FROM salaries;
 		{
 			mgorm.Sum(db, "salary").
-				From("salaries").(*mgorm.Stmt),
+				From("salaries").(*mgorm.SelectStmt),
 			&sum,
 		},
 	}
@@ -90,13 +90,13 @@ func TestAvg(t *testing.T) {
 	avg := 57929.0
 
 	testCases := []struct {
-		Stmt   *mgorm.Stmt
+		Stmt   *mgorm.SelectStmt
 		Result *float64
 	}{
 		// SELECT AVG(salary) FROM salaries;
 		{
 			mgorm.Avg(db, "salary").
-				From("salaries").(*mgorm.Stmt),
+				From("salaries").(*mgorm.SelectStmt),
 			&avg,
 		},
 	}
