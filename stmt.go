@@ -4,6 +4,7 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
+// Stmt is interface for DeleteStmt, InsertStmt, SelectStmt, and so on.
 type Stmt interface {
 	String() string
 	funcString() string
@@ -12,7 +13,7 @@ type Stmt interface {
 
 // stmt stores information about query.
 type stmt struct {
-	db     Pool
+	conn   Conn
 	called []syntax.Clause
 	model  interface{}
 	errors []error

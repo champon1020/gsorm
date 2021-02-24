@@ -163,14 +163,14 @@ func (s *SelectStmt) Query(model interface{}) error {
 		return s.errors[0]
 	}
 
-	switch pool := s.db.(type) {
+	switch conn := s.conn.(type) {
 	case *DB, *Tx:
 		var sql internal.SQL
 		if err := s.processSQL(&sql); err != nil {
 			return err
 		}
 
-		rows, err := pool.Query(sql.String())
+		rows, err := conn.Query(sql.String())
 		if err != nil {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
@@ -180,7 +180,7 @@ func (s *SelectStmt) Query(model interface{}) error {
 			return err
 		}
 	case Mock:
-		returned, err := pool.CompareWith(s)
+		returned, err := conn.CompareWith(s)
 		if err != nil || returned == nil {
 			return err
 		}

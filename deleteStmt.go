@@ -78,18 +78,18 @@ func (s *DeleteStmt) Exec() error {
 		return s.errors[0]
 	}
 
-	switch pool := s.db.(type) {
+	switch conn := s.conn.(type) {
 	case *DB, *Tx:
 		var sql internal.SQL
 		if err := s.processSQL(&sql); err != nil {
 			return err
 		}
-		if _, err := pool.Exec(sql.String()); err != nil {
+		if _, err := conn.Exec(sql.String()); err != nil {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
 		return nil
 	case Mock:
-		_, err := pool.CompareWith(s)
+		_, err := conn.CompareWith(s)
 		if err != nil {
 			return err
 		}
