@@ -150,13 +150,14 @@ func (s *SelectStmt) funcString() string {
 	return str
 }
 
-// ExpectQuery returns *Stmt. This function is used for mock test.
+// ExpectQuery returns *SelectStmt. This function is used for mock test.
 func (s *SelectStmt) ExpectQuery(model interface{}) *SelectStmt {
 	return s
 }
 
 // Query executes SQL statement with mapping to model.
-// If type of (*SelectStmt).conn is mgorm.MockDB, map expected values to model.
+// If type of (*SelectStmt).conn is mgorm.MockDB, compare statements between called and expected.
+// Then, it maps expected values to model.
 func (s *SelectStmt) Query(model interface{}) error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
@@ -201,7 +202,7 @@ func (s *SelectStmt) Query(model interface{}) error {
 	return nil
 }
 
-// processSQL bulids SQL statement from called clauses.
+// processSQL builds SQL statement from called clauses.
 func (s *SelectStmt) processSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
