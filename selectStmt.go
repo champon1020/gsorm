@@ -131,8 +131,8 @@ type SelectStmt struct {
 
 // String returns statement with string.
 func (s *SelectStmt) String() string {
-	sql, err := s.processSQL()
-	if err != nil {
+	var sql internal.SQL
+	if err := s.processSQL(&sql); err != nil {
 		s.throw(err)
 		return err.Error()
 	}
@@ -159,8 +159,8 @@ func (s *SelectStmt) Query(model interface{}) error {
 
 	switch pool := s.db.(type) {
 	case *DB, *Tx:
-		sql, err := s.processSQL()
-		if err != nil {
+		var sql internal.SQL
+		if err := s.processSQL(&sql); err != nil {
 			return err
 		}
 
@@ -196,12 +196,10 @@ func (s *SelectStmt) Query(model interface{}) error {
 	return nil
 }
 
-func (s *SelectStmt) processSQL() (internal.SQL, error) {
-	var sql internal.SQL
-
+func (s *SelectStmt) processSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
-		return "", err
+		return err
 	}
 	sql.Write(ss.Build())
 
@@ -221,16 +219,16 @@ func (s *SelectStmt) processSQL() (internal.SQL, error) {
 			*clause.Union:
 			s, err := e.Build()
 			if err != nil {
-				return "", err
+				return err
 			}
 			sql.Write(s.Build())
 		default:
 			msg := fmt.Sprintf("Type %s is not supported for SELECT", reflect.TypeOf(e).Elem().String())
-			return "", errors.New(msg, errors.InvalidTypeError)
+			return errors.New(msg, errors.InvalidTypeError)
 		}
 	}
 
-	return sql, nil
+	return nil
 }
 
 // From calls FROM clause.

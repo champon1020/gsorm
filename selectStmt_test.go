@@ -4,6 +4,9 @@ import (
 	"testing"
 
 	"github.com/champon1020/mgorm"
+	"github.com/champon1020/mgorm/errors"
+	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -197,17 +200,18 @@ func TestSelectStmt_String(t *testing.T) {
 	}
 }
 
-/*
 func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 	{
 		expectedErr := errors.New(
 			`Type clause.Values is not supported for SELECT`, errors.InvalidTypeError).(*errors.Error)
 
 		// Prepare for test.
-		s := mgorm.Select(nil, "").(*mgorm.Stmt).Values("").(*mgorm.Stmt)
+		s := mgorm.Select(nil, "").(*mgorm.SelectStmt)
+		s.ExportedSetCalled(&clause.Values{})
 
 		// Actual process.
-		_, err := mgorm.SelectStmtProcessSQL(s)
+		var sql internal.SQL
+		err := mgorm.SelectStmtProcessSQL(s, &sql)
 
 		// Validate error.
 		if err == nil {
@@ -226,4 +230,3 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 		}
 	}
 }
-*/

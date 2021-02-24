@@ -48,6 +48,10 @@ func (s *InsertStmt) ExportedSetCalled(c ...syntax.Clause) {
 	s.called = append(s.called, c...)
 }
 
+func (s *SelectStmt) ExportedSetCalled(c ...syntax.Clause) {
+	s.called = append(s.called, c...)
+}
+
 func (s *UpdateStmt) ExportedSetCalled(c ...syntax.Clause) {
 	s.called = append(s.called, c...)
 }
