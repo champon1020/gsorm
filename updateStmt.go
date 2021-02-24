@@ -9,23 +9,27 @@ import (
 	"github.com/champon1020/mgorm/syntax/clause"
 )
 
+// MgormUpdate is interface for returned value of mgorm.Update.
 type MgormUpdate interface {
 	Model(interface{}) UpdateModel
 	Set(...interface{}) UpdateSet
 }
 
+// UpdateModel is interface for returned value of (*UpdateStmt).Model.
 type UpdateModel interface {
 	Where(string, ...interface{}) UpdateWhere
 	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
+// UpdateSet is interface for returned value of (*UpdateStmt).Set.
 type UpdateSet interface {
 	Where(string, ...interface{}) UpdateWhere
 	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
+// UpdateWhere is interface for returned value of (*UpdateStmt).Where.
 type UpdateWhere interface {
 	And(string, ...interface{}) UpdateAnd
 	Or(string, ...interface{}) UpdateOr
@@ -33,22 +37,25 @@ type UpdateWhere interface {
 	ExecCallable
 }
 
+// UpdateAnd is interface for returned value of (*UpdateStmt).And.
 type UpdateAnd interface {
 	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
+// UpdateOr is interface for returned value of (*UpdateStmt).Or.
 type UpdateOr interface {
 	ExpectExec() *UpdateStmt
 	ExecCallable
 }
 
-// UpdateStmt is UPDATE STATEMENT.
+// UpdateStmt is UPDATE statement..
 type UpdateStmt struct {
 	stmt
 	cmd *clause.Update
 }
 
+// String returns SQL statement with string.
 func (s *UpdateStmt) String() string {
 	var sql internal.SQL
 	if err := s.processSQL(&sql); err != nil {
@@ -58,6 +65,7 @@ func (s *UpdateStmt) String() string {
 	return sql.String()
 }
 
+// funcString returns function call as string.
 func (s *UpdateStmt) funcString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
@@ -66,36 +74,40 @@ func (s *UpdateStmt) funcString() string {
 	return str
 }
 
+// ExpectExec returns *UpdateStmt. This function is used for mock test.
 func (s *UpdateStmt) ExpectExec() *UpdateStmt {
 	return s
 }
 
+// Exec executes SQL statement without mapping to model.
+// If type of conn is mgorm.MockDB, compare statements between called and expected.
 func (s *UpdateStmt) Exec() error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
 	}
 
-	switch pool := s.db.(type) {
+	switch conn := s.conn.(type) {
 	case *DB, *Tx:
 		var sql internal.SQL
 		if err := s.processSQL(&sql); err != nil {
 			return err
 		}
-		if _, err := pool.Exec(sql.String()); err != nil {
+		if _, err := conn.Exec(sql.String()); err != nil {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
 		return nil
 	case Mock:
-		_, err := pool.CompareWith(s)
+		_, err := conn.CompareWith(s)
 		if err != nil {
 			return err
 		}
 		return nil
 	}
 
-	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
+// processSQL builds SQL statement.
 func (s *UpdateStmt) processSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
@@ -119,6 +131,7 @@ func (s *UpdateStmt) processSQL(sql *internal.SQL) error {
 	return nil
 }
 
+// processSQLWithClauses builds SQL statement from called clauses.
 func (s *UpdateStmt) processSQLWithClauses(sql *internal.SQL) error {
 	for _, e := range s.called {
 		switch e := e.(type) {
@@ -132,13 +145,14 @@ func (s *UpdateStmt) processSQLWithClauses(sql *internal.SQL) error {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("Type %s is not supported for UPDATE", reflect.TypeOf(e).Elem().String())
+			msg := fmt.Sprintf("%s is not supported for UPDATE statement", reflect.TypeOf(e).Elem().String())
 			return errors.New(msg, errors.InvalidTypeError)
 		}
 	}
 	return nil
 }
 
+// processSQLWithModel builds SQL statement from model.
 func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
 	ref := reflect.ValueOf(model)
 	switch ref.Kind() {
@@ -169,7 +183,7 @@ func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *
 	}
 
 	if ref.Kind() != reflect.Ptr {
-		return errors.New("Model must be pointer", errors.InvalidValueError)
+		return errors.New("If model is not variable, model must be pointer", errors.InvalidValueError)
 	}
 	ref = ref.Elem()
 
@@ -195,7 +209,7 @@ func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *
 			}
 			v := ref.MapIndex(reflect.ValueOf(c))
 			if !v.IsValid() {
-				return errors.New("Column names must be included in some of map keys", errors.InvalidSyntaxError)
+				return errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError)
 			}
 			vStr, err := internal.ToString(v.Interface(), true)
 			if err != nil {
@@ -206,11 +220,11 @@ func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *
 		return nil
 	}
 
-	msg := fmt.Sprintf("Type %s is not supported for Model with UPDATE", reflect.TypeOf(model).String())
+	msg := fmt.Sprintf("Type %s is not supported for (*UpdateStmt).Model", reflect.TypeOf(model).String())
 	return errors.New(msg, errors.InvalidTypeError)
 }
 
-// Model sets model to Stmt.
+// Model sets model to UpdateStmt.
 func (s *UpdateStmt) Model(model interface{}) UpdateModel {
 	s.model = model
 	return s
@@ -219,11 +233,11 @@ func (s *UpdateStmt) Model(model interface{}) UpdateModel {
 // Set calls SET clause.
 func (s *UpdateStmt) Set(vals ...interface{}) UpdateSet {
 	if s.cmd == nil {
-		s.throw(errors.New("Command is nil", errors.InvalidValueError))
+		s.throw(errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError))
 		return s
 	}
 	if len(s.cmd.Columns) != len(vals) {
-		s.throw(errors.New("Length is different between columns and values", errors.InvalidValueError))
+		s.throw(errors.New("Number of values is not equal to that of columns", errors.InvalidValueError))
 		return s
 	}
 	set := new(clause.Set)

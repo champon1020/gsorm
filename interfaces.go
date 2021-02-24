@@ -7,8 +7,8 @@ import (
 	"github.com/champon1020/mgorm/internal"
 )
 
-// Pool is database connection pool like DB or Tx. This is also implemented by MockDB and MockTx.
-type Pool interface {
+// Conn is database connection like DB or Tx. This is also implemented by MockDB and MockTx.
+type Conn interface {
 	getDriver() internal.SQLDriver
 	Query(string, ...interface{}) (*sql.Rows, error)
 	Exec(string, ...interface{}) (sql.Result, error)
@@ -16,7 +16,7 @@ type Pool interface {
 
 // Mock is mock database conneciton pool.
 type Mock interface {
-	Pool
+	Conn
 	Complete() error
 	CompareWith(Stmt) (interface{}, error)
 }

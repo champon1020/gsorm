@@ -13,7 +13,7 @@ import (
 
 // MigStmt stores information about database migration query.
 type MigStmt struct {
-	pool   Pool
+	conn   Conn
 	driver internal.SQLDriver
 	cmd    syntax.MigClause
 	called []syntax.MigClause
@@ -59,13 +59,13 @@ func (m *MigStmt) Migration() error {
 		return m.errors[0]
 	}
 
-	switch pool := m.pool.(type) {
+	switch conn := m.conn.(type) {
 	case *DB, *Tx:
 		sql, err := m.processMigrationSQL()
 		if err != nil {
 			return err
 		}
-		if _, err := pool.Exec(sql.String()); err != nil {
+		if _, err := conn.Exec(sql.String()); err != nil {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
 	case *MockDB, *MockTx:

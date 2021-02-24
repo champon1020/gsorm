@@ -10,10 +10,12 @@ import (
 	"github.com/champon1020/mgorm/syntax/clause"
 )
 
+// MgormSelect is interface for returned value of mgorm.Select.
 type MgormSelect interface {
 	From(...string) SelectFrom
 }
 
+// SelectFrom is interface for returned value of (*SelectStmt).From.
 type SelectFrom interface {
 	Join(string) SelectJoin
 	LeftJoin(string) SelectJoin
@@ -28,12 +30,12 @@ type SelectFrom interface {
 	QueryCallable
 }
 
-// JoinStmt is returned after (*Stmt).Join, (*Stmt).LeftJoin, (*Stmt).RightJoin or (*Stmt).FullJoin is called.
+// SelectJoin is interface for returned value of (*SelectStmt).Join.
 type SelectJoin interface {
 	On(string, ...interface{}) SelectOn
 }
 
-// OnStmt is returned after (*Stmt).On is called.
+// SelectOn is interface for returned value of (*SelectStmt).On.
 type SelectOn interface {
 	Where(string, ...interface{}) SelectWhere
 	GroupBy(...string) SelectGroupBy
@@ -44,7 +46,7 @@ type SelectOn interface {
 	QueryCallable
 }
 
-// WhereStmt is returned after (*Stmt).Where is called.
+// SelectWhere is interface for returned value of (*SelectStmt).Where.
 type SelectWhere interface {
 	And(string, ...interface{}) SelectAnd
 	Or(string, ...interface{}) SelectOr
@@ -56,7 +58,7 @@ type SelectWhere interface {
 	QueryCallable
 }
 
-// AndStmt is returned after (*Stmt).And is called.
+// SelectAnd is interface for returned value of (*SelectStmt).And.
 type SelectAnd interface {
 	GroupBy(...string) SelectGroupBy
 	OrderBy(...string) SelectOrderBy
@@ -65,7 +67,7 @@ type SelectAnd interface {
 	QueryCallable
 }
 
-// OrStmt is returned after (*Stmt).Or is called.
+// SelectOr is interface for returned value of (*SelectStmt).Or.
 type SelectOr interface {
 	GroupBy(...string) SelectGroupBy
 	OrderBy(...string) SelectOrderBy
@@ -74,7 +76,7 @@ type SelectOr interface {
 	QueryCallable
 }
 
-// GroupByStmt is returned after (*Stmt).GroupBy is called.
+// SelectGroupBy is interface for returned value of (*SelectStmt).GroupBy.
 type SelectGroupBy interface {
 	Having(string, ...interface{}) SelectHaving
 	OrderBy(...string) SelectOrderBy
@@ -83,7 +85,7 @@ type SelectGroupBy interface {
 	QueryCallable
 }
 
-// HavingStmt is returned after (*Stmt).Having is called.
+// SelectHaving is interface for returned value of (*SelectStmt).Having.
 type SelectHaving interface {
 	OrderBy(...string) SelectOrderBy
 	Union(syntax.Stmt) SelectUnion
@@ -91,7 +93,7 @@ type SelectHaving interface {
 	QueryCallable
 }
 
-// OrderByStmt is returned after (*Stmt).OrderBy is called.
+// SelectOrderBy is interface for returned value of (*SelectStmt).OrderBy.
 type SelectOrderBy interface {
 	Limit(int) SelectLimit
 	Union(syntax.Stmt) SelectUnion
@@ -99,7 +101,7 @@ type SelectOrderBy interface {
 	QueryCallable
 }
 
-// LimitStmt is returned after (*Stmt).Limit is called.
+// SelectLimit is interface for returned value of (*SelectStmt).Limit.
 type SelectLimit interface {
 	Offset(int) SelectOffset
 	Union(syntax.Stmt) SelectUnion
@@ -107,14 +109,14 @@ type SelectLimit interface {
 	QueryCallable
 }
 
-// OffsetStmt is returned after (*Stmt).Offset is called.
+// SelectOffset is interface for returned value of (*SelectStmt).Offset.
 type SelectOffset interface {
 	Union(syntax.Stmt) SelectUnion
 	UnionAll(syntax.Stmt) SelectUnion
 	QueryCallable
 }
 
-// UnionStmt is returned after (*Stmt).Union is called.
+// SelectUnion is interface for returned value of (*SelectStmt).Union.
 type SelectUnion interface {
 	OrderBy(...string) SelectOrderBy
 	Limit(int) SelectLimit
@@ -129,7 +131,7 @@ type SelectStmt struct {
 	cmd *clause.Select
 }
 
-// String returns statement with string.
+// String returns SQL statement with string.
 func (s *SelectStmt) String() string {
 	var sql internal.SQL
 	if err := s.processSQL(&sql); err != nil {
@@ -139,6 +141,7 @@ func (s *SelectStmt) String() string {
 	return sql.String()
 }
 
+// funcString returns function call as string.
 func (s *SelectStmt) funcString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
@@ -147,24 +150,27 @@ func (s *SelectStmt) funcString() string {
 	return str
 }
 
-// ExpectQuery returns *Stmt. This function is used for mock test.
+// ExpectQuery returns *SelectStmt. This function is used for mock test.
 func (s *SelectStmt) ExpectQuery(model interface{}) *SelectStmt {
 	return s
 }
 
+// Query executes SQL statement with mapping to model.
+// If type of (*SelectStmt).conn is mgorm.MockDB, compare statements between called and expected.
+// Then, it maps expected values to model.
 func (s *SelectStmt) Query(model interface{}) error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
 	}
 
-	switch pool := s.db.(type) {
+	switch conn := s.conn.(type) {
 	case *DB, *Tx:
 		var sql internal.SQL
 		if err := s.processSQL(&sql); err != nil {
 			return err
 		}
 
-		rows, err := pool.Query(sql.String())
+		rows, err := conn.Query(sql.String())
 		if err != nil {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
@@ -174,7 +180,7 @@ func (s *SelectStmt) Query(model interface{}) error {
 			return err
 		}
 	case Mock:
-		returned, err := pool.CompareWith(s)
+		returned, err := conn.CompareWith(s)
 		if err != nil || returned == nil {
 			return err
 		}
@@ -196,6 +202,7 @@ func (s *SelectStmt) Query(model interface{}) error {
 	return nil
 }
 
+// processSQL builds SQL statement from called clauses.
 func (s *SelectStmt) processSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
@@ -223,8 +230,8 @@ func (s *SelectStmt) processSQL(sql *internal.SQL) error {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("Type %s is not supported for SELECT", reflect.TypeOf(e).Elem().String())
-			return errors.New(msg, errors.InvalidTypeError)
+			msg := fmt.Sprintf("%s is not supported for SELECT statement", reflect.TypeOf(e).Elem().String())
+			return errors.New(msg, errors.InvalidSyntaxError)
 		}
 	}
 

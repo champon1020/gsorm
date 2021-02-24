@@ -9,16 +9,19 @@ import (
 	"github.com/champon1020/mgorm/syntax/clause"
 )
 
+// MgormInsert is interface for returned value of mgorm.Insert.
 type MgormInsert interface {
 	Model(interface{}) InsertModel
 	Values(...interface{}) InsertValues
 }
 
+// InsertModel is interface for returned value of (*InsertStmt).Model.
 type InsertModel interface {
 	ExpectExec() *InsertStmt
 	ExecCallable
 }
 
+// InsertValues is interface for returned value of (*InsertStmt).Values.
 type InsertValues interface {
 	Values(...interface{}) InsertValues
 	ExpectExec() *InsertStmt
@@ -31,6 +34,7 @@ type InsertStmt struct {
 	cmd *clause.Insert
 }
 
+// String returns SQL statement with string.
 func (s *InsertStmt) String() string {
 	var sql internal.SQL
 	if err := s.processSQL(&sql); err != nil {
@@ -40,6 +44,7 @@ func (s *InsertStmt) String() string {
 	return sql.String()
 }
 
+// funcString returns function call as string.
 func (s *InsertStmt) funcString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
@@ -48,36 +53,40 @@ func (s *InsertStmt) funcString() string {
 	return str
 }
 
+// ExpectExec returns *InsertStmt. This function is used for mock test.
 func (s *InsertStmt) ExpectExec() *InsertStmt {
 	return s
 }
 
+// Exec executed SQL statement without mapping to model.
+// If type of conn is mgorm.MockDB, compare statements between called and expected.
 func (s *InsertStmt) Exec() error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
 	}
 
-	switch pool := s.db.(type) {
+	switch conn := s.conn.(type) {
 	case *DB, *Tx:
 		var sql internal.SQL
 		if err := s.processSQL(&sql); err != nil {
 			return err
 		}
-		if _, err := pool.Exec(sql.String()); err != nil {
+		if _, err := conn.Exec(sql.String()); err != nil {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
 		return nil
 	case Mock:
-		_, err := pool.CompareWith(s)
+		_, err := conn.CompareWith(s)
 		if err != nil {
 			return err
 		}
 		return nil
 	}
 
-	return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
+// processSQL builds SQL statement.
 func (s *InsertStmt) processSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
@@ -106,6 +115,7 @@ func (s *InsertStmt) processSQL(sql *internal.SQL) error {
 	return nil
 }
 
+// processSQLWithClauses builds SQL statement from called clauses.
 func (s *InsertStmt) processSQLWithClauses(sql *internal.SQL) error {
 	for i, e := range s.called {
 		switch e := e.(type) {
@@ -121,13 +131,14 @@ func (s *InsertStmt) processSQLWithClauses(sql *internal.SQL) error {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("Type %s is not supported for INSERT", reflect.TypeOf(e).Elem().String())
-			return errors.New(msg, errors.InvalidTypeError)
+			msg := fmt.Sprintf("%s is not supported for INSERT statement", reflect.TypeOf(e).Elem().String())
+			return errors.New(msg, errors.InvalidSyntaxError)
 		}
 	}
 	return nil
 }
 
+// processSQLWithModel builds SQL statement from model.
 func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
 	ref := reflect.ValueOf(model)
 	if ref.Kind() != reflect.Ptr {
@@ -198,7 +209,7 @@ func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *
 			}
 			v := ref.MapIndex(reflect.ValueOf(c))
 			if !v.IsValid() {
-				return errors.New("Column names must be included in some of map keys", errors.InvalidSyntaxError)
+				return errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError)
 			}
 			vStr, err := internal.ToString(v.Interface(), true)
 			if err != nil {
@@ -210,11 +221,11 @@ func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *
 		return nil
 	}
 
-	msg := fmt.Sprintf("Type %s is not supported for Model with INSERT", reflect.TypeOf(model).String())
+	msg := fmt.Sprintf("Type %s is not supported for (*InsertStmt).Model", reflect.TypeOf(model).String())
 	return errors.New(msg, errors.InvalidTypeError)
 }
 
-// Model sets model to Stmt.
+// Model sets model to InsertStmt.
 func (s *InsertStmt) Model(model interface{}) InsertModel {
 	s.model = model
 	return s
