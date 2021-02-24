@@ -184,24 +184,7 @@ func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *
 		sql.Write(")")
 		return nil
 	case reflect.Map:
-		r := ref.MapRange()
-		fst := true
-		for r.Next() {
-			if !fst {
-				sql.Write(",")
-			}
-			key, err := internal.ToString(r.Key().Interface(), true)
-			if err != nil {
-				return err
-			}
-			val, err := internal.ToString(r.Value().Interface(), true)
-			if err != nil {
-				return err
-			}
-			sql.Write(fmt.Sprintf("(%s, %s)", key, val))
-			fst = false
-		}
-
+		sql.Write("(")
 		for i, c := range cols {
 			if i > 0 {
 				sql.Write(",")
@@ -214,8 +197,9 @@ func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *
 			if err != nil {
 				return err
 			}
-			sql.Write(fmt.Sprintf("%s = %s", c, vStr))
+			sql.Write(vStr)
 		}
+		sql.Write(")")
 		return nil
 	}
 

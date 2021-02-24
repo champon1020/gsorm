@@ -16,6 +16,10 @@ func TestInsertStmt_String(t *testing.T) {
 	model1 := Model{ID: 10000, Name: "Taro"}
 	model2 := []Model{{ID: 10000, Name: "Taro"}, {ID: 10001, Name: "Hanako"}}
 	model3 := []int{10000, 10001}
+	model4 := map[string]interface{}{
+		"id":   10000,
+		"name": "Taro",
+	}
 
 	testCases := []struct {
 		Stmt     *mgorm.InsertStmt
@@ -32,6 +36,10 @@ func TestInsertStmt_String(t *testing.T) {
 		{
 			mgorm.Insert(nil, "sample", "id").Model(&model3).(*mgorm.InsertStmt),
 			`INSERT INTO sample (id) VALUES (10000), (10001)`,
+		},
+		{
+			mgorm.Insert(nil, "sample", "id", "name").Model(&model4).(*mgorm.InsertStmt),
+			`INSERT INTO sample (id, name) VALUES (10000, "Taro")`,
 		},
 	}
 
