@@ -50,31 +50,39 @@ func TestDeleteStmt_String(t *testing.T) {
 }
 
 func TestDeleteStmt_ProcessSQL_Fail(t *testing.T) {
-	{
-		expectedErr := errors.New(
-			"clause.Join is not supported for DELETE statement", errors.InvalidSyntaxError).(*errors.Error)
+	testCases := []struct {
+		ExpectedErr *errors.Error
+		Process     func() error
+	}{
+		{
+			errors.New("clause.Join is not supported for DELETE statement", errors.InvalidSyntaxError).(*errors.Error),
+			func() error {
+				// Prepare for test.
+				s := mgorm.Delete(nil).(*mgorm.DeleteStmt)
+				s.ExportedSetCalled(&clause.Join{})
 
-		// Prepare for test.
-		s := mgorm.Delete(nil).(*mgorm.DeleteStmt)
-		s.ExportedSetCalled(&clause.Join{})
+				// Actual process.
+				var sql internal.SQL
+				err := mgorm.DeleteStmtProcessSQL(s, &sql)
+				return err
+			},
+		},
+	}
 
-		// Actual process.
-		var sql internal.SQL
-		err := mgorm.DeleteStmtProcessSQL(s, &sql)
-
-		// Validate error.
+	for _, testCase := range testCases {
+		err := testCase.Process()
 		if err == nil {
 			t.Errorf("Error was not occurred")
-			return
+			continue
 		}
 		actualErr, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Error type is invalid")
-			return
+			continue
 		}
-		if !actualErr.Is(expectedErr) {
+		if !actualErr.Is(testCase.ExpectedErr) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
 			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}

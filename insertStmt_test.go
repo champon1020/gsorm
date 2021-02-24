@@ -93,117 +93,103 @@ func TestInsertStmt_String(t *testing.T) {
 }
 
 func TestInsertStmt_ProcessSQLWithClauses_Fail(t *testing.T) {
-	{
-		expectedErr := errors.New(
-			"clause.Set is not supported for INSERT statement", errors.InvalidSyntaxError).(*errors.Error)
+	testCases := []struct {
+		ExpectedErr *errors.Error
+		Process     func() error
+	}{
+		{
+			errors.New("clause.Set is not supported for INSERT statement", errors.InvalidSyntaxError).(*errors.Error),
+			func() error {
+				// Prepare for test.
+				s := mgorm.Insert(nil, "", "").(*mgorm.InsertStmt)
+				s.ExportedSetCalled(&clause.Set{})
 
-		// Prepare for test.
-		s := mgorm.Insert(nil, "", "").(*mgorm.InsertStmt)
-		s.ExportedSetCalled(&clause.Set{})
+				// Actual process.
+				var sql internal.SQL
+				err := mgorm.InsertStmtProcessSQL(s, &sql)
+				return err
+			},
+		},
+	}
 
-		// Actual process.
-		var sql internal.SQL
-		err := mgorm.InsertStmtProcessSQL(s, &sql)
-
-		// Validate error.
+	for _, testCase := range testCases {
+		err := testCase.Process()
 		if err == nil {
 			t.Errorf("Error was not occurred")
-			return
+			continue
 		}
 		actualErr, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Error type is invalid")
-			return
+			continue
 		}
-		if !actualErr.Is(expectedErr) {
+		if !actualErr.Is(testCase.ExpectedErr) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
 			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}
 }
 
 func TestInsertStmt_ProcessSQLWithModel_Fail(t *testing.T) {
-	{
-		expectedErr := errors.New(
-			"Model must be pointer", errors.InvalidValueError).(*errors.Error)
+	testCases := []struct {
+		ExpectedErr *errors.Error
+		Process     func() error
+	}{
+		{
+			errors.New("Model must be pointer", errors.InvalidValueError).(*errors.Error),
+			func() error {
+				// Prepare for test.
+				s := mgorm.Insert(nil, "", "").Model(1000).(*mgorm.InsertStmt)
 
-		// Prepare for test.
-		s := mgorm.Insert(nil, "", "").Model(1000).(*mgorm.InsertStmt)
+				// Actual process.
+				var sql internal.SQL
+				err := mgorm.InsertStmtProcessSQL(s, &sql)
+				return err
+			},
+		},
+		{
+			errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError).(*errors.Error),
+			func() error {
+				// Prepare for test.
+				model := make(map[string]interface{})
+				s := mgorm.Insert(nil, "table", "column").Model(&model).(*mgorm.InsertStmt)
 
-		// Actual process.
-		var sql internal.SQL
-		err := mgorm.InsertStmtProcessSQL(s, &sql)
+				// Actual process.
+				var sql internal.SQL
+				err := mgorm.InsertStmtProcessSQL(s, &sql)
+				return err
+			},
+		},
+		{
+			errors.New("Type *int is not supported for (*InsertStmt).Model", errors.InvalidTypeError).(*errors.Error),
+			func() error {
+				// Prepare for test.
+				model := 10000
+				s := mgorm.Insert(nil, "table", "column").Model(&model).(*mgorm.InsertStmt)
 
-		// Validate error.
-		if err == nil {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
-		}
-		if !actualErr.Is(expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
+				// Actual process.
+				var sql internal.SQL
+				err := mgorm.InsertStmtProcessSQL(s, &sql)
+				return err
+			},
+		},
 	}
-	{
-		expectedErr := errors.New(
-			"Column names must be included in one of map keys", errors.InvalidSyntaxError).(*errors.Error)
 
-		// Prepare for test.
-		model := make(map[string]interface{})
-		s := mgorm.Insert(nil, "table", "column").Model(&model).(*mgorm.InsertStmt)
-
-		// Actual process.
-		var sql internal.SQL
-		err := mgorm.InsertStmtProcessSQL(s, &sql)
-
-		// Validate error.
+	for _, testCase := range testCases {
+		err := testCase.Process()
 		if err == nil {
 			t.Errorf("Error was not occurred")
-			return
+			continue
 		}
 		actualErr, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Error type is invalid")
-			return
+			continue
 		}
-		if !actualErr.Is(expectedErr) {
+		if !actualErr.Is(testCase.ExpectedErr) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
-	}
-	{
-		expectedErr := errors.New(
-			"Type *int is not supported for (*InsertStmt).Model", errors.InvalidTypeError).(*errors.Error)
-
-		// Prepare for test.
-		model := 10000
-		s := mgorm.Insert(nil, "table", "column").Model(&model).(*mgorm.InsertStmt)
-
-		// Actual process.
-		var sql internal.SQL
-		err := mgorm.InsertStmtProcessSQL(s, &sql)
-
-		// Validate error.
-		if err == nil {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
-		}
-		if !actualErr.Is(expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
 			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}

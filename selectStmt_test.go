@@ -201,31 +201,39 @@ func TestSelectStmt_String(t *testing.T) {
 }
 
 func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
-	{
-		expectedErr := errors.New(
-			`clause.Values is not supported for SELECT statement`, errors.InvalidSyntaxError).(*errors.Error)
+	testCases := []struct {
+		ExpectedErr *errors.Error
+		Process     func() error
+	}{
+		{
+			errors.New(`clause.Values is not supported for SELECT statement`, errors.InvalidSyntaxError).(*errors.Error),
+			func() error {
+				// Prepare for test.
+				s := mgorm.Select(nil, "").(*mgorm.SelectStmt)
+				s.ExportedSetCalled(&clause.Values{})
 
-		// Prepare for test.
-		s := mgorm.Select(nil, "").(*mgorm.SelectStmt)
-		s.ExportedSetCalled(&clause.Values{})
+				// Actual process.
+				var sql internal.SQL
+				err := mgorm.SelectStmtProcessSQL(s, &sql)
+				return err
+			},
+		},
+	}
 
-		// Actual process.
-		var sql internal.SQL
-		err := mgorm.SelectStmtProcessSQL(s, &sql)
-
-		// Validate error.
+	for _, testCase := range testCases {
+		err := testCase.Process()
 		if err == nil {
 			t.Errorf("Error was not occurred")
-			return
+			continue
 		}
 		actualErr, ok := err.(*errors.Error)
 		if !ok {
 			t.Errorf("Error type is invalid")
-			return
+			continue
 		}
-		if !actualErr.Is(expectedErr) {
+		if !actualErr.Is(testCase.ExpectedErr) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
+			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
 			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
 		}
 	}
