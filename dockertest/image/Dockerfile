@@ -9,3 +9,5 @@ ADD data/ /docker/data
 ADD entry/ /docker-entrypoint-initdb.d
 
 CMD ["mysqld"]
+
+EXPOSE 3306

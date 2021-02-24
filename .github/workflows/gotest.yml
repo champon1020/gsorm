@@ -1,0 +1,29 @@
+name: Run test
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      MGORM_CI: "true"
+    services:
+      mysql-mock:
+        image: gcr.io/mgorm-305807/mysql-mock
+        ports:
+          - 3306:3306
+    steps:
+      - uses: actions/checkout@v2
+        
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+          
+      - name: Build
+        run: go build -v ./...
+        
+      - name: Test
+        run: go test -v ./...
+      

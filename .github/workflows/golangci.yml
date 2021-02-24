@@ -1,0 +1,22 @@
+name: Run golangci-lint with reviewdog
+
+on:
+  pull_request:
+
+jobs:
+  securiy:
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+        
+      - name: Run golangci-lint
+        uses: reviewdog/action-golangci-lint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: warning
+          golangci_lint_flags: "--config=.golangci.yml"
+          filter_mode: nofilter
+          reporter: github-pr-review

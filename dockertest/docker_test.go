@@ -18,13 +18,49 @@ const TIMEOUT = 20 * time.Second
 var db *mgorm.DB
 
 func TestMain(m *testing.M) {
+	if os.Getenv("MGORM_CI") == "true" {
+		RunTest(m)
+		return
+	}
+	RunTestWithBuild(m)
+}
+
+func RunTest(m *testing.M) {
+	var err error
+	db, err = mgorm.New("mysql", "root:toor@tcp(localhost:3306)/employees")
+	if err != nil {
+		log.Fatalf("Could not connect to docker: %v", err)
+	}
+
+	defer func() {
+		db.Close()
+	}()
+
+	start := time.Now()
+	// Ignore any errors which is printed by go-sql-driver/mysql.
+	mysql.SetLogger(log.New(ioutil.Discard, "", 0))
+	for {
+		if db.Ping() == nil {
+			break
+		}
+		now := time.Now()
+		if (now.Sub(start)).Seconds() > float64(TIMEOUT) {
+			log.Fatalf("Timeout")
+		}
+	}
+	// Reset logger of go-sql-driver/mysql.
+	mysql.SetLogger(log.New(os.Stderr, "[mysql] ", log.Ldate|log.Ltime|log.Lshortfile))
+
+	m.Run()
+}
+
+func RunTestWithBuild(m *testing.M) {
 	pool, err := dockertest.NewPool("")
 	if err != nil {
 		log.Fatalf("Could not connect to docker: %v", err)
 	}
 
 	// Build container.
-	//options := &dockertest.RunOptions{Name: "mysql-mock", ExposedPorts: []string{"53306"}}
 	resource, err := pool.BuildAndRun("mysql-mock", "./image/Dockerfile", []string{})
 	if err != nil {
 		log.Fatalf("Could not start resource: %v", err)
