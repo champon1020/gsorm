@@ -28,13 +28,13 @@ func TestDeleteStmt_String(t *testing.T) {
 			mgorm.Delete(nil).From("sample").
 				Where("id = ?", 10000).
 				And("name = ? OR name = ?", "Taro", "Jiro").(*mgorm.DeleteStmt),
-			`DELETE FROM sample WHERE id = 10000 AND (name = "Taro" OR name = "Jiro")`,
+			`DELETE FROM sample WHERE id = 10000 AND (name = 'Taro' OR name = 'Jiro')`,
 		},
 		{
 			mgorm.Delete(nil).From("sample").
 				Where("id = ?", 10000).
 				Or("name = ? AND nickname = ?", "Taro", "TaroTaro").(*mgorm.DeleteStmt),
-			`DELETE FROM sample WHERE id = 10000 OR (name = "Taro" AND nickname = "TaroTaro")`,
+			`DELETE FROM sample WHERE id = 10000 OR (name = 'Taro' AND nickname = 'TaroTaro')`,
 		},
 	}
 

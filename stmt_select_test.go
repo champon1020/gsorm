@@ -28,7 +28,7 @@ func TestSelectStmt_String(t *testing.T) {
 				And("first_name = ? OR last_name = ?", "Georgi", "Bamford").(*mgorm.SelectStmt),
 			`SELECT emp_no, first_name, last_name FROM employees ` +
 				`WHERE emp_no <= 10005 ` +
-				`AND (first_name = "Georgi" OR last_name = "Bamford")`,
+				`AND (first_name = 'Georgi' OR last_name = 'Bamford')`,
 		},
 		{
 			mgorm.Select(nil, "emp_no", "first_name", "last_name").
@@ -37,7 +37,7 @@ func TestSelectStmt_String(t *testing.T) {
 				Or("first_name = ? AND last_name = ?", "Saniya", "Kalloufi").(*mgorm.SelectStmt),
 			`SELECT emp_no, first_name, last_name FROM employees ` +
 				`WHERE emp_no <= 10002 ` +
-				`OR (first_name = "Saniya" AND last_name = "Kalloufi")`,
+				`OR (first_name = 'Saniya' AND last_name = 'Kalloufi')`,
 		},
 		{
 			mgorm.Select(nil, "emp_no").
@@ -60,7 +60,7 @@ func TestSelectStmt_String(t *testing.T) {
 			mgorm.Select(nil, "first_name").
 				From("employees").
 				Where("first_name LIKE ?", "S%").(*mgorm.SelectStmt),
-			`SELECT first_name FROM employees WHERE first_name LIKE "S%"`,
+			`SELECT first_name FROM employees WHERE first_name LIKE 'S%'`,
 		},
 		{
 			mgorm.Select(nil, "emp_no").

@@ -56,25 +56,25 @@ func (s *CreateIndexStmt) buildSQL(sql *internal.SQL) error {
 		return err
 	}
 	sql.Write(ss.Build())
-	s.advanceClause()
 
-	e := s.headClause()
-	if e == nil {
-		msg := "Called clauses have already been processed but SQL is not completed."
-		return errors.New(msg, errors.InvalidSyntaxError)
-	}
-
-	switch e := e.(type) {
-	case *mig.On:
-		ss, err := e.Build()
-		if err != nil {
-			return err
+	for len(s.called) > 0 {
+		e := s.headClause()
+		if e == nil {
+			break
 		}
-		sql.Write(ss.Build())
-		s.advanceClause()
-	default:
-		msg := fmt.Sprintf("%v is not supported for CREATE INDEX statement", reflect.TypeOf(e).String())
-		return errors.New(msg, errors.InvalidTypeError)
+
+		switch e := e.(type) {
+		case *mig.On:
+			ss, err := e.Build()
+			if err != nil {
+				return err
+			}
+			sql.Write(ss.Build())
+			s.advanceClause()
+		default:
+			msg := fmt.Sprintf("%v is not supported for CREATE INDEX statement", reflect.TypeOf(e).String())
+			return errors.New(msg, errors.InvalidTypeError)
+		}
 	}
 
 	return nil
@@ -96,6 +96,7 @@ func (s *CreateTableStmt) String() string {
 	return s.string(s.buildSQL)
 }
 
+// Migration executes database migration.
 func (s *CreateTableStmt) Migration() error {
 	return s.migration(s.buildSQL)
 }
@@ -107,6 +108,7 @@ func (s *CreateTableStmt) buildSQL(sql *internal.SQL) error {
 	}
 	sql.Write(ss.Build())
 
+	sql.Write("(")
 	for len(s.called) > 0 {
 		e := s.headClause()
 		if e == nil {
@@ -146,6 +148,7 @@ func (s *CreateTableStmt) buildSQL(sql *internal.SQL) error {
 			return errors.New(msg, errors.InvalidTypeError)
 		}
 	}
+	sql.Write(")")
 
 	return nil
 }

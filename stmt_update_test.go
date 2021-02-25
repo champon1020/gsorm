@@ -28,24 +28,24 @@ func TestUpdateStmt_String(t *testing.T) {
 				Set(10000, "Taro").
 				Where("id = ?", 20000).
 				And("first_name = ? OR first_name = ?", "Jiro", "Hanako").(*mgorm.UpdateStmt),
-			`UPDATE sample SET id = 10000, first_name = "Taro" ` +
+			`UPDATE sample SET id = 10000, first_name = 'Taro' ` +
 				`WHERE id = 20000 ` +
-				`AND (first_name = "Jiro" OR first_name = "Hanako")`,
+				`AND (first_name = 'Jiro' OR first_name = 'Hanako')`,
 		},
 		{
 			mgorm.Update(nil, "sample", "id", "first_name").
 				Set(10000, "Taro").
 				Where("id = ?", 20000).
 				Or("first_name = ? AND last_name = ?", "Jiro", "Sato").(*mgorm.UpdateStmt),
-			`UPDATE sample SET id = 10000, first_name = "Taro" ` +
+			`UPDATE sample SET id = 10000, first_name = 'Taro' ` +
 				`WHERE id = 20000 ` +
-				`OR (first_name = "Jiro" AND last_name = "Sato")`,
+				`OR (first_name = 'Jiro' AND last_name = 'Sato')`,
 		},
 		{
 			mgorm.Update(nil, "sample", "id", "first_name").
 				Model(&model1).
 				Where("id = ?", 20000).(*mgorm.UpdateStmt),
-			`UPDATE sample SET id = 10000, first_name = "Taro" ` +
+			`UPDATE sample SET id = 10000, first_name = 'Taro' ` +
 				`WHERE id = 20000`,
 		},
 		{
@@ -59,7 +59,7 @@ func TestUpdateStmt_String(t *testing.T) {
 			mgorm.Update(nil, "sample", "id", "first_name").
 				Model(&model2).
 				Where("id = ?", 20000).(*mgorm.UpdateStmt),
-			`UPDATE sample SET id = 10000, first_name = "Taro" ` +
+			`UPDATE sample SET id = 10000, first_name = 'Taro' ` +
 				`WHERE id = 20000`,
 		},
 	}

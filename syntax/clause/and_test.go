@@ -54,9 +54,9 @@ func TestAnd_Build(t *testing.T) {
 }
 
 func TestAnd_Build_Fail(t *testing.T) {
-    a := &clause.And{Expr: "column = ?"}
-    _, err := a.Build()
-    if err == nil {
-        t.Errorf("Error was not occurred")
-    }
+	a := &clause.And{Expr: "column = ?"}
+	_, err := a.Build()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+	}
 }

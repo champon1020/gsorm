@@ -43,7 +43,7 @@ func TestToStringWithQuotes(t *testing.T) {
 		Value  interface{}
 		Result string
 	}{
-		{"rhs", `"rhs"`},
+		{"rhs", `'rhs'`},
 		{n0, "1"},
 		{n1, "2"},
 		{n2, "3"},

@@ -45,7 +45,7 @@ func TestWhere_Build(t *testing.T) {
 		},
 		{
 			&clause.Where{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			&syntax.StmtSet{Keyword: "WHERE", Value: `lhs1 = 10 AND lhs2 = "str"`},
+			&syntax.StmtSet{Keyword: "WHERE", Value: `lhs1 = 10 AND lhs2 = 'str'`},
 		},
 	}
 

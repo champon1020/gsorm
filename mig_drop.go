@@ -59,8 +59,7 @@ func (s *DropIndexStmt) buildSQL(sql *internal.SQL) error {
 	for len(s.called) > 0 {
 		e := s.headClause()
 		if e == nil {
-			msg := "Called clauses have already been processed but SQL is not completed."
-			return errors.New(msg, errors.InvalidSyntaxError)
+			break
 		}
 
 		switch e := e.(type) {
