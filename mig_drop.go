@@ -6,8 +6,9 @@ import (
 
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/mp/drop"
 	"github.com/champon1020/mgorm/syntax/mig"
+
+	provider "github.com/champon1020/mgorm/provider/drop"
 )
 
 // DropDBStmt is DROP DATABASE statement.
@@ -84,7 +85,7 @@ func (s *DropIndexStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // On calls ON clause.
-func (s *DropIndexStmt) On(table string) drop.OnMP {
+func (s *DropIndexStmt) On(table string) provider.OnMP {
 	s.call(&mig.On{Table: table})
 	return s
 }

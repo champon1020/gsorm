@@ -5,11 +5,12 @@ import (
 	"fmt"
 
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/mp/alter"
-	"github.com/champon1020/mgorm/mp/create"
-	"github.com/champon1020/mgorm/mp/drop"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/champon1020/mgorm/syntax/mig"
+
+	altProvider "github.com/champon1020/mgorm/provider/alter"
+	crtProvider "github.com/champon1020/mgorm/provider/create"
+	drpProvider "github.com/champon1020/mgorm/provider/drop"
 )
 
 // New creates DB.
@@ -118,50 +119,50 @@ func Max(conn Conn, col string, alias ...string) MgormSelect {
 }
 
 // CreateDB calls CREATE DATABASE command.
-func CreateDB(conn Conn, dbName string) create.DBMP {
+func CreateDB(conn Conn, dbName string) crtProvider.DBMP {
 	s := &CreateDBStmt{cmd: &mig.CreateDB{DBName: dbName}}
 	s.conn = conn
 	return s
 }
 
-// DropDB calls DROP DATABASE command.
-func DropDB(conn Conn, dbName string) drop.DBMP {
-	s := &DropDBStmt{cmd: &mig.DropDB{DBName: dbName}}
+// CreateIndex calls CREATE INDEX command.
+func CreateIndex(conn Conn, idx string) crtProvider.IndexMP {
+	s := &CreateIndexStmt{cmd: &mig.CreateIndex{IdxName: idx}}
 	s.conn = conn
 	return s
 }
 
 // CreateTable calls CREATE TABLE command.
-func CreateTable(conn Conn, table string) create.TableMP {
+func CreateTable(conn Conn, table string) crtProvider.TableMP {
 	s := &CreateTableStmt{cmd: &mig.CreateTable{Table: table}}
 	s.conn = conn
 	return s
 }
 
+// DropDB calls DROP DATABASE command.
+func DropDB(conn Conn, dbName string) drpProvider.DBMP {
+	s := &DropDBStmt{cmd: &mig.DropDB{DBName: dbName}}
+	s.conn = conn
+	return s
+}
+
+// DropIndex calls DROP INDEX command.
+func DropIndex(conn Conn, idx string) drpProvider.IndexMP {
+	s := &DropIndexStmt{cmd: &mig.DropIndex{IdxName: idx}}
+	s.conn = conn
+	return s
+}
+
 // DropTable calls DROP TABLE command.
-func DropTable(conn Conn, table string) drop.TableMP {
+func DropTable(conn Conn, table string) drpProvider.TableMP {
 	s := &DropTableStmt{cmd: &mig.DropTable{Table: table}}
 	s.conn = conn
 	return s
 }
 
 // AlterTable calls ALTER TABLE command.
-func AlterTable(conn Conn, table string) alter.TableMP {
+func AlterTable(conn Conn, table string) altProvider.TableMP {
 	s := &AlterTableStmt{cmd: &mig.AlterTable{Table: table}}
-	s.conn = conn
-	return s
-}
-
-// CreateIndex calls CREATE INDEX command.
-func CreateIndex(conn Conn, idx string) create.IndexMP {
-	s := &CreateIndexStmt{cmd: &mig.CreateIndex{IdxName: idx}}
-	s.conn = conn
-	return s
-}
-
-// DropIndex calls DROP INDEX command.
-func DropIndex(conn Conn, idx string) drop.IndexMP {
-	s := &DropIndexStmt{cmd: &mig.DropIndex{IdxName: idx}}
 	s.conn = conn
 	return s
 }

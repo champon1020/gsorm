@@ -7,8 +7,9 @@ import (
 
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/mp/create"
 	"github.com/champon1020/mgorm/syntax/mig"
+
+	provider "github.com/champon1020/mgorm/provider/create"
 )
 
 // CreateDBStmt is CREATE DATABASE statement.
@@ -81,7 +82,7 @@ func (s *CreateIndexStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // On calls ON clause.
-func (s *CreateIndexStmt) On(table string, cols ...string) create.OnMP {
+func (s *CreateIndexStmt) On(table string, cols ...string) provider.OnMP {
 	s.call(&mig.On{Table: table, Columns: cols})
 	return s
 }
@@ -154,55 +155,55 @@ func (s *CreateTableStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // Column calls table column definition.
-func (s *CreateTableStmt) Column(col, typ string) create.ColumnMP {
+func (s *CreateTableStmt) Column(col, typ string) provider.ColumnMP {
 	s.call(&mig.Column{Col: col, Type: typ})
 	return s
 }
 
 // NotNull calls NOT NULL option.
-func (s *CreateTableStmt) NotNull() create.NotNullMP {
+func (s *CreateTableStmt) NotNull() provider.NotNullMP {
 	s.call(&mig.NotNull{})
 	return s
 }
 
 // AutoInc calls AUTO_INCREMENT option. (only MySQL)
-func (s *CreateTableStmt) AutoInc() create.AutoIncMP {
+func (s *CreateTableStmt) AutoInc() provider.AutoIncMP {
 	s.call(&mig.AutoInc{})
 	return s
 }
 
 // Default calls DEFAULT option.
-func (s *CreateTableStmt) Default(val interface{}) create.DefaultMP {
+func (s *CreateTableStmt) Default(val interface{}) provider.DefaultMP {
 	s.call(&mig.Default{Value: val})
 	return s
 }
 
 // Cons calls CONSTRAINT option.
-func (s *CreateTableStmt) Cons(key string) create.ConsMP {
+func (s *CreateTableStmt) Cons(key string) provider.ConsMP {
 	s.call(&mig.Cons{Key: key})
 	return s
 }
 
 // Unique calls UNIQUE keyword.
-func (s *CreateTableStmt) Unique(cols ...string) create.UniqueMP {
+func (s *CreateTableStmt) Unique(cols ...string) provider.UniqueMP {
 	s.call(&mig.Unique{Columns: cols})
 	return s
 }
 
 // Primary calls PRIMARY KEY keyword.
-func (s *CreateTableStmt) Primary(cols ...string) create.PrimaryMP {
+func (s *CreateTableStmt) Primary(cols ...string) provider.PrimaryMP {
 	s.call(&mig.Primary{Columns: cols})
 	return s
 }
 
 // Foreign calls FOREIGN KEY keyword.
-func (s *CreateTableStmt) Foreign(cols ...string) create.ForeignMP {
+func (s *CreateTableStmt) Foreign(cols ...string) provider.ForeignMP {
 	s.call(&mig.Foreign{Columns: cols})
 	return s
 }
 
 // Ref calls REFERENCES keyword.
-func (s *CreateTableStmt) Ref(table, col string) create.RefMP {
+func (s *CreateTableStmt) Ref(table, col string) provider.RefMP {
 	s.call(&mig.Ref{Table: table, Column: col})
 	return s
 }
