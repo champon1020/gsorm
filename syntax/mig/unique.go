@@ -2,18 +2,18 @@ package mig
 
 import "github.com/champon1020/mgorm/syntax"
 
-// UC is UNIQUE clause.
-type UC struct {
+// Unique is UNIQUE clause.
+type Unique struct {
 	Columns []string
 }
 
 // Keyword returns clause keyword.
-func (u *UC) Keyword() string {
+func (u *Unique) Keyword() string {
 	return "UNIQUE"
 }
 
 // Build makes UNIQUE clause with syntax.StmtSet.
-func (u *UC) Build() (*syntax.StmtSet, error) {
+func (u *Unique) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(u.Keyword())
 	ss.WriteValue("(")

@@ -19,7 +19,7 @@ func (tx *Tx) ExportedSetConn(conn sqlTx) {
 }
 
 // Exported values which is declared in migration.go.
-func (m *MigStmt) ExportedGetErrors() []error {
+func (m *migStmt) ExportedGetErrors() []error {
 	return m.errors
 }
 

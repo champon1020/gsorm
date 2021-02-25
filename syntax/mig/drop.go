@@ -77,14 +77,14 @@ func (d *DropColumn) Build() (*syntax.StmtSet, error) {
 	return ss, nil
 }
 
-// DropPK is DROP PRIMARY KEY | DROP CONSTRAINT clause.
-type DropPK struct {
+// DropPrimary is DROP PRIMARY KEY | DROP CONSTRAINT clause.
+type DropPrimary struct {
 	Driver internal.SQLDriver
 	Key    string
 }
 
 // Keyword returns clause keyword.
-func (d *DropPK) Keyword() string {
+func (d *DropPrimary) Keyword() string {
 	if d.Driver == internal.PSQL {
 		return "DROP CONSTRAINT"
 	}
@@ -92,7 +92,7 @@ func (d *DropPK) Keyword() string {
 }
 
 // Build makes DROP PRIMARY KEY | DROP CONSTRAINT clause.
-func (d *DropPK) Build() (*syntax.StmtSet, error) {
+func (d *DropPrimary) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())
 	if d.Driver == internal.PSQL {
@@ -101,14 +101,14 @@ func (d *DropPK) Build() (*syntax.StmtSet, error) {
 	return ss, nil
 }
 
-// DropFK is DROP FOREIGN KEY | DROP CONSTRAINT clause.
-type DropFK struct {
+// DropForeign is DROP FOREIGN KEY | DROP CONSTRAINT clause.
+type DropForeign struct {
 	Driver internal.SQLDriver
 	Key    string
 }
 
 // Keyword returns clause keyword.
-func (d *DropFK) Keyword() string {
+func (d *DropForeign) Keyword() string {
 	if d.Driver == internal.PSQL {
 		return "DROP CONSTRAINT"
 	}
@@ -116,21 +116,21 @@ func (d *DropFK) Keyword() string {
 }
 
 // Build makes DROP FOREIGN KEY | DROP CONSTRAINT clause.
-func (d *DropFK) Build() (*syntax.StmtSet, error) {
+func (d *DropForeign) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())
 	ss.WriteValue(d.Key)
 	return ss, nil
 }
 
-// DropUC is DROP UNIQUE | DROP CONSTRAINT clause.
-type DropUC struct {
+// DropUnique is DROP UNIQUE | DROP CONSTRAINT clause.
+type DropUnique struct {
 	Driver internal.SQLDriver
 	Key    string
 }
 
 // Keyword returns clause keyword.
-func (d *DropUC) Keyword() string {
+func (d *DropUnique) Keyword() string {
 	if d.Driver == internal.PSQL {
 		return "DROP CONSTRAINT"
 	}
@@ -138,7 +138,7 @@ func (d *DropUC) Keyword() string {
 }
 
 // Build makes DROP INDEX KEY | DROP CONSTRAINT clause.
-func (d *DropUC) Build() (*syntax.StmtSet, error) {
+func (d *DropUnique) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())
 	ss.WriteValue(d.Key)

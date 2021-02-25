@@ -8,23 +8,23 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestPK_Build(t *testing.T) {
+func TestUnique_Build(t *testing.T) {
 	testCases := []struct {
-		PK       *mig.PK
+		Unique   *mig.Unique
 		Expected *syntax.StmtSet
 	}{
 		{
-			&mig.PK{Columns: []string{"id"}},
-			&syntax.StmtSet{Keyword: "PRIMARY KEY", Value: "(id)"},
+			&mig.Unique{Columns: []string{"column"}},
+			&syntax.StmtSet{Keyword: "UNIQUE", Value: "(column)"},
 		},
 		{
-			&mig.PK{Columns: []string{"id", "name"}},
-			&syntax.StmtSet{Keyword: "PRIMARY KEY", Value: "(id, name)"},
+			&mig.Unique{Columns: []string{"column1", "column2"}},
+			&syntax.StmtSet{Keyword: "UNIQUE", Value: "(column1, column2)"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		actual, err := testCase.PK.Build()
+		actual, err := testCase.Unique.Build()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue

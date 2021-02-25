@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/mgorm/mp/alter"
+	"github.com/champon1020/mgorm/mp/create"
+	"github.com/champon1020/mgorm/mp/drop"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/champon1020/mgorm/syntax/mig"
 )
@@ -116,72 +118,50 @@ func Max(conn Conn, col string, alias ...string) MgormSelect {
 }
 
 // CreateDB calls CREATE DATABASE command.
-func CreateDB(conn Conn, dbName string) CreateDBMig {
-	return &MigStmt{
-		conn:   conn,
-		driver: conn.getDriver(),
-		cmd:    &mig.CreateDB{DBName: dbName},
-	}
+func CreateDB(conn Conn, dbName string) create.DBMP {
+	s := &CreateDBStmt{cmd: &mig.CreateDB{DBName: dbName}}
+	s.conn = conn
+	return s
 }
 
 // DropDB calls DROP DATABASE command.
-func DropDB(conn Conn, dbName string) DropDBMig {
-	return &MigStmt{
-		conn:   conn,
-		driver: conn.getDriver(),
-		cmd:    &mig.DropDB{DBName: dbName},
-	}
+func DropDB(conn Conn, dbName string) drop.DBMP {
+	s := &DropDBStmt{cmd: &mig.DropDB{DBName: dbName}}
+	s.conn = conn
+	return s
 }
 
 // CreateTable calls CREATE TABLE command.
-func CreateTable(conn Conn, table string) CreateTableMig {
-	return &MigStmt{
-		conn:   conn,
-		driver: conn.getDriver(),
-		cmd:    &mig.CreateTable{Table: table},
-	}
+func CreateTable(conn Conn, table string) create.TableMP {
+	s := &CreateTableStmt{cmd: &mig.CreateTable{Table: table}}
+	s.conn = conn
+	return s
 }
 
 // DropTable calls DROP TABLE command.
-func DropTable(conn Conn, table string) DropTableMig {
-	return &MigStmt{
-		conn:   conn,
-		driver: conn.getDriver(),
-		cmd:    &mig.DropTable{Table: table},
-	}
+func DropTable(conn Conn, table string) drop.TableMP {
+	s := &DropTableStmt{cmd: &mig.DropTable{Table: table}}
+	s.conn = conn
+	return s
 }
 
 // AlterTable calls ALTER TABLE command.
-func AlterTable(conn Conn, table string) AlterTableMig {
-	return &MigStmt{
-		conn:   conn,
-		driver: conn.getDriver(),
-		cmd:    &mig.AlterTable{Table: table},
-	}
+func AlterTable(conn Conn, table string) alter.TableMP {
+	s := &AlterTableStmt{cmd: &mig.AlterTable{Table: table}}
+	s.conn = conn
+	return s
 }
 
 // CreateIndex calls CREATE INDEX command.
-func CreateIndex(conn Conn, idx string) CreateIndexMig {
-	return &MigStmt{
-		conn:   conn,
-		driver: conn.getDriver(),
-		cmd:    &mig.CreateIndex{IdxName: idx},
-	}
+func CreateIndex(conn Conn, idx string) create.IndexMP {
+	s := &CreateIndexStmt{cmd: &mig.CreateIndex{IdxName: idx}}
+	s.conn = conn
+	return s
 }
 
 // DropIndex calls DROP INDEX command.
-func DropIndex(conn Conn, table string, idx string) DropIndexMig {
-	if conn.getDriver() == internal.MySQL {
-		return &MigStmt{
-			conn:   conn,
-			driver: conn.getDriver(),
-			cmd:    &mig.AlterTable{Table: table},
-			called: []syntax.MigClause{&mig.DropIndex{IdxName: idx}},
-		}
-	}
-	return &MigStmt{
-		conn:   conn,
-		driver: conn.getDriver(),
-		cmd:    &mig.DropIndex{IdxName: idx},
-	}
+func DropIndex(conn Conn, idx string) drop.IndexMP {
+	s := &DropIndexStmt{cmd: &mig.DropIndex{IdxName: idx}}
+	s.conn = conn
+	return s
 }
