@@ -244,18 +244,10 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 		}
 
 		if v := f.Tag.Get(unique); v != "" {
-			if _, ok := uc[v]; ok {
-				uc[v] = append(uc[v], name)
-			} else {
-				uc[v] = []string{name}
-			}
+			uc[v] = append(uc[v], name)
 		}
 		if v := f.Tag.Get(primary); v != "" {
-			if _, ok := pk[v]; ok {
-				pk[v] = append(pk[v], name)
-			} else {
-				pk[v] = []string{name}
-			}
+			pk[v] = append(pk[v], name)
 		}
 		if v := f.Tag.Get(foreign); v != "" {
 			el := strings.Split(v, " ")
@@ -263,11 +255,7 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 				msg := `Format of tag for foreign key must be fk:"<key> <ref_table>(<ref_column>)"`
 				return errors.New(msg, errors.InvalidSyntaxError)
 			}
-			if _, ok := fk[el[0]]; ok {
-				fk[el[0]] = append(fk[el[0]], name)
-			} else {
-				fk[el[0]] = []string{name}
-			}
+			fk[el[0]] = append(fk[el[0]], name)
 			if _, ok := ref[el[0]]; ok && ref[el[0]] != el[1] {
 				msg := "Different reference is used with same key"
 				return errors.New(msg, errors.InvalidSyntaxError)
