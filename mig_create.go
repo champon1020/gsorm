@@ -10,7 +10,7 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
 
-	provider "github.com/champon1020/mgorm/provider/create"
+	prCreate "github.com/champon1020/mgorm/provider/create"
 )
 
 // CreateDBStmt is CREATE DATABASE statement.
@@ -83,7 +83,7 @@ func (s *CreateIndexStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // On calls ON clause.
-func (s *CreateIndexStmt) On(table string, cols ...string) provider.OnMP {
+func (s *CreateIndexStmt) On(table string, cols ...string) prCreate.OnMP {
 	s.call(&mig.On{Table: table, Columns: cols})
 	return s
 }
@@ -214,6 +214,7 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 		}
 		f := typ.Field(i)
 
+		// Write column name.
 		var name string
 		if v, ok := f.Tag.Lookup(colName); ok {
 			name = v
@@ -222,6 +223,7 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 		}
 		sql.Write(name)
 
+		// Write column type.
 		if v := f.Tag.Get(colType); v != "" {
 			sql.Write(v)
 		} else {
@@ -233,22 +235,27 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 			sql.Write(dbtyp)
 		}
 
+		// Write NOT NULL option if exist.
 		if _, ok := f.Tag.Lookup(notnull); ok {
 			sql.Write("NOT NULL")
 		}
+		// Write DEFAULT option if exist.
 		if v, ok := f.Tag.Lookup(def); ok {
 			sql.Write(fmt.Sprintf("DEFAULT %s", v))
 		}
+		// Write AUTO_INCREMENT option if exist.
 		if _, ok := f.Tag.Lookup(autoinc); ok {
 			sql.Write("AUTO_INCREMENT")
 		}
-
+		// Store unique key if exist.
 		if v := f.Tag.Get(unique); v != "" {
 			uc[v] = append(uc[v], name)
 		}
+		// Store primary key if exist.
 		if v := f.Tag.Get(primary); v != "" {
 			pk[v] = append(pk[v], name)
 		}
+		// Store foreign key if exist.
 		if v := f.Tag.Get(foreign); v != "" {
 			el := strings.Split(v, " ")
 			if len(el) != 2 {
@@ -263,14 +270,18 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 			ref[el[0]] = el[1]
 		}
 	}
+
+	// Write unique key if exist.
 	for k, v := range uc {
 		sql.Write(",")
 		sql.Write(fmt.Sprintf("CONSTRAINT %s UNIQUE (%s)", k, strings.Join(v, ", ")))
 	}
+	// Write primary key if exist.
 	for k, v := range pk {
 		sql.Write(",")
 		sql.Write(fmt.Sprintf("CONSTRAINT %s PRIMARY KEY (%s)", k, strings.Join(v, ", ")))
 	}
+	// Write foreign key if exist.
 	for k, v := range fk {
 		sql.Write(",")
 		sql.Write(fmt.Sprintf("CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s", k, strings.Join(v, ", "), ref[k]))
@@ -279,6 +290,7 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 	return nil
 }
 
+// convertToDBType converts golang type to database type.
 func convertToDBType(t reflect.Type, d internal.SQLDriver) string {
 	switch t.Kind() {
 	case reflect.String:
@@ -310,61 +322,61 @@ func convertToDBType(t reflect.Type, d internal.SQLDriver) string {
 }
 
 // Model sets model to CreateTableStmt.
-func (s *CreateTableStmt) Model(model interface{}) provider.ModelMP {
+func (s *CreateTableStmt) Model(model interface{}) prCreate.ModelMP {
 	s.model = model
 	return s
 }
 
 // Column calls table column definition.
-func (s *CreateTableStmt) Column(col, typ string) provider.ColumnMP {
+func (s *CreateTableStmt) Column(col, typ string) prCreate.ColumnMP {
 	s.call(&mig.Column{Col: col, Type: typ})
 	return s
 }
 
 // NotNull calls NOT NULL option.
-func (s *CreateTableStmt) NotNull() provider.NotNullMP {
+func (s *CreateTableStmt) NotNull() prCreate.NotNullMP {
 	s.call(&mig.NotNull{})
 	return s
 }
 
 // AutoInc calls AUTO_INCREMENT option (only MySQL).
-func (s *CreateTableStmt) AutoInc() provider.AutoIncMP {
+func (s *CreateTableStmt) AutoInc() prCreate.AutoIncMP {
 	s.call(&mig.AutoInc{})
 	return s
 }
 
 // Default calls DEFAULT option.
-func (s *CreateTableStmt) Default(val interface{}) provider.DefaultMP {
+func (s *CreateTableStmt) Default(val interface{}) prCreate.DefaultMP {
 	s.call(&mig.Default{Value: val})
 	return s
 }
 
 // Cons calls CONSTRAINT option.
-func (s *CreateTableStmt) Cons(key string) provider.ConsMP {
+func (s *CreateTableStmt) Cons(key string) prCreate.ConsMP {
 	s.call(&mig.Cons{Key: key})
 	return s
 }
 
 // Unique calls UNIQUE keyword.
-func (s *CreateTableStmt) Unique(cols ...string) provider.UniqueMP {
+func (s *CreateTableStmt) Unique(cols ...string) prCreate.UniqueMP {
 	s.call(&mig.Unique{Columns: cols})
 	return s
 }
 
 // Primary calls PRIMARY KEY keyword.
-func (s *CreateTableStmt) Primary(cols ...string) provider.PrimaryMP {
+func (s *CreateTableStmt) Primary(cols ...string) prCreate.PrimaryMP {
 	s.call(&mig.Primary{Columns: cols})
 	return s
 }
 
 // Foreign calls FOREIGN KEY keyword.
-func (s *CreateTableStmt) Foreign(cols ...string) provider.ForeignMP {
+func (s *CreateTableStmt) Foreign(cols ...string) prCreate.ForeignMP {
 	s.call(&mig.Foreign{Columns: cols})
 	return s
 }
 
 // Ref calls REFERENCES keyword.
-func (s *CreateTableStmt) Ref(table, col string) provider.RefMP {
+func (s *CreateTableStmt) Ref(table, col string) prCreate.RefMP {
 	s.call(&mig.Ref{Table: table, Column: col})
 	return s
 }

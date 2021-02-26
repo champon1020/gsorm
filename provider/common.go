@@ -8,6 +8,7 @@ type QueryCallable interface {
 	String() string
 	FuncString() string
 	Called() []syntax.Clause
+	Cmd() syntax.Clause
 }
 
 // ExecCallable is embedded into clause interfaces which can call (*Stmt).Exec.
@@ -16,6 +17,7 @@ type ExecCallable interface {
 	String() string
 	FuncString() string
 	Called() []syntax.Clause
+	Cmd() syntax.Clause
 }
 
 // MigrationCallable is embedded into clause interfaces which can call (*MigStmt).Migration.

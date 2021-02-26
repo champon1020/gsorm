@@ -6,9 +6,11 @@ import (
 
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/provider"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 
-	provider "github.com/champon1020/mgorm/provider/insert"
+	prInsert "github.com/champon1020/mgorm/provider/insert"
 )
 
 // InsertStmt is INSERT statement.
@@ -16,6 +18,7 @@ type InsertStmt struct {
 	stmt
 	model interface{}
 	cmd   *clause.Insert
+	sel   Stmt
 }
 
 // String returns SQL statement with string.
@@ -26,6 +29,11 @@ func (s *InsertStmt) String() string {
 // FuncString returns function call as string.
 func (s *InsertStmt) FuncString() string {
 	return s.funcString(s.cmd)
+}
+
+// Cmd returns cmd clause.
+func (s *InsertStmt) Cmd() syntax.Clause {
+	return s.cmd
 }
 
 // Exec executed SQL statement without mapping to model.
@@ -54,6 +62,11 @@ func (s *InsertStmt) buildSQL(sql *internal.SQL) error {
 		if err := s.buildSQLWithModel(cols, s.model, sql); err != nil {
 			return err
 		}
+		return nil
+	}
+
+	if s.sel != nil {
+		sql.Write(s.sel.String())
 		return nil
 	}
 
@@ -174,13 +187,19 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // Model sets model to InsertStmt.
-func (s *InsertStmt) Model(model interface{}) provider.ModelMP {
+func (s *InsertStmt) Model(model interface{}) prInsert.ModelMP {
 	s.model = model
 	return s
 }
 
+// Select calls SELECT statement.
+func (s *InsertStmt) Select(sel provider.QueryCallable) prInsert.SelectMP {
+	s.sel = sel
+	return s
+}
+
 // Values calls VALUES clause.
-func (s *InsertStmt) Values(vals ...interface{}) provider.ValuesMP {
+func (s *InsertStmt) Values(vals ...interface{}) prInsert.ValuesMP {
 	v := new(clause.Values)
 	for _, val := range vals {
 		v.AddValue(val)

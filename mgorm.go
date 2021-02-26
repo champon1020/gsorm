@@ -8,13 +8,13 @@ import (
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/champon1020/mgorm/syntax/mig"
 
-	altProvider "github.com/champon1020/mgorm/provider/alter"
-	crtProvider "github.com/champon1020/mgorm/provider/create"
-	delProvider "github.com/champon1020/mgorm/provider/delete"
-	drpProvider "github.com/champon1020/mgorm/provider/drop"
-	insProvider "github.com/champon1020/mgorm/provider/insert"
-	selProvider "github.com/champon1020/mgorm/provider/select"
-	updProvider "github.com/champon1020/mgorm/provider/update"
+	prAlter "github.com/champon1020/mgorm/provider/alter"
+	prCreate "github.com/champon1020/mgorm/provider/create"
+	prDelete "github.com/champon1020/mgorm/provider/delete"
+	prDrop "github.com/champon1020/mgorm/provider/drop"
+	prInsert "github.com/champon1020/mgorm/provider/insert"
+	prSelect "github.com/champon1020/mgorm/provider/select"
+	prUpdate "github.com/champon1020/mgorm/provider/update"
 )
 
 // New creates DB.
@@ -36,7 +36,7 @@ func NewMock() *MockDB {
 }
 
 // Select calls SELECT command.
-func Select(conn Conn, cols ...string) selProvider.StmtMP {
+func Select(conn Conn, cols ...string) prSelect.StmtMP {
 	s := new(SelectStmt)
 	s.conn = conn
 	s.cmd = clause.NewSelect(cols)
@@ -44,7 +44,7 @@ func Select(conn Conn, cols ...string) selProvider.StmtMP {
 }
 
 // Insert calls INSERT command.
-func Insert(conn Conn, table string, cols ...string) insProvider.StmtMP {
+func Insert(conn Conn, table string, cols ...string) prInsert.StmtMP {
 	s := new(InsertStmt)
 	s.conn = conn
 	s.cmd = clause.NewInsert(table, cols)
@@ -52,7 +52,7 @@ func Insert(conn Conn, table string, cols ...string) insProvider.StmtMP {
 }
 
 // Update calls UPDATE command.
-func Update(conn Conn, table string, cols ...string) updProvider.StmtMP {
+func Update(conn Conn, table string, cols ...string) prUpdate.StmtMP {
 	s := new(UpdateStmt)
 	s.conn = conn
 	s.cmd = clause.NewUpdate(table, cols)
@@ -60,7 +60,7 @@ func Update(conn Conn, table string, cols ...string) updProvider.StmtMP {
 }
 
 // Delete calls DELETE command.
-func Delete(conn Conn) delProvider.StmtMP {
+func Delete(conn Conn) prDelete.StmtMP {
 	s := new(DeleteStmt)
 	s.conn = conn
 	s.cmd = clause.NewDelete()
@@ -68,7 +68,7 @@ func Delete(conn Conn) delProvider.StmtMP {
 }
 
 // Count calls COUNT function.
-func Count(conn Conn, col string, alias ...string) selProvider.StmtMP {
+func Count(conn Conn, col string, alias ...string) prSelect.StmtMP {
 	c := fmt.Sprintf("COUNT(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -79,7 +79,7 @@ func Count(conn Conn, col string, alias ...string) selProvider.StmtMP {
 }
 
 // Avg calls AVG function.
-func Avg(conn Conn, col string, alias ...string) selProvider.StmtMP {
+func Avg(conn Conn, col string, alias ...string) prSelect.StmtMP {
 	c := fmt.Sprintf("AVG(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -90,7 +90,7 @@ func Avg(conn Conn, col string, alias ...string) selProvider.StmtMP {
 }
 
 // Sum calls SUM function.
-func Sum(conn Conn, col string, alias ...string) selProvider.StmtMP {
+func Sum(conn Conn, col string, alias ...string) prSelect.StmtMP {
 	c := fmt.Sprintf("SUM(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -101,7 +101,7 @@ func Sum(conn Conn, col string, alias ...string) selProvider.StmtMP {
 }
 
 // Min calls MIN function.
-func Min(conn Conn, col string, alias ...string) selProvider.StmtMP {
+func Min(conn Conn, col string, alias ...string) prSelect.StmtMP {
 	c := fmt.Sprintf("MIN(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -112,7 +112,7 @@ func Min(conn Conn, col string, alias ...string) selProvider.StmtMP {
 }
 
 // Max calls MAX function.
-func Max(conn Conn, col string, alias ...string) selProvider.StmtMP {
+func Max(conn Conn, col string, alias ...string) prSelect.StmtMP {
 	c := fmt.Sprintf("MAX(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -123,49 +123,49 @@ func Max(conn Conn, col string, alias ...string) selProvider.StmtMP {
 }
 
 // CreateDB calls CREATE DATABASE command.
-func CreateDB(conn Conn, dbName string) crtProvider.DBMP {
+func CreateDB(conn Conn, dbName string) prCreate.DBMP {
 	s := &CreateDBStmt{cmd: &mig.CreateDB{DBName: dbName}}
 	s.conn = conn
 	return s
 }
 
 // CreateIndex calls CREATE INDEX command.
-func CreateIndex(conn Conn, idx string) crtProvider.IndexMP {
+func CreateIndex(conn Conn, idx string) prCreate.IndexMP {
 	s := &CreateIndexStmt{cmd: &mig.CreateIndex{IdxName: idx}}
 	s.conn = conn
 	return s
 }
 
 // CreateTable calls CREATE TABLE command.
-func CreateTable(conn Conn, table string) crtProvider.TableMP {
+func CreateTable(conn Conn, table string) prCreate.TableMP {
 	s := &CreateTableStmt{cmd: &mig.CreateTable{Table: table}}
 	s.conn = conn
 	return s
 }
 
 // DropDB calls DROP DATABASE command.
-func DropDB(conn Conn, dbName string) drpProvider.DBMP {
+func DropDB(conn Conn, dbName string) prDrop.DBMP {
 	s := &DropDBStmt{cmd: &mig.DropDB{DBName: dbName}}
 	s.conn = conn
 	return s
 }
 
 // DropIndex calls DROP INDEX command.
-func DropIndex(conn Conn, idx string) drpProvider.IndexMP {
+func DropIndex(conn Conn, idx string) prDrop.IndexMP {
 	s := &DropIndexStmt{cmd: &mig.DropIndex{IdxName: idx}}
 	s.conn = conn
 	return s
 }
 
 // DropTable calls DROP TABLE command.
-func DropTable(conn Conn, table string) drpProvider.TableMP {
+func DropTable(conn Conn, table string) prDrop.TableMP {
 	s := &DropTableStmt{cmd: &mig.DropTable{Table: table}}
 	s.conn = conn
 	return s
 }
 
 // AlterTable calls ALTER TABLE command.
-func AlterTable(conn Conn, table string) altProvider.TableMP {
+func AlterTable(conn Conn, table string) prAlter.TableMP {
 	s := &AlterTableStmt{cmd: &mig.AlterTable{Table: table}}
 	s.conn = conn
 	return s

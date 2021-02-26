@@ -157,6 +157,15 @@ func TestInsertStmt_String(t *testing.T) {
 			mgorm.Insert(nil, "sample", "name", "id").Model(&model4).(*mgorm.InsertStmt),
 			`INSERT INTO sample (name, id) VALUES ('Taro', 10000)`,
 		},
+		// Test for INSERT INTO ... SELECT statement.
+		{
+			mgorm.Insert(nil, "person").
+				Select(mgorm.Select(nil, "id", "name").
+					From("country_code").
+					Where("name = ?", "Japan"),
+				).(*mgorm.InsertStmt),
+			`INSERT INTO person SELECT id, name FROM country_code WHERE name = 'Japan'`,
+		},
 	}
 
 	for _, testCase := range testCases {

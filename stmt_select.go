@@ -9,7 +9,7 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 
-	provider "github.com/champon1020/mgorm/provider/select"
+	prSelect "github.com/champon1020/mgorm/provider/select"
 )
 
 // SelectStmt is SELECT statement.
@@ -26,6 +26,11 @@ func (s *SelectStmt) String() string {
 // FuncString returns function call as string.
 func (s *SelectStmt) FuncString() string {
 	return s.funcString(s.cmd)
+}
+
+// Cmd returns cmd clause.
+func (s *SelectStmt) Cmd() syntax.Clause {
+	return s.cmd
 }
 
 // Query executes SQL statement with mapping to model.
@@ -72,7 +77,7 @@ func (s *SelectStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // From calls FROM clause.
-func (s *SelectStmt) From(tables ...string) provider.FromMP {
+func (s *SelectStmt) From(tables ...string) prSelect.FromMP {
 	f := new(clause.From)
 	for _, t := range tables {
 		f.AddTable(t)
@@ -82,43 +87,43 @@ func (s *SelectStmt) From(tables ...string) provider.FromMP {
 }
 
 // Where calls WHERE clause.
-func (s *SelectStmt) Where(expr string, vals ...interface{}) provider.WhereMP {
+func (s *SelectStmt) Where(expr string, vals ...interface{}) prSelect.WhereMP {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *SelectStmt) And(expr string, vals ...interface{}) provider.AndMP {
+func (s *SelectStmt) And(expr string, vals ...interface{}) prSelect.AndMP {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *SelectStmt) Or(expr string, vals ...interface{}) provider.OrMP {
+func (s *SelectStmt) Or(expr string, vals ...interface{}) prSelect.OrMP {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }
 
 // Limit calls LIMIT clause.
-func (s *SelectStmt) Limit(num int) provider.LimitMP {
+func (s *SelectStmt) Limit(num int) prSelect.LimitMP {
 	s.call(&clause.Limit{Num: num})
 	return s
 }
 
 // Offset calls OFFSET clause.
-func (s *SelectStmt) Offset(num int) provider.OffsetMP {
+func (s *SelectStmt) Offset(num int) prSelect.OffsetMP {
 	s.call(&clause.Offset{Num: num})
 	return s
 }
 
 // OrderBy calls ORDER BY clause.
-func (s *SelectStmt) OrderBy(cols ...string) provider.OrderByMP {
+func (s *SelectStmt) OrderBy(cols ...string) prSelect.OrderByMP {
 	s.call(&clause.OrderBy{Columns: cols})
 	return s
 }
 
 // Join calls (INNER) JOIN clause.
-func (s *SelectStmt) Join(table string) provider.JoinMP {
+func (s *SelectStmt) Join(table string) prSelect.JoinMP {
 	j := &clause.Join{Type: clause.InnerJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -126,7 +131,7 @@ func (s *SelectStmt) Join(table string) provider.JoinMP {
 }
 
 // LeftJoin calls (INNER) JOIN clause.
-func (s *SelectStmt) LeftJoin(table string) provider.JoinMP {
+func (s *SelectStmt) LeftJoin(table string) prSelect.JoinMP {
 	j := &clause.Join{Type: clause.LeftJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -134,7 +139,7 @@ func (s *SelectStmt) LeftJoin(table string) provider.JoinMP {
 }
 
 // RightJoin calls (INNER) JOIN clause.
-func (s *SelectStmt) RightJoin(table string) provider.JoinMP {
+func (s *SelectStmt) RightJoin(table string) prSelect.JoinMP {
 	j := &clause.Join{Type: clause.RightJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -142,7 +147,7 @@ func (s *SelectStmt) RightJoin(table string) provider.JoinMP {
 }
 
 // FullJoin calls (INNER) JOIN clause.
-func (s *SelectStmt) FullJoin(table string) provider.JoinMP {
+func (s *SelectStmt) FullJoin(table string) prSelect.JoinMP {
 	j := &clause.Join{Type: clause.FullJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -150,25 +155,25 @@ func (s *SelectStmt) FullJoin(table string) provider.JoinMP {
 }
 
 // On calls ON clause.
-func (s *SelectStmt) On(expr string, vals ...interface{}) provider.OnMP {
+func (s *SelectStmt) On(expr string, vals ...interface{}) prSelect.OnMP {
 	s.call(&clause.On{Expr: expr, Values: vals})
 	return s
 }
 
 // Union calls UNION clause.
-func (s *SelectStmt) Union(stmt syntax.Stmt) provider.UnionMP {
+func (s *SelectStmt) Union(stmt syntax.Stmt) prSelect.UnionMP {
 	s.call(&clause.Union{Stmt: stmt, All: false})
 	return s
 }
 
 // UnionAll calls UNION ALL clause.
-func (s *SelectStmt) UnionAll(stmt syntax.Stmt) provider.UnionMP {
+func (s *SelectStmt) UnionAll(stmt syntax.Stmt) prSelect.UnionMP {
 	s.call(&clause.Union{Stmt: stmt, All: true})
 	return s
 }
 
 // GroupBy calls GROUP BY clause.
-func (s *SelectStmt) GroupBy(cols ...string) provider.GroupByMP {
+func (s *SelectStmt) GroupBy(cols ...string) prSelect.GroupByMP {
 	g := new(clause.GroupBy)
 	for _, c := range cols {
 		g.AddColumn(c)
@@ -178,7 +183,7 @@ func (s *SelectStmt) GroupBy(cols ...string) provider.GroupByMP {
 }
 
 // Having calls HAVING clause.
-func (s *SelectStmt) Having(expr string, vals ...interface{}) provider.HavingMP {
+func (s *SelectStmt) Having(expr string, vals ...interface{}) prSelect.HavingMP {
 	s.call(&clause.Having{Expr: expr, Values: vals})
 	return s
 }
