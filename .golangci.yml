@@ -27,7 +27,7 @@ linters:
     - gosec
     - gosimple
     - govet
-    - inefassign
+    - ineffassign
     - lll
     - nestif
     - structcheck
