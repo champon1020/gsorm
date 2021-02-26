@@ -20,7 +20,6 @@ type Stmt interface {
 type stmt struct {
 	conn   Conn
 	called []syntax.Clause
-	model  interface{}
 	errors []error
 }
 

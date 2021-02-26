@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
@@ -87,10 +88,38 @@ func (s *CreateIndexStmt) On(table string, cols ...string) provider.OnMP {
 	return s
 }
 
+// These are Column options which is used as field tag.
+const (
+	// Column name.
+	colName = "mgorm"
+
+	// Column type.
+	colType = "type"
+
+	// NOT NULL option.
+	notnull = "notnull"
+
+	// DEFAULT option.
+	def = "def"
+
+	// AUTO_INCREMENT option.
+	autoinc = "autoinc"
+
+	// Unique key.
+	unique = "uc"
+
+	// Primary key.
+	primary = "pk"
+
+	// Foreign key.
+	foreign = "fk"
+)
+
 // CreateTableStmt is CREATE TABLE statement.
 type CreateTableStmt struct {
 	migStmt
-	cmd *mig.CreateTable
+	model interface{}
+	cmd   *mig.CreateTable
 }
 
 func (s *CreateTableStmt) String() string {
@@ -109,6 +138,14 @@ func (s *CreateTableStmt) buildSQL(sql *internal.SQL) error {
 	}
 	sql.Write(ss.Build())
 
+	if s.model != nil {
+		return s.buildSQLWithModel(sql)
+	}
+
+	return s.buildSQLWithClauses(sql)
+}
+
+func (s *CreateTableStmt) buildSQLWithClauses(sql *internal.SQL) error {
 	sql.Write("(")
 	for len(s.called) > 0 {
 		e := s.headClause()
@@ -150,8 +187,132 @@ func (s *CreateTableStmt) buildSQL(sql *internal.SQL) error {
 		}
 	}
 	sql.Write(")")
-
 	return nil
+}
+
+func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
+	typ := reflect.TypeOf(s.model)
+	if typ.Kind() != reflect.Ptr {
+		return errors.New("Model must be pointer", errors.InvalidValueError)
+	}
+
+	typ = typ.Elem()
+	if typ.Kind() != reflect.Struct {
+		return errors.New("Type of model must be pointer of struct", errors.InvalidTypeError)
+	}
+
+	var (
+		uc  = make(map[string][]string)
+		pk  = make(map[string][]string)
+		fk  = make(map[string][]string)
+		ref = make(map[string]string)
+	)
+	sql.Write("(")
+	for i := 0; i < typ.NumField(); i++ {
+		if i > 0 {
+			sql.Write(",")
+		}
+		f := typ.Field(i)
+
+		var name string
+		if v, ok := f.Tag.Lookup(colName); ok {
+			name = v
+		} else {
+			name = internal.ConvertToSnakeCase(f.Name)
+		}
+		sql.Write(name)
+
+		if v := f.Tag.Get(colType); v != "" {
+			sql.Write(v)
+		} else {
+			dbtyp := convertToDBType(f.Type, s.conn.getDriver())
+			if dbtyp == "" {
+				msg := fmt.Sprintf("Type of %v is not supported for database column", f.Type)
+				return errors.New(msg, errors.InvalidTypeError)
+			}
+			sql.Write(dbtyp)
+		}
+
+		if _, ok := f.Tag.Lookup(notnull); ok {
+			sql.Write("NOT NULL")
+		}
+		if v, ok := f.Tag.Lookup(def); ok {
+			sql.Write(fmt.Sprintf("DEFAULT %s", v))
+		}
+		if _, ok := f.Tag.Lookup(autoinc); ok {
+			sql.Write("AUTO_INCREMENT")
+		}
+
+		if v := f.Tag.Get(unique); v != "" {
+			uc[v] = append(uc[v], name)
+		}
+		if v := f.Tag.Get(primary); v != "" {
+			pk[v] = append(pk[v], name)
+		}
+		if v := f.Tag.Get(foreign); v != "" {
+			el := strings.Split(v, " ")
+			if len(el) != 2 {
+				msg := `Format of tag for foreign key must be fk:"<key> <ref_table>(<ref_column>)"`
+				return errors.New(msg, errors.InvalidSyntaxError)
+			}
+			fk[el[0]] = append(fk[el[0]], name)
+			if _, ok := ref[el[0]]; ok && ref[el[0]] != el[1] {
+				msg := "Different reference is used with same key"
+				return errors.New(msg, errors.InvalidSyntaxError)
+			}
+			ref[el[0]] = el[1]
+		}
+	}
+	for k, v := range uc {
+		sql.Write(",")
+		sql.Write(fmt.Sprintf("CONSTRAINT %s UNIQUE (%s)", k, strings.Join(v, ", ")))
+	}
+	for k, v := range pk {
+		sql.Write(",")
+		sql.Write(fmt.Sprintf("CONSTRAINT %s PRIMARY KEY (%s)", k, strings.Join(v, ", ")))
+	}
+	for k, v := range fk {
+		sql.Write(",")
+		sql.Write(fmt.Sprintf("CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s", k, strings.Join(v, ", "), ref[k]))
+	}
+	sql.Write(")")
+	return nil
+}
+
+func convertToDBType(t reflect.Type, d internal.SQLDriver) string {
+	switch t.Kind() {
+	case reflect.String:
+		return "VARCHAR(128)"
+	case reflect.Int,
+		reflect.Int8,
+		reflect.Int16,
+		reflect.Int32,
+		reflect.Int64,
+		reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64:
+		return "INT"
+	case reflect.Float32, reflect.Float64:
+		if d == internal.MySQL {
+			return "FLOAT"
+		}
+		return "NUMERIC"
+	case reflect.Struct:
+		if t == reflect.TypeOf(time.Time{}) {
+			return "DATE"
+		}
+	case reflect.Bool:
+		return "SMALLINT"
+	}
+	return ""
+}
+
+// Model sets model to CreateTableStmt.
+func (s *CreateTableStmt) Model(model interface{}) provider.ModelMP {
+	s.model = model
+	return s
 }
 
 // Column calls table column definition.
