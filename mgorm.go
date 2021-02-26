@@ -37,33 +37,41 @@ func NewMock() *MockDB {
 
 // Select calls SELECT command.
 func Select(conn Conn, cols ...string) prSelect.StmtMP {
-	s := new(SelectStmt)
+	sel := new(clause.Select)
+	for _, c := range cols {
+		sel.AddColumn(c)
+	}
+	s := &SelectStmt{cmd: sel}
 	s.conn = conn
-	s.cmd = clause.NewSelect(cols)
 	return s
 }
 
 // Insert calls INSERT command.
 func Insert(conn Conn, table string, cols ...string) prInsert.StmtMP {
-	s := new(InsertStmt)
+	i := new(clause.Insert)
+	i.AddTable(table)
+	for _, c := range cols {
+		i.AddColumn(c)
+	}
+	s := &InsertStmt{cmd: i}
 	s.conn = conn
-	s.cmd = clause.NewInsert(table, cols)
 	return s
 }
 
 // Update calls UPDATE command.
 func Update(conn Conn, table string, cols ...string) prUpdate.StmtMP {
-	s := new(UpdateStmt)
+	u := new(clause.Update)
+	u.AddTable(table)
+	u.AddColumns(cols)
+	s := &UpdateStmt{cmd: u}
 	s.conn = conn
-	s.cmd = clause.NewUpdate(table, cols)
 	return s
 }
 
 // Delete calls DELETE command.
 func Delete(conn Conn) prDelete.StmtMP {
-	s := new(DeleteStmt)
+	s := &DeleteStmt{cmd: &clause.Delete{}}
 	s.conn = conn
-	s.cmd = clause.NewDelete()
 	return s
 }
 
@@ -73,7 +81,9 @@ func Count(conn Conn, col string, alias ...string) prSelect.StmtMP {
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	s := &SelectStmt{cmd: clause.NewSelect([]string{c})}
+	sel := new(clause.Select)
+	sel.AddColumn(c)
+	s := &SelectStmt{cmd: sel}
 	s.conn = conn
 	return s
 }
@@ -84,7 +94,9 @@ func Avg(conn Conn, col string, alias ...string) prSelect.StmtMP {
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	s := &SelectStmt{cmd: clause.NewSelect([]string{c})}
+	sel := new(clause.Select)
+	sel.AddColumn(c)
+	s := &SelectStmt{cmd: sel}
 	s.conn = conn
 	return s
 }
@@ -95,7 +107,9 @@ func Sum(conn Conn, col string, alias ...string) prSelect.StmtMP {
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	s := &SelectStmt{cmd: clause.NewSelect([]string{c})}
+	sel := new(clause.Select)
+	sel.AddColumn(c)
+	s := &SelectStmt{cmd: sel}
 	s.conn = conn
 	return s
 }
@@ -106,7 +120,9 @@ func Min(conn Conn, col string, alias ...string) prSelect.StmtMP {
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	s := &SelectStmt{cmd: clause.NewSelect([]string{c})}
+	sel := new(clause.Select)
+	sel.AddColumn(c)
+	s := &SelectStmt{cmd: sel}
 	s.conn = conn
 	return s
 }
@@ -117,7 +133,9 @@ func Max(conn Conn, col string, alias ...string) prSelect.StmtMP {
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	s := &SelectStmt{cmd: clause.NewSelect([]string{c})}
+	sel := new(clause.Select)
+	sel.AddColumn(c)
+	s := &SelectStmt{cmd: sel}
 	s.conn = conn
 	return s
 }

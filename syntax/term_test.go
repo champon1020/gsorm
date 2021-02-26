@@ -30,6 +30,7 @@ func TestNewTable(t *testing.T) {
 	}{
 		{"table", &syntax.Table{Name: "table"}},
 		{"table AS t", &syntax.Table{Name: "table", Alias: "t"}},
+		{"table as t", &syntax.Table{Name: "table", Alias: "t"}},
 	}
 
 	for _, testCase := range testCases {
@@ -62,6 +63,7 @@ func TestNewColumn(t *testing.T) {
 	}{
 		{"column", &syntax.Column{Name: "column"}},
 		{"column AS c", &syntax.Column{Name: "column", Alias: "c"}},
+		{"column as c", &syntax.Column{Name: "column", Alias: "c"}},
 	}
 
 	for _, testCase := range testCases {
