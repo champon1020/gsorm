@@ -214,6 +214,7 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 		}
 		f := typ.Field(i)
 
+		// Write column name.
 		var name string
 		if v, ok := f.Tag.Lookup(colName); ok {
 			name = v
@@ -222,6 +223,7 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 		}
 		sql.Write(name)
 
+		// Write column type.
 		if v := f.Tag.Get(colType); v != "" {
 			sql.Write(v)
 		} else {
@@ -233,22 +235,27 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 			sql.Write(dbtyp)
 		}
 
+		// Write NOT NULL option if exist.
 		if _, ok := f.Tag.Lookup(notnull); ok {
 			sql.Write("NOT NULL")
 		}
+		// Write DEFAULT option if exist.
 		if v, ok := f.Tag.Lookup(def); ok {
 			sql.Write(fmt.Sprintf("DEFAULT %s", v))
 		}
+		// Write AUTO_INCREMENT option if exist.
 		if _, ok := f.Tag.Lookup(autoinc); ok {
 			sql.Write("AUTO_INCREMENT")
 		}
-
+		// Store unique key if exist.
 		if v := f.Tag.Get(unique); v != "" {
 			uc[v] = append(uc[v], name)
 		}
+		// Store primary key if exist.
 		if v := f.Tag.Get(primary); v != "" {
 			pk[v] = append(pk[v], name)
 		}
+		// Store foreign key if exist.
 		if v := f.Tag.Get(foreign); v != "" {
 			el := strings.Split(v, " ")
 			if len(el) != 2 {
@@ -263,14 +270,18 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 			ref[el[0]] = el[1]
 		}
 	}
+
+	// Write unique key if exist.
 	for k, v := range uc {
 		sql.Write(",")
 		sql.Write(fmt.Sprintf("CONSTRAINT %s UNIQUE (%s)", k, strings.Join(v, ", ")))
 	}
+	// Write primary key if exist.
 	for k, v := range pk {
 		sql.Write(",")
 		sql.Write(fmt.Sprintf("CONSTRAINT %s PRIMARY KEY (%s)", k, strings.Join(v, ", ")))
 	}
+	// Write foreign key if exist.
 	for k, v := range fk {
 		sql.Write(",")
 		sql.Write(fmt.Sprintf("CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s", k, strings.Join(v, ", "), ref[k]))
@@ -279,6 +290,7 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 	return nil
 }
 
+// convertToDBType converts golang type to database type.
 func convertToDBType(t reflect.Type, d internal.SQLDriver) string {
 	switch t.Kind() {
 	case reflect.String:
