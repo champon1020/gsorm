@@ -113,7 +113,7 @@ func (s *AlterTableStmt) NotNull() provider.NotNullMP {
 	return s
 }
 
-// AutoInc calls AUTO_INCREMENT option. (only MySQL)
+// AutoInc calls AUTO_INCREMENT option (only MySQL).
 func (s *AlterTableStmt) AutoInc() provider.AutoIncMP {
 	s.call(&mig.AutoInc{})
 	return s

@@ -166,7 +166,7 @@ func (s *CreateTableStmt) NotNull() provider.NotNullMP {
 	return s
 }
 
-// AutoInc calls AUTO_INCREMENT option. (only MySQL)
+// AutoInc calls AUTO_INCREMENT option (only MySQL).
 func (s *CreateTableStmt) AutoInc() provider.AutoIncMP {
 	s.call(&mig.AutoInc{})
 	return s

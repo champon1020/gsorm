@@ -43,10 +43,8 @@ func (s *UpdateStmt) buildSQL(sql *internal.SQL) error {
 
 	if s.model != nil {
 		cols := []string{}
-		for _, c := range s.cmd.Columns {
-			cols = append(cols, c)
-		}
-		if err := s.buildSQLWithModel(cols, s.model, sql); err != nil {
+		cols = append(cols, s.cmd.Columns...)
+		if err = s.buildSQLWithModel(cols, s.model, sql); err != nil {
 			return err
 		}
 	}
