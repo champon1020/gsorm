@@ -35,10 +35,10 @@ var (
 
 // Exported values which is declared in stmt.go.
 var (
-	SelectStmtProcessSQL = (*SelectStmt).processSQL
-	InsertStmtProcessSQL = (*InsertStmt).processSQL
-	UpdateStmtProcessSQL = (*UpdateStmt).processSQL
-	DeleteStmtProcessSQL = (*DeleteStmt).processSQL
+	SelectStmtBuildSQL = (*SelectStmt).buildSQL
+	InsertStmtBuildSQL = (*InsertStmt).buildSQL
+	UpdateStmtBuildSQL = (*UpdateStmt).buildSQL
+	DeleteStmtBuildSQL = (*DeleteStmt).buildSQL
 )
 
 func (s *stmt) ExportedGetErrors() []error {

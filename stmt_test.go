@@ -49,10 +49,10 @@ func TestDeleteStmt_String(t *testing.T) {
 	}
 }
 
-func TestDeleteStmt_ProcessSQL_Fail(t *testing.T) {
+func TestDeleteStmt_BuildSQL_Fail(t *testing.T) {
 	testCases := []struct {
 		ExpectedErr *errors.Error
-		Process     func() error
+		Build       func() error
 	}{
 		{
 			errors.New("clause.Join is not supported for DELETE statement", errors.InvalidSyntaxError).(*errors.Error),
@@ -61,16 +61,16 @@ func TestDeleteStmt_ProcessSQL_Fail(t *testing.T) {
 				s := mgorm.Delete(nil).(*mgorm.DeleteStmt)
 				s.ExportedSetCalled(&clause.Join{})
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.DeleteStmtProcessSQL(s, &sql)
+				err := mgorm.DeleteStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
 	}
 
 	for _, testCase := range testCases {
-		err := testCase.Process()
+		err := testCase.Build()
 		if err == nil {
 			t.Errorf("Error was not occurred")
 			continue
@@ -170,10 +170,10 @@ func TestInsertStmt_String(t *testing.T) {
 	}
 }
 
-func TestInsertStmt_ProcessSQLWithClauses_Fail(t *testing.T) {
+func TestInsertStmt_BuildSQLWithClauses_Fail(t *testing.T) {
 	testCases := []struct {
 		ExpectedErr *errors.Error
-		Process     func() error
+		Build       func() error
 	}{
 		{
 			errors.New("clause.Set is not supported for INSERT statement", errors.InvalidSyntaxError).(*errors.Error),
@@ -182,16 +182,16 @@ func TestInsertStmt_ProcessSQLWithClauses_Fail(t *testing.T) {
 				s := mgorm.Insert(nil, "", "").(*mgorm.InsertStmt)
 				s.ExportedSetCalled(&clause.Set{})
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.InsertStmtProcessSQL(s, &sql)
+				err := mgorm.InsertStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
 	}
 
 	for _, testCase := range testCases {
-		err := testCase.Process()
+		err := testCase.Build()
 		if err == nil {
 			t.Errorf("Error was not occurred")
 			continue
@@ -209,10 +209,10 @@ func TestInsertStmt_ProcessSQLWithClauses_Fail(t *testing.T) {
 	}
 }
 
-func TestInsertStmt_ProcessSQLWithModel_Fail(t *testing.T) {
+func TestInsertStmt_BuildSQLWithModel_Fail(t *testing.T) {
 	testCases := []struct {
 		ExpectedErr *errors.Error
-		Process     func() error
+		Build       func() error
 	}{
 		{
 			errors.New("Model must be pointer", errors.InvalidValueError).(*errors.Error),
@@ -220,9 +220,9 @@ func TestInsertStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 				// Prepare for test.
 				s := mgorm.Insert(nil, "", "").Model(1000).(*mgorm.InsertStmt)
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.InsertStmtProcessSQL(s, &sql)
+				err := mgorm.InsertStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
@@ -233,9 +233,9 @@ func TestInsertStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 				model := make(map[string]interface{})
 				s := mgorm.Insert(nil, "table", "column").Model(&model).(*mgorm.InsertStmt)
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.InsertStmtProcessSQL(s, &sql)
+				err := mgorm.InsertStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
@@ -246,16 +246,16 @@ func TestInsertStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 				model := 10000
 				s := mgorm.Insert(nil, "table", "column").Model(&model).(*mgorm.InsertStmt)
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.InsertStmtProcessSQL(s, &sql)
+				err := mgorm.InsertStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
 	}
 
 	for _, testCase := range testCases {
-		err := testCase.Process()
+		err := testCase.Build()
 		if err == nil {
 			t.Errorf("Error was not occurred")
 			continue
@@ -463,10 +463,10 @@ func TestSelectStmt_String(t *testing.T) {
 	}
 }
 
-func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
+func TestStmt_BuildQuerySQL_Fail(t *testing.T) {
 	testCases := []struct {
 		ExpectedErr *errors.Error
-		Process     func() error
+		Build       func() error
 	}{
 		{
 			errors.New(`clause.Values is not supported for SELECT statement`, errors.InvalidSyntaxError).(*errors.Error),
@@ -475,16 +475,16 @@ func TestStmt_ProcessQuerySQL_Fail(t *testing.T) {
 				s := mgorm.Select(nil, "").(*mgorm.SelectStmt)
 				s.ExportedSetCalled(&clause.Values{})
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.SelectStmtProcessSQL(s, &sql)
+				err := mgorm.SelectStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
 	}
 
 	for _, testCase := range testCases {
-		err := testCase.Process()
+		err := testCase.Build()
 		if err == nil {
 			t.Errorf("Error was not occurred")
 			continue
@@ -567,10 +567,10 @@ func TestUpdateStmt_String(t *testing.T) {
 	}
 }
 
-func TestUpdateStmt_ProcessSQLWithClauses_Fail(t *testing.T) {
+func TestUpdateStmt_BuildSQLWithClauses_Fail(t *testing.T) {
 	testCases := []struct {
 		ExpectedErr *errors.Error
-		Process     func() error
+		Build       func() error
 	}{
 		{
 			errors.New("clause.Join is not supported for UPDATE statement", errors.InvalidTypeError).(*errors.Error),
@@ -579,16 +579,16 @@ func TestUpdateStmt_ProcessSQLWithClauses_Fail(t *testing.T) {
 				s := mgorm.Update(nil, "", "").(*mgorm.UpdateStmt)
 				s.ExportedSetCalled(&clause.Join{})
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.UpdateStmtProcessSQL(s, &sql)
+				err := mgorm.UpdateStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
 	}
 
 	for _, testCase := range testCases {
-		err := testCase.Process()
+		err := testCase.Build()
 		if err == nil {
 			t.Errorf("Error was not occurred")
 			continue
@@ -606,10 +606,10 @@ func TestUpdateStmt_ProcessSQLWithClauses_Fail(t *testing.T) {
 	}
 }
 
-func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
+func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 	testCases := []struct {
 		ExpectedErr *errors.Error
-		Process     func() error
+		Build       func() error
 	}{
 		{
 			errors.New(
@@ -619,9 +619,9 @@ func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 				// Prepare for test.
 				s := mgorm.Update(nil, "table", "column1", "column2").Model(1000).(*mgorm.UpdateStmt)
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.UpdateStmtProcessSQL(s, &sql)
+				err := mgorm.UpdateStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
@@ -632,9 +632,9 @@ func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 				model := make(map[string]interface{})
 				s := mgorm.Update(nil, "table", "column").Model(model).(*mgorm.UpdateStmt)
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.UpdateStmtProcessSQL(s, &sql)
+				err := mgorm.UpdateStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
@@ -648,9 +648,9 @@ func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 				}
 				s := mgorm.Update(nil, "sample", "id", "first_name").Model(&model).(*mgorm.UpdateStmt)
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.UpdateStmtProcessSQL(s, &sql)
+				err := mgorm.UpdateStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
@@ -661,16 +661,16 @@ func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 				model := []int{1000}
 				s := mgorm.Update(nil, "sample", "id", "first_name").Model(&model).(*mgorm.UpdateStmt)
 
-				// Actual process.
+				// Actual build.
 				var sql internal.SQL
-				err := mgorm.UpdateStmtProcessSQL(s, &sql)
+				err := mgorm.UpdateStmtBuildSQL(s, &sql)
 				return err
 			},
 		},
 	}
 
 	for _, testCase := range testCases {
-		err := testCase.Process()
+		err := testCase.Build()
 		if err == nil {
 			t.Errorf("Error was not occurred")
 			continue
@@ -691,7 +691,7 @@ func TestUpdateStmt_ProcessSQLWithModel_Fail(t *testing.T) {
 func TestUpdateStmt_Set_Fail(t *testing.T) {
 	testCases := []struct {
 		ExpectedErr *errors.Error
-		Process     func() []error
+		Build       func() []error
 	}{
 		{
 			errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError).(*errors.Error),
@@ -699,7 +699,7 @@ func TestUpdateStmt_Set_Fail(t *testing.T) {
 				// Prepare for test.
 				s := new(mgorm.UpdateStmt)
 
-				// Actual process.
+				// Actual build.
 				s.Set("")
 				return s.ExportedGetErrors()
 			},
@@ -707,7 +707,7 @@ func TestUpdateStmt_Set_Fail(t *testing.T) {
 		{
 			errors.New("Number of values is not equal to that of columns", errors.InvalidValueError).(*errors.Error),
 			func() []error {
-				// Actual process.
+				// Actual build.
 				s := mgorm.Update(nil, "sample", "id").Set(10, "Taro").(*mgorm.UpdateStmt)
 				return s.ExportedGetErrors()
 			},
@@ -715,7 +715,7 @@ func TestUpdateStmt_Set_Fail(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		errs := testCase.Process()
+		errs := testCase.Build()
 		if len(errs) == 0 {
 			t.Errorf("Error was not occurred")
 			return

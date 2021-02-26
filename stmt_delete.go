@@ -19,53 +19,22 @@ type DeleteStmt struct {
 
 // String returns SQL statement with string.
 func (s *DeleteStmt) String() string {
-	var sql internal.SQL
-	if err := s.processSQL(&sql); err != nil {
-		s.throw(err)
-		return err.Error()
-	}
-	return sql.String()
+	return s.string(s.buildSQL)
 }
 
 // FuncString returns function call as string.
 func (s *DeleteStmt) FuncString() string {
-	str := s.cmd.String()
-	for _, e := range s.called {
-		str += fmt.Sprintf(".%s", e.String())
-	}
-	return str
+	return s.funcString(s.cmd)
 }
 
 // Exec executed SQL statement without mapping to model.
 // If type of conn is mgorm.MockDB, compare statements between called and expected.
 func (s *DeleteStmt) Exec() error {
-	if len(s.errors) > 0 {
-		return s.errors[0]
-	}
-
-	switch conn := s.conn.(type) {
-	case *DB, *Tx:
-		var sql internal.SQL
-		if err := s.processSQL(&sql); err != nil {
-			return err
-		}
-		if _, err := conn.Exec(sql.String()); err != nil {
-			return errors.New(err.Error(), errors.DBQueryError)
-		}
-		return nil
-	case Mock:
-		_, err := conn.CompareWith(s)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return s.exec(s.buildSQL, s)
 }
 
-// processSQL builds SQL statement.
-func (s *DeleteStmt) processSQL(sql *internal.SQL) error {
+// buildSQL builds SQL statement.
+func (s *DeleteStmt) buildSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
 		return err

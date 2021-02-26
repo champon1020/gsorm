@@ -20,72 +20,23 @@ type SelectStmt struct {
 
 // String returns SQL statement with string.
 func (s *SelectStmt) String() string {
-	var sql internal.SQL
-	if err := s.processSQL(&sql); err != nil {
-		s.throw(err)
-		return err.Error()
-	}
-	return sql.String()
+	return s.string(s.buildSQL)
 }
 
 // FuncString returns function call as string.
 func (s *SelectStmt) FuncString() string {
-	str := s.cmd.String()
-	for _, e := range s.called {
-		str += fmt.Sprintf(".%s", e.String())
-	}
-	return str
+	return s.funcString(s.cmd)
 }
 
 // Query executes SQL statement with mapping to model.
 // If type of (*SelectStmt).conn is mgorm.MockDB, compare statements between called and expected.
 // Then, it maps expected values to model.
 func (s *SelectStmt) Query(model interface{}) error {
-	if len(s.errors) > 0 {
-		return s.errors[0]
-	}
-
-	switch conn := s.conn.(type) {
-	case *DB, *Tx:
-		var sql internal.SQL
-		if err := s.processSQL(&sql); err != nil {
-			return err
-		}
-
-		rows, err := conn.Query(sql.String())
-		if err != nil {
-			return errors.New(err.Error(), errors.DBQueryError)
-		}
-
-		defer rows.Close()
-		if err := internal.MapRowsToModel(rows, model); err != nil {
-			return err
-		}
-	case Mock:
-		returned, err := conn.CompareWith(s)
-		if err != nil || returned == nil {
-			return err
-		}
-
-		v := reflect.ValueOf(returned)
-		if v.Kind() == reflect.Ptr {
-			return errors.New("Returned value must not be pointer", errors.InvalidValueError)
-		}
-		mv := reflect.ValueOf(model)
-		if mv.Kind() != reflect.Ptr {
-			return errors.New("Model must be pointer", errors.InvalidPointerError)
-		}
-
-		mv.Elem().Set(v)
-	default:
-		return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
-	}
-
-	return nil
+	return s.query(s.buildSQL, s, model)
 }
 
-// processSQL builds SQL statement from called clauses.
-func (s *SelectStmt) processSQL(sql *internal.SQL) error {
+// buildSQL builds SQL statement from called clauses.
+func (s *SelectStmt) buildSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
 		return err
