@@ -19,7 +19,13 @@ type OnMP interface {
 
 // TableMP is method provider which is returned by mgorm.CreateTable.
 type TableMP interface {
+	Model(interface{}) ModelMP
 	Column(string, string) ColumnMP
+}
+
+// ModelMP is method provider which is returned by (*CreateTableStmt).Model.
+type ModelMP interface {
+	provider.MigrationCallable
 }
 
 // ColumnMP is method provider which is returned by (*CreateTableStmt).Column.

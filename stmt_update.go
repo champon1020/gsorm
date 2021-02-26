@@ -14,7 +14,8 @@ import (
 // UpdateStmt is UPDATE statement..
 type UpdateStmt struct {
 	stmt
-	cmd *clause.Update
+	model interface{}
+	cmd   *clause.Update
 }
 
 // String returns SQL statement with string.

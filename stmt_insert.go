@@ -14,7 +14,8 @@ import (
 // InsertStmt is INSERT statement.
 type InsertStmt struct {
 	stmt
-	cmd *clause.Insert
+	model interface{}
+	cmd   *clause.Insert
 }
 
 // String returns SQL statement with string.

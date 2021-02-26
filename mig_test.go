@@ -73,6 +73,24 @@ func TestCreateIndex_String(t *testing.T) {
 }
 
 func TestCreateTable_String(t *testing.T) {
+	type Model struct {
+		ID          int       `notnull:"" autoinc:"" pk:"PK_id"`
+		CountryCode string    `type:"CHAR(3)" notnull:"" def:"'0'" fk:"FK_country_code country(code)"`
+		Name        string    `type:"VARCHAR(16)" notnull:"" def:"'anonymous'" uc:"UC_name"`
+		Nickname    string    `type:"VARCHAR(32)" uc:"UC_name"`
+		BirthDate   time.Time `notnull:""`
+	}
+	type Model2 struct {
+		ID          int       `type:"SERIAL" notnull:"" pk:"PK_id"`
+		CountryCode string    `type:"CHAR(3)" notnull:"" def:"'0'" fk:"FK_country_code country(code)"`
+		Name        string    `type:"VARCHAR(16)" notnull:"" def:"'anonymous'" uc:"UC_name"`
+		Nickname    string    `type:"VARCHAR(32)" uc:"UC_name"`
+		BirthDate   time.Time `notnull:""`
+	}
+
+	model := new(Model)
+	model2 := new(Model2)
+
 	testCases := []struct {
 		Stmt     *mgorm.CreateTableStmt
 		Expected string
@@ -80,7 +98,7 @@ func TestCreateTable_String(t *testing.T) {
 		{
 			mgorm.CreateTable(mgorm.ExportedMySQLDB, "person").
 				Column("id", "INT").NotNull().AutoInc().
-				Column("country_code", "CHAR(3)").NotNull().Default(0).
+				Column("country_code", "CHAR(3)").NotNull().Default("0").
 				Column("name", "VARCHAR(16)").NotNull().Default("anonymous").
 				Column("nickname", "VARCHAR(32)").
 				Column("birth_date", "DATE").NotNull().
@@ -89,7 +107,7 @@ func TestCreateTable_String(t *testing.T) {
 				Cons("FK_country_code").Foreign("country_code").Ref("country", "code").(*mgorm.CreateTableStmt),
 			`CREATE TABLE person (` +
 				`id INT NOT NULL AUTO_INCREMENT, ` +
-				`country_code CHAR(3) NOT NULL DEFAULT 0, ` +
+				`country_code CHAR(3) NOT NULL DEFAULT '0', ` +
 				`name VARCHAR(16) NOT NULL DEFAULT 'anonymous', ` +
 				`nickname VARCHAR(32), ` +
 				`birth_date DATE NOT NULL, ` +
@@ -101,7 +119,7 @@ func TestCreateTable_String(t *testing.T) {
 		{
 			mgorm.CreateTable(mgorm.ExportedPSQLDB, "person").
 				Column("id", "SERIAL").NotNull().
-				Column("country_code", "CHAR(3)").NotNull().Default(0).
+				Column("country_code", "CHAR(3)").NotNull().Default("0").
 				Column("name", "VARCHAR(16)").NotNull().Default("anonymous").
 				Column("nickname", "VARCHAR(32)").
 				Column("birth_date", "DATE").NotNull().
@@ -110,7 +128,35 @@ func TestCreateTable_String(t *testing.T) {
 				Cons("FK_country_code").Foreign("country_code").Ref("country", "code").(*mgorm.CreateTableStmt),
 			`CREATE TABLE person (` +
 				`id SERIAL NOT NULL, ` +
-				`country_code CHAR(3) NOT NULL DEFAULT 0, ` +
+				`country_code CHAR(3) NOT NULL DEFAULT '0', ` +
+				`name VARCHAR(16) NOT NULL DEFAULT 'anonymous', ` +
+				`nickname VARCHAR(32), ` +
+				`birth_date DATE NOT NULL, ` +
+				`CONSTRAINT UC_name UNIQUE (name, nickname), ` +
+				`CONSTRAINT PK_id PRIMARY KEY (id), ` +
+				`CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country(code)` +
+				`)`,
+		},
+		{
+			mgorm.CreateTable(mgorm.ExportedMySQLDB, "person").
+				Model(model).(*mgorm.CreateTableStmt),
+			`CREATE TABLE person (` +
+				`id INT NOT NULL AUTO_INCREMENT, ` +
+				`country_code CHAR(3) NOT NULL DEFAULT '0', ` +
+				`name VARCHAR(16) NOT NULL DEFAULT 'anonymous', ` +
+				`nickname VARCHAR(32), ` +
+				`birth_date DATE NOT NULL, ` +
+				`CONSTRAINT UC_name UNIQUE (name, nickname), ` +
+				`CONSTRAINT PK_id PRIMARY KEY (id), ` +
+				`CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country(code)` +
+				`)`,
+		},
+		{
+			mgorm.CreateTable(mgorm.ExportedPSQLDB, "person").
+				Model(model2).(*mgorm.CreateTableStmt),
+			`CREATE TABLE person (` +
+				`id SERIAL NOT NULL, ` +
+				`country_code CHAR(3) NOT NULL DEFAULT '0', ` +
 				`name VARCHAR(16) NOT NULL DEFAULT 'anonymous', ` +
 				`nickname VARCHAR(32), ` +
 				`birth_date DATE NOT NULL, ` +
