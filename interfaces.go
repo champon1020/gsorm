@@ -40,16 +40,3 @@ type sqlTx interface {
 	Commit() error
 	Rollback() error
 }
-
-// QueryCallable is embedded into clause interfaces which can call (*Stmt).Query.
-type QueryCallable interface {
-	Query(interface{}) error
-	ExpectQuery(interface{}) *SelectStmt
-	String() string
-}
-
-// ExecCallable is embedded into clause interfaces which can call (*Stmt).Exec.
-type ExecCallable interface {
-	Exec() error
-	String() string
-}

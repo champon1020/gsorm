@@ -7,47 +7,9 @@ import (
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/clause"
+
+	provider "github.com/champon1020/mgorm/provider/update"
 )
-
-// MgormUpdate is interface for returned value of mgorm.Update.
-type MgormUpdate interface {
-	Model(interface{}) UpdateModel
-	Set(...interface{}) UpdateSet
-}
-
-// UpdateModel is interface for returned value of (*UpdateStmt).Model.
-type UpdateModel interface {
-	Where(string, ...interface{}) UpdateWhere
-	ExpectExec() *UpdateStmt
-	ExecCallable
-}
-
-// UpdateSet is interface for returned value of (*UpdateStmt).Set.
-type UpdateSet interface {
-	Where(string, ...interface{}) UpdateWhere
-	ExpectExec() *UpdateStmt
-	ExecCallable
-}
-
-// UpdateWhere is interface for returned value of (*UpdateStmt).Where.
-type UpdateWhere interface {
-	And(string, ...interface{}) UpdateAnd
-	Or(string, ...interface{}) UpdateOr
-	ExpectExec() *UpdateStmt
-	ExecCallable
-}
-
-// UpdateAnd is interface for returned value of (*UpdateStmt).And.
-type UpdateAnd interface {
-	ExpectExec() *UpdateStmt
-	ExecCallable
-}
-
-// UpdateOr is interface for returned value of (*UpdateStmt).Or.
-type UpdateOr interface {
-	ExpectExec() *UpdateStmt
-	ExecCallable
-}
 
 // UpdateStmt is UPDATE statement..
 type UpdateStmt struct {
@@ -65,18 +27,13 @@ func (s *UpdateStmt) String() string {
 	return sql.String()
 }
 
-// funcString returns function call as string.
-func (s *UpdateStmt) funcString() string {
+// FuncString returns function call as string.
+func (s *UpdateStmt) FuncString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
 		str += fmt.Sprintf(".%s", e.String())
 	}
 	return str
-}
-
-// ExpectExec returns *UpdateStmt. This function is used for mock test.
-func (s *UpdateStmt) ExpectExec() *UpdateStmt {
-	return s
 }
 
 // Exec executes SQL statement without mapping to model.
@@ -225,13 +182,13 @@ func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *
 }
 
 // Model sets model to UpdateStmt.
-func (s *UpdateStmt) Model(model interface{}) UpdateModel {
+func (s *UpdateStmt) Model(model interface{}) provider.ModelMP {
 	s.model = model
 	return s
 }
 
 // Set calls SET clause.
-func (s *UpdateStmt) Set(vals ...interface{}) UpdateSet {
+func (s *UpdateStmt) Set(vals ...interface{}) provider.SetMP {
 	if s.cmd == nil {
 		s.throw(errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError))
 		return s
@@ -249,19 +206,19 @@ func (s *UpdateStmt) Set(vals ...interface{}) UpdateSet {
 }
 
 // Where calls WHERE clause.
-func (s *UpdateStmt) Where(expr string, vals ...interface{}) UpdateWhere {
+func (s *UpdateStmt) Where(expr string, vals ...interface{}) provider.WhereMP {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *UpdateStmt) And(expr string, vals ...interface{}) UpdateAnd {
+func (s *UpdateStmt) And(expr string, vals ...interface{}) provider.AndMP {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *UpdateStmt) Or(expr string, vals ...interface{}) UpdateOr {
+func (s *UpdateStmt) Or(expr string, vals ...interface{}) provider.OrMP {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }

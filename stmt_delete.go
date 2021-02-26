@@ -7,39 +7,9 @@ import (
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/clause"
+
+	provider "github.com/champon1020/mgorm/provider/delete"
 )
-
-// MgormDelete is interface for returned value of mgorm.Delete.
-type MgormDelete interface {
-	From(...string) DeleteFrom
-}
-
-// DeleteFrom is interface for returned value of (*DeleteStmt).From.
-type DeleteFrom interface {
-	Where(string, ...interface{}) DeleteWhere
-	ExpectExec() *DeleteStmt
-	ExecCallable
-}
-
-// DeleteWhere is interface for returned value of (*DeleteStmt).Where.
-type DeleteWhere interface {
-	And(string, ...interface{}) DeleteAnd
-	Or(string, ...interface{}) DeleteOr
-	ExpectExec() *DeleteStmt
-	ExecCallable
-}
-
-// DeleteAnd is interface for returned value of (*DeleteStmt).And.
-type DeleteAnd interface {
-	ExpectExec() *DeleteStmt
-	ExecCallable
-}
-
-// DeleteOr is interface for returned value of (*DeleteOr).Or.
-type DeleteOr interface {
-	ExpectExec() *DeleteStmt
-	ExecCallable
-}
 
 // DeleteStmt is DELETE statement.
 type DeleteStmt struct {
@@ -57,18 +27,13 @@ func (s *DeleteStmt) String() string {
 	return sql.String()
 }
 
-// funcString returns function call as string.
-func (s *DeleteStmt) funcString() string {
+// FuncString returns function call as string.
+func (s *DeleteStmt) FuncString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
 		str += fmt.Sprintf(".%s", e.String())
 	}
 	return str
-}
-
-// ExpectExec returns *DeleteStmt. This function is used for mock test.
-func (s *DeleteStmt) ExpectExec() *DeleteStmt {
-	return s
 }
 
 // Exec executed SQL statement without mapping to model.
@@ -127,7 +92,7 @@ func (s *DeleteStmt) processSQL(sql *internal.SQL) error {
 }
 
 // From calls FROM clause.
-func (s *DeleteStmt) From(tables ...string) DeleteFrom {
+func (s *DeleteStmt) From(tables ...string) provider.FromMP {
 	f := new(clause.From)
 	for _, t := range tables {
 		f.AddTable(t)
@@ -137,19 +102,19 @@ func (s *DeleteStmt) From(tables ...string) DeleteFrom {
 }
 
 // Where calls WHERE clause.
-func (s *DeleteStmt) Where(expr string, vals ...interface{}) DeleteWhere {
+func (s *DeleteStmt) Where(expr string, vals ...interface{}) provider.WhereMP {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *DeleteStmt) And(expr string, vals ...interface{}) DeleteAnd {
+func (s *DeleteStmt) And(expr string, vals ...interface{}) provider.AndMP {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *DeleteStmt) Or(expr string, vals ...interface{}) DeleteOr {
+func (s *DeleteStmt) Or(expr string, vals ...interface{}) provider.OrMP {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }

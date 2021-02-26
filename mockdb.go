@@ -130,12 +130,12 @@ func (m *MockDB) Complete() error {
 func (m *MockDB) CompareWith(s Stmt) (interface{}, error) {
 	expected := m.popExpected()
 	if expected == nil {
-		msg := fmt.Sprintf("%s was executed but not expected", s.funcString())
+		msg := fmt.Sprintf("%s was executed but not expected", s.FuncString())
 		return nil, errors.New(msg, errors.MockError)
 	}
 	eq, ok := expected.(*expectedQuery)
 	if !ok {
-		msg := fmt.Sprintf("%s was executed but %s is expected", s.funcString(), expected.String())
+		msg := fmt.Sprintf("%s was executed but %s is expected", s.FuncString(), expected.String())
 		return nil, errors.New(msg, errors.MockError)
 	}
 	return eq.willReturn, compareStmts(eq.stmt, s)
@@ -249,12 +249,12 @@ func (m *MockTx) Complete() error {
 func (m *MockTx) CompareWith(s Stmt) (interface{}, error) {
 	expected := m.popExpected()
 	if expected == nil {
-		msg := fmt.Sprintf("%s was executed but not expected", s.funcString())
+		msg := fmt.Sprintf("%s was executed but not expected", s.FuncString())
 		return nil, errors.New(msg, errors.MockError)
 	}
 	eq, ok := expected.(*expectedQuery)
 	if !ok {
-		msg := fmt.Sprintf("%s was executed but %s is expected", s.funcString(), expected.String())
+		msg := fmt.Sprintf("%s was executed but %s is expected", s.FuncString(), expected.String())
 		return nil, errors.New(msg, errors.MockError)
 	}
 	return eq.willReturn, compareStmts(eq.stmt, s)
@@ -262,15 +262,15 @@ func (m *MockTx) CompareWith(s Stmt) (interface{}, error) {
 
 // compareStmts compares two statements. If their are different, returns error.
 func compareStmts(expected Stmt, actual Stmt) error {
-	expectedCalled := expected.getCalled()
-	actualCalled := actual.getCalled()
+	expectedCalled := expected.Called()
+	actualCalled := actual.Called()
 	if len(expectedCalled) != len(actualCalled) {
-		msg := fmt.Sprintf("%s was executed but %s is expected", actual.funcString(), expected.funcString())
+		msg := fmt.Sprintf("%s was executed but %s is expected", actual.FuncString(), expected.FuncString())
 		return errors.New(msg, errors.MockError)
 	}
 	for i, e := range expectedCalled {
 		if diff := cmp.Diff(actualCalled[i], e); diff != "" {
-			msg := fmt.Sprintf("%s was executed but %s is expected", actual.funcString(), expected.funcString())
+			msg := fmt.Sprintf("%s was executed but %s is expected", actual.FuncString(), expected.FuncString())
 			return errors.New(msg, errors.MockError)
 		}
 	}
@@ -300,7 +300,7 @@ type expectedQuery struct {
 }
 
 func (e *expectedQuery) String() string {
-	return e.stmt.funcString()
+	return e.stmt.FuncString()
 }
 
 // expectedBegin is expectation of beginning transaction.

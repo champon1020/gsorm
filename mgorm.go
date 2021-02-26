@@ -10,7 +10,11 @@ import (
 
 	altProvider "github.com/champon1020/mgorm/provider/alter"
 	crtProvider "github.com/champon1020/mgorm/provider/create"
+	delProvider "github.com/champon1020/mgorm/provider/delete"
 	drpProvider "github.com/champon1020/mgorm/provider/drop"
+	insProvider "github.com/champon1020/mgorm/provider/insert"
+	selProvider "github.com/champon1020/mgorm/provider/select"
+	updProvider "github.com/champon1020/mgorm/provider/update"
 )
 
 // New creates DB.
@@ -32,7 +36,7 @@ func NewMock() *MockDB {
 }
 
 // Select calls SELECT command.
-func Select(conn Conn, cols ...string) MgormSelect {
+func Select(conn Conn, cols ...string) selProvider.StmtMP {
 	s := new(SelectStmt)
 	s.conn = conn
 	s.cmd = clause.NewSelect(cols)
@@ -40,7 +44,7 @@ func Select(conn Conn, cols ...string) MgormSelect {
 }
 
 // Insert calls INSERT command.
-func Insert(conn Conn, table string, cols ...string) MgormInsert {
+func Insert(conn Conn, table string, cols ...string) insProvider.StmtMP {
 	s := new(InsertStmt)
 	s.conn = conn
 	s.cmd = clause.NewInsert(table, cols)
@@ -48,7 +52,7 @@ func Insert(conn Conn, table string, cols ...string) MgormInsert {
 }
 
 // Update calls UPDATE command.
-func Update(conn Conn, table string, cols ...string) MgormUpdate {
+func Update(conn Conn, table string, cols ...string) updProvider.StmtMP {
 	s := new(UpdateStmt)
 	s.conn = conn
 	s.cmd = clause.NewUpdate(table, cols)
@@ -56,7 +60,7 @@ func Update(conn Conn, table string, cols ...string) MgormUpdate {
 }
 
 // Delete calls DELETE command.
-func Delete(conn Conn) MgormDelete {
+func Delete(conn Conn) delProvider.StmtMP {
 	s := new(DeleteStmt)
 	s.conn = conn
 	s.cmd = clause.NewDelete()
@@ -64,7 +68,7 @@ func Delete(conn Conn) MgormDelete {
 }
 
 // Count calls COUNT function.
-func Count(conn Conn, col string, alias ...string) MgormSelect {
+func Count(conn Conn, col string, alias ...string) selProvider.StmtMP {
 	c := fmt.Sprintf("COUNT(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -75,7 +79,7 @@ func Count(conn Conn, col string, alias ...string) MgormSelect {
 }
 
 // Avg calls AVG function.
-func Avg(conn Conn, col string, alias ...string) MgormSelect {
+func Avg(conn Conn, col string, alias ...string) selProvider.StmtMP {
 	c := fmt.Sprintf("AVG(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -86,7 +90,7 @@ func Avg(conn Conn, col string, alias ...string) MgormSelect {
 }
 
 // Sum calls SUM function.
-func Sum(conn Conn, col string, alias ...string) MgormSelect {
+func Sum(conn Conn, col string, alias ...string) selProvider.StmtMP {
 	c := fmt.Sprintf("SUM(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -97,7 +101,7 @@ func Sum(conn Conn, col string, alias ...string) MgormSelect {
 }
 
 // Min calls MIN function.
-func Min(conn Conn, col string, alias ...string) MgormSelect {
+func Min(conn Conn, col string, alias ...string) selProvider.StmtMP {
 	c := fmt.Sprintf("MIN(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -108,7 +112,7 @@ func Min(conn Conn, col string, alias ...string) MgormSelect {
 }
 
 // Max calls MAX function.
-func Max(conn Conn, col string, alias ...string) MgormSelect {
+func Max(conn Conn, col string, alias ...string) selProvider.StmtMP {
 	c := fmt.Sprintf("MAX(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])

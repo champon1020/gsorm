@@ -7,26 +7,9 @@ import (
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/clause"
+
+	provider "github.com/champon1020/mgorm/provider/insert"
 )
-
-// MgormInsert is interface for returned value of mgorm.Insert.
-type MgormInsert interface {
-	Model(interface{}) InsertModel
-	Values(...interface{}) InsertValues
-}
-
-// InsertModel is interface for returned value of (*InsertStmt).Model.
-type InsertModel interface {
-	ExpectExec() *InsertStmt
-	ExecCallable
-}
-
-// InsertValues is interface for returned value of (*InsertStmt).Values.
-type InsertValues interface {
-	Values(...interface{}) InsertValues
-	ExpectExec() *InsertStmt
-	ExecCallable
-}
 
 // InsertStmt is INSERT statement.
 type InsertStmt struct {
@@ -44,18 +27,13 @@ func (s *InsertStmt) String() string {
 	return sql.String()
 }
 
-// funcString returns function call as string.
-func (s *InsertStmt) funcString() string {
+// FuncString returns function call as string.
+func (s *InsertStmt) FuncString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
 		str += fmt.Sprintf(".%s", e.String())
 	}
 	return str
-}
-
-// ExpectExec returns *InsertStmt. This function is used for mock test.
-func (s *InsertStmt) ExpectExec() *InsertStmt {
-	return s
 }
 
 // Exec executed SQL statement without mapping to model.
@@ -226,13 +204,13 @@ func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *
 }
 
 // Model sets model to InsertStmt.
-func (s *InsertStmt) Model(model interface{}) InsertModel {
+func (s *InsertStmt) Model(model interface{}) provider.ModelMP {
 	s.model = model
 	return s
 }
 
 // Values calls VALUES clause.
-func (s *InsertStmt) Values(vals ...interface{}) InsertValues {
+func (s *InsertStmt) Values(vals ...interface{}) provider.ValuesMP {
 	v := new(clause.Values)
 	for _, val := range vals {
 		v.AddValue(val)

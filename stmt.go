@@ -7,8 +7,8 @@ import (
 // Stmt is interface for DeleteStmt, InsertStmt, SelectStmt, and so on.
 type Stmt interface {
 	String() string
-	funcString() string
-	getCalled() []syntax.Clause
+	FuncString() string
+	Called() []syntax.Clause
 }
 
 // stmt stores information about query.
@@ -29,6 +29,7 @@ func (s *stmt) throw(err error) {
 	s.errors = append(s.errors, err)
 }
 
-func (s *stmt) getCalled() []syntax.Clause {
+// Called gets called clauses.
+func (s *stmt) Called() []syntax.Clause {
 	return s.called
 }

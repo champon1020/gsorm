@@ -8,122 +8,9 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
+
+	provider "github.com/champon1020/mgorm/provider/select"
 )
-
-// MgormSelect is interface for returned value of mgorm.Select.
-type MgormSelect interface {
-	From(...string) SelectFrom
-}
-
-// SelectFrom is interface for returned value of (*SelectStmt).From.
-type SelectFrom interface {
-	Join(string) SelectJoin
-	LeftJoin(string) SelectJoin
-	RightJoin(string) SelectJoin
-	FullJoin(string) SelectJoin
-	Where(string, ...interface{}) SelectWhere
-	GroupBy(...string) SelectGroupBy
-	OrderBy(...string) SelectOrderBy
-	Limit(int) SelectLimit
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
-
-// SelectJoin is interface for returned value of (*SelectStmt).Join.
-type SelectJoin interface {
-	On(string, ...interface{}) SelectOn
-}
-
-// SelectOn is interface for returned value of (*SelectStmt).On.
-type SelectOn interface {
-	Where(string, ...interface{}) SelectWhere
-	GroupBy(...string) SelectGroupBy
-	OrderBy(...string) SelectOrderBy
-	Limit(int) SelectLimit
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
-
-// SelectWhere is interface for returned value of (*SelectStmt).Where.
-type SelectWhere interface {
-	And(string, ...interface{}) SelectAnd
-	Or(string, ...interface{}) SelectOr
-	GroupBy(...string) SelectGroupBy
-	OrderBy(...string) SelectOrderBy
-	Limit(int) SelectLimit
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
-
-// SelectAnd is interface for returned value of (*SelectStmt).And.
-type SelectAnd interface {
-	GroupBy(...string) SelectGroupBy
-	OrderBy(...string) SelectOrderBy
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
-
-// SelectOr is interface for returned value of (*SelectStmt).Or.
-type SelectOr interface {
-	GroupBy(...string) SelectGroupBy
-	OrderBy(...string) SelectOrderBy
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
-
-// SelectGroupBy is interface for returned value of (*SelectStmt).GroupBy.
-type SelectGroupBy interface {
-	Having(string, ...interface{}) SelectHaving
-	OrderBy(...string) SelectOrderBy
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
-
-// SelectHaving is interface for returned value of (*SelectStmt).Having.
-type SelectHaving interface {
-	OrderBy(...string) SelectOrderBy
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
-
-// SelectOrderBy is interface for returned value of (*SelectStmt).OrderBy.
-type SelectOrderBy interface {
-	Limit(int) SelectLimit
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
-
-// SelectLimit is interface for returned value of (*SelectStmt).Limit.
-type SelectLimit interface {
-	Offset(int) SelectOffset
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
-
-// SelectOffset is interface for returned value of (*SelectStmt).Offset.
-type SelectOffset interface {
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
-
-// SelectUnion is interface for returned value of (*SelectStmt).Union.
-type SelectUnion interface {
-	OrderBy(...string) SelectOrderBy
-	Limit(int) SelectLimit
-	Union(syntax.Stmt) SelectUnion
-	UnionAll(syntax.Stmt) SelectUnion
-	QueryCallable
-}
 
 // SelectStmt is SELECT statement.
 type SelectStmt struct {
@@ -141,18 +28,13 @@ func (s *SelectStmt) String() string {
 	return sql.String()
 }
 
-// funcString returns function call as string.
-func (s *SelectStmt) funcString() string {
+// FuncString returns function call as string.
+func (s *SelectStmt) FuncString() string {
 	str := s.cmd.String()
 	for _, e := range s.called {
 		str += fmt.Sprintf(".%s", e.String())
 	}
 	return str
-}
-
-// ExpectQuery returns *SelectStmt. This function is used for mock test.
-func (s *SelectStmt) ExpectQuery(model interface{}) *SelectStmt {
-	return s
 }
 
 // Query executes SQL statement with mapping to model.
@@ -239,7 +121,7 @@ func (s *SelectStmt) processSQL(sql *internal.SQL) error {
 }
 
 // From calls FROM clause.
-func (s *SelectStmt) From(tables ...string) SelectFrom {
+func (s *SelectStmt) From(tables ...string) provider.FromMP {
 	f := new(clause.From)
 	for _, t := range tables {
 		f.AddTable(t)
@@ -249,43 +131,43 @@ func (s *SelectStmt) From(tables ...string) SelectFrom {
 }
 
 // Where calls WHERE clause.
-func (s *SelectStmt) Where(expr string, vals ...interface{}) SelectWhere {
+func (s *SelectStmt) Where(expr string, vals ...interface{}) provider.WhereMP {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *SelectStmt) And(expr string, vals ...interface{}) SelectAnd {
+func (s *SelectStmt) And(expr string, vals ...interface{}) provider.AndMP {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *SelectStmt) Or(expr string, vals ...interface{}) SelectOr {
+func (s *SelectStmt) Or(expr string, vals ...interface{}) provider.OrMP {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }
 
 // Limit calls LIMIT clause.
-func (s *SelectStmt) Limit(num int) SelectLimit {
+func (s *SelectStmt) Limit(num int) provider.LimitMP {
 	s.call(&clause.Limit{Num: num})
 	return s
 }
 
 // Offset calls OFFSET clause.
-func (s *SelectStmt) Offset(num int) SelectOffset {
+func (s *SelectStmt) Offset(num int) provider.OffsetMP {
 	s.call(&clause.Offset{Num: num})
 	return s
 }
 
 // OrderBy calls ORDER BY clause.
-func (s *SelectStmt) OrderBy(cols ...string) SelectOrderBy {
+func (s *SelectStmt) OrderBy(cols ...string) provider.OrderByMP {
 	s.call(&clause.OrderBy{Columns: cols})
 	return s
 }
 
 // Join calls (INNER) JOIN clause.
-func (s *SelectStmt) Join(table string) SelectJoin {
+func (s *SelectStmt) Join(table string) provider.JoinMP {
 	j := &clause.Join{Type: clause.InnerJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -293,7 +175,7 @@ func (s *SelectStmt) Join(table string) SelectJoin {
 }
 
 // LeftJoin calls (INNER) JOIN clause.
-func (s *SelectStmt) LeftJoin(table string) SelectJoin {
+func (s *SelectStmt) LeftJoin(table string) provider.JoinMP {
 	j := &clause.Join{Type: clause.LeftJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -301,7 +183,7 @@ func (s *SelectStmt) LeftJoin(table string) SelectJoin {
 }
 
 // RightJoin calls (INNER) JOIN clause.
-func (s *SelectStmt) RightJoin(table string) SelectJoin {
+func (s *SelectStmt) RightJoin(table string) provider.JoinMP {
 	j := &clause.Join{Type: clause.RightJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -309,7 +191,7 @@ func (s *SelectStmt) RightJoin(table string) SelectJoin {
 }
 
 // FullJoin calls (INNER) JOIN clause.
-func (s *SelectStmt) FullJoin(table string) SelectJoin {
+func (s *SelectStmt) FullJoin(table string) provider.JoinMP {
 	j := &clause.Join{Type: clause.FullJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -317,25 +199,25 @@ func (s *SelectStmt) FullJoin(table string) SelectJoin {
 }
 
 // On calls ON clause.
-func (s *SelectStmt) On(expr string, vals ...interface{}) SelectOn {
+func (s *SelectStmt) On(expr string, vals ...interface{}) provider.OnMP {
 	s.call(&clause.On{Expr: expr, Values: vals})
 	return s
 }
 
 // Union calls UNION clause.
-func (s *SelectStmt) Union(stmt syntax.Stmt) SelectUnion {
+func (s *SelectStmt) Union(stmt syntax.Stmt) provider.UnionMP {
 	s.call(&clause.Union{Stmt: stmt, All: false})
 	return s
 }
 
 // UnionAll calls UNION ALL clause.
-func (s *SelectStmt) UnionAll(stmt syntax.Stmt) SelectUnion {
+func (s *SelectStmt) UnionAll(stmt syntax.Stmt) provider.UnionMP {
 	s.call(&clause.Union{Stmt: stmt, All: true})
 	return s
 }
 
 // GroupBy calls GROUP BY clause.
-func (s *SelectStmt) GroupBy(cols ...string) SelectGroupBy {
+func (s *SelectStmt) GroupBy(cols ...string) provider.GroupByMP {
 	g := new(clause.GroupBy)
 	for _, c := range cols {
 		g.AddColumn(c)
@@ -345,7 +227,7 @@ func (s *SelectStmt) GroupBy(cols ...string) SelectGroupBy {
 }
 
 // Having calls HAVING clause.
-func (s *SelectStmt) Having(expr string, vals ...interface{}) SelectHaving {
+func (s *SelectStmt) Having(expr string, vals ...interface{}) provider.HavingMP {
 	s.call(&clause.Having{Expr: expr, Values: vals})
 	return s
 }
