@@ -37,11 +37,11 @@ func TestValues_Build(t *testing.T) {
 	}{
 		{
 			&clause.Values{Values: []interface{}{"column"}},
-			&syntax.StmtSet{Keyword: "VALUES", Value: `("column")`},
+			&syntax.StmtSet{Keyword: "VALUES", Value: `('column')`},
 		},
 		{
 			&clause.Values{Values: []interface{}{"column", 2, true}},
-			&syntax.StmtSet{Keyword: "VALUES", Value: `("column", 2, true)`},
+			&syntax.StmtSet{Keyword: "VALUES", Value: `('column', 2, true)`},
 		},
 	}
 

@@ -33,7 +33,7 @@ func ToString(v interface{}, quotes bool) (string, error) {
 		switch r.Kind() {
 		case reflect.String:
 			if quotes {
-				s := fmt.Sprintf("%+q", r.String())
+				s := fmt.Sprintf("'%s'", r.String())
 				return s, nil
 			}
 			return r.String(), nil
@@ -48,7 +48,7 @@ func ToString(v interface{}, quotes bool) (string, error) {
 		case reflect.Struct:
 			t, ok := v.(time.Time)
 			if ok {
-				return t.Format("2006-01-02 15:04:05"), nil
+				return fmt.Sprintf("'%s'", t.Format("2006-01-02 15:04:05")), nil
 			}
 		default:
 			return "", errors.New(fmt.Sprintf("Type %v is not supported", r.Kind()), errors.InvalidTypeError)

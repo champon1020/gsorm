@@ -16,34 +16,34 @@ func TestBuildForExpression(t *testing.T) {
 		Expected string
 	}{
 		{
-			`lhs = "rhs"`,
+			`lhs = 'rhs'`,
 			[]interface{}{},
-			`lhs = "rhs"`,
+			`lhs = 'rhs'`,
 		},
 		{
 			"lhs = ?",
 			[]interface{}{"rhs"},
-			`lhs = "rhs"`,
+			`lhs = 'rhs'`,
 		},
 		{
 			"NOT lhs = ?",
 			[]interface{}{"rhs"},
-			`NOT lhs = "rhs"`,
+			`NOT lhs = 'rhs'`,
 		},
 		{
 			"lhs1 = ? AND lhs2 = ?",
 			[]interface{}{"rhs", 100},
-			`lhs1 = "rhs" AND lhs2 = 100`,
+			`lhs1 = 'rhs' AND lhs2 = 100`,
 		},
 		{
 			"IN lhs (?, ?, ?)",
 			[]interface{}{"rhs", 100, true},
-			`IN lhs ("rhs", 100, true)`,
+			`IN lhs ('rhs', 100, true)`,
 		},
 		{
 			"lhs LIKE %%?%%",
 			[]interface{}{"rhs"},
-			`lhs LIKE %"rhs"%`,
+			`lhs LIKE %'rhs'%`,
 		},
 		{
 			"lhs BETWEEN ? AND ?",
@@ -55,7 +55,7 @@ func TestBuildForExpression(t *testing.T) {
 			[]interface{}{mgorm.Select(nil, "*").
 				From("table").
 				Where("lhs = ?", "rhs")},
-			`IN (SELECT * FROM table WHERE lhs = "rhs")`,
+			`IN (SELECT * FROM table WHERE lhs = 'rhs')`,
 		},
 	}
 

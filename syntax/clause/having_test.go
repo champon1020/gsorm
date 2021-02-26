@@ -49,7 +49,7 @@ func TestHaving_Build(t *testing.T) {
 		},
 		{
 			&clause.Having{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			&syntax.StmtSet{Keyword: "HAVING", Value: `lhs1 = 10 AND lhs2 = "str"`},
+			&syntax.StmtSet{Keyword: "HAVING", Value: `lhs1 = 10 AND lhs2 = 'str'`},
 		},
 	}
 
@@ -66,9 +66,9 @@ func TestHaving_Build(t *testing.T) {
 }
 
 func TestHaving_Build_Fail(t *testing.T) {
-    a := &clause.Having{Expr: "column = ?"}
-    _, err := a.Build()
-    if err == nil {
-        t.Errorf("Error was not occurred")
-    }
+	a := &clause.Having{Expr: "column = ?"}
+	_, err := a.Build()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+	}
 }

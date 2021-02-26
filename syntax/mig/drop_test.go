@@ -101,23 +101,23 @@ func TestDropColumn_Build(t *testing.T) {
 	}
 }
 
-func TestDropPK_Build(t *testing.T) {
+func TestDropPrimary_Build(t *testing.T) {
 	testCases := []struct {
-		DropPK   *mig.DropPK
-		Expected *syntax.StmtSet
+		DropPrimary *mig.DropPrimary
+		Expected    *syntax.StmtSet
 	}{
 		{
-			&mig.DropPK{Driver: internal.PSQL, Key: "key"},
+			&mig.DropPrimary{Driver: internal.PSQL, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP CONSTRAINT", Value: "key"},
 		},
 		{
-			&mig.DropPK{Driver: internal.MySQL, Key: "key"},
+			&mig.DropPrimary{Driver: internal.MySQL, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP PRIMARY KEY"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		actual, err := testCase.DropPK.Build()
+		actual, err := testCase.DropPrimary.Build()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
@@ -128,23 +128,23 @@ func TestDropPK_Build(t *testing.T) {
 	}
 }
 
-func TestDropFK_Build(t *testing.T) {
+func TestDropForeign_Build(t *testing.T) {
 	testCases := []struct {
-		DropFK   *mig.DropFK
-		Expected *syntax.StmtSet
+		DropForeign *mig.DropForeign
+		Expected    *syntax.StmtSet
 	}{
 		{
-			&mig.DropFK{Driver: internal.PSQL, Key: "key"},
+			&mig.DropForeign{Driver: internal.PSQL, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP CONSTRAINT", Value: "key"},
 		},
 		{
-			&mig.DropFK{Driver: internal.MySQL, Key: "key"},
+			&mig.DropForeign{Driver: internal.MySQL, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP FOREIGN KEY", Value: "key"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		actual, err := testCase.DropFK.Build()
+		actual, err := testCase.DropForeign.Build()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
@@ -155,23 +155,23 @@ func TestDropFK_Build(t *testing.T) {
 	}
 }
 
-func TestDropUC_Build(t *testing.T) {
+func TestDropUnique_Build(t *testing.T) {
 	testCases := []struct {
-		DropUC   *mig.DropUC
-		Expected *syntax.StmtSet
+		DropUnique *mig.DropUnique
+		Expected   *syntax.StmtSet
 	}{
 		{
-			&mig.DropUC{Driver: internal.PSQL, Key: "key"},
+			&mig.DropUnique{Driver: internal.PSQL, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP CONSTRAINT", Value: "key"},
 		},
 		{
-			&mig.DropUC{Driver: internal.MySQL, Key: "key"},
+			&mig.DropUnique{Driver: internal.MySQL, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP INDEX", Value: "key"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		actual, err := testCase.DropUC.Build()
+		actual, err := testCase.DropUnique.Build()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue

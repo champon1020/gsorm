@@ -7,47 +7,9 @@ import (
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/clause"
+
+	provider "github.com/champon1020/mgorm/provider/update"
 )
-
-// MgormUpdate is interface for returned value of mgorm.Update.
-type MgormUpdate interface {
-	Model(interface{}) UpdateModel
-	Set(...interface{}) UpdateSet
-}
-
-// UpdateModel is interface for returned value of (*UpdateStmt).Model.
-type UpdateModel interface {
-	Where(string, ...interface{}) UpdateWhere
-	ExpectExec() *UpdateStmt
-	ExecCallable
-}
-
-// UpdateSet is interface for returned value of (*UpdateStmt).Set.
-type UpdateSet interface {
-	Where(string, ...interface{}) UpdateWhere
-	ExpectExec() *UpdateStmt
-	ExecCallable
-}
-
-// UpdateWhere is interface for returned value of (*UpdateStmt).Where.
-type UpdateWhere interface {
-	And(string, ...interface{}) UpdateAnd
-	Or(string, ...interface{}) UpdateOr
-	ExpectExec() *UpdateStmt
-	ExecCallable
-}
-
-// UpdateAnd is interface for returned value of (*UpdateStmt).And.
-type UpdateAnd interface {
-	ExpectExec() *UpdateStmt
-	ExecCallable
-}
-
-// UpdateOr is interface for returned value of (*UpdateStmt).Or.
-type UpdateOr interface {
-	ExpectExec() *UpdateStmt
-	ExecCallable
-}
 
 // UpdateStmt is UPDATE statement..
 type UpdateStmt struct {
@@ -57,58 +19,22 @@ type UpdateStmt struct {
 
 // String returns SQL statement with string.
 func (s *UpdateStmt) String() string {
-	var sql internal.SQL
-	if err := s.processSQL(&sql); err != nil {
-		s.throw(err)
-		return err.Error()
-	}
-	return sql.String()
+	return s.string(s.buildSQL)
 }
 
-// funcString returns function call as string.
-func (s *UpdateStmt) funcString() string {
-	str := s.cmd.String()
-	for _, e := range s.called {
-		str += fmt.Sprintf(".%s", e.String())
-	}
-	return str
-}
-
-// ExpectExec returns *UpdateStmt. This function is used for mock test.
-func (s *UpdateStmt) ExpectExec() *UpdateStmt {
-	return s
+// FuncString returns function call as string.
+func (s *UpdateStmt) FuncString() string {
+	return s.funcString(s.cmd)
 }
 
 // Exec executes SQL statement without mapping to model.
 // If type of conn is mgorm.MockDB, compare statements between called and expected.
 func (s *UpdateStmt) Exec() error {
-	if len(s.errors) > 0 {
-		return s.errors[0]
-	}
-
-	switch conn := s.conn.(type) {
-	case *DB, *Tx:
-		var sql internal.SQL
-		if err := s.processSQL(&sql); err != nil {
-			return err
-		}
-		if _, err := conn.Exec(sql.String()); err != nil {
-			return errors.New(err.Error(), errors.DBQueryError)
-		}
-		return nil
-	case Mock:
-		_, err := conn.CompareWith(s)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return s.exec(s.buildSQL, s)
 }
 
-// processSQL builds SQL statement.
-func (s *UpdateStmt) processSQL(sql *internal.SQL) error {
+// buildSQL builds SQL statement.
+func (s *UpdateStmt) buildSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
 		return err
@@ -117,22 +43,20 @@ func (s *UpdateStmt) processSQL(sql *internal.SQL) error {
 
 	if s.model != nil {
 		cols := []string{}
-		for _, c := range s.cmd.Columns {
-			cols = append(cols, c)
-		}
-		if err := s.processSQLWithModel(cols, s.model, sql); err != nil {
+		cols = append(cols, s.cmd.Columns...)
+		if err = s.buildSQLWithModel(cols, s.model, sql); err != nil {
 			return err
 		}
 	}
 
-	if err = s.processSQLWithClauses(sql); err != nil {
+	if err = s.buildSQLWithClauses(sql); err != nil {
 		return err
 	}
 	return nil
 }
 
-// processSQLWithClauses builds SQL statement from called clauses.
-func (s *UpdateStmt) processSQLWithClauses(sql *internal.SQL) error {
+// buildSQLWithClauses builds SQL statement from called clauses.
+func (s *UpdateStmt) buildSQLWithClauses(sql *internal.SQL) error {
 	for _, e := range s.called {
 		switch e := e.(type) {
 		case *clause.Set,
@@ -152,8 +76,8 @@ func (s *UpdateStmt) processSQLWithClauses(sql *internal.SQL) error {
 	return nil
 }
 
-// processSQLWithModel builds SQL statement from model.
-func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
+// buildSQLWithModel builds SQL statement from model.
+func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
 	ref := reflect.ValueOf(model)
 	switch ref.Kind() {
 	case reflect.Int,
@@ -225,13 +149,13 @@ func (s *UpdateStmt) processSQLWithModel(cols []string, model interface{}, sql *
 }
 
 // Model sets model to UpdateStmt.
-func (s *UpdateStmt) Model(model interface{}) UpdateModel {
+func (s *UpdateStmt) Model(model interface{}) provider.ModelMP {
 	s.model = model
 	return s
 }
 
 // Set calls SET clause.
-func (s *UpdateStmt) Set(vals ...interface{}) UpdateSet {
+func (s *UpdateStmt) Set(vals ...interface{}) provider.SetMP {
 	if s.cmd == nil {
 		s.throw(errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError))
 		return s
@@ -249,19 +173,19 @@ func (s *UpdateStmt) Set(vals ...interface{}) UpdateSet {
 }
 
 // Where calls WHERE clause.
-func (s *UpdateStmt) Where(expr string, vals ...interface{}) UpdateWhere {
+func (s *UpdateStmt) Where(expr string, vals ...interface{}) provider.WhereMP {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *UpdateStmt) And(expr string, vals ...interface{}) UpdateAnd {
+func (s *UpdateStmt) And(expr string, vals ...interface{}) provider.AndMP {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *UpdateStmt) Or(expr string, vals ...interface{}) UpdateOr {
+func (s *UpdateStmt) Or(expr string, vals ...interface{}) provider.OrMP {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }

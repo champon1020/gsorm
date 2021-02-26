@@ -21,6 +21,10 @@ func TestOn_Build(t *testing.T) {
 			&mig.On{Table: "table", Columns: []string{"column1", "column2"}},
 			&syntax.StmtSet{Keyword: "ON", Value: "table (column1, column2)"},
 		},
+		{
+			&mig.On{Table: "table"},
+			&syntax.StmtSet{Keyword: "ON", Value: "table"},
+		},
 	}
 
 	for _, testCase := range testCases {

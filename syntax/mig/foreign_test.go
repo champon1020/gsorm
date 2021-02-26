@@ -8,23 +8,23 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestFK_Build(t *testing.T) {
+func TestForeign_Build(t *testing.T) {
 	testCases := []struct {
-		FK       *mig.FK
+		Foreign  *mig.Foreign
 		Expected *syntax.StmtSet
 	}{
 		{
-			&mig.FK{Columns: []string{"column"}},
+			&mig.Foreign{Columns: []string{"column"}},
 			&syntax.StmtSet{Keyword: "FOREIGN KEY", Value: "(column)"},
 		},
 		{
-			&mig.FK{Columns: []string{"column1", "column2"}},
+			&mig.Foreign{Columns: []string{"column1", "column2"}},
 			&syntax.StmtSet{Keyword: "FOREIGN KEY", Value: "(column1, column2)"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		actual, err := testCase.FK.Build()
+		actual, err := testCase.Foreign.Build()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue

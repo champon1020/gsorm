@@ -49,7 +49,7 @@ func TestOn_Build(t *testing.T) {
 		},
 		{
 			&clause.On{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			&syntax.StmtSet{Keyword: "ON", Value: `lhs1 = 10 AND lhs2 = "str"`},
+			&syntax.StmtSet{Keyword: "ON", Value: `lhs1 = 10 AND lhs2 = 'str'`},
 		},
 	}
 
@@ -66,9 +66,9 @@ func TestOn_Build(t *testing.T) {
 }
 
 func TestOn_Build_Fail(t *testing.T) {
-    a := &clause.On{Expr: "column = ?"}
-    _, err := a.Build()
-    if err == nil {
-        t.Errorf("Error was not occurred")
-    }
+	a := &clause.On{Expr: "column = ?"}
+	_, err := a.Build()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+	}
 }

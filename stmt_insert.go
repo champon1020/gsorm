@@ -7,26 +7,9 @@ import (
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/clause"
+
+	provider "github.com/champon1020/mgorm/provider/insert"
 )
-
-// MgormInsert is interface for returned value of mgorm.Insert.
-type MgormInsert interface {
-	Model(interface{}) InsertModel
-	Values(...interface{}) InsertValues
-}
-
-// InsertModel is interface for returned value of (*InsertStmt).Model.
-type InsertModel interface {
-	ExpectExec() *InsertStmt
-	ExecCallable
-}
-
-// InsertValues is interface for returned value of (*InsertStmt).Values.
-type InsertValues interface {
-	Values(...interface{}) InsertValues
-	ExpectExec() *InsertStmt
-	ExecCallable
-}
 
 // InsertStmt is INSERT statement.
 type InsertStmt struct {
@@ -36,58 +19,22 @@ type InsertStmt struct {
 
 // String returns SQL statement with string.
 func (s *InsertStmt) String() string {
-	var sql internal.SQL
-	if err := s.processSQL(&sql); err != nil {
-		s.throw(err)
-		return err.Error()
-	}
-	return sql.String()
+	return s.string(s.buildSQL)
 }
 
-// funcString returns function call as string.
-func (s *InsertStmt) funcString() string {
-	str := s.cmd.String()
-	for _, e := range s.called {
-		str += fmt.Sprintf(".%s", e.String())
-	}
-	return str
-}
-
-// ExpectExec returns *InsertStmt. This function is used for mock test.
-func (s *InsertStmt) ExpectExec() *InsertStmt {
-	return s
+// FuncString returns function call as string.
+func (s *InsertStmt) FuncString() string {
+	return s.funcString(s.cmd)
 }
 
 // Exec executed SQL statement without mapping to model.
 // If type of conn is mgorm.MockDB, compare statements between called and expected.
 func (s *InsertStmt) Exec() error {
-	if len(s.errors) > 0 {
-		return s.errors[0]
-	}
-
-	switch conn := s.conn.(type) {
-	case *DB, *Tx:
-		var sql internal.SQL
-		if err := s.processSQL(&sql); err != nil {
-			return err
-		}
-		if _, err := conn.Exec(sql.String()); err != nil {
-			return errors.New(err.Error(), errors.DBQueryError)
-		}
-		return nil
-	case Mock:
-		_, err := conn.CompareWith(s)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return s.exec(s.buildSQL, s)
 }
 
-// processSQL builds SQL statement.
-func (s *InsertStmt) processSQL(sql *internal.SQL) error {
+// buildSQL builds SQL statement.
+func (s *InsertStmt) buildSQL(sql *internal.SQL) error {
 	ss, err := s.cmd.Build()
 	if err != nil {
 		return err
@@ -103,20 +50,20 @@ func (s *InsertStmt) processSQL(sql *internal.SQL) error {
 			}
 			cols = append(cols, c.Name)
 		}
-		if err := s.processSQLWithModel(cols, s.model, sql); err != nil {
+		if err := s.buildSQLWithModel(cols, s.model, sql); err != nil {
 			return err
 		}
 		return nil
 	}
 
-	if err := s.processSQLWithClauses(sql); err != nil {
+	if err := s.buildSQLWithClauses(sql); err != nil {
 		return err
 	}
 	return nil
 }
 
-// processSQLWithClauses builds SQL statement from called clauses.
-func (s *InsertStmt) processSQLWithClauses(sql *internal.SQL) error {
+// buildSQLWithClauses builds SQL statement from called clauses.
+func (s *InsertStmt) buildSQLWithClauses(sql *internal.SQL) error {
 	for i, e := range s.called {
 		switch e := e.(type) {
 		case *clause.Values:
@@ -138,8 +85,8 @@ func (s *InsertStmt) processSQLWithClauses(sql *internal.SQL) error {
 	return nil
 }
 
-// processSQLWithModel builds SQL statement from model.
-func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
+// buildSQLWithModel builds SQL statement from model.
+func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
 	ref := reflect.ValueOf(model)
 	if ref.Kind() != reflect.Ptr {
 		return errors.New("Model must be pointer", errors.InvalidValueError)
@@ -226,13 +173,13 @@ func (s *InsertStmt) processSQLWithModel(cols []string, model interface{}, sql *
 }
 
 // Model sets model to InsertStmt.
-func (s *InsertStmt) Model(model interface{}) InsertModel {
+func (s *InsertStmt) Model(model interface{}) provider.ModelMP {
 	s.model = model
 	return s
 }
 
 // Values calls VALUES clause.
-func (s *InsertStmt) Values(vals ...interface{}) InsertValues {
+func (s *InsertStmt) Values(vals ...interface{}) provider.ValuesMP {
 	v := new(clause.Values)
 	for _, val := range vals {
 		v.AddValue(val)

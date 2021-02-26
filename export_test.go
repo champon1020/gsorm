@@ -18,8 +18,13 @@ func (tx *Tx) ExportedSetConn(conn sqlTx) {
 	tx.conn = conn
 }
 
-// Exported values which is declared in migration.go.
-func (m *MigStmt) ExportedGetErrors() []error {
+// Exported values which is declared in mig.go.
+var (
+	ExportedMySQLDB = &DB{driver: internal.MySQL}
+	ExportedPSQLDB  = &DB{driver: internal.PSQL}
+)
+
+func (m *migStmt) ExportedGetErrors() []error {
 	return m.errors
 }
 
@@ -30,10 +35,10 @@ var (
 
 // Exported values which is declared in stmt.go.
 var (
-	SelectStmtProcessSQL = (*SelectStmt).processSQL
-	InsertStmtProcessSQL = (*InsertStmt).processSQL
-	UpdateStmtProcessSQL = (*UpdateStmt).processSQL
-	DeleteStmtProcessSQL = (*DeleteStmt).processSQL
+	SelectStmtBuildSQL = (*SelectStmt).buildSQL
+	InsertStmtBuildSQL = (*InsertStmt).buildSQL
+	UpdateStmtBuildSQL = (*UpdateStmt).buildSQL
+	DeleteStmtBuildSQL = (*DeleteStmt).buildSQL
 )
 
 func (s *stmt) ExportedGetErrors() []error {

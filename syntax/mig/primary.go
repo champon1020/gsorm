@@ -2,18 +2,18 @@ package mig
 
 import "github.com/champon1020/mgorm/syntax"
 
-// PK is PRIMARY KEY clause.
-type PK struct {
+// Primary is PRIMARY KEY clause.
+type Primary struct {
 	Columns []string
 }
 
 // Keyword returns clause keyword.
-func (p *PK) Keyword() string {
+func (p *Primary) Keyword() string {
 	return "PRIMARY KEY"
 }
 
 // Build makes PRIMARY KEY clause with syntax.StmtSet.
-func (p *PK) Build() (*syntax.StmtSet, error) {
+func (p *Primary) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(p.Keyword())
 	ss.WriteValue("(")
