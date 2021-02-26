@@ -6,9 +6,10 @@ import (
 
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 
-	provider "github.com/champon1020/mgorm/provider/update"
+	prUpdate "github.com/champon1020/mgorm/provider/update"
 )
 
 // UpdateStmt is UPDATE statement..
@@ -26,6 +27,11 @@ func (s *UpdateStmt) String() string {
 // FuncString returns function call as string.
 func (s *UpdateStmt) FuncString() string {
 	return s.funcString(s.cmd)
+}
+
+// Cmd returns cmd clause.
+func (s *UpdateStmt) Cmd() syntax.Clause {
+	return s.cmd
 }
 
 // Exec executes SQL statement without mapping to model.
@@ -150,13 +156,13 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // Model sets model to UpdateStmt.
-func (s *UpdateStmt) Model(model interface{}) provider.ModelMP {
+func (s *UpdateStmt) Model(model interface{}) prUpdate.ModelMP {
 	s.model = model
 	return s
 }
 
 // Set calls SET clause.
-func (s *UpdateStmt) Set(vals ...interface{}) provider.SetMP {
+func (s *UpdateStmt) Set(vals ...interface{}) prUpdate.SetMP {
 	if s.cmd == nil {
 		s.throw(errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError))
 		return s
@@ -174,19 +180,19 @@ func (s *UpdateStmt) Set(vals ...interface{}) provider.SetMP {
 }
 
 // Where calls WHERE clause.
-func (s *UpdateStmt) Where(expr string, vals ...interface{}) provider.WhereMP {
+func (s *UpdateStmt) Where(expr string, vals ...interface{}) prUpdate.WhereMP {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *UpdateStmt) And(expr string, vals ...interface{}) provider.AndMP {
+func (s *UpdateStmt) And(expr string, vals ...interface{}) prUpdate.AndMP {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *UpdateStmt) Or(expr string, vals ...interface{}) provider.OrMP {
+func (s *UpdateStmt) Or(expr string, vals ...interface{}) prUpdate.OrMP {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }

@@ -6,9 +6,10 @@ import (
 
 	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 
-	provider "github.com/champon1020/mgorm/provider/delete"
+	prDelete "github.com/champon1020/mgorm/provider/delete"
 )
 
 // DeleteStmt is DELETE statement.
@@ -25,6 +26,11 @@ func (s *DeleteStmt) String() string {
 // FuncString returns function call as string.
 func (s *DeleteStmt) FuncString() string {
 	return s.funcString(s.cmd)
+}
+
+// Cmd returns cmd clause.
+func (s *DeleteStmt) Cmd() syntax.Clause {
+	return s.cmd
 }
 
 // Exec executed SQL statement without mapping to model.
@@ -61,7 +67,7 @@ func (s *DeleteStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // From calls FROM clause.
-func (s *DeleteStmt) From(tables ...string) provider.FromMP {
+func (s *DeleteStmt) From(tables ...string) prDelete.FromMP {
 	f := new(clause.From)
 	for _, t := range tables {
 		f.AddTable(t)
@@ -71,19 +77,19 @@ func (s *DeleteStmt) From(tables ...string) provider.FromMP {
 }
 
 // Where calls WHERE clause.
-func (s *DeleteStmt) Where(expr string, vals ...interface{}) provider.WhereMP {
+func (s *DeleteStmt) Where(expr string, vals ...interface{}) prDelete.WhereMP {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *DeleteStmt) And(expr string, vals ...interface{}) provider.AndMP {
+func (s *DeleteStmt) And(expr string, vals ...interface{}) prDelete.AndMP {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *DeleteStmt) Or(expr string, vals ...interface{}) provider.OrMP {
+func (s *DeleteStmt) Or(expr string, vals ...interface{}) prDelete.OrMP {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }

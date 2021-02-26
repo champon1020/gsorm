@@ -14,6 +14,7 @@ type Stmt interface {
 	String() string
 	FuncString() string
 	Called() []syntax.Clause
+	Cmd() syntax.Clause
 }
 
 // stmt stores information about query.
@@ -33,7 +34,7 @@ func (s *stmt) throw(err error) {
 	s.errors = append(s.errors, err)
 }
 
-// Called gets called clauses.
+// Called returns called clauses.
 func (s *stmt) Called() []syntax.Clause {
 	return s.called
 }

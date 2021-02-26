@@ -8,7 +8,7 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
 
-	provider "github.com/champon1020/mgorm/provider/alter"
+	prAlter "github.com/champon1020/mgorm/provider/alter"
 )
 
 // AlterTableStmt is ALTER TABLE statement.
@@ -84,91 +84,91 @@ func (s *AlterTableStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // Rename calls RENAME TO clause.
-func (s *AlterTableStmt) Rename(table string) provider.RenameMP {
+func (s *AlterTableStmt) Rename(table string) prAlter.RenameMP {
 	s.call(&mig.Rename{Table: table})
 	return s
 }
 
 // AddColumn calls ADD COLUMN clause.
-func (s *AlterTableStmt) AddColumn(col, typ string) provider.AddColumnMP {
+func (s *AlterTableStmt) AddColumn(col, typ string) prAlter.AddColumnMP {
 	s.call(&mig.AddColumn{Column: col, Type: typ})
 	return s
 }
 
 // DropColumn calls DROP COLUMN clause.
-func (s *AlterTableStmt) DropColumn(col string) provider.DropColumnMP {
+func (s *AlterTableStmt) DropColumn(col string) prAlter.DropColumnMP {
 	s.call(&mig.DropColumn{Column: col})
 	return s
 }
 
 // RenameColumn calls RENAME COLUMN clause.
-func (s *AlterTableStmt) RenameColumn(col, dest string) provider.RenameColumnMP {
+func (s *AlterTableStmt) RenameColumn(col, dest string) prAlter.RenameColumnMP {
 	s.call(&mig.RenameColumn{Column: col, Dest: dest})
 	return s
 }
 
 // NotNull calls NOT NULL option.
-func (s *AlterTableStmt) NotNull() provider.NotNullMP {
+func (s *AlterTableStmt) NotNull() prAlter.NotNullMP {
 	s.call(&mig.NotNull{})
 	return s
 }
 
 // AutoInc calls AUTO_INCREMENT option (only MySQL).
-func (s *AlterTableStmt) AutoInc() provider.AutoIncMP {
+func (s *AlterTableStmt) AutoInc() prAlter.AutoIncMP {
 	s.call(&mig.AutoInc{})
 	return s
 }
 
 // Default calls DEFAULT option.
-func (s *AlterTableStmt) Default(val interface{}) provider.DefaultMP {
+func (s *AlterTableStmt) Default(val interface{}) prAlter.DefaultMP {
 	s.call(&mig.Default{Value: val})
 	return s
 }
 
 // AddCons calls ADD CONSTRAINT clause.
-func (s *AlterTableStmt) AddCons(key string) provider.AddConsMP {
+func (s *AlterTableStmt) AddCons(key string) prAlter.AddConsMP {
 	s.call(&mig.AddCons{Key: key})
 	return s
 }
 
 // DropUnique calls DROP INDEX | DROP CONSTRAINT clause.
-func (s *AlterTableStmt) DropUnique(key string) provider.DropUniqueMP {
+func (s *AlterTableStmt) DropUnique(key string) prAlter.DropUniqueMP {
 	s.call(&mig.DropUnique{Driver: s.conn.getDriver(), Key: key})
 	return s
 }
 
 // DropPrimary calls DROP PRIMARY KEY | DROP CONSTRAINT clause.
-func (s *AlterTableStmt) DropPrimary(key string) provider.DropPrimaryMP {
+func (s *AlterTableStmt) DropPrimary(key string) prAlter.DropPrimaryMP {
 	s.call(&mig.DropPrimary{Driver: s.conn.getDriver(), Key: key})
 	return s
 }
 
 // DropForeign calls DROP FOREIGN KEY | DROP CONSTRAINT clause.
-func (s *AlterTableStmt) DropForeign(key string) provider.DropForeignMP {
+func (s *AlterTableStmt) DropForeign(key string) prAlter.DropForeignMP {
 	s.call(&mig.DropForeign{Driver: s.conn.getDriver(), Key: key})
 	return s
 }
 
 // Unique calls UNIQUE keyword.
-func (s *AlterTableStmt) Unique(cols ...string) provider.UniqueMP {
+func (s *AlterTableStmt) Unique(cols ...string) prAlter.UniqueMP {
 	s.call(&mig.Unique{Columns: cols})
 	return s
 }
 
 // Primary calls PRIMARY KEY keyword.
-func (s *AlterTableStmt) Primary(cols ...string) provider.PrimaryMP {
+func (s *AlterTableStmt) Primary(cols ...string) prAlter.PrimaryMP {
 	s.call(&mig.Primary{Columns: cols})
 	return s
 }
 
 // Foreign calls FOREIGN KEY keyword.
-func (s *AlterTableStmt) Foreign(cols ...string) provider.ForeignMP {
+func (s *AlterTableStmt) Foreign(cols ...string) prAlter.ForeignMP {
 	s.call(&mig.Foreign{Columns: cols})
 	return s
 }
 
 // Ref calls REFERENCES keyword.
-func (s *AlterTableStmt) Ref(table, col string) provider.RefMP {
+func (s *AlterTableStmt) Ref(table, col string) prAlter.RefMP {
 	s.call(&mig.Ref{Table: table, Column: col})
 	return s
 }
