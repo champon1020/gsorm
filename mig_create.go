@@ -219,7 +219,7 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 		if v, ok := f.Tag.Lookup(colName); ok {
 			name = v
 		} else {
-			name = internal.ConvertToSnakeCase(f.Name)
+			name = internal.SnakeCase(f.Name)
 		}
 		sql.Write(name)
 

@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConvertToSnakeCase(t *testing.T) {
+func TestSnakeCase(t *testing.T) {
 	testCases := []struct {
 		String string
 		Result string
@@ -21,7 +21,7 @@ func TestConvertToSnakeCase(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		assert.Equal(t, testCase.Result, internal.ConvertToSnakeCase(testCase.String))
+		assert.Equal(t, testCase.Result, internal.SnakeCase(testCase.String))
 	}
 }
 

@@ -16,8 +16,8 @@ var (
 	matchAllCap   = regexp.MustCompile("([a-z0-9])([A-Z])")
 )
 
-// ConvertToSnakeCase convert camel case string to snake case.
-func ConvertToSnakeCase(str string) (snake string) {
+// SnakeCase returns str as snake case.
+func SnakeCase(str string) (snake string) {
 	str = strings.Split(str, "#")[0]
 	snake = matchFirstCap.ReplaceAllString(str, "${1}_${2}")
 	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
@@ -177,7 +177,7 @@ func MapOfColumnsToFields(cols []string, modelTyp reflect.Type) map[int]int {
 // ColumnNameFromTag gets column name from struct field tag.
 func ColumnNameFromTag(sf reflect.StructField) string {
 	if sf.Tag.Get("mgorm") == "" {
-		return ConvertToSnakeCase(sf.Name)
+		return SnakeCase(sf.Name)
 	}
 	return sf.Tag.Get("mgorm")
 }
