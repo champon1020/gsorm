@@ -83,11 +83,7 @@ func TestEq_Build(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res, err := testCase.Eq.Build()
-		if err != nil {
-			t.Errorf("Error was occurred: %v", err)
-			continue
-		}
+		res := testCase.Eq.Build()
 		assert.Equal(t, testCase.Result, res)
 	}
 }

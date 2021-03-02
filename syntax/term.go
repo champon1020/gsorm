@@ -75,12 +75,11 @@ type Eq struct {
 }
 
 // Build makes equal expression with string.
-func (e *Eq) Build() (string, error) {
+func (e *Eq) Build() string {
 	s := e.LHS
 	s += " = "
-	rhs, err := internal.ToString(e.RHS, true)
-	s += rhs
-	return s, err
+	s += internal.ToString(e.RHS, true)
+	return s
 }
 
 // NewEq creates new Eq instance.

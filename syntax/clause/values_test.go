@@ -16,11 +16,11 @@ func TestValues_String(t *testing.T) {
 	}{
 		{
 			&clause.Values{Values: []interface{}{"column"}},
-			`VALUES("column")`,
+			`VALUES('column')`,
 		},
 		{
 			&clause.Values{Values: []interface{}{"column", 2, true}},
-			`VALUES("column", 2, true)`,
+			`VALUES('column', 2, true)`,
 		},
 	}
 
@@ -53,21 +53,6 @@ func TestValues_Build(t *testing.T) {
 		}
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}
-
-func TestValues_Build_Fail(t *testing.T) {
-	testCases := []struct {
-		Values *clause.Values
-	}{
-		{&clause.Values{Values: []interface{}{nil}}},
-	}
-
-	for _, testCase := range testCases {
-		_, err := testCase.Values.Build()
-		if err == nil {
-			t.Errorf("Error was not occurred")
 		}
 	}
 }

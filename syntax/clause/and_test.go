@@ -24,7 +24,7 @@ func TestAnd_String(t *testing.T) {
 		},
 		{
 			&clause.And{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			`AND("lhs1 = ? AND lhs2 = ?", 10, "str")`,
+			`AND("lhs1 = ? AND lhs2 = ?", 10, 'str')`,
 		},
 	}
 

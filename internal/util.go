@@ -4,11 +4,8 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
-
-	"github.com/champon1020/mgorm/errors"
 )
 
 var (
@@ -27,52 +24,41 @@ func SnakeCase(str string) (snake string) {
 
 // ToString convert the value of interface to string.
 // If quotes is true, attache double quotes to string value.
-func ToString(v interface{}, quotes bool) (string, error) {
-	r := reflect.ValueOf(v)
-	if r.IsValid() {
-		switch r.Kind() {
-		case reflect.String:
-			if quotes {
-				s := fmt.Sprintf("'%s'", r.String())
-				return s, nil
-			}
-			return r.String(), nil
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			return strconv.FormatInt(r.Int(), 10), nil
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			return strconv.FormatUint(r.Uint(), 10), nil
-		case reflect.Float32, reflect.Float64:
-			return strconv.FormatFloat(r.Float(), 'f', -1, 64), nil
-		case reflect.Bool:
-			return strconv.FormatBool(r.Bool()), nil
-		case reflect.Struct:
-			t, ok := v.(time.Time)
-			if ok {
-				return fmt.Sprintf("'%s'", t.Format("2006-01-02 15:04:05")), nil
-			}
-		default:
-			return "", errors.New(fmt.Sprintf("Type %v is not supported", r.Kind()), errors.InvalidTypeError)
-		}
+func ToString(v interface{}, quotes bool) string {
+	if v == nil {
+		return "nil"
 	}
-	return "", errors.New(fmt.Sprintf("Value %v is invalid", v), errors.InvalidValueError)
-}
 
-// SliceToString converts slice of interface{} to string separated with comma.
-// If type of element is string, enclose with quotes.
-func SliceToString(values []interface{}) string {
-	var s string
-	for i, v := range values {
-		if i != 0 {
-			s += ", "
+	switch v := v.(type) {
+	case string:
+		if quotes {
+			return fmt.Sprintf("'%s'", v)
 		}
-		switch v := v.(type) {
-		case string:
-			s += fmt.Sprintf("%q", v)
-		default:
-			s += fmt.Sprintf("%v", v)
-		}
+		return v
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		return fmt.Sprintf("%d", v)
+	case float32, float64:
+		return strings.TrimRight(strings.TrimRight(fmt.Sprintf("%F", v), "0"), ".")
+	case bool:
+		return fmt.Sprintf("%v", v)
+	case time.Time:
+		return fmt.Sprintf("'%s'", v.Format("2006-01-02 15:04:05"))
 	}
-	return s
+
+	typ := reflect.TypeOf(v).Kind()
+	if typ == reflect.Slice || typ == reflect.Array {
+		var s string
+		vals := reflect.ValueOf(v)
+		for i := 0; i < vals.Len(); i++ {
+			if i != 0 {
+				s += ", "
+			}
+			s += ToString(vals.Index(i).Interface(), true)
+		}
+		return s
+	}
+
+	return reflect.TypeOf(v).String()
 }
 
 // mapKeyType returns map key type with reflect.Type.

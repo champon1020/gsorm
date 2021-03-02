@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 
 	"github.com/stretchr/testify/assert"
@@ -27,16 +26,18 @@ func TestSnakeCase(t *testing.T) {
 
 func TestToStringWithQuotes(t *testing.T) {
 	var (
-		n0 int    = 1
-		n1 int8   = 2
-		n2 int16  = 3
-		n3 int32  = 4
-		n4 int64  = 5
-		u0 uint   = 6
-		u1 uint8  = 7
-		u2 uint16 = 8
-		u3 uint32 = 9
-		u4 uint64 = 10
+		i   int     = 1
+		i8  int8    = 2
+		i16 int16   = 3
+		i32 int32   = 4
+		i64 int64   = 5
+		u   uint    = 6
+		u8  uint8   = 7
+		u16 uint16  = 8
+		u32 uint32  = 9
+		u64 uint64  = 10
+		f32 float32 = 10.1
+		f64 float64 = 100.1
 	)
 
 	testCases := []struct {
@@ -44,21 +45,35 @@ func TestToStringWithQuotes(t *testing.T) {
 		Result string
 	}{
 		{"rhs", `'rhs'`},
-		{n0, "1"},
-		{n1, "2"},
-		{n2, "3"},
-		{n3, "4"},
-		{n4, "5"},
-		{u0, "6"},
-		{u1, "7"},
-		{u2, "8"},
-		{u3, "9"},
-		{u4, "10"},
+		{i, "1"},
+		{i8, "2"},
+		{i16, "3"},
+		{i32, "4"},
+		{i64, "5"},
+		{u, "6"},
+		{u8, "7"},
+		{u16, "8"},
+		{u32, "9"},
+		{u64, "10"},
 		{true, "true"},
+		{f32, "10.1"},
+		{f64, "100.1"},
+		{
+			[]interface{}{10, "str", true},
+			`10, 'str', true`,
+		},
+		{
+			map[string]string{"key": "value"},
+			`map[string]string`,
+		},
+		{
+			nil,
+			`nil`,
+		},
 	}
 
 	for _, testCase := range testCases {
-		res, _ := internal.ToString(testCase.Value, true)
+		res := internal.ToString(testCase.Value, true)
 		assert.Equal(t, testCase.Result, res)
 	}
 }
@@ -72,63 +87,8 @@ func TestToStringWituhoutQuotes(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res, _ := internal.ToString(testCase.Value, false)
+		res := internal.ToString(testCase.Value, false)
 		assert.Equal(t, testCase.Result, res)
-	}
-}
-
-func TestToString_Fail(t *testing.T) {
-	testCases := []struct {
-		Value interface{}
-		Error error
-	}{
-		{
-			map[string]string{"key": "value"},
-			errors.New("Type map is not supported", errors.InvalidTypeError),
-		},
-		{
-			[]int{1, 2},
-			errors.New("Type slice is not supported", errors.InvalidTypeError),
-		},
-		{
-			[2]int{1, 2},
-			errors.New("Type array is not supported", errors.InvalidTypeError),
-		},
-	}
-
-	for _, testCase := range testCases {
-		_, err := internal.ToString(testCase.Value, false)
-		if err == nil {
-			t.Errorf("Error was not occurred")
-			continue
-		}
-		actualError, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			continue
-		}
-		resultError := testCase.Error.(*errors.Error)
-		if !resultError.Is(err) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
-		}
-	}
-}
-
-func TestSliceToString(t *testing.T) {
-	testCases := []struct {
-		Values []interface{}
-		Result string
-	}{
-		{
-			[]interface{}{10, "str", true},
-			`10, "str", true`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		assert.Equal(t, testCase.Result, internal.SliceToString(testCase.Values))
 	}
 }
 

@@ -19,10 +19,6 @@ func (d *Default) Keyword() string {
 func (d *Default) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())
-	vStr, err := internal.ToString(d.Value, true)
-	if err != nil {
-		return nil, err
-	}
-	ss.WriteValue(vStr)
+	ss.WriteValue(internal.ToString(d.Value, true))
 	return ss, nil
 }
