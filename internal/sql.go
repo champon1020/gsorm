@@ -18,7 +18,3 @@ func (s *SQL) Write(str string) {
 	}
 	*s += SQL(str)
 }
-
-func (s *SQL) Len() int {
-	return len(s.String())
-}

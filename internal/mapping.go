@@ -35,21 +35,21 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 
 		if mt.Elem().Kind() == reflect.Struct {
 			// Get index map.
-			indR2M := MapOfColumnsToFields(rCols, mt.Elem())
+			idxR2M := MapOfColumnsToFields(rCols, mt.Elem())
 
 			for rows.Next() {
 				if err := rows.Scan(rValPtr...); err != nil {
 					return errors.New(err.Error(), errors.DBScanError)
 				}
 
-				// Set values to model struct.
-				v := reflect.New(mt.Elem()).Elem()
-				if err := setValuesToModel(v, &indR2M, rVal); err != nil {
+				// Set values to fields.
+				v, err := values2Fields(mt.Elem(), idxR2M, rVal)
+				if err != nil {
 					return err
 				}
 
 				// Append value to slice|array.
-				vec = reflect.Append(vec, v)
+				vec = reflect.Append(vec, *v)
 			}
 		} else {
 			if len(rCols) != 1 {
@@ -182,6 +182,29 @@ func setValuesToModel(ref reflect.Value, indexMap *map[int]int, rVal [][]byte) e
 	// Set to model.
 	ref.Set(v)
 	return nil
+}
+
+func values2Fields(typ reflect.Type, idxR2M map[int]int, rVal [][]byte) (*reflect.Value, error) {
+	// Generate new value from typ.
+	v := reflect.New(typ).Elem()
+
+	// Loop with row values.
+	for ri := 0; ri < len(rVal); ri++ {
+		// fi is field index.
+		fi := idxR2M[ri]
+
+		// Convert type of row value, []byte to string.
+		rv := string(rVal[ri])
+		if rv == "" {
+			continue
+		}
+
+		if err := setValueToField(v, fi, rv); err != nil {
+			return nil, err
+		}
+	}
+
+	return &v, nil
 }
 
 // setValueToField sets string value to struct field.
