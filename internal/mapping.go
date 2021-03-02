@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"reflect"
-	"strconv"
 	"time"
 
 	"github.com/champon1020/mgorm/errors"
@@ -12,8 +11,7 @@ import (
 
 // MapRowsToModel executes query and sets rows to model structure.
 func MapRowsToModel(rows *sql.Rows, model interface{}) error {
-	// Type of model.
-	mt := reflect.TypeOf(model).Elem()
+	mTyp := reflect.TypeOf(model).Elem()
 
 	// Get columns from rows.
 	rCols, err := rows.Columns()
@@ -28,27 +26,23 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 		rValPtr = append(rValPtr, &rVal[i])
 	}
 
-	switch mt.Kind() {
+	switch mTyp.Kind() {
 	case reflect.Slice, reflect.Array:
-		// Generate new slice|array.
-		vec := reflect.New(mt).Elem()
-
-		if mt.Elem().Kind() == reflect.Struct {
-			// Get index map.
-			idxR2M := MapOfColumnsToFields(rCols, mt.Elem())
-
+		// If model is slice of struct, generates struct whose fields are assigned
+		// and appends it to vec which is reflect.Value of slice | array.
+		// Or if model is slice of variable, generates variable which is assigned and
+		// appends it to vec.
+		vec := reflect.New(mTyp).Elem()
+		if mTyp.Elem().Kind() == reflect.Struct {
+			idxR2M := MapOfColumnsToFields(rCols, mTyp.Elem())
 			for rows.Next() {
 				if err := rows.Scan(rValPtr...); err != nil {
 					return errors.New(err.Error(), errors.DBScanError)
 				}
-
-				// Set values to fields.
-				v, err := values2Fields(mt.Elem(), idxR2M, rVal)
+				v, err := values2Fields(mTyp.Elem(), idxR2M, rVal)
 				if err != nil {
 					return err
 				}
-
-				// Append value to slice|array.
 				vec = reflect.Append(vec, *v)
 			}
 		} else {
@@ -61,60 +55,51 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 				if err := rows.Scan(rValPtr...); err != nil {
 					return errors.New(err.Error(), errors.DBScanError)
 				}
-
-				// Set values to variable.
-				v := reflect.New(mt.Elem()).Elem()
-				if err := setValueToVar(v, string(rVal[0])); err != nil {
+				v, err := value2Var(mTyp.Elem(), Str(rVal[0]))
+				if err != nil {
 					return err
 				}
-
-				// Append value to slice|array.
-				vec = reflect.Append(vec, v)
+				vec = reflect.Append(vec, *v)
 			}
 		}
-		// Set slice|array to model.
 		ref := reflect.ValueOf(model).Elem()
 		ref.Set(vec)
+		return nil
+	case reflect.Struct:
+		// Generates reflect.Value of struct whose fields are assigned and sets the struct to model.
+		idxR2M := MapOfColumnsToFields(rCols, mTyp)
+		if rows.Next() {
+			if err := rows.Scan(rValPtr...); err != nil {
+				return errors.New(err.Error(), errors.DBScanError)
+			}
+			v, err := values2Fields(mTyp, idxR2M, rVal)
+			if err != nil {
+				return err
+			}
+			ref := reflect.ValueOf(model).Elem()
+			ref.Set(*v)
+			return nil
+		}
 	case reflect.Map:
+		// Generates reflect.Value of map whose key and value are assigned and sets the map to model.
+		// If number of row columns is not 2, returns error.
 		if len(rCols) != 2 {
 			msg := fmt.Sprintf("Column length must be 2 but got %d", len(rCols))
 			return errors.New(msg, errors.DBColumnError)
 		}
 
-		// Get map value.
-		mapRef := reflect.ValueOf(model).Elem()
-
+		ref := reflect.ValueOf(model).Elem()
 		for rows.Next() {
 			if err := rows.Scan(rValPtr...); err != nil {
 				return errors.New(err.Error(), errors.DBScanError)
 			}
-
-			// Set index and value to map.
-			if err := setValueToMap(mapRef, string(rVal[0]), string(rVal[1])); err != nil {
+			k, v, err := value2Map(mTyp, Str(rVal[0]), Str(rVal[1]))
+			if err != nil {
 				return err
 			}
+			ref.SetMapIndex(*k, *v)
 		}
-	case reflect.Struct:
-		// Generate new struct.
-		v := reflect.New(mt).Elem()
-
-		// Get index map.
-		indR2M := MapOfColumnsToFields(rCols, mt)
-
-		if rows.Next() {
-			if err := rows.Scan(rValPtr...); err != nil {
-				return errors.New(err.Error(), errors.DBScanError)
-			}
-
-			// Set values to model struct.
-			if err := setValuesToModel(v, &indR2M, rVal); err != nil {
-				return err
-			}
-		}
-
-		// Set to model.
-		ref := reflect.ValueOf(model).Elem()
-		ref.Set(v)
+		return nil
 	case reflect.Int,
 		reflect.Int8,
 		reflect.Int16,
@@ -129,212 +114,189 @@ func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 		reflect.Float64,
 		reflect.Bool,
 		reflect.String:
+		// Generates reflect.Value of variable which is assigned and sets it to model.
+		// If number of row columns is not 1, returns error.
 		if len(rCols) != 1 {
 			msg := fmt.Sprintf("Column length must be 1 but got %d", len(rCols))
 			return errors.New(msg, errors.DBColumnError)
 		}
 
-		// Generate new variable.
-		v := reflect.New(mt).Elem()
-
 		if rows.Next() {
 			if err := rows.Scan(rValPtr...); err != nil {
 				return errors.New(err.Error(), errors.DBScanError)
 			}
-
-			// Set values to model.
-			if err := setValueToVar(v, string(rVal[0])); err != nil {
+			v, err := value2Var(mTyp, Str(rVal[0]))
+			if err != nil {
 				return err
 			}
-		}
-
-		ref := reflect.ValueOf(model).Elem()
-		ref.Set(v)
-	default:
-		return errors.New(fmt.Sprintf("Type %v is not supported", mt.Kind()), errors.InvalidTypeError)
-	}
-
-	return nil
-}
-
-// setValuesToModel sets values to model fields.
-func setValuesToModel(ref reflect.Value, indexMap *map[int]int, rVal [][]byte) error {
-	// Generate new value from type.
-	v := reflect.New(reflect.TypeOf(ref.Interface())).Elem()
-
-	// Loop with values.
-	for ri := 0; ri < len(rVal); ri++ {
-		// mi is index of model field.
-		mi := (*indexMap)[ri]
-
-		// Convert value to string.
-		valStr := string(rVal[ri])
-		if valStr == "" {
-			continue
-		}
-
-		// Set value to struct field.
-		if err := setValueToField(v, mi, valStr); err != nil {
-			return err
+			ref := reflect.ValueOf(model).Elem()
+			ref.Set(*v)
+			return nil
 		}
 	}
 
-	// Set to model.
-	ref.Set(v)
-	return nil
+	return errors.New(fmt.Sprintf("Type %v is not supported", mTyp.Kind()), errors.InvalidTypeError)
 }
 
-func values2Fields(typ reflect.Type, idxR2M map[int]int, rVal [][]byte) (*reflect.Value, error) {
-	// Generate new value from typ.
-	v := reflect.New(typ).Elem()
+// values2Fields assigns rVals to struct fields and returns the struct as pointer of reflect.Value.
+// The struct is generated by mTyp which is type of model.
+// vals is string values with type of [][]byte.
+// idxR2M is map of index correspondence between row columns and model fields.
+func values2Fields(mTyp reflect.Type, idxR2M map[int]int, vals [][]byte) (*reflect.Value, error) {
+	v := reflect.New(mTyp).Elem()
 
 	// Loop with row values.
-	for ri := 0; ri < len(rVal); ri++ {
+	for ri := 0; ri < len(vals); ri++ {
 		// fi is field index.
 		fi := idxR2M[ri]
 
 		// Convert type of row value, []byte to string.
-		rv := string(rVal[ri])
-		if rv == "" {
+		val := Str(vals[ri])
+		if val.Empty() {
 			continue
 		}
 
-		if err := setValueToField(v, fi, rv); err != nil {
-			return nil, err
+		if !v.Field(fi).CanSet() {
+			msg := fmt.Sprintf("Cannot set to field %d of %s", fi, mTyp.String())
+			return nil, errors.New(msg, errors.UnchangeableError)
+		}
+
+		// Field type.
+		fTyp := mTyp.Field(fi).Type.Kind()
+
+		switch fTyp {
+		case reflect.String:
+			s, err := val.String()
+			if err != nil {
+				return nil, err
+			}
+			v.Field(fi).SetString(s)
+		case reflect.Int,
+			reflect.Int8,
+			reflect.Int16,
+			reflect.Int32,
+			reflect.Int64:
+			i64, err := val.Int()
+			if err != nil {
+				return nil, err
+			}
+			v.Field(fi).SetInt(i64)
+		case reflect.Uint,
+			reflect.Uint8,
+			reflect.Uint16,
+			reflect.Uint32,
+			reflect.Uint64:
+			u64, err := val.Uint()
+			if err != nil {
+				return nil, err
+			}
+			v.Field(fi).SetUint(u64)
+		case reflect.Float32, reflect.Float64:
+			f64, err := val.Float()
+			if err != nil {
+				return nil, err
+			}
+			v.Field(fi).SetFloat(f64)
+		case reflect.Bool:
+			b, err := val.Bool()
+			if err != nil {
+				return nil, err
+			}
+			v.Field(fi).SetBool(b)
+		case reflect.Struct:
+			if v.Field(fi).Type() == reflect.TypeOf(time.Time{}) {
+				sf := mTyp.Field(fi)
+				layout := TimeFormat(sf.Tag.Get("layout"))
+				if layout == "" {
+					layout = time.RFC3339
+				}
+				t, err := val.Time(layout)
+				if err != nil {
+					return nil, err
+				}
+				v.Field(fi).Set(reflect.ValueOf(t))
+			}
+		default:
+			msg := fmt.Sprintf("%s is not supported for values2Fields", fTyp.String())
+			return nil, errors.New(msg, errors.InvalidTypeError)
 		}
 	}
 
 	return &v, nil
 }
 
-// setValueToField sets string value to struct field.
-func setValueToField(modelRef reflect.Value, index int, val string) error {
-	// Get field from model.
-	ref := modelRef.Field(index)
-	if !ref.CanSet() {
-		return errors.New("Cannot set to field", errors.UnchangeableError)
+// value2Map assings key and val to map and returns it as pointer of reflect.Value.
+// The map is generated by mTyp which is type of map.
+func value2Map(mTyp reflect.Type, key Str, val Str) (*reflect.Value, *reflect.Value, error) {
+	k, err := value2Var(mTyp.Key(), key)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	switch ref.Kind() {
+	v, err := value2Var(mTyp.Elem(), val)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return k, v, nil
+}
+
+// value2Var assigns val to variable and returns it as pointer of reflect.Value.
+// The variable is generated by vTyp which is type of variable.
+func value2Var(vTyp reflect.Type, val Str) (*reflect.Value, error) {
+	v := reflect.New(vTyp).Elem()
+
+	switch vTyp.Kind() {
 	case reflect.String:
-		ref.SetString(val)
-		return nil
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return setInt(ref, val)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return setUint(ref, val)
+		s, err := val.String()
+		if err != nil {
+			return nil, err
+		}
+		v.SetString(s)
+	case reflect.Int,
+		reflect.Int8,
+		reflect.Int16,
+		reflect.Int32,
+		reflect.Int64:
+		i64, err := val.Int()
+		if err != nil {
+			return nil, err
+		}
+		v.SetInt(i64)
+	case reflect.Uint,
+		reflect.Uint8,
+		reflect.Uint16,
+		reflect.Uint32,
+		reflect.Uint64:
+		u64, err := val.Uint()
+		if err != nil {
+			return nil, err
+		}
+		v.SetUint(u64)
 	case reflect.Float32, reflect.Float64:
-		return setFloat(ref, val)
+		f64, err := val.Float()
+		if err != nil {
+			return nil, err
+		}
+		v.SetFloat(f64)
 	case reflect.Bool:
-		return setBool(ref, val)
+		b, err := val.Bool()
+		if err != nil {
+			return nil, err
+		}
+		v.SetBool(b)
 	case reflect.Struct:
-		if ref.Type() == reflect.TypeOf(time.Time{}) {
-			sf := reflect.TypeOf(modelRef.Interface()).Field(index)
-			layout := TimeFormat(sf.Tag.Get("layout"))
-			if layout == "" {
-				layout = time.RFC3339
+		if vTyp == reflect.TypeOf(time.Time{}) {
+			t, err := val.Time(time.RFC3339)
+			if err != nil {
+				return nil, err
 			}
-			return setTime(ref, val, layout)
+			v.Set(reflect.ValueOf(t))
 		}
+	default:
+		msg := fmt.Sprintf("%s is not supported for values2Fields", vTyp.String())
+		return nil, errors.New(msg, errors.InvalidTypeError)
 	}
 
-	return errors.New(fmt.Sprintf("Type %v is not supported", ref.Kind()), errors.InvalidTypeError)
-}
-
-// setValueToMap inserts the pair of key and value to map.
-func setValueToMap(mapRef reflect.Value, key string, val string) error {
-	if !mapRef.CanSet() {
-		return errors.New("Cannot set to field", errors.UnchangeableError)
-	}
-
-	// Generate new value of map key and value.
-	kVal := reflect.New(mapKeyType(reflect.TypeOf(mapRef.Interface()))).Elem()
-	vVal := reflect.New(mapValueType(reflect.TypeOf(mapRef.Interface()))).Elem()
-
-	// Set values to reflect.Value.
-	setValueToVar(kVal, key)
-	setValueToVar(vVal, val)
-
-	// Set key and value to map.
-	mapRef.SetMapIndex(kVal, vVal)
-
-	return nil
-}
-
-// setValueToVar sets string value to variable.
-func setValueToVar(ref reflect.Value, val string) error {
-	if !ref.CanSet() {
-		return errors.New("Cannot set to field", errors.UnchangeableError)
-	}
-
-	switch ref.Kind() {
-	case reflect.String:
-		ref.SetString(val)
-		return nil
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return setInt(ref, val)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return setUint(ref, val)
-	case reflect.Float32, reflect.Float64:
-		return setFloat(ref, val)
-	case reflect.Bool:
-		return setBool(ref, val)
-	case reflect.Struct:
-		if ref.Type() == reflect.TypeOf(time.Time{}) {
-			return setTime(ref, val, time.RFC3339)
-		}
-	}
-
-	return errors.New(fmt.Sprintf("Type %v is not supported", ref.Kind()), errors.InvalidTypeError)
-}
-
-func setInt(ref reflect.Value, val string) error {
-	i64, err := strconv.ParseInt(val, 10, 64)
-	if err != nil {
-		msg := fmt.Sprintf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
-		return errors.New(msg, errors.InvalidTypeError)
-	}
-	ref.SetInt(i64)
-	return nil
-}
-
-func setUint(ref reflect.Value, val string) error {
-	u64, err := strconv.ParseUint(val, 10, 64)
-	if err != nil {
-		msg := fmt.Sprintf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
-		return errors.New(msg, errors.InvalidTypeError)
-	}
-	ref.SetUint(u64)
-	return nil
-}
-
-func setFloat(ref reflect.Value, val string) error {
-	f64, err := strconv.ParseFloat(val, 64)
-	if err != nil {
-		msg := fmt.Sprintf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
-		return errors.New(msg, errors.InvalidTypeError)
-	}
-	ref.SetFloat(f64)
-	return nil
-}
-
-func setBool(ref reflect.Value, val string) error {
-	b, err := strconv.ParseBool(val)
-	if err != nil {
-		msg := fmt.Sprintf(`Field type "%v" is invalid with value "%s"`, ref.Kind(), val)
-		return errors.New(msg, errors.InvalidTypeError)
-	}
-	ref.SetBool(b)
-	return nil
-}
-
-func setTime(ref reflect.Value, val string, layout string) error {
-	t, err := time.Parse(layout, val)
-	if err != nil {
-		msg := fmt.Sprintf(`Cannot parse %s to time.Time with format of %s`, val, layout)
-		return errors.New(msg, errors.InvalidFormatError)
-
-	}
-	ref.Set(reflect.ValueOf(t))
-	return nil
+	return &v, nil
 }
