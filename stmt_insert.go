@@ -115,7 +115,7 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 
 		// If undelying type of slice element is struct.
 		if typ.Kind() == reflect.Struct {
-			idxC2F := internal.ColumnsAndFields(cols, typ)
+			candf := internal.ColumnsAndFields(cols, typ)
 			for i := 0; i < ref.Len(); i++ {
 				if i > 0 {
 					sql.Write(",")
@@ -125,7 +125,7 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 					if j > 0 {
 						sql.Write(",")
 					}
-					vStr := internal.ToString(ref.Index(i).Field(idxC2F[j]).Interface(), true)
+					vStr := internal.ToString(ref.Index(i).Field(candf[j]).Interface(), true)
 					sql.Write(vStr)
 				}
 				sql.Write(")")
@@ -142,13 +142,13 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 		}
 		return nil
 	case reflect.Struct:
-		idxC2F := internal.ColumnsAndFields(cols, reflect.TypeOf(ref.Interface()))
+		candf := internal.ColumnsAndFields(cols, reflect.TypeOf(ref.Interface()))
 		sql.Write("(")
 		for j := 0; j < len(cols); j++ {
 			if j > 0 {
 				sql.Write(",")
 			}
-			vStr := internal.ToString(ref.Field(idxC2F[j]).Interface(), true)
+			vStr := internal.ToString(ref.Field(candf[j]).Interface(), true)
 			sql.Write(vStr)
 		}
 		sql.Write(")")

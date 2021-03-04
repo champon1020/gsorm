@@ -63,6 +63,7 @@ func (s *migStmt) migration(buildSQL func(*internal.SQL) error) error {
 		if _, err := conn.Exec(sql.String()); err != nil {
 			return errors.New(err.Error(), errors.DBQueryError)
 		}
+		return nil
 	case *MockDB, *MockTx:
 		return nil
 	}

@@ -77,6 +77,7 @@ func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt Stmt, model interf
 		if err := internal.MapRowsToModel(rows, model); err != nil {
 			return err
 		}
+		return nil
 	case Mock:
 		returned, err := conn.CompareWith(stmt)
 		if err != nil || returned == nil {
@@ -93,11 +94,10 @@ func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt Stmt, model interf
 		}
 
 		mv.Elem().Set(v)
-	default:
-		return errors.New("DB type must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+		return nil
 	}
 
-	return nil
+	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
 }
 
 func (s *stmt) exec(buildSQL func(*internal.SQL) error, stmt Stmt) error {
