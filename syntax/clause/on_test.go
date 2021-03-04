@@ -24,7 +24,7 @@ func TestOn_String(t *testing.T) {
 		},
 		{
 			&clause.On{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			`ON("lhs1 = ? AND lhs2 = ?", 10, "str")`,
+			`ON("lhs1 = ? AND lhs2 = ?", 10, 'str')`,
 		},
 	}
 

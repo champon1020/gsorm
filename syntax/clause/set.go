@@ -47,11 +47,7 @@ func (s *Set) Build() (*syntax.StmtSet, error) {
 		if i != 0 {
 			ss.WriteValue(",")
 		}
-		e, err := eq.Build()
-		if err != nil {
-			return nil, err
-		}
-		ss.WriteValue(e)
+		ss.WriteValue(eq.Build())
 	}
 	return ss, nil
 }

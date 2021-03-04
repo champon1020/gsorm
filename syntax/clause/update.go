@@ -17,13 +17,13 @@ func (u *Update) Name() string {
 	return "UPDATE"
 }
 
-// addTable appends table to Update.
-func (u *Update) addTable(table string) {
+// AddTable appends table to Update.
+func (u *Update) AddTable(table string) {
 	u.Table = *syntax.NewTable(table)
 }
 
-// addColumns appends columns to Update.
-func (u *Update) addColumns(cols []string) {
+// AddColumns appends columns to Update.
+func (u *Update) AddColumns(cols []string) {
 	u.Columns = cols
 }
 
@@ -42,12 +42,4 @@ func (u *Update) Build() (*syntax.StmtSet, error) {
 	ss.WriteKeyword(u.Name())
 	ss.WriteValue(u.Table.Build())
 	return ss, nil
-}
-
-// NewUpdate create new update object.
-func NewUpdate(table string, cols []string) *Update {
-	u := new(Update)
-	u.addTable(table)
-	u.addColumns(cols)
-	return u
 }

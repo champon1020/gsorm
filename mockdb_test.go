@@ -155,7 +155,7 @@ func TestMockDB_Begin_Fail(t *testing.T) {
 
 func TestMockDB_Complete_Fail(t *testing.T) {
 	expectedErr := errors.New(`No query was executed, but `+
-		`INSERT INTO("table2", "column1", "column2").VALUES(10, "str") `+
+		`INSERT INTO("table2", "column1", "column2").VALUES(10, 'str') `+
 		`is expected`, errors.MockError).(*errors.Error)
 
 	// Test phase.
@@ -189,7 +189,7 @@ func TestMockDB_Complete_Fail(t *testing.T) {
 
 func TestMockDB_Complete_Transaction_Fail(t *testing.T) {
 	expectedErr := errors.New(`No query was executed, but `+
-		`INSERT INTO("table2", "column1", "column2").VALUES(10, "str") `+
+		`INSERT INTO("table2", "column1", "column2").VALUES(10, 'str') `+
 		`is expected`, errors.MockError).(*errors.Error)
 
 	// Test phase.

@@ -24,18 +24,17 @@ func (t *Table) Build() string {
 
 // NewTable creates new Table instance.
 func NewTable(table string) *Table {
-	var (
-		name  string
-		alias string
-	)
-
-	strs := strings.Split(table, " AS ")
-	name = strs[0]
-	if len(strs) == 2 {
-		alias = strs[1]
+	t := new(Table)
+	t.Name = table
+	if strs := strings.Split(table, " AS "); len(strs) == 2 {
+		t.Name = strs[0]
+		t.Alias = strs[1]
 	}
-
-	return &Table{Name: name, Alias: alias}
+	if strs := strings.Split(table, " as "); len(strs) == 2 {
+		t.Name = strs[0]
+		t.Alias = strs[1]
+	}
+	return t
 }
 
 // Column is column term.
@@ -56,18 +55,17 @@ func (c *Column) Build() string {
 
 // NewColumn creates new Column instance.
 func NewColumn(column string) *Column {
-	var (
-		name  string
-		alias string
-	)
-
-	strs := strings.Split(column, " AS ")
-	name = strs[0]
-	if len(strs) == 2 {
-		alias = strs[1]
+	c := new(Column)
+	c.Name = column
+	if strs := strings.Split(column, " AS "); len(strs) == 2 {
+		c.Name = strs[0]
+		c.Alias = strs[1]
 	}
-
-	return &Column{Name: name, Alias: alias}
+	if strs := strings.Split(column, " as "); len(strs) == 2 {
+		c.Name = strs[0]
+		c.Alias = strs[1]
+	}
+	return c
 }
 
 // Eq is equal expression.
@@ -77,12 +75,11 @@ type Eq struct {
 }
 
 // Build makes equal expression with string.
-func (e *Eq) Build() (string, error) {
+func (e *Eq) Build() string {
 	s := e.LHS
 	s += " = "
-	rhs, err := internal.ToString(e.RHS, true)
-	s += rhs
-	return s, err
+	s += internal.ToString(e.RHS, true)
+	return s
 }
 
 // NewEq creates new Eq instance.

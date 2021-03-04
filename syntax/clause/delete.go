@@ -25,8 +25,3 @@ func (d *Delete) Build() (*syntax.StmtSet, error) {
 	ss.WriteKeyword(d.Name())
 	return ss, nil
 }
-
-// NewDelete create new delete object.
-func NewDelete() *Delete {
-	return &Delete{}
-}

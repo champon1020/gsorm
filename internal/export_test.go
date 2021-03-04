@@ -2,9 +2,9 @@ package internal
 
 // Exported values which is declared in exec.go.
 var (
-	SetValueToField = setValueToField
-	SetValueToMap   = setValueToMap
-	SetValueToVar   = setValueToVar
-	MapKeyType      = mapKeyType
-	MapValueType    = mapValueType
+	Values2Fields = values2Fields
+	Value2Map     = value2Map
+	Value2Var     = value2Var
+	MapKeyType    = mapKeyType
+	MapValueType  = mapValueType
 )

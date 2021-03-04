@@ -24,7 +24,7 @@ func TestOr_String(t *testing.T) {
 		},
 		{
 			&clause.Or{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			`OR("lhs1 = ? AND lhs2 = ?", 10, "str")`,
+			`OR("lhs1 = ? AND lhs2 = ?", 10, 'str')`,
 		},
 	}
 

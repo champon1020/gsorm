@@ -17,13 +17,13 @@ func (i *Insert) Name() string {
 	return "INSERT INTO"
 }
 
-// addTable appends table to Insert.
-func (i *Insert) addTable(table string) {
+// AddTable appends table to Insert.
+func (i *Insert) AddTable(table string) {
 	i.Table = *syntax.NewTable(table)
 }
 
-// addColumn appends column to Insert.
-func (i *Insert) addColumn(col string) {
+// AddColumn appends column to Insert.
+func (i *Insert) AddColumn(col string) {
 	column := syntax.NewColumn(col)
 	i.Columns = append(i.Columns, *column)
 }
@@ -53,14 +53,4 @@ func (i *Insert) Build() (*syntax.StmtSet, error) {
 		ss.WriteValue(")")
 	}
 	return ss, nil
-}
-
-// NewInsert create new insert object.
-func NewInsert(table string, cols []string) *Insert {
-	i := new(Insert)
-	i.addTable(table)
-	for _, c := range cols {
-		i.addColumn(c)
-	}
-	return i
 }
