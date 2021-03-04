@@ -21,8 +21,8 @@ func (s *AlterTableStmt) String() string {
 	return s.string(s.buildSQL)
 }
 
-// Migration executes database migration.
-func (s *AlterTableStmt) Migration() error {
+// Migrate executes database migration.
+func (s *AlterTableStmt) Migrate() error {
 	return s.migration(s.buildSQL)
 }
 

@@ -17,7 +17,7 @@ type TableMP interface {
 // RenameMP is method provider which is returned by (*AlterTableStmt).Rename.
 type RenameMP interface {
 	TableMP
-	provider.MigrationCallable
+	provider.MigrateCallable
 }
 
 // AddColumnMP is method provider which is returned by (*AlterTableStmt).AddColumn.
@@ -31,13 +31,13 @@ type AddColumnMP interface {
 // DropColumnMP is method provider which is returned by (*AlterTableStmt).DropColumn.
 type DropColumnMP interface {
 	TableMP
-	provider.MigrationCallable
+	provider.MigrateCallable
 }
 
 // RenameColumnMP is method provider which is returned by (*AlterTableStmt).RenameColumn.
 type RenameColumnMP interface {
 	TableMP
-	provider.MigrationCallable
+	provider.MigrateCallable
 }
 
 // NotNullMP is method provider which is returned by (*AlterTableStmt).NotNull.
@@ -67,31 +67,31 @@ type AddConsMP interface {
 // DropUniqueMP is method provider which is returned by (*AlterTableStmt).DropUnique.
 type DropUniqueMP interface {
 	TableMP
-	provider.MigrationCallable
+	provider.MigrateCallable
 }
 
 // DropPrimaryMP is method provider which is returned by (*AlterTableStmt).DropPrimary.
 type DropPrimaryMP interface {
 	TableMP
-	provider.MigrationCallable
+	provider.MigrateCallable
 }
 
 // DropForeignMP is method provider which is returned by (*AlterTableStmt).DropForeign.
 type DropForeignMP interface {
 	TableMP
-	provider.MigrationCallable
+	provider.MigrateCallable
 }
 
 // UniqueMP is method provider which is returned by (*AlterTableStmt).Unique.
 type UniqueMP interface {
 	TableMP
-	provider.MigrationCallable
+	provider.MigrateCallable
 }
 
 // PrimaryMP is method provider which is returned by (*AlterTableStmt).Primary.
 type PrimaryMP interface {
 	TableMP
-	provider.MigrationCallable
+	provider.MigrateCallable
 }
 
 // ForeignMP is method provider which is returned by (*AlterTableStmt).Foreign.
@@ -102,5 +102,5 @@ type ForeignMP interface {
 // RefMP is method provider which is returned by (*AlterTableStmt).Ref.
 type RefMP interface {
 	TableMP
-	provider.MigrationCallable
+	provider.MigrateCallable
 }

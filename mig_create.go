@@ -23,8 +23,8 @@ func (s *CreateDBStmt) String() string {
 	return s.string(s.buildSQL)
 }
 
-// Migration executes database migration.
-func (s *CreateDBStmt) Migration() error {
+// Migrate executes database migration.
+func (s *CreateDBStmt) Migrate() error {
 	return s.migration(s.buildSQL)
 }
 
@@ -47,8 +47,8 @@ func (s *CreateIndexStmt) String() string {
 	return s.string(s.buildSQL)
 }
 
-// Migration executes database migration.
-func (s *CreateIndexStmt) Migration() error {
+// Migrate executes database migration.
+func (s *CreateIndexStmt) Migrate() error {
 	return s.migration(s.buildSQL)
 }
 
@@ -126,8 +126,8 @@ func (s *CreateTableStmt) String() string {
 	return s.string(s.buildSQL)
 }
 
-// Migration executes database migration.
-func (s *CreateTableStmt) Migration() error {
+// Migrate executes database migration.
+func (s *CreateTableStmt) Migrate() error {
 	return s.migration(s.buildSQL)
 }
 

@@ -20,8 +20,8 @@ type ExecCallable interface {
 	Cmd() syntax.Clause
 }
 
-// MigrationCallable is embedded into clause interfaces which can call (*MigStmt).Migration.
-type MigrationCallable interface {
-	Migration() error
+// MigrateCallable is embedded into clause interfaces which can call (*MigStmt).Migration.
+type MigrateCallable interface {
+	Migrate() error
 	String() string
 }

@@ -21,8 +21,8 @@ func (s *DropDBStmt) String() string {
 	return s.string(s.buildSQL)
 }
 
-// Migration executes database migration.
-func (s *DropDBStmt) Migration() error {
+// Migrate executes database migration.
+func (s *DropDBStmt) Migrate() error {
 	return s.migration(s.buildSQL)
 }
 
@@ -45,8 +45,8 @@ func (s *DropIndexStmt) String() string {
 	return s.string(s.buildSQL)
 }
 
-// Migration executes database migration.
-func (s *DropIndexStmt) Migration() error {
+// Migrate executes database migration.
+func (s *DropIndexStmt) Migrate() error {
 	return s.migration(s.buildSQL)
 }
 
@@ -100,8 +100,8 @@ func (s *DropTableStmt) String() string {
 	return s.string(s.buildSQL)
 }
 
-// Migration executes database migration.
-func (s *DropTableStmt) Migration() error {
+// Migrate executes database migration.
+func (s *DropTableStmt) Migrate() error {
 	return s.migration(s.buildSQL)
 }
 
