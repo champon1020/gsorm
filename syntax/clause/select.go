@@ -16,8 +16,8 @@ func (s *Select) Name() string {
 	return "SELECT"
 }
 
-// addColumn appends column to Select.
-func (s *Select) addColumn(col string) {
+// AddColumn appends column to Select.
+func (s *Select) AddColumn(col string) {
 	c := syntax.NewColumn(col)
 	s.Columns = append(s.Columns, *c)
 }
@@ -45,13 +45,4 @@ func (s *Select) Build() (*syntax.StmtSet, error) {
 		ss.WriteValue(c.Build())
 	}
 	return ss, nil
-}
-
-// NewSelect create new select object.
-func NewSelect(cols []string) *Select {
-	s := new(Select)
-	for _, c := range cols {
-		s.addColumn(c)
-	}
-	return s
 }

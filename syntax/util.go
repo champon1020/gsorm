@@ -20,12 +20,7 @@ func BuildForExpression(expr string, vals ...interface{}) (string, error) {
 			values = append(values, fmt.Sprintf("(%s)", stmt.String()))
 			continue
 		}
-
-		vStr, err := internal.ToString(v, true)
-		if err != nil {
-			return "", err
-		}
-		values = append(values, vStr)
+		values = append(values, internal.ToString(v, true))
 	}
 
 	return fmt.Sprintf(strings.ReplaceAll(expr, "?", "%s"), values...), nil

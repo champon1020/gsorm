@@ -70,33 +70,3 @@ func TestSelect_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewSelect(t *testing.T) {
-	testCases := []struct {
-		Cols   []string
-		Result *clause.Select
-	}{
-		{
-			[]string{"column1"},
-			&clause.Select{Columns: []syntax.Column{{Name: "column1"}}},
-		},
-		{
-			[]string{"column AS c"},
-			&clause.Select{Columns: []syntax.Column{{Name: "column", Alias: "c"}}},
-		},
-		{
-			[]string{"column1 AS c1", "column2 AS c2"},
-			&clause.Select{Columns: []syntax.Column{
-				{Name: "column1", Alias: "c1"},
-				{Name: "column2", Alias: "c2"},
-			}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewSelect(testCase.Cols)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

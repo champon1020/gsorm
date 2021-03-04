@@ -1,14 +1,5 @@
 package syntax
 
-/*
-// Cmd is interface for entry commands like SELECT, INSERT, UPDATE or DELETE.
-type Cmd interface {
-	Query() string
-	String() string
-	Build() *StmtSet
-}
-*/
-
 // Clause is interface for SQL clauses.
 type Clause interface {
 	Name() string

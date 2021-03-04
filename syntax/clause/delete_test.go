@@ -33,18 +33,3 @@ func TestDelete_Build(t *testing.T) {
 		}
 	}
 }
-
-func TestNewDelete(t *testing.T) {
-	testCases := []struct {
-		Result *clause.Delete
-	}{
-		{&clause.Delete{}},
-	}
-
-	for _, testCase := range testCases {
-		res := clause.NewDelete()
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

@@ -24,7 +24,7 @@ func TestHaving_String(t *testing.T) {
 		},
 		{
 			&clause.Having{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			`HAVING("lhs1 = ? AND lhs2 = ?", 10, "str")`,
+			`HAVING("lhs1 = ? AND lhs2 = ?", 10, 'str')`,
 		},
 	}
 

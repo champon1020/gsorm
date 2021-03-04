@@ -76,11 +76,6 @@ func TestBuildForExpression_Fail(t *testing.T) {
 			[]interface{}{10},
 			errors.New("Length of values is not valid", errors.InvalidValueError),
 		},
-		{
-			"lhs = ?",
-			[]interface{}{[]string{}},
-			errors.New("Type slice is not supported", errors.InvalidTypeError),
-		},
 	}
 
 	for _, testCase := range testCases {

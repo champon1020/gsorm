@@ -1,7 +1,6 @@
 package internal_test
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -11,276 +10,196 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSetValueToField(t *testing.T) {
+func TestValues2Fields(t *testing.T) {
 	type Car struct {
-		Name  string
-		ID    int
-		ID8   int8
-		ID16  int16
-		ID32  int32
-		ID64  int64
-		UID   uint
-		UID8  uint8
-		UID16 uint16
-		UID32 uint32
-		UID64 uint64
-		FID32 float32
-		FID64 float64
-		Flg   bool
-		Time  time.Time
-		Time2 time.Time `layout:"2006-01-02"`
-		Time3 time.Time `layout:"time.ANSIC"`
+		S   string    //0
+		I   int       //1
+		I8  int8      //2
+		I16 int16     //3
+		I32 int32     //4
+		I64 int64     //5
+		U   uint      //6
+		U8  uint8     //7
+		U16 uint16    //8
+		U32 uint32    //9
+		U64 uint64    //10
+		F32 float32   //11
+		F64 float64   //12
+		BL  bool      //13
+		T   time.Time //14
+		T2  time.Time `layout:"2006-01-02"` //15
+		T3  time.Time `layout:"time.ANSIC"` //16
 	}
 
 	testCases := []struct {
-		FieldIndex int
-		Value      string
-		Result     reflect.Value
+		Type     reflect.Type
+		IdxR2M   map[int]int
+		Vals     [][]byte
+		Expected reflect.Value
 	}{
 		{
-			0,
-			"test",
-			reflect.ValueOf(&Car{Name: "test"}),
-		},
-		{
-			1,
-			fmt.Sprintf("%d", 10),
-			reflect.ValueOf(&Car{ID: 10}),
-		},
-		{
-			2,
-			fmt.Sprintf("%d", 10),
-			reflect.ValueOf(&Car{ID8: 10}),
-		},
-		{
-			3,
-			fmt.Sprintf("%d", 10),
-			reflect.ValueOf(&Car{ID16: 10}),
-		},
-		{
-			4,
-			fmt.Sprintf("%d", 10),
-			reflect.ValueOf(&Car{ID32: 10}),
-		},
-		{
-			5,
-			fmt.Sprintf("%d", 10),
-			reflect.ValueOf(&Car{ID64: 10}),
-		},
-		{
-			6,
-			fmt.Sprintf("%d", 100),
-			reflect.ValueOf(&Car{UID: 100}),
-		},
-		{
-			7,
-			fmt.Sprintf("%d", 100),
-			reflect.ValueOf(&Car{UID8: 100}),
-		},
-		{
-			8,
-			fmt.Sprintf("%d", 100),
-			reflect.ValueOf(&Car{UID16: 100}),
-		},
-		{
-			9,
-			fmt.Sprintf("%d", 100),
-			reflect.ValueOf(&Car{UID32: 100}),
-		},
-		{
-			10,
-			fmt.Sprintf("%d", 100),
-			reflect.ValueOf(&Car{UID64: 100}),
-		},
-		{
-			11,
-			fmt.Sprintf("%f", 100.2),
-			reflect.ValueOf(&Car{FID32: 100.2}),
-		},
-		{
-			12,
-			fmt.Sprintf("%f", 100.2),
-			reflect.ValueOf(&Car{FID64: 100.2}),
-		},
-		{
-			13,
-			"true",
-			reflect.ValueOf(&Car{Flg: true}),
-		},
-		{
-			14,
-			"2020-01-02T03:04:05Z",
-			reflect.ValueOf(&Car{
-				Time: time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC),
-			}),
-		},
-		{
-			15,
-			"2020-01-02",
-			reflect.ValueOf(&Car{
-				Time2: time.Date(2020, time.January, 2, 0, 0, 0, 0, time.UTC),
-			}),
-		},
-		{
-			16,
-			"Thu Jan 2 03:04:05 2020",
-			reflect.ValueOf(&Car{
-				Time3: time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC),
+			reflect.TypeOf(Car{}),
+			map[int]int{
+				0: 0,
+				1: 1,
+				2: 11,
+				3: 13,
+				4: 14,
+				5: 15,
+				6: 16,
+			},
+			[][]byte{
+				[]byte("str"),
+				[]byte("10"),
+				[]byte("100.2"),
+				[]byte("true"),
+				[]byte("2020-01-02T03:04:05Z"),
+				[]byte("2020-01-02"),
+				[]byte("Thu Jan 2 03:04:05 2020"),
+			},
+			reflect.ValueOf(Car{
+				S:   "str",
+				I:   10,
+				F32: 100.2,
+				BL:  true,
+				T:   time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC),
+				T2:  time.Date(2020, time.January, 2, 0, 0, 0, 0, time.UTC),
+				T3:  time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC),
 			}),
 		},
 	}
 
 	for _, testCase := range testCases {
-		ref := reflect.ValueOf(new(Car))
-		if err := internal.SetValueToField(
-			ref.Elem(),
-			testCase.FieldIndex,
-			testCase.Value,
-		); err != nil {
+		v, err := internal.Values2Fields(testCase.Type, testCase.IdxR2M, testCase.Vals)
+		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		assert.Equal(t, testCase.Result.Interface(), ref.Interface())
+		assert.Equal(t, testCase.Expected.Interface(), v.Interface())
 	}
 }
 
-func TestSetValueToMap(t *testing.T) {
-	m := make(map[int]string)
-
+func TestValue2Map(t *testing.T) {
 	testCases := []struct {
-		Ref    interface{}
-		Key    string
-		Value  string
-		Result reflect.Value
+		Type          reflect.Type
+		Key           string
+		Value         string
+		ExpectedKey   reflect.Value
+		ExpectedValue reflect.Value
 	}{
 		{
-			Ref:    &m,
-			Key:    "10",
-			Value:  "str",
-			Result: reflect.ValueOf(&map[int]string{10: "str"}),
+			Type:          reflect.TypeOf(map[int]string{}),
+			Key:           "10",
+			Value:         "str",
+			ExpectedKey:   reflect.ValueOf(10),
+			ExpectedValue: reflect.ValueOf("str"),
 		},
 	}
 
 	for _, testCase := range testCases {
-		mResult := make(map[int]string)
-		ref := reflect.ValueOf(&mResult)
-		if err := internal.SetValueToMap(ref.Elem(), testCase.Key, testCase.Value); err != nil {
+		k, v, err := internal.Value2Map(testCase.Type, internal.Str(testCase.Key), internal.Str(testCase.Value))
+		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		if diff := cmp.Diff(testCase.Result.Interface(), ref.Interface()); diff != "" {
+		if diff := cmp.Diff(testCase.ExpectedKey.Interface(), (*k).Interface()); diff != "" {
+			t.Errorf("Differs: (-want +got)\n%s", diff)
+		}
+		if diff := cmp.Diff(testCase.ExpectedValue.Interface(), (*v).Interface()); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
 	}
 }
 
-func TestSetValueToVar(t *testing.T) {
-	var (
-		s   string
-		i   int
-		i8  int8
-		i16 int16
-		i32 int32
-		i64 int64
-		u   uint
-		u8  uint8
-		u16 uint16
-		u32 uint32
-		u64 uint64
-		f32 float32
-		f64 float64
-		b   bool
-		tm  time.Time
-	)
-
+func TestValue2Var(t *testing.T) {
 	testCases := []struct {
-		Ref    interface{}
-		Value  string
-		Result reflect.Value
+		Type     reflect.Type
+		Value    string
+		Expected reflect.Value
 	}{
 		{
-			Ref:    &s,
-			Value:  "str",
-			Result: reflect.ValueOf("str"),
+			Type:     reflect.TypeOf(""),
+			Value:    "str",
+			Expected: reflect.ValueOf("str"),
 		},
 		{
-			Ref:    &i,
-			Value:  "10",
-			Result: reflect.ValueOf(10),
+			Type:     reflect.TypeOf(int(0)),
+			Value:    "10",
+			Expected: reflect.ValueOf(10),
 		},
 		{
-			Ref:    &i8,
-			Value:  "10",
-			Result: reflect.ValueOf(int8(10)),
+			Type:     reflect.TypeOf(int8(0)),
+			Value:    "10",
+			Expected: reflect.ValueOf(int8(10)),
 		},
 		{
-			Ref:    &i16,
-			Value:  "10",
-			Result: reflect.ValueOf(int16(10)),
+			Type:     reflect.TypeOf(int16(0)),
+			Value:    "10",
+			Expected: reflect.ValueOf(int16(10)),
 		},
 		{
-			Ref:    &i32,
-			Value:  "10",
-			Result: reflect.ValueOf(int32(10)),
+			Type:     reflect.TypeOf(int32(0)),
+			Value:    "10",
+			Expected: reflect.ValueOf(int32(10)),
 		},
 		{
-			Ref:    &i64,
-			Value:  "10",
-			Result: reflect.ValueOf(int64(10)),
+			Type:     reflect.TypeOf(int64(0)),
+			Value:    "10",
+			Expected: reflect.ValueOf(int64(10)),
 		},
 		{
-			Ref:    &u,
-			Value:  "100",
-			Result: reflect.ValueOf(uint(100)),
+			Type:     reflect.TypeOf(uint(0)),
+			Value:    "100",
+			Expected: reflect.ValueOf(uint(100)),
 		},
 		{
-			Ref:    &u8,
-			Value:  "100",
-			Result: reflect.ValueOf(uint8(100)),
+			Type:     reflect.TypeOf(uint8(0)),
+			Value:    "100",
+			Expected: reflect.ValueOf(uint8(100)),
 		},
 		{
-			Ref:    &u16,
-			Value:  "100",
-			Result: reflect.ValueOf(uint16(100)),
+			Type:     reflect.TypeOf(uint16(0)),
+			Value:    "100",
+			Expected: reflect.ValueOf(uint16(100)),
 		},
 		{
-			Ref:    &u32,
-			Value:  "100",
-			Result: reflect.ValueOf(uint32(100)),
+			Type:     reflect.TypeOf(uint32(0)),
+			Value:    "100",
+			Expected: reflect.ValueOf(uint32(100)),
 		},
 		{
-			Ref:    &u64,
-			Value:  "100",
-			Result: reflect.ValueOf(uint64(100)),
+			Type:     reflect.TypeOf(uint64(0)),
+			Value:    "100",
+			Expected: reflect.ValueOf(uint64(100)),
 		},
 		{
-			Ref:    &f32,
-			Value:  "100.2",
-			Result: reflect.ValueOf(float32(100.2)),
+			Type:     reflect.TypeOf(float32(0.0)),
+			Value:    "100.2",
+			Expected: reflect.ValueOf(float32(100.2)),
 		},
 		{
-			Ref:    &f64,
-			Value:  "100.2",
-			Result: reflect.ValueOf(float64(100.2)),
+			Type:     reflect.TypeOf(float64(0.0)),
+			Value:    "100.2",
+			Expected: reflect.ValueOf(float64(100.2)),
 		},
 		{
-			Ref:    &b,
-			Value:  "true",
-			Result: reflect.ValueOf(true),
+			Type:     reflect.TypeOf(false),
+			Value:    "true",
+			Expected: reflect.ValueOf(true),
 		},
 		{
-			Ref:    &tm,
-			Value:  "2020-01-02T03:04:05Z",
-			Result: reflect.ValueOf(time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC)),
+			Type:     reflect.TypeOf(time.Time{}),
+			Value:    "2020-01-02T03:04:05Z",
+			Expected: reflect.ValueOf(time.Date(2020, time.January, 2, 3, 4, 5, 0, time.UTC)),
 		},
 	}
 
 	for _, testCase := range testCases {
-		ref := reflect.ValueOf(testCase.Ref).Elem()
-		if err := internal.SetValueToVar(ref, testCase.Value); err != nil {
+		v, err := internal.Value2Var(testCase.Type, internal.Str(testCase.Value))
+		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		assert.Equal(t, testCase.Result.Interface(), ref.Interface())
+		assert.Equal(t, testCase.Expected.Interface(), v.Interface())
 	}
 }

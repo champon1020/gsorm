@@ -105,10 +105,7 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 			msg := fmt.Sprintf("If you set variable to Model, number of columns must be 1, not %d", len(cols))
 			return errors.New(msg, errors.InvalidSyntaxError)
 		}
-		vStr, err := internal.ToString(ref.Interface(), true)
-		if err != nil {
-			return err
-		}
+		vStr := internal.ToString(ref.Interface(), true)
 		sql.Write(fmt.Sprintf("SET %s = %s", cols[0], vStr))
 		return nil
 	}
@@ -121,15 +118,12 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 	sql.Write("SET")
 	switch ref.Kind() {
 	case reflect.Struct:
-		idxC2F := internal.MapOfColumnsToFields(cols, reflect.TypeOf(ref.Interface()))
+		idxC2F := internal.ColumnsAndFields(cols, reflect.TypeOf(ref.Interface()))
 		for i, c := range cols {
 			if i > 0 {
 				sql.Write(",")
 			}
-			vStr, err := internal.ToString(ref.Field(idxC2F[i]).Interface(), true)
-			if err != nil {
-				return err
-			}
+			vStr := internal.ToString(ref.Field(idxC2F[i]).Interface(), true)
 			sql.Write(fmt.Sprintf("%s = %s", c, vStr))
 		}
 		return nil
@@ -142,10 +136,7 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 			if !v.IsValid() {
 				return errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError)
 			}
-			vStr, err := internal.ToString(v.Interface(), true)
-			if err != nil {
-				return err
-			}
+			vStr := internal.ToString(v.Interface(), true)
 			sql.Write(fmt.Sprintf("%s = %s", c, vStr))
 		}
 		return nil
