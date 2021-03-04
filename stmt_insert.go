@@ -115,7 +115,7 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 
 		// If undelying type of slice element is struct.
 		if typ.Kind() == reflect.Struct {
-			idxC2F := internal.MapOfColumnsToFields(cols, typ)
+			idxC2F := internal.ColumnsAndFields(cols, typ)
 			for i := 0; i < ref.Len(); i++ {
 				if i > 0 {
 					sql.Write(",")
@@ -142,7 +142,7 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 		}
 		return nil
 	case reflect.Struct:
-		idxC2F := internal.MapOfColumnsToFields(cols, reflect.TypeOf(ref.Interface()))
+		idxC2F := internal.ColumnsAndFields(cols, reflect.TypeOf(ref.Interface()))
 		sql.Write("(")
 		for j := 0; j < len(cols); j++ {
 			if j > 0 {

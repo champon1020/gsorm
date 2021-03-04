@@ -152,7 +152,7 @@ func TestMapValueType(t *testing.T) {
 	}
 }
 
-func TestMapOfColumnsToFields(t *testing.T) {
+func TestColumnsAndFields(t *testing.T) {
 	type Model1 struct {
 		ID        int
 		Name      string
@@ -197,12 +197,12 @@ func TestMapOfColumnsToFields(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := internal.MapOfColumnsToFields(testCase.Columns, testCase.ModelType)
+		res := internal.ColumnsAndFields(testCase.Columns, testCase.ModelType)
 		assert.Equal(t, testCase.Result, res)
 	}
 }
 
-func TestColumnNameFromTag(t *testing.T) {
+func TestColumnName(t *testing.T) {
 	type Model1 struct {
 		UID int `mgorm:"id"`
 	}
@@ -228,7 +228,7 @@ func TestColumnNameFromTag(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		cn := internal.ColumnNameFromTag(testCase.Struct)
+		cn := internal.ColumnName(testCase.Struct)
 		assert.Equal(t, testCase.Result, cn)
 	}
 }

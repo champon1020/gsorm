@@ -118,7 +118,7 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 	sql.Write("SET")
 	switch ref.Kind() {
 	case reflect.Struct:
-		idxC2F := internal.MapOfColumnsToFields(cols, reflect.TypeOf(ref.Interface()))
+		idxC2F := internal.ColumnsAndFields(cols, reflect.TypeOf(ref.Interface()))
 		for i, c := range cols {
 			if i > 0 {
 				sql.Write(",")

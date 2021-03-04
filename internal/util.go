@@ -146,12 +146,12 @@ func TimeFormat(layout string) string {
 	return layout
 }
 
-// MapOfColumnsToFields returns map to localize between column and field.
-func MapOfColumnsToFields(cols []string, modelTyp reflect.Type) map[int]int {
+// ColumnsAndFields generates map of column index and field index.
+func ColumnsAndFields(cols []string, modelTyp reflect.Type) map[int]int {
 	indR2M := make(map[int]int)
 	for i, c := range cols {
 		for j := 0; j < modelTyp.NumField(); j++ {
-			if c != ColumnNameFromTag(modelTyp.Field(j)) {
+			if c != ColumnName(modelTyp.Field(j)) {
 				continue
 			}
 			indR2M[i] = j
@@ -160,8 +160,8 @@ func MapOfColumnsToFields(cols []string, modelTyp reflect.Type) map[int]int {
 	return indR2M
 }
 
-// ColumnNameFromTag gets column name from struct field tag.
-func ColumnNameFromTag(sf reflect.StructField) string {
+// ColumnName returns column name with field tag.
+func ColumnName(sf reflect.StructField) string {
 	if sf.Tag.Get("mgorm") == "" {
 		return SnakeCase(sf.Name)
 	}
