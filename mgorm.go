@@ -4,10 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax/clause"
-	"github.com/champon1020/mgorm/syntax/mig"
+	_ "github.com/go-sql-driver/mysql"
 
+	"github.com/champon1020/mgorm/internal"
 	prAlter "github.com/champon1020/mgorm/provider/alter"
 	prCreate "github.com/champon1020/mgorm/provider/create"
 	prDelete "github.com/champon1020/mgorm/provider/delete"
@@ -15,6 +14,8 @@ import (
 	prInsert "github.com/champon1020/mgorm/provider/insert"
 	prSelect "github.com/champon1020/mgorm/provider/select"
 	prUpdate "github.com/champon1020/mgorm/provider/update"
+	"github.com/champon1020/mgorm/syntax/clause"
+	"github.com/champon1020/mgorm/syntax/mig"
 )
 
 // New creates DB.
