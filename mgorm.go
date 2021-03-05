@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	_ "github.com/go-sql-driver/mysql"
-
 	"github.com/champon1020/mgorm/internal"
 	prAlter "github.com/champon1020/mgorm/provider/alter"
 	prCreate "github.com/champon1020/mgorm/provider/create"
