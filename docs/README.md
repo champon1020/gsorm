@@ -17,7 +17,6 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 type Person struct {
