@@ -2,8 +2,8 @@
 This is documents for mgorm.
 
 ## Overview
-- [Instllation](https://github.com/champon1020/mgorm/blob/docs/docs#installation)
-- [Quick Start](https://github.com/champon1020/mgorm/tree/docs/docs#quick-start)
+- [Instllation](https://github.com/champon1020/mgorm/blob/docs/docs/README.md#installation)
+- [Quick Start](https://github.com/champon1020/mgorm/tree/docs/docs/README.md#quick-start)
 - [Fundamental]()
 - [Select]()
   - [Where]()
