@@ -49,7 +49,7 @@ go get -u github.com/champon1020/mgorm
 ```
 
 ## Quick Start
-```go
+```
 package main
 
 import (
