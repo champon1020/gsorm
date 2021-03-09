@@ -1,12 +1,12 @@
 # Docs
-This is documents for mgorm.
+mgormのドキュメントです．
 
-[Japanese](https://github.com/champon1020/mgorm/blob/docs/docs/README_jp.md)
+[English](https://github.com/champon1020/mgorm/blob/docs/docs/README.md)
 
 ## Overview
-- [Instllation](https://github.com/champon1020/mgorm/blob/docs/docs/README.md#installation)
-- [Quick Start](https://github.com/champon1020/mgorm/tree/docs/docs/README.md#quick-start)
-- [Introduction](https://github.com/champon1020/mgorm/blob/docs/docs/introduction.md)
+- [Instllation](https://github.com/champon1020/mgorm/blob/docs/docs/README_jp.md#installation)
+- [Quick Start](https://github.com/champon1020/mgorm/tree/docs/docs/README_jp.md#quick-start)
+- [Introduction](https://github.com/champon1020/mgorm/blob/docs/docs/introduction_jp.md)
 - [Select]()
   - [Where]()
   - [And / Or]()
@@ -45,12 +45,12 @@ This is documents for mgorm.
   - [Return]()
   - [Complete]()
 
-## Installation
+## インストール
 ```
 go get -u github.com/champon1020/mgorm
 ```
 
-## Quick Start
+## クイックスタート
 ```go
 package main
 
