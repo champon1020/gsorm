@@ -130,3 +130,22 @@ mgorm.Select(db, "id, COUNT(birth_date)").From("people").
 // SELECT SUM(salary) FROM people HAVING SUM(salary) > 100000;
 mgorm.Sum(db, "salary").From("people").Having("SUM(salary) > ?", 10000).Query(&model);
 ```
+
+
+## OrderBy
+`OrderBy`は引数に複数のカラム名をstring型で受け取ります．
+
+必要であれば，カラム名に`DESC`や`ASC`などの順序の方向も含めてください．
+`DESC`や`ASC`は小文字でも問題ありません．
+
+#### 例
+```go
+// SELECT id FROM people ORDER BY id;
+mgorm.Select(db, "id").From("people").OrderBy("id").Query(&model)
+
+// SELECT id FROM people ORDER BY name DESC;
+mgorm.Select(db, "id").From("people").OrderBy("name DESC").Query(&model)
+
+// SELECT id FROM people ORDER BY id ORDER BY name DESC;
+mgorm.Select(db, "id").From("people").OrderBy("id", "name DESC")
+```
