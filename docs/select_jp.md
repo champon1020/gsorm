@@ -104,16 +104,18 @@ mgorm.Select(db, "*").From("people").Where("id > ?", 10).
 ```
 
 
-### GroupBy
+## GroupBy
 `GroupBy`は引数に複数のカラム名をstring型で受け取ります．
 
+
+#### 例
 ```go
 // SELECT COUNT(birth_date) FROM people GROUP BY birth_date;
 mgorm.Select(db, "COUNT(birth_date)").From("people").GroupBy("birth_date").Query(&model)
 ```
 
 
-### Having
+## Having
 `Having`は引数に条件式を受け取ります．
 条件式の受け取り方は`Where`や`And`，`Or`と同様です．
 
