@@ -19,7 +19,7 @@ mgorm.Insert(db, "people").Values(10, "Taro", time.Date(2006, time.January, 2, 0
 
 
 ## Values
-`mgorm.Insert`を用いてカラムを挿入する際，`Values`を用いることで値を挿入することができます．
+`mgorm.Insert`を用いてカラムを挿入するとき，`Values`を用いることで値を挿入することができます．
 `Values`は連続で複数回使用することができます．
 
 #### 例

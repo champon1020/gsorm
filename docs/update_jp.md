@@ -13,3 +13,13 @@
 // UPDATE people SET id=10, name='Taro';
 mgorm.Update(db, "people", "id", "name").Set(10, "Taro").Exec()
 ```
+
+
+## Set
+`mgorm.Update`を用いてカラムを更新するとき，`Set`を用いることで値を更新することができます．
+
+#### 例
+```go
+// UPDATE people SET id=10, name='Taro';
+mgorm.Update(db, "people", "id", "name").Set(10, "Taro").Exec()
+```
