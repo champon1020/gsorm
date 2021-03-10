@@ -39,12 +39,12 @@ JOIN句で使用できるのは`Join`，`LeftJoin`，`RightJoin`の3種類です
 #### 例
 ```go
 // SELECT p.id, o.id FROM people AS p INNER JOIN others AS o ON p.id = o.id;
-mgorm.Select(db, "p.id", "o.id").From("people AS p").Join("others AS o").On("p.id = o.id").Query(&model)
+err := mgorm.Select(db, "p.id", "o.id").From("people AS p").Join("others AS o").On("p.id = o.id").Query(&model)
 
 // SELECT p.id, o.id FROM people AS p
 //  INNER JOIN others1 AS o1 ON p.id = o1.id
 //  LEFT  JOIN others2 AS o2 ON p.id = o2.id;
-mgorm.Select(db, "p.id", "o.id").From("people AS p").
+err := mgorm.Select(db, "p.id", "o.id").From("people AS p").
     Join("others1 AS o1").On("p.id = o1.id").
     LeftJoin("others2 AS o2").On("p.id = o2.id").Query(&model)
 ```
@@ -59,23 +59,23 @@ mgorm.Select(db, "p.id", "o.id").From("people AS p").
 #### 例
 ```go
 // SELECT * FROM people WHERE id > 10;
-mgorm.Select(db, "*").From("people").Where("id > ?", 10).Query(&model)
+err := mgorm.Select(db, "*").From("people").Where("id > ?", 10).Query(&model)
 
 // SELECT * FROM people WHERE name LIKE '%Taro';
-mgorm.Select(db, "*").From("people").Where("name LIKE ?", "%Taro").Query(&model)
+err := mgorm.Select(db, "*").From("people").Where("name LIKE ?", "%Taro").Query(&model)
 
 // SELECT * FROM people WHERE id > 10 AND name Like '%Taro';
-mgorm.Select(db, "*").From("people").Where("id > ? AND name LIKE ?", 10, "%Taro").Query(&model)
+err := mgorm.Select(db, "*").From("people").Where("id > ? AND name LIKE ?", 10, "%Taro").Query(&model)
 ```
 
 
 また，`Where`を用いることで副問合せを実行することもできます．
-これは，値として`mgorm.Select`による文を渡すことで実現できます．
+これは，値として`err := mgorm.Select`による文を渡すことで実現できます．
 
 #### 例
 ```go
 // SELECT * FROM people WHERE id IN (SELECT personal_id FROM companies WHERE name = 'ABC Company');
-mgorm.Select(db, "*").From("people").Where("id IN (?)",
+err := mgorm.Select(db, "*").From("people").Where("id IN (?)",
     mgorm.Select(nil, "personal_id").From("companies").Where("name = ?", "ABC Company")).Query(&model)
 ```
 
@@ -87,10 +87,10 @@ mgorm.Select(db, "*").From("people").Where("id IN (?)",
 #### 例
 ```go
 // SELECT * FROM people WHERE id > 10 AND (name = 'Taro' OR name = 'Jiro');
-mgorm.Select(db, "*").From("people").Where("id > ?" 10).And("name = ? OR name = ?", "Taro", "Jiro").Query(&model)
+err := mgorm.Select(db, "*").From("people").Where("id > ?" 10).And("name = ? OR name = ?", "Taro", "Jiro").Query(&model)
 
 // SELECT * FROM people WHERE id > 10 OR (id = 5 AND name = 'Saburo');
-mgorm.Select(db, "*").From("people").Where("id > ?", 10).Or("id = ? AND name = ?", 5, "Saburo").Query(&model)
+err := mgorm.Select(db, "*").From("people").Where("id > ?", 10).Or("id = ? AND name = ?", 5, "Saburo").Query(&model)
 ```
 
 また，`Where`と同様に副問合せも用いることができます．
@@ -99,7 +99,7 @@ mgorm.Select(db, "*").From("people").Where("id > ?", 10).Or("id = ? AND name = ?
 ```go
 // SELECT * FROM people WHERE id > 10
 //  OR (name = 'Saburo' AND id IN (SELECT personal_id FROM companies));
-mgorm.Select(db, "*").From("people").Where("id > ?", 10).
+err := mgorm.Select(db, "*").From("people").Where("id > ?", 10).
     Or("name = ? AND id IN (?)", "Saburo",mgorm.Select(nil, "*").From("companies")).Query(&model)
 ```
 
@@ -111,7 +111,7 @@ mgorm.Select(db, "*").From("people").Where("id > ?", 10).
 #### 例
 ```go
 // SELECT COUNT(birth_date) FROM people GROUP BY birth_date;
-mgorm.Select(db, "COUNT(birth_date)").From("people").GroupBy("birth_date").Query(&model)
+err := mgorm.Select(db, "COUNT(birth_date)").From("people").GroupBy("birth_date").Query(&model)
 ```
 
 
@@ -124,11 +124,11 @@ mgorm.Select(db, "COUNT(birth_date)").From("people").GroupBy("birth_date").Query
 #### 例
 ```go
 // SELECT id, COUNT(birth_date) FROM people GROUP BY birth_date HAVING COUNT(birth_date) > 10;
-mgorm.Select(db, "id, COUNT(birth_date)").From("people").
+err := mgorm.Select(db, "id, COUNT(birth_date)").From("people").
     GroupBy("birth_date").Having("COUNT(birth_date) > ?", 10).Query(&model)
 
 // SELECT SUM(salary) FROM people HAVING SUM(salary) > 100000;
-mgorm.Sum(db, "salary").From("people").Having("SUM(salary) > ?", 10000).Query(&model);
+err := mgorm.Sum(db, "salary").From("people").Having("SUM(salary) > ?", 10000).Query(&model);
 ```
 
 
@@ -141,13 +141,13 @@ mgorm.Sum(db, "salary").From("people").Having("SUM(salary) > ?", 10000).Query(&m
 #### 例
 ```go
 // SELECT id FROM people ORDER BY id;
-mgorm.Select(db, "id").From("people").OrderBy("id").Query(&model)
+err := mgorm.Select(db, "id").From("people").OrderBy("id").Query(&model)
 
 // SELECT id FROM people ORDER BY name DESC;
-mgorm.Select(db, "id").From("people").OrderBy("name DESC").Query(&model)
+err := mgorm.Select(db, "id").From("people").OrderBy("name DESC").Query(&model)
 
 // SELECT id FROM people ORDER BY id ORDER BY name DESC;
-mgorm.Select(db, "id").From("people").OrderBy("id", "name DESC")
+err := mgorm.Select(db, "id").From("people").OrderBy("id", "name DESC")
 ```
 
 
@@ -157,7 +157,7 @@ mgorm.Select(db, "id").From("people").OrderBy("id", "name DESC")
 #### 例
 ```go
 // SELECT id FROM people LIMIT 10;
-mgorm.Select(db, "id").From("people").Limit(10).Query(&model)
+err := mgorm.Select(db, "id").From("people").Limit(10).Query(&model)
 ```
 
 
@@ -168,5 +168,5 @@ mgorm.Select(db, "id").From("people").Limit(10).Query(&model)
 #### 例
 ```go
 // SELECT id FROM people LIMIT 10 OFFSET 5;
-mgorm.Select(db, "id").From("people").Limit(10).Offset(5).Query(&model)
+err := mgorm.Select(db, "id").From("people").Limit(10).Offset(5).Query(&model)
 ```
