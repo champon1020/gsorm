@@ -70,7 +70,7 @@ err := mgorm.Select(db, "*").From("people").Where("id > ? AND name LIKE ?", 10, 
 
 
 また，`Where`を用いることで副問合せを実行することもできます．
-これは，値として`err := mgorm.Select`による文を渡すことで実現できます．
+これは，値として`mgorm.Select`による文を渡すことで実現できます．
 
 #### 例
 ```go
@@ -100,7 +100,7 @@ err := mgorm.Select(db, "*").From("people").Where("id > ?", 10).Or("id = ? AND n
 // SELECT * FROM people WHERE id > 10
 //  OR (name = 'Saburo' AND id IN (SELECT personal_id FROM companies));
 err := mgorm.Select(db, "*").From("people").Where("id > ?", 10).
-    Or("name = ? AND id IN (?)", "Saburo",mgorm.Select(nil, "*").From("companies")).Query(&model)
+    Or("name = ? AND id IN (?)", "Saburo", mgorm.Select(nil, "*").From("companies")).Query(&model)
 ```
 
 
