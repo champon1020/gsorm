@@ -1,4 +1,16 @@
 # Select
+`mgorm.Select`を使用したとき，`Query`を呼び出すことでデータベースからの検索結果をマッピングすることができます．
+
+`mgorm.Select`の第1引数は`mgorm.Conn`を実装した型，第2引数以降は複数のカラム名をstring型として受け取ることができます．
+`mgorm.Conn`を実装した型としては`*mgorm.DB`，`*mgorm.Tx`，`*mgorm.MockDB`，`*mgorm.MockTx`があります．
+
+詳細は[Transaction]()，[Mock]()などに記載されています．
+
+#### 例
+```go
+mgorm.Select(db, "id").From("people").Query(&model)
+```
+
 
 ## メソッド
 `mgorm.Select`を使用する際の文法を以下に示します．
@@ -9,7 +21,7 @@
 ```
 []: optional,  |: or,  {}: one of them
 
-mgorm.Select(DB, columns...).From(table)
+mgorm.Select(DB, columns...).From(tables...)
     [{ .Join(tables) | .LeftJoin(table) | .RightJoin(table) }.On(expression)]
     [.Where(expression, values...)]
     [.Or(expression, values...) | .And(expression, values...)]
@@ -20,6 +32,20 @@ mgorm.Select(DB, columns...).From(table)
     [.Offset(number)]
     [.Union(*mgorm.Stmt) | .UnionAll(*mgorm.Stmt)]
     .Query(*model)
+```
+
+
+## From
+`From`は複数のテーブル名をstring方で受け取ります．
+必要であれば，テーブル名にエイリアスを含めることができます．
+
+#### 例
+```go
+// SELECT id FROM people;
+mgorm.Select(db, "id").From("people").Query(&model)
+
+// SELECT p.id, t.id FROM "people AS p", "teams AS t" LIMIT 10;
+mgorm.Select(db, "p1.id", "p2.id").From("people AS p1", "people AS p2").Limit(10).Query(&model)
 ```
 
 
