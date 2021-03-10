@@ -23,3 +23,15 @@ mgorm.Update(db, "people", "id", "name").Set(10, "Taro").Exec()
 // UPDATE people SET id=10, name='Taro';
 mgorm.Update(db, "people", "id", "name").Set(10, "Taro").Exec()
 ```
+
+
+## Where
+`Where`は引数に条件式を受け取ります．
+
+詳しい使用方法は`mgorm.Select`における[Where]()と同様です．
+
+#### 例
+```go
+// UPDATE people SET name='Taro' WHERE id = 10;
+mgorm.Update(db, "people", "name").Set("Taro").Where("id = ?", 10).Exec()
+```
