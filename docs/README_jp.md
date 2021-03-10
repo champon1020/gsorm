@@ -19,6 +19,8 @@ mgormのドキュメントです．
   - [Limit](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#limit)
   - [Offset](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#offset)
 - [Insert]()
+  - [Values]()
+  - [Select]()
   - [With Model]()
 - [Update]()
   - [With Model]()
