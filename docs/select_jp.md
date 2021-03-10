@@ -1,13 +1,14 @@
 # Select
 `mgorm.Select`を使用したとき，`Query`を呼び出すことでデータベースからの検索結果をマッピングすることができます．
 
-`mgorm.Select`の第1引数は`mgorm.Conn`を実装した型，第2引数以降は複数のカラム名をstring型として受け取ることができます．
+`mgorm.Select`の第1引数は`mgorm.Conn`の型，第2引数以降は複数のカラム名をstring型として受け取ることができます．
 `mgorm.Conn`を実装した型としては`*mgorm.DB`，`*mgorm.Tx`，`*mgorm.MockDB`，`*mgorm.MockTx`があります．
 
-詳細は[Transaction]()，[Mock]()などに記載されています．
+詳細は[Transaction]()，[Mock]()に記載されています．
 
 #### 例
 ```go
+// SELECT id FROM people;
 mgorm.Select(db, "id").From("people").Query(&model)
 ```
 
