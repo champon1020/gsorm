@@ -19,6 +19,7 @@ mgorm.Select(DB, columns...).From(table)
     [.Limit(number)]
     [.Offset(number)]
     [.Union(*mgorm.Stmt) | .UnionAll(*mgorm.Stmt)]
+    .Query(*model)
 ```
 
 
@@ -68,7 +69,7 @@ mgorm.Select(db, "*").From("people").Where("id > ? AND name LIKE ?", 10, "%Taro"
 ```
 
 
-`Where`を用いることで副問合せを実行することもできます．
+また，`Where`を用いることで副問合せを実行することもできます．
 これは，値として`mgorm.Select`による文を渡すことで実現できます．
 
 #### 例
@@ -76,4 +77,28 @@ mgorm.Select(db, "*").From("people").Where("id > ? AND name LIKE ?", 10, "%Taro"
 // SELECT * FROM people WHERE id IN (SELECT personal_id FROM companies WHERE name = 'ABC Company');
 mgorm.Select(db, "*").From("people").Where("id IN (?)",
     mgorm.Select(nil, "personal_id").From("companies").Where("name = ?", "ABC Company")).Query(&model)
+```
+
+
+## Or / And
+`Or`，`And`は`Where`とほぼ同様の使用方法になります．
+ただし，これらを使用した場合の条件には`(`と`)`で囲まれたものになります．
+
+#### 例
+```go
+// SELECT * FROM people WHERE id > 10 AND (name = 'Taro' OR name = 'Jiro');
+mgorm.Select(db, "*").From("people").Where("id > ?" 10).And("name = ? OR name = ?", "Taro", "Jiro").Query(&model)
+
+// SELECT * FROM people WHERE id > 10 OR (id = 5 AND name = 'Saburo');
+mgorm.Select(db, "*").From("people").Where("id > ?", 10).Or("id = ? AND name = ?", 5, "Saburo").Query(&model)
+```
+
+また，`Where`と同様に副問合せも用いることができます．
+
+#### 例
+```go
+// SELECT * FROM people WHERE id > 10
+//  OR (name = 'Saburo' AND id IN (SELECT personal_id FROM companies));
+mgorm.Select(db, "*").From("people").Where("id > ?", 10).
+    Or("name = ? AND id IN (?)", "Saburo",mgorm.Select(nil, "*").From("companies")).Query(&model)
 ```
