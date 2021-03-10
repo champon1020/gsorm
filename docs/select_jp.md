@@ -2,16 +2,22 @@
 
 ## メソッド
 `mgorm.Select`を使用する際の文法を以下に示します．
-また，各メソッドについては順に説明いたします．
+各メソッドは上に行くほど呼び出しの優先度が高いです．
+
+各メソッドについては順に説明いたします．
 
 ```
+[]: optional,  |: or,  {}: one of them
+
 mgorm.Select(DB, columns...).From(table)
     [{ .Join(tables) | .LeftJoin(table) | .RightJoin(table) }.On(expression)]
     [.Where(expression, values...)]
     [.Or(expression, values...) | .And(expression, values...)]
-    [.GroupBy(columns...)] [.Having(expression, values...)]
+    [.GroupBy(columns...)]
+    [.Having(expression, values...)]
     [.OrderBy(columns...)]
-    [.Limit(number)] [.Offset(number)]
+    [.Limit(number)]
+    [.Offset(number)]
     [.Union(*mgorm.Stmt) | .UnionAll(*mgorm.Stmt)]
 ```
 
