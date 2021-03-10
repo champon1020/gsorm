@@ -148,16 +148,16 @@ func TimeFormat(layout string) string {
 
 // ColumnsAndFields generates map of column index and field index.
 func ColumnsAndFields(cols []string, modelTyp reflect.Type) map[int]int {
-	indR2M := make(map[int]int)
+	candf := make(map[int]int)
 	for i, c := range cols {
 		for j := 0; j < modelTyp.NumField(); j++ {
 			if c != ColumnName(modelTyp.Field(j)) {
 				continue
 			}
-			indR2M[i] = j
+			candf[i] = j
 		}
 	}
-	return indR2M
+	return candf
 }
 
 // ColumnName returns column name with field tag.
