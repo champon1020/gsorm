@@ -149,3 +149,24 @@ mgorm.Select(db, "id").From("people").OrderBy("name DESC").Query(&model)
 // SELECT id FROM people ORDER BY id ORDER BY name DESC;
 mgorm.Select(db, "id").From("people").OrderBy("id", "name DESC")
 ```
+
+
+## Limit
+`Limit`は引数にint型を受け取ります．
+
+#### 例
+```go
+// SELECT id FROM people LIMIT 10;
+mgorm.Select(db, "id").From("people").Limit(10).Query(&model)
+```
+
+
+## Offset
+`Offset`は引数にint型を受け取ります．
+`Offset`は`Limit`の直後のみ呼び出すことができます．
+
+#### 例
+```go
+// SELECT id FROM people LIMIT 10 OFFSET 5;
+mgorm.Select(db, "id").From("people").Limit(10).Offset(5).Query(&model)
+```
