@@ -38,3 +38,27 @@ mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Values(20, "Jiro").E
 // INSERT INTO people (id, name) SELECT (id, name) FROM others;
 mgorm.Insert(db, "people", "id", "name").Select(mgorm.Select(nil, "id", "name").From("others")).Exec()
 ```
+
+
+## Model
+`mgorm.Insert`を使用すとき，`Model`を使用することで構造体をマッピングしてカラムを挿入することができます．
+
+`Model`は引数として構造体のポインタ，構造体スライスのポインタ，マップ型のポインタなどを受け取ることができます．
+
+また，フィールドタグを変更することで対応するカラム名を変更することができます．
+指定しない場合は，フィールド名のスネークケースとなります．
+
+Modelの型やタグについての詳細は[Model]()に記載されています．
+
+#### 例
+```go
+type Person struct {
+    ID        int
+    FirstName string `mgorm:"name"`
+}
+
+people := []Person{{ID: 10, FirstName: "Taro"}, {ID: 20, FirstName: "Jiro"}}
+
+// INSERT INTO people (id, name) VALUES (10, 'Taro'), (20, 'Jiro');
+mgorm.Insert(db, "people", "id", "name").Model(&people).Exec()
+```
