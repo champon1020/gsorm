@@ -174,4 +174,4 @@ if err != nil{
 
 <br>
 
-**次の項目ヘ進む -> [Select]()**
+**次の項目ヘ進む -> [Select](https://github.com/champon1020/mgorm/blob/docs/docs/select_jp.md)**
