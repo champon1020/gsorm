@@ -82,7 +82,7 @@ mgorm.Select(db, "*").From("people").Where("id IN (?)",
 
 ## Or / And
 `Or`，`And`は`Where`とほぼ同様の使用方法になります．
-ただし，これらを使用した場合の条件には`(`と`)`で囲まれたものになります．
+ただし，これらを使用した場合の条件式は`(`と`)`で囲まれたものになります．
 
 #### 例
 ```go
@@ -101,4 +101,30 @@ mgorm.Select(db, "*").From("people").Where("id > ?", 10).Or("id = ? AND name = ?
 //  OR (name = 'Saburo' AND id IN (SELECT personal_id FROM companies));
 mgorm.Select(db, "*").From("people").Where("id > ?", 10).
     Or("name = ? AND id IN (?)", "Saburo",mgorm.Select(nil, "*").From("companies")).Query(&model)
+```
+
+
+### GroupBy
+`GroupBy`は引数に複数のカラム名をstring型で受け取ります．
+
+```go
+// SELECT COUNT(birth_date) FROM people GROUP BY birth_date;
+mgorm.Select(db, "COUNT(birth_date)").From("people").GroupBy("birth_date").Query(&model)
+```
+
+
+### Having
+`Having`は引数に条件式を受け取ります．
+条件式の受け取り方は`Where`や`And`，`Or`と同様です．
+
+基本的には`GroupBy`と共に使用しますが，`Having`のみで使用することも可能です．
+
+#### 例
+```go
+// SELECT id, COUNT(birth_date) FROM people GROUP BY birth_date HAVING COUNT(birth_date) > 10;
+mgorm.Select(db, "id, COUNT(birth_date)").From("people").
+    GroupBy("birth_date").Having("COUNT(birth_date) > ?", 10).Query(&model)
+
+// SELECT SUM(salary) FROM people HAVING SUM(salary) > 100000;
+mgorm.Sum(db, "salary").From("people").Having("SUM(salary) > ?", 10000).Query(&model);
 ```
