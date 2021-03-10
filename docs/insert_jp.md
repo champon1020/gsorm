@@ -2,6 +2,8 @@
 `mgorm.Insert`を使用したとき，`Exec`を呼び出すことでテーブルにカラムを挿入することができます．
 
 `mgorm.Insert`の第1引数は`mgorm.Conn`の型，第2引数はテーブル名をstring型として，第3引数以降は複数のカラム名をstring型として受け取ることができます．
+カラム名を指定しない場合は，全てのカラムとして適用されます．
+
 `mgorm.Conn`を実装した型としては`*mgorm.DB`，`*mgorm.Tx`，`*mgorm.MockDB`，`*mgorm.MockTx`があります．
 
 詳細は[Transaction]()，[Mock]()に記載されています．
@@ -10,6 +12,9 @@
 ```go
 // INSERT INTO people (id, name) VALUES (10, 'Taro');
 mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Exec()
+
+// INSERT INTO people (id, name, birth_date) VALUES (10, 'Taro', '2006-01-02');
+mgorm.Insert(db, "people").Values(10, "Taro", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Exec()
 ```
 
 
