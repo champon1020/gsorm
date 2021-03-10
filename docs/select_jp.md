@@ -18,7 +18,7 @@ mgorm.Select(DB, columns...).From(table)
 
 ## Join
 JOIN句で使用できるのは`Join`，`LeftJoin`，`RightJoin`の3種類です．
-ここで，`Join`はINNER JOIN句とSQLを実行します．
+ここで，`Join`はINNER JOIN句としてSQLを実行します．
 
 `Join`は結合したいテーブル名を引数としてstring型で受け取ります．
 
@@ -26,8 +26,9 @@ JOIN句で使用できるのは`Join`，`LeftJoin`，`RightJoin`の3種類です
 
 `On`には結合条件となる式を引数としてstring型で受け取ります．
 
+これらの使用方法は，`LeftJoin`や`RightJoin`を使用する場合も同様です．
+
+#### 例
 ```go
 mgorm.Select(db, "p.id", "o.id").From("people AS p").Join("others AS o").On("p.id = o.id").Query(&model)
 ```
-
-これらの使用方法は，`LeftJoin`や`RightJoin`を使用する場合も同様です．
