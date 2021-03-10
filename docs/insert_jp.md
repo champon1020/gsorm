@@ -11,3 +11,17 @@
 // INSERT INTO people (id, name) VALUES (10, 'Taro');
 mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Exec()
 ```
+
+
+## Values
+`mgorm.Insert`を用いてカラムを挿入する際，`Values`を用いることで値を挿入することができます．
+`Values`は連続で複数回使用することができます．
+
+#### 例
+```go
+// INSERT INTO people (id, name) VALUES (10, 'Taro');
+mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Exec()
+
+// INSERT INTO people (id, name) VALUES (10, 'Taro'), (20, 'Jiro');
+mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Values(20, "Jiro").Exec()
+```
