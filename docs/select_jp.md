@@ -31,8 +31,12 @@ JOIN句で使用できるのは`Join`，`LeftJoin`，`RightJoin`の3種類です
 
 #### 例
 ```go
+// SELECT p.id, o.id FROM people AS p INNER JOIN others AS o ON p.id = o.id;
 mgorm.Select(db, "p.id", "o.id").From("people AS p").Join("others AS o").On("p.id = o.id").Query(&model)
 
+// SELECT p.id, o.id FROM people AS p
+//  INNER JOIN others1 AS o1 ON p.id = o1.id
+//  LEFT  JOIN others2 AS o2 ON p.id = o2.id;
 mgorm.Select(db, "p.id", "o.id").From("people AS p").
     Join("others1 AS o1").On("p.id = o1.id").
     LeftJoin("others2 AS o2").On("p.id = o2.id").Query(&model)
@@ -47,10 +51,13 @@ mgorm.Select(db, "p.id", "o.id").From("people AS p").
 
 #### 例
 ```go
+// SELECT * FROM people WHERE id > 10;
 mgorm.Select(db, "*").From("people").Where("id > ?", 10).Query(&model)
 
+// SELECT * FROM people WHERE name LIKE '%Taro';
 mgorm.Select(db, "*").From("people").Where("name LIKE ?", "%Taro").Query(&model)
 
+// SELECT * FROM people WHERE id > 10 AND name Like '%Taro';
 mgorm.Select(db, "*").From("people").Where("id > ? AND name LIKE ?", 10, "%Taro").Query(&model)
 ```
 
@@ -60,6 +67,7 @@ mgorm.Select(db, "*").From("people").Where("id > ? AND name LIKE ?", 10, "%Taro"
 
 #### 例
 ```go
+// SELECT * FROM people WHERE id IN (SELECT personal_id FROM companies WHERE name = 'ABC Company');
 mgorm.Select(db, "*").From("people").Where("id IN (?)",
     mgorm.Select(nil, "personal_id").From("companies").Where("name = ?", "ABC Company")).Query(&model)
 ```
