@@ -27,10 +27,10 @@ mgorm.Select(DB, columns...).From(tables...)
     [.Or(expression, values...) | .And(expression, values...)]
     [.GroupBy(columns...)]
     [.Having(expression, values...)]
+    [.Union(*mgorm.SelectStmt) | .UnionAll(*mgorm.SelectStmt)]
     [.OrderBy(columns...)]
     [.Limit(number)]
     [.Offset(number)]
-    [.Union(*mgorm.Stmt) | .UnionAll(*mgorm.Stmt)]
     .Query(*model)
 ```
 
@@ -155,6 +155,23 @@ err := mgorm.Select(db, "id, COUNT(birth_date)").From("people").
 
 // SELECT SUM(salary) FROM people HAVING SUM(salary) > 100000;
 err := mgorm.Sum(db, "salary").From("people").Having("SUM(salary) > ?", 10000).Query(&model);
+```
+
+
+## Union
+`Union`は引数に`*mgorm.SelectStmt`の型を受け取ります．
+つまり，`mgorm.Select`による文を受け取ることができます．
+ただし，引数に渡す`*mgorm.SelectStmt`では`OrderBy`，`Limit`，`Offset`を呼び出してはいけません．
+
+また，`Union`と同様に`UnionAll`も使用することができます．
+
+#### 例
+```go
+// SELECT id FROM people UNION (SELECT id FROM teams);
+mgorm.Select(db, "id").From("people").Union(mgorm.Select(db, "id").From("teams")).Query(&model)
+
+// SELECT id FROM people UNION ALL (SELECT id FROM teams);
+mgorm.Select(db, "id").From("people").UnionAll(mgorm.Select(db, "id").From("teams")).Query(&model)
 ```
 
 
