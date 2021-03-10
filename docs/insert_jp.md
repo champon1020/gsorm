@@ -25,3 +25,16 @@ mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Exec()
 // INSERT INTO people (id, name) VALUES (10, 'Taro'), (20, 'Jiro');
 mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Values(20, "Jiro").Exec()
 ```
+
+
+## Select
+`Select`を用いることでINSERT INTO ... SELECTという文を実行することができます．
+これは`mgorm.Select`とは異なる関数(メソッド)です．
+
+`Select`は引数に`mgorm.SelectStmt`を受け取ります．
+
+#### 例
+```go
+// INSERT INTO people (id, name) SELECT (id, name) FROM others;
+mgorm.Insert(db, "people", "id", "name").Select(mgorm.Select(nil, "id", "name").From("others")).Exec()
+```
