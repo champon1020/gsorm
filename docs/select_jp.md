@@ -115,17 +115,25 @@ err := mgorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").From("employees AS 
 
 #### 例
 ```go
-// SELECT * FROM employees WHERE emp_no = 20000;
-err := mgorm.Select(db).From("employees").Where("emp_no = ?", 20000).Query(&model)
+// SELECT * FROM employees
+//  WHERE emp_no = 20000;
+err := mgorm.Select(db).From("employees").
+    Where("emp_no = ?", 20000).Query(&model)
 
-// SELECT * FROM employees WHERE first_name LIKE '%Taro';
-err := mgorm.Select(db).From("employees").Where("first_name LIKE ?", "%Taro").Query(&model)
+// SELECT * FROM employees
+//  WHERE first_name LIKE '%Taro';
+err := mgorm.Select(db).From("employees").
+    Where("first_name LIKE ?", "%Taro").Query(&model)
 
-// SELECT * FROM employees WHERE emp_no IN (10000, 20000);
-err := mgorm.Select(db).From("employees").Where("emp_no IN (?)", []int{10000, 20000}).Query(&model)
+// SELECT * FROM employees
+//  WHERE emp_no IN (10000, 20000);
+err := mgorm.Select(db).From("employees").
+    Where("emp_no IN (?)", []int{10000, 20000}).Query(&model)
 
-// SELECT * FROM employees WHERE emp_no BETWEEN 10000 AND 20000;
-err := mgorm.Select(db).From("employees").Where("birth_date BETWEEN ?", [2]int{10000, 20000}).Query(&model)
+// SELECT * FROM employees
+//  WHERE emp_no BETWEEN 10000 AND 20000;
+err := mgorm.Select(db).From("employees").
+    Where("birth_date BETWEEN ?", [2]int{10000, 20000}).Query(&model)
 ```
 
 
@@ -134,7 +142,8 @@ err := mgorm.Select(db).From("employees").Where("birth_date BETWEEN ?", [2]int{1
 
 #### 例
 ```go
-// SELECT * FROM employees WHERE emp_no IN (SELECT emp_no FROM dept_manager);
+// SELECT * FROM employees
+//  WHERE emp_no IN (SELECT emp_no FROM dept_manager);
 err := mgorm.Select(db).From("employees").
     Where("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
 ```
@@ -146,12 +155,16 @@ err := mgorm.Select(db).From("employees").
 
 #### 例
 ```go
-// SELECT * FROM employees WHERE emp_no > 20000 AND (first_name = 'Taro' OR first_name = 'Jiro');
+// SELECT * FROM employees
+//  WHERE emp_no > 20000
+//  AND (first_name = 'Taro' OR first_name = 'Jiro');
 err := mgorm.Select(db).From("employees").
     Where("emp_no > ?" 20000).
     And("first_name = ? OR first_name = ?", "Taro", "Jiro").Query(&model)
 
-// SELECT * FROM employees WHERE emp_no > 20000 OR (emp_no <= 20000 AND first_name = 'Saburo');
+// SELECT * FROM employees
+//  WHERE emp_no > 20000
+//  OR (emp_no <= 20000 AND first_name = 'Saburo');
 err := mgorm.Select(db).From("employees").
     Where("emp_no > ?", 20000).
     Or("emp_no <= ? AND first_name = ?", 20000, "Saburo").Query(&model)
@@ -176,8 +189,10 @@ err := mgorm.Select(db).From("employees").
 
 #### 例
 ```go
-// SELECT emp_no, AVG(salary) FROM salaries GROUP BY emp_no;
-err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").GroupBy("emp_no").Query(&model)
+// SELECT emp_no, AVG(salary) FROM salaries
+//  GROUP BY emp_no;
+err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
+    GroupBy("emp_no").Query(&model)
 ```
 
 
@@ -189,13 +204,17 @@ err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").GroupBy("emp_n
 
 #### 例
 ```go
-// SELECT emp_no, AVG(salary) FROM salaries GROUP BY emp_no HAVING AVG(salary) > 130000;
+// SELECT emp_no, AVG(salary) FROM salaries
+//  GROUP BY emp_no
+//  HAVING AVG(salary) > 130000;
 err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
     GroupBy("emp_no").
     Having("AVG(salary) > ?", 130000).Query(&model)
 
-// SELECT SUM(salary) FROM salaries HAVING SUM(salary) > 1000000;
-err := mgorm.Sum(db, "salary").From("salaries").Having("SUM(salary) > ?", 1000000).Query(&model);
+// SELECT SUM(salary) FROM salaries
+//  HAVING SUM(salary) > 1000000;
+err := mgorm.Sum(db, "salary").From("salaries").
+    Having("SUM(salary) > ?", 1000000).Query(&model);
 ```
 
 `mgorm.Sum`については[Function]()に記載されています．
@@ -209,11 +228,13 @@ err := mgorm.Sum(db, "salary").From("salaries").Having("SUM(salary) > ?", 100000
 
 #### 例
 ```go
-// SELECT * FROM employees UNION (SELECT * FROM departments);
+// SELECT * FROM employees
+//  UNION (SELECT * FROM departments);
 mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
     Union(mgorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
 
-// SELECT * FROM employees UNION ALL (SELECT * FROM departments);
+// SELECT * FROM employees
+//  UNION ALL (SELECT * FROM departments);
 mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
     UnionAll(mgorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
 ```
@@ -227,13 +248,19 @@ mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 
 #### 例
 ```go
-// SELECT * FROM employees ORDER BY birth_date;
-err := mgorm.Select(db).From("employees").OrderBy("birth_date").Query(&model)
+// SELECT * FROM employees
+//  ORDER BY birth_date;
+err := mgorm.Select(db).From("employees").
+    OrderBy("birth_date").Query(&model)
 
-// SELECT * FROM employees ORDER BY hire_date DESC;
-err := mgorm.Select(db).From("employees").OrderBy("hire_date DESC").Query(&model)
+// SELECT * FROM employees
+//  ORDER BY hire_date DESC;
+err := mgorm.Select(db).From("employees").
+    OrderBy("hire_date DESC").Query(&model)
 
-// SELECT id FROM people ORDER BY id ORDER BY birth_date ORDER BY hire_date DESC;
+// SELECT id FROM people
+//  ORDER BY birth_date
+//  ORDER BY hire_date DESC;
 err := mgorm.Select(db).From("employees").
     OrderBy("birth_date").
     OrderBy("hire_date DESC").Query(&model)
@@ -245,8 +272,10 @@ err := mgorm.Select(db).From("employees").
 
 #### 例
 ```go
-// SELECT * FROM employees LIMIT 10;
-err := mgorm.Select(db).From("employees").Limit(10).Query(&model)
+// SELECT * FROM employees
+//  LIMIT 10;
+err := mgorm.Select(db).From("employees").
+    Limit(10).Query(&model)
 ```
 
 
@@ -256,7 +285,9 @@ err := mgorm.Select(db).From("employees").Limit(10).Query(&model)
 
 #### 例
 ```go
-// SELECT * FROM employees LIMIT 10 OFFSET 5;
+// SELECT * FROM employees
+//  LIMIT 10
+//  OFFSET 5;
 err := mgorm.Select(db).From("employees").
     Limit(10).
     Offset(5).Query(&model)
