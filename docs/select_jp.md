@@ -118,7 +118,22 @@ err := mgorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").From("employees AS 
 // SELECT * FROM employees
 //  WHERE emp_no = 20000;
 err := mgorm.Select(db).From("employees").
+    Where("emp_no = 20000").Query(&model)
+
+// SELECT * FROM employees
+//  WHERE emp_no = 20000;
+err := mgorm.Select(db).From("employees").
     Where("emp_no = ?", 20000).Query(&model)
+
+// SELECT * FROM employees
+//  WHERE first_name = 'Taro';
+err := mgorm.Select(db).From("employees").
+    Where("first_name = ?", "Taro").Query(&model)
+
+// SELECT * FROM employees
+//  WHERE birth_date = '2006-01-02 00:00:00';
+err := mgorm.Select(db).From("employees").
+    Where("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
 
 // SELECT * FROM employees
 //  WHERE first_name LIKE '%Taro';
@@ -153,6 +168,9 @@ err := mgorm.Select(db).From("employees").
 `Or`，`And`は`Where`とほぼ同様の使用方法になります．
 ただし，これらを使用した場合の条件式は`(`と`)`で囲まれたものになります．
 
+`And`と`Or`は，`Where`を呼び出した直後のみ呼び出すことができます．
+また，`And`と`Or`は連続して呼び出すことができます．
+
 #### 例
 ```go
 // SELECT * FROM employees
@@ -168,6 +186,17 @@ err := mgorm.Select(db).From("employees").
 err := mgorm.Select(db).From("employees").
     Where("emp_no > ?", 20000).
     Or("emp_no <= ? AND first_name = ?", 20000, "Saburo").Query(&model)
+
+// SELECT * FROM employees
+//  WHERE emp_no > 20000
+//  AND (first_name = 'Taro')
+//  AND (last_name = 'Sato')
+//  OR (emp_no < 20000 AND first_name = 'Jiro');
+err := mgorm.Select(db).From("employees").
+    Where("emp_no > ?", 20000).
+    And("first_name = ?", "Taro").
+    And("last_name = ?", "Sato").
+    Or("emp_no < ? AND first_name = ?", 20000, "Jiro").Query(&model)
 ```
 
 また，`Where`と同様に副問合せも用いることができます．
