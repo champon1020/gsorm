@@ -18,12 +18,12 @@ mgorm.Insert(db, "employees", "emp_no", "first_name").
 # Methods
 `mgorm.Insert`で使用できるメソッドを以下に示します．
 
-- [Values](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#values)
-- [Select](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#select)
-- [Model](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#model)
+- [Values](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#values)
+- [Select](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#select)
+- [Model](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#model)
 
 ```
-[]: optional, |: or, {}: one of them, **: able to use multiple
+[]: optional, |: or, {}: block, **: able to use many times
 
 mgorm.Insert(DB, table, columns...)
     {.Values(values...)** | .Select(*mgorm.SelectStmt) | .Model(model)}

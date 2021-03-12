@@ -16,7 +16,7 @@ err := mgorm.Delete(db).From("employees").Exec()
 - [And / Or](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#and-or)
 
 ```
-[]: optional, |: or, **: able to used multiple
+[]: optional, |: or, **: able to used many times
 
 mgorm.Delete(DB)
     .From(table)
@@ -27,13 +27,14 @@ mgorm.Delete(DB)
 上の図において，上に行くほど実行優先度が高いです．
 例えば，以下のようなことはできません．
 
-これに反した場合，コンパイルエラーを吐き出します．
 ```go
 // NG
 err := mgorm.Delete(db).
     Where("emp_no = ?", 10000).
     From("employees").Exec()
 ```
+
+これに反した場合，コンパイルエラーを吐き出します．
 
 
 ## From

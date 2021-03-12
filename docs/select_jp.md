@@ -35,7 +35,7 @@ err := mgorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 - [Offset](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#offset)
 
 ```
-[]: optional,  |: or,  {}: one of them, **: able to use multiple
+[]: optional,  |: or,  {}: block, **: able to use many times
 
 mgorm.Select(DB, columns...).From(tables...)
     [{ .Join(tables) | .LeftJoin(table) | .RightJoin(table) }.On(expression)]**
@@ -53,13 +53,14 @@ mgorm.Select(DB, columns...).From(tables...)
 上の図において，上に行くほど実行優先度が高いです．
 例えば以下のようなことはできません．
 
-これに反した場合，コンパイルエラーを吐き出します．
 ```go
 // NG
 err := mgorm.Select(db).
     Where("emp_no = ?", 10000).
     From("employees").Query(&model)
 ```
+
+これに反した場合，コンパイルエラーを吐き出します．
 
 
 ## From
