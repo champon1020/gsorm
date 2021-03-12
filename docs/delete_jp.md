@@ -8,7 +8,7 @@ err := mgorm.Delete(db).From("employees").Exec()
 ```
 
 
-# Method
+# Methods
 `mgorm.Delete`で使用できるメソッドを以下に示します．
 
 - [From]()
@@ -21,6 +21,15 @@ err := mgorm.Delete(db).From("employees").Exec()
 mgorm.Delete(DB).
     [.Where(expression, values...)]
     [.And(expression, values) | .Or(expression, values)]
+```
+上の図において，上に行くほど実行優先度が高いです．
+例えば，以下のようなことはできません．
+
+```go
+// NG
+err := mgorm.Delete(db).
+    Where("emp_no = ?", 10000).
+    From("employees").Exec()
 ```
 
 
