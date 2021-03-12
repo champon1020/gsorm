@@ -1,22 +1,8 @@
 # Update
 `mgorm.Update`を使用したとき，`Exec`を呼び出すことでテーブル上のカラムを更新することができます．
 
-`mgorm.Update`の第1引数は`mgorm.Conn`の型，第2引数はテーブル名をstring型として，第3引数以降は複数のカラム名をstring型として受け取ることができます．
-カラム名を指定しない場合は，全てのカラムとして適用されます．
-
-`mgorm.Conn`を実装した型としては`*mgorm.DB`，`*mgorm.Tx`，`*mgorm.MockDB`，`*mgorm.MockTx`があります．
-
-詳細は[Transaction]()，[Mock]()に記載されています．
-
 #### 例
 ```go
-// UPDATE employees
-//  SET emp_no=1001,
-//      birth_date='1995-07-07',
-//      first_name='Hanako',
-//      last_name='Suzuki',
-//      gender='W',
-//      hire_date='2019-09-01';
 mgorm.Update(db).Set(10, "employees").
     Set(1001,
         "1995-07-07",
@@ -24,13 +10,51 @@ mgorm.Update(db).Set(10, "employees").
         "Suzuki",
         "W",
         "2019-09-01").Exec()
+// UPDATE employees
+//  SET emp_no=1001,
+//      birth_date='1995-07-07',
+//      first_name='Hanako',
+//      last_name='Suzuki',
+//      gender='W',
+//      hire_date='2019-09-01';
 
+mgorm.Update(db, "employees", "emp_no", "first_name").
+    Set(1001, "Hanako").Exec()
 // UPDATE employees
 //  SET emp_no=1001,
 //      first_name='Hanako';
-mgorm.Update(db, "employees", "emp_no", "first_name").
-    Set(1001, "Hanako").Exec()
 ```
+
+
+# Methods
+`mgorm.Update`で使用できるメソッドを以下に示します．
+
+- [Set](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#set)
+- [Where](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#where)
+- [And / Or](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#and-or)
+- [Model](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#model)
+
+```
+[]: optional, |: or, {}: block, **: able to use many times
+
+mgorm.Update(DB, table, columns...)
+    {.Set(values...)
+        [.Where(expression, values...)]
+        [.And(expression, values...) | .Or(expression, values...)]**
+    } | .Model(*model)
+    .Exec()
+```
+上の図において，上に行くほど実行優先度が高いです． 例えば以下のようなことはできません．
+
+```go
+// NG
+err := mgorm.Update(db, "employees", "emp_no", "first_name").
+    Set(1001, "Hanako").
+    And("emp_no < ? AND first_name = ?", 1000, "Taro")
+    Where("emp_no > ?", 1000).Exec()
+```
+
+これに反した場合，コンパイルエラーを吐き出します．
 
 
 ## Set
@@ -40,11 +64,11 @@ mgorm.Update(db, "employees", "emp_no", "first_name").
 
 #### 例
 ```go
+mgorm.Update(db, "employees", "emp_no", "first_name").
+    Set(1001, "Hanako").Exec()
 // UPDATE employees
 //  SET emp_no=1001,
 //      first_name='Hanako';
-mgorm.Update(db, "employees", "emp_no", "first_name").
-    Set(1001, "Hanako").Exec()
 ```
 
 
@@ -55,13 +79,13 @@ mgorm.Update(db, "employees", "emp_no", "first_name").
 
 #### 例
 ```go
+mgorm.Update(db, "employees", "first_name").
+    Set("Jiro").
+    Where("emp_no = ?", 1000).Exec()
 // UPDATE employees
 //  SET first_name='Jiro'
 //      last_name='Kaneko'
 //  WHERE emp_no = 1000;
-mgorm.Update(db, "employees", "first_name").
-    Set("Jiro").
-    Where("emp_no = ?", 1000).Exec()
 ```
 
 
@@ -72,25 +96,25 @@ mgorm.Update(db, "employees", "first_name").
 
 #### 例
 ```go
+mgorm.Update(db, "employees", "first_name", "last_name").
+    Set("Jiro", "Kaneko").
+    Where("emp_no = ?", 1000).
+    And("first_name = ? OR last_name = ?", "Taro", "Sato").Exec()
 // UPDATE employees
 //  SET first_name='Jiro'
 //      last_name='Kaneko'
 //  WHERE emp_no = 1000
 //  AND (first_name = 'Taro' OR last_name = 'Sato');
+
 mgorm.Update(db, "employees", "first_name", "last_name").
     Set("Jiro", "Kaneko").
-    Where("emp_no = ?", 1000).
-    And("first_name = ? OR last_name = ?", "Taro", "Sato").Exec()
-
+    Where("emp_no > ?", 1000).
+    And("emp_no < ? AND first_name = ?", 1000, "Taro").Exec()
 // UPDATE employees
 //  SET first_name='Jiro'
 //      last_name='Kaneko'
 //  WHERE emp_no > 1000
 //  OR (emp_no < 1000 AND first_name = 'Taro');
-mgorm.Update(db, "employees", "first_name", "last_name").
-    Set("Jiro", "Kaneko").
-    Where("emp_no > ?", 1000).
-    And("emp_no < ? AND first_name = ?", 1000, "Taro").Exec()
 ```
 
 
@@ -117,11 +141,11 @@ type Employee struct {
 
 emp1 := Employee{ID: 1000, FirstName: "Taro"}
 
+mgorm.Update(db, "employees", "emp_no", "first_name").
+    Model(&emp1).Exec()
 // UPDATE employees
 //  SET emp_no=1000,
 //      first_name='Taro';
-mgorm.Update(db, "employees", "emp_no", "first_name").
-    Model(&emp1).Exec()
 
 emp2 = Employee{
     ID: 1000,
@@ -132,6 +156,8 @@ emp2 = Employee{
     HireDate: "1988-04-01",
 }
 
+mgorm.Update(db, "employees").
+    Model(&emp2).Exec()
 // UPDATE employees
 //  SET emp_no=1000,
 //      birth_date='1965-04-04 00:00:00'
@@ -139,6 +165,4 @@ emp2 = Employee{
 //      last_name='Sato',
 //      gender='M',
 //      hire_date='1988-04-01';
-mgorm.Update(db, "employees").
-    Model(&emp2).Exec()
 ```

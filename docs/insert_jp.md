@@ -1,24 +1,33 @@
 # Insert
 `mgorm.Insert`を使用したとき，`Exec`を呼び出すことでテーブルにカラムを挿入することができます．
 
-`mgorm.Insert`の第1引数は`mgorm.Conn`の型，第2引数はテーブル名をstring型として，第3引数以降は複数のカラム名をstring型として受け取ることができます．
-カラム名を指定しない場合は，全てのカラムとして適用されます．
-
-`mgorm.Conn`を実装した型としては`*mgorm.DB`，`*mgorm.Tx`，`*mgorm.MockDB`，`*mgorm.MockTx`があります．
-
-詳細は[Transaction]()，[Mock]()に記載されています．
-
 #### 例
 ```go
-// INSERT INTO employees
-//  VALUES (1000, '1996-03-09', 'Taro', 'Sato', 'M', '2020-04-01');
 mgorm.Insert(db, "employees").
     Values(1000, "1996-03-09", "Taro", "Sato", "M", "2020-04-01").Exec()
+// INSERT INTO employees
+//  VALUES (1000, '1996-03-09', 'Taro', 'Sato', 'M', '2020-04-01');
 
-// INSERT INTO employees (emp_no, first_name)
-//  VALUES (1000, 'Taro');
 mgorm.Insert(db, "employees", "emp_no", "first_name").
     Values(1000, "Taro").Exec()
+// INSERT INTO employees (emp_no, first_name)
+//  VALUES (1000, 'Taro');
+```
+
+
+# Methods
+`mgorm.Insert`で使用できるメソッドを以下に示します．
+
+- [Values](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#values)
+- [Select](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#select)
+- [Model](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#model)
+
+```
+[]: optional, |: or, {}: block, **: able to use many times
+
+mgorm.Insert(DB, table, columns...)
+    {.Values(values...)** | .Select(*mgorm.SelectStmt) | .Model(model)}
+    .Exec()
 ```
 
 
@@ -28,15 +37,15 @@ mgorm.Insert(db, "employees", "emp_no", "first_name").
 
 #### 例
 ```go
-// INSERT INTO employees (emp_no, first_name)
-//  VALUES (1000, 'Taro');
 mgorm.Insert(db, "employees", "emp_no", "first_name").
     Values(1000, "Taro").Exec()
-
 // INSERT INTO employees (emp_no, first_name)
-//  VALUES (1000, 'Taro'), (2000, 'Jiro');
+//  VALUES (1000, 'Taro');
+
 mgorm.Insert(db, "employees", "emp_no", "first_name").
     Values(1000, "Taro").Values(2000, "Jiro").Exec()
+// INSERT INTO employees (emp_no, first_name)
+//  VALUES (1000, 'Taro'), (2000, 'Jiro');
 ```
 
 
@@ -48,10 +57,10 @@ mgorm.Insert(db, "employees", "emp_no", "first_name").
 
 #### 例
 ```go
-// INSERT INTO dept_manager
-//  SELECT * FROM dept_emp;
 mgorm.Insert(db, "dept_manager").
     Select(mgorm.Select(nil).From("dept_emp")).Exec()
+// INSERT INTO dept_manager
+//  SELECT * FROM dept_emp;
 ```
 
 
@@ -74,8 +83,8 @@ type Employee struct {
 
 employees := []Employee{{ID: 1000, FirstName: "Taro"}, {ID: 2000, FirstName: "Jiro"}}
 
-// INSERT INTO employees (emp_no, first_name)
-//  VALUES (1000, 'Taro'), (2000, 'Jiro');
 mgorm.Insert(db, "employees", "emp_no", "first_name").
     Model(&employees).Exec()
+// INSERT INTO employees (emp_no, first_name)
+//  VALUES (1000, 'Taro'), (2000, 'Jiro');
 ```
