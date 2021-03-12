@@ -10,25 +10,33 @@
 
 #### 例
 ```go
-// INSERT INTO people (id, name) VALUES (10, 'Taro');
-mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Exec()
+// INSERT INTO employees
+//  VALUES (1000, '1996-03-09', 'Taro', 'Sato', 'M', '2020-04-01');
+mgorm.Insert(db, "employees").
+    Values(1000, "1996-03-09", "Taro", "Sato", "M", "2020-04-01").Exec()
 
-// INSERT INTO people (id, name, birth_date) VALUES (10, 'Taro', '2006-01-02');
-mgorm.Insert(db, "people").Values(10, "Taro", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Exec()
+// INSERT INTO employees (emp_no, first_name)
+//  VALUES (1000, 'Taro');
+mgorm.Insert(db, "employees", "emp_no", "first_name").
+    Values(1000, "Taro").Exec()
 ```
 
 
 ## Values
-`mgorm.Insert`を用いてカラムを挿入する際，`Values`を用いることで値を挿入することができます．
+`mgorm.Insert`を用いてカラムを挿入するとき，`Values`を用いることで値を挿入することができます．
 `Values`は連続で複数回使用することができます．
 
 #### 例
 ```go
-// INSERT INTO people (id, name) VALUES (10, 'Taro');
-mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Exec()
+// INSERT INTO employees (emp_no, first_name)
+//  VALUES (1000, 'Taro');
+mgorm.Insert(db, "employees", "emp_no", "first_name").
+    Values(1000, "Taro").Exec()
 
-// INSERT INTO people (id, name) VALUES (10, 'Taro'), (20, 'Jiro');
-mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Values(20, "Jiro").Exec()
+// INSERT INTO employees (emp_no, first_name)
+//  VALUES (1000, 'Taro'), (2000, 'Jiro');
+mgorm.Insert(db, "employees", "emp_no", "first_name").
+    Values(1000, "Taro").Values(2000, "Jiro").Exec()
 ```
 
 
@@ -40,8 +48,10 @@ mgorm.Insert(db, "people", "id", "name").Values(10, "Taro").Values(20, "Jiro").E
 
 #### 例
 ```go
-// INSERT INTO people (id, name) SELECT (id, name) FROM others;
-mgorm.Insert(db, "people", "id", "name").Select(mgorm.Select(nil, "id", "name").From("others")).Exec()
+// INSERT INTO dept_manager
+//  SELECT * FROM dept_emp;
+mgorm.Insert(db, "dept_manager").
+    Select(mgorm.Select(nil).From("dept_emp")).Exec()
 ```
 
 
@@ -57,13 +67,15 @@ Modelの型やタグについての詳細は[Model]()に記載されています
 
 #### 例
 ```go
-type Person struct {
-    ID        int
-    FirstName string `mgorm:"name"`
+type Employee struct {
+    ID        int    `mgorm:"emp_no"`
+    FirstName string
 }
 
-people := []Person{{ID: 10, FirstName: "Taro"}, {ID: 20, FirstName: "Jiro"}}
+employees := []Employee{{ID: 1000, FirstName: "Taro"}, {ID: 2000, FirstName: "Jiro"}}
 
-// INSERT INTO people (id, name) VALUES (10, 'Taro'), (20, 'Jiro');
-mgorm.Insert(db, "people", "id", "name").Model(&people).Exec()
+// INSERT INTO employees (emp_no, first_name)
+//  VALUES (1000, 'Taro'), (2000, 'Jiro');
+mgorm.Insert(db, "employees", "emp_no", "first_name").
+    Model(&employees).Exec()
 ```
