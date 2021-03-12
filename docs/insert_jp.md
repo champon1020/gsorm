@@ -74,6 +74,8 @@ type Employee struct {
 
 employees := []Employee{{ID: 1000, FirstName: "Taro"}, {ID: 2000, FirstName: "Jiro"}}
 
-// INSERT INTO employees (emp_no, first_name) VALUES (1000, 'Taro'), (2000, 'Jiro');
-mgorm.Insert(db, "employees", "emp_no", "first_name").Model(&employees).Exec()
+// INSERT INTO employees (emp_no, first_name)
+//  VALUES (1000, 'Taro'), (2000, 'Jiro');
+mgorm.Insert(db, "employees", "emp_no", "first_name").
+    Model(&employees).Exec()
 ```

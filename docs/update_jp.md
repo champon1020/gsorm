@@ -92,3 +92,53 @@ mgorm.Update(db, "employees", "first_name", "last_name").
     Where("emp_no > ?", 1000).
     And("emp_no < ? AND first_name = ?", 1000, "Taro").Exec()
 ```
+
+
+## Model
+`mgorm.Update`を使用すとき，`Model`を使用することで構造体をマッピングしてカラムを更新することができます．
+
+`Model`は引数として構造体のポインタ，構造体スライスのポインタ，マップ型のポインタなどを受け取ることができます．
+
+また，フィールドタグを変更することで対応するカラム名を変更することができます．
+指定しない場合は，フィールド名のスネークケースとなります．
+
+Modelの型やタグについての詳細は[Model]()に記載されています．
+
+#### 例
+```go
+type Employee struct {
+    ID        int       `mgorm:"emp_no"`
+    BirthDate time.Time
+    FirstName string
+    LastName  string
+    Gender    string
+    HireDate  string
+}
+
+emp1 := Employee{ID: 1000, FirstName: "Taro"}
+
+// UPDATE employees
+//  SET emp_no=1000,
+//      first_name='Taro';
+mgorm.Update(db, "employees", "emp_no", "first_name").
+    Model(&emp1).Exec()
+
+emp2 = Employee{
+    ID: 1000,
+    BirthDate: time.Date(1965, time.April, 4, 0, 0, 0, 0, time.UTC),
+    FirstName: "Taro",
+    LastName: "Sato",
+    Gender: "M",
+    HireDate: "1988-04-01",
+}
+
+// UPDATE employees
+//  SET emp_no=1000,
+//      birth_date='1965-04-04 00:00:00'
+//      first_name='Taro',
+//      last_name='Sato',
+//      gender='M',
+//      hire_date='1988-04-01';
+mgorm.Update(db, "employees").
+    Model(&emp2).Exec()
+```
