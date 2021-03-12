@@ -1,0 +1,80 @@
+# Delete
+`mgorm.Delete`を使用したとき，`Exec`メソッドを呼び出すことでカラムを消去することができます．
+
+#### 例
+```go
+err := mgorm.Delete(db).From("employees").Exec()
+// DELETE FROM employees;
+```
+
+
+# Method
+`mgorm.Delete`で使用できるメソッドを以下に示します．
+
+- [From]()
+- [Where]()
+- [And / Or]()
+
+```
+[]: optional, |: Or
+
+mgorm.Delete(DB).
+    [.Where(expression, values...)]
+    [.And(expression, values) | .Or(expression, values)]
+```
+
+
+## From
+`From`は複数のテーブル名を受け取ります．
+必要であれば，テーブル名にはエイリアスを含めることができます．
+
+#### 例
+```go
+err := mgorm.Delete(db).From("employees").Exec()
+// DELETE FROM employees;
+
+err := mgorm.Delete(db).From("employees", "dept_emp").Exec()
+// DELETE FROM employees, dept_emp;
+
+err := mgorm.Delete(db).From("employees AS e").
+    Where("e.emp_no = ?", 10000).Exec()
+// DELETE FROM employees AS e
+//  WHERE e.emp_no = 10000;
+```
+
+
+## Where
+`Where`は引数に条件式を受け取ります．
+
+詳しい使用方法は`mgorm.Select`における[Where]()に記載されています．
+
+#### 例
+```go
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 10000).Exec()
+// DELETE FROM employees
+//  WHERE emp_no = 10000;
+```
+
+
+## And / Or
+`And`，`Or`は引数に条件式を受け取ります．
+
+詳しい使用方法は`mgorm.Select`における[And / Or]()に記載されています．
+
+#### 例
+```go
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 10000).
+    And("first_name = ? OR last_name = ?", "Taro", "Sato").Exec()
+// DELETE FROM employees
+//  WHERE emp_no = 10000
+//  AND (first_name = 'Taro' AND last_name = 'Sato');
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no > ?", 10000).
+    And("emp_no < ? AND first_name = ?", 10000, "Taro").Exec()
+// DELETE FROM employees
+//  WHERE emp_no > 10000
+//  OR (emp_no < 10000 AND first_name = 'Taro');
+```
