@@ -11,9 +11,9 @@ err := mgorm.Delete(db).From("employees").Exec()
 # Methods
 `mgorm.Delete`で使用できるメソッドを以下に示します．
 
-- [From]()
-- [Where]()
-- [And / Or]()
+- [From](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#from)
+- [Where](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#where)
+- [And / Or](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#and-or)
 
 ```
 []: optional, |: Or
@@ -25,6 +25,7 @@ mgorm.Delete(DB).
 上の図において，上に行くほど実行優先度が高いです．
 例えば，以下のようなことはできません．
 
+これに反した場合，コンパイルエラーを吐き出します．
 ```go
 // NG
 err := mgorm.Delete(db).
