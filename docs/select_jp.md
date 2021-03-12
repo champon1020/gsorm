@@ -1,11 +1,6 @@
 # Select
 `mgorm.Select`を使用したとき，`Query`を呼び出すことでデータベースからの検索結果をマッピングすることができます．
 
-`mgorm.Select`の第1引数は`mgorm.Conn`の型，第2引数以降は複数のカラム名をstring型として受け取ることができます．
-`mgorm.Conn`を実装した型としては`*mgorm.DB`，`*mgorm.Tx`，`*mgorm.MockDB`，`*mgorm.MockTx`があります．
-
-詳細は[Transaction]()，[Mock]()に記載されています．
-
 #### 例
 ```go
 err := mgorm.Select(db, "emp_no").From("employees").Query(&model)
@@ -40,16 +35,16 @@ err := mgorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 - [Offset](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#offset)
 
 ```
-[]: optional,  |: or,  {}: one of them
+[]: optional,  |: or,  {}: one of them, **: able to use multiple
 
 mgorm.Select(DB, columns...).From(tables...)
-    [{ .Join(tables) | .LeftJoin(table) | .RightJoin(table) }.On(expression)]
+    [{ .Join(tables) | .LeftJoin(table) | .RightJoin(table) }.On(expression)]**
     [.Where(expression, values...)]
-    [.Or(expression, values...) | .And(expression, values...)]
+    [.And(expression, values...) | .Or(expression, values...)]**
     [.GroupBy(columns...)]
     [.Having(expression, values...)]
     [.Union(*mgorm.SelectStmt) | .UnionAll(*mgorm.SelectStmt)]
-    [.OrderBy(columns...)]
+    [.OrderBy(columns...)]**
     [.Limit(number)]
     [.Offset(number)]
     .Query(*model)

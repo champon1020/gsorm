@@ -16,12 +16,14 @@ err := mgorm.Delete(db).From("employees").Exec()
 - [And / Or](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#and-or)
 
 ```
-[]: optional, |: Or
+[]: optional, |: or, **: able to used multiple
 
-mgorm.Delete(DB).
+mgorm.Delete(DB)
+    .From(table)
     [.Where(expression, values...)]
-    [.And(expression, values) | .Or(expression, values)]
+    [.And(expression, values) | .Or(expression, values)]**
 ```
+
 上の図において，上に行くほど実行優先度が高いです．
 例えば，以下のようなことはできません．
 
