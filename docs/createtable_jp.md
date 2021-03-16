@@ -1,5 +1,5 @@
 # CreateTable
-`mgorm.CreateTable`を使用したとき，`Migrate`を呼び出すことでテーブルを作成することができる．
+`mgorm.CreateTable`を使用したとき，`Migrate`を呼び出すことでテーブルを作成することができます．
 
 #### 例
 ```go
