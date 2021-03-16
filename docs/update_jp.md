@@ -31,7 +31,7 @@ mgorm.Update(db, "employees", "emp_no", "first_name").
 
 - [Set](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#set)
 - [Where](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#where)
-- [And / Or](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#and-or)
+- [And / Or](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#and--or)
 - [Model](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#model)
 
 ```

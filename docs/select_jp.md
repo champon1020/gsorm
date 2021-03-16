@@ -26,7 +26,7 @@ err := mgorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 - [From](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#from)
 - [Join / LeftJoin / RightJoin](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#join)
 - [Where](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#where)
-- [And / Or](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#and-or)
+- [And / Or](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#and--or)
 - [GroupBy](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#groupby)
 - [Having](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#having)
 - [Union / UnionAll](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#union)
