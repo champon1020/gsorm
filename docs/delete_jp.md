@@ -13,7 +13,7 @@ err := mgorm.Delete(db).From("employees").Exec()
 
 - [From](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#from)
 - [Where](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#where)
-- [And / Or](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#and-or)
+- [And / Or](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#and--or)
 
 ```
 []: optional, |: or, **: able to used many times
