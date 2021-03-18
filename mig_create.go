@@ -88,33 +88,6 @@ func (s *CreateIndexStmt) On(table string, cols ...string) prCreate.OnMP {
 	return s
 }
 
-// These are Column options which is used as field tag.
-const (
-	// Column name.
-	colName = "mgorm"
-
-	// Column type.
-	colType = "type"
-
-	// NOT NULL option.
-	notnull = "notnull"
-
-	// DEFAULT option.
-	def = "def"
-
-	// AUTO_INCREMENT option.
-	autoinc = "autoinc"
-
-	// Unique key.
-	unique = "uc"
-
-	// Primary key.
-	primary = "pk"
-
-	// Foreign key.
-	foreign = "fk"
-)
-
 // CreateTableStmt is CREATE TABLE statement.
 type CreateTableStmt struct {
 	migStmt
@@ -213,19 +186,20 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 			sql.Write(",")
 		}
 		f := typ.Field(i)
+		tag := internal.ExtractTag(f)
 
 		// Write column name.
 		var name string
-		if v, ok := f.Tag.Lookup(colName); ok {
-			name = v
+		if tag.Lookup("col") {
+			name = tag.Column
 		} else {
 			name = internal.SnakeCase(f.Name)
 		}
 		sql.Write(name)
 
 		// Write column type.
-		if v := f.Tag.Get(colType); v != "" {
-			sql.Write(v)
+		if tag.Lookup("typ") {
+			sql.Write(tag.Type)
 		} else {
 			dbtyp := convertToDBType(f.Type, s.conn.getDriver())
 			if dbtyp == "" {
@@ -236,38 +210,25 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 		}
 
 		// Write NOT NULL option if exist.
-		if _, ok := f.Tag.Lookup(notnull); ok {
+		if tag.Lookup("notnull") {
 			sql.Write("NOT NULL")
 		}
 		// Write DEFAULT option if exist.
-		if v, ok := f.Tag.Lookup(def); ok {
-			sql.Write(fmt.Sprintf("DEFAULT %s", v))
-		}
-		// Write AUTO_INCREMENT option if exist.
-		if _, ok := f.Tag.Lookup(autoinc); ok {
-			sql.Write("AUTO_INCREMENT")
+		if tag.Lookup("default") {
+			sql.Write(fmt.Sprintf("DEFAULT %s", tag.Default))
 		}
 		// Store unique key if exist.
-		if v := f.Tag.Get(unique); v != "" {
-			uc[v] = append(uc[v], name)
+		if tag.Lookup("uc") {
+			uc[tag.UC] = append(uc[tag.UC], name)
 		}
 		// Store primary key if exist.
-		if v := f.Tag.Get(primary); v != "" {
-			pk[v] = append(pk[v], name)
+		if tag.Lookup("pk") {
+			pk[tag.PK] = append(pk[tag.PK], name)
 		}
 		// Store foreign key if exist.
-		if v := f.Tag.Get(foreign); v != "" {
-			el := strings.Split(v, " ")
-			if len(el) != 2 {
-				msg := `Format of tag for foreign key must be fk:"<key> <ref_table>(<ref_column>)"`
-				return errors.New(msg, errors.InvalidSyntaxError)
-			}
-			fk[el[0]] = append(fk[el[0]], name)
-			if _, ok := ref[el[0]]; ok && ref[el[0]] != el[1] {
-				msg := "Different reference is used with same key"
-				return errors.New(msg, errors.InvalidSyntaxError)
-			}
-			ref[el[0]] = el[1]
+		if tag.Lookup("fk") {
+			fk[tag.FK] = append(fk[tag.FK], name)
+			ref[tag.FK] = tag.Ref
 		}
 	}
 

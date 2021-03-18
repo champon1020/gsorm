@@ -18,6 +18,29 @@ type Tag struct {
 	Layout  string
 }
 
+// Lookup returns tag exists or not.
+func (t *Tag) Lookup(tag string) bool {
+	switch tag {
+	case "col":
+		return t.Column != ""
+	case "typ":
+		return t.Type != ""
+	case "notnull":
+		return t.NotNull == true
+	case "default":
+		return t.Default != ""
+	case "pk":
+		return t.PK != ""
+	case "fk":
+		return t.FK != "" && t.Ref != ""
+	case "uc":
+		return t.UC != ""
+	case "layout":
+		return t.Layout != ""
+	}
+	return false
+}
+
 // ExtractTag extracts the field tag.
 func ExtractTag(f reflect.StructField) *Tag {
 	t := &Tag{}
@@ -26,7 +49,7 @@ func ExtractTag(f reflect.StructField) *Tag {
 		t.Column = jsonTag
 	}
 
-	tags := strings.Split(f.Tag.Get("mgorm"), " ")
+	tags := strings.Split(f.Tag.Get("mgorm"), ",")
 	for _, v := range tags {
 		if !strings.Contains(v, "=") {
 			t.Column = v

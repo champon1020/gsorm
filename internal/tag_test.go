@@ -10,7 +10,7 @@ import (
 
 func Test_ExtractTag(t *testing.T) {
 	type Model struct {
-		A string `mgorm:"col typ=VARCHAR(64) notnull=t default='test' pk=PK_a fk=FK_a:reftbl(refcol) uc=UC_a layout=time.RFC3339"`
+		A string `mgorm:"col,typ=VARCHAR(64),notnull=t,default='test',pk=PK_a,fk=FK_a:reftbl(refcol),uc=UC_a,layout=time.RFC3339"`
 		B string `mgorm:"col" json:"col2"`
 	}
 
