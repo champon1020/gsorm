@@ -11,30 +11,6 @@ import (
 	prDrop "github.com/champon1020/mgorm/provider/drop"
 )
 
-// DropDBStmt is DROP DATABASE statement.
-type DropDBStmt struct {
-	migStmt
-	cmd *mig.DropDB
-}
-
-func (s *DropDBStmt) String() string {
-	return s.string(s.buildSQL)
-}
-
-// Migrate executes database migration.
-func (s *DropDBStmt) Migrate() error {
-	return s.migration(s.buildSQL)
-}
-
-func (s *DropDBStmt) buildSQL(sql *internal.SQL) error {
-	ss, err := s.cmd.Build()
-	if err != nil {
-		return err
-	}
-	sql.Write(ss.Build())
-	return nil
-}
-
 // DropIndexStmt is DROP INDEX statement.
 type DropIndexStmt struct {
 	migStmt
@@ -88,28 +64,4 @@ func (s *DropIndexStmt) buildSQL(sql *internal.SQL) error {
 func (s *DropIndexStmt) On(table string) prDrop.OnMP {
 	s.call(&mig.On{Table: table})
 	return s
-}
-
-// DropTableStmt is DROP TABLE statement.
-type DropTableStmt struct {
-	migStmt
-	cmd *mig.DropTable
-}
-
-func (s *DropTableStmt) String() string {
-	return s.string(s.buildSQL)
-}
-
-// Migrate executes database migration.
-func (s *DropTableStmt) Migrate() error {
-	return s.migration(s.buildSQL)
-}
-
-func (s *DropTableStmt) buildSQL(sql *internal.SQL) error {
-	ss, err := s.cmd.Build()
-	if err != nil {
-		return err
-	}
-	sql.Write(ss.Build())
-	return nil
 }
