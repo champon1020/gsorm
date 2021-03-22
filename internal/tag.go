@@ -26,7 +26,7 @@ func (t *Tag) Lookup(tag string) bool {
 	case "typ":
 		return t.Type != ""
 	case "notnull":
-		return t.NotNull == true
+		return t.NotNull
 	case "default":
 		return t.Default != ""
 	case "pk":
