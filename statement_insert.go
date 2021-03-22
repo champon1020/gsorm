@@ -175,19 +175,19 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // Model sets model to InsertStmt.
-func (s *InsertStmt) Model(model interface{}) ifc.ModelMP {
+func (s *InsertStmt) Model(model interface{}) ifc.Model {
 	s.model = model
 	return s
 }
 
 // Select calls SELECT statement.
-func (s *InsertStmt) Select(sel interfaces.QueryCallable) ifc.SelectMP {
+func (s *InsertStmt) Select(sel interfaces.QueryCallable) ifc.Select {
 	s.sel = sel
 	return s
 }
 
 // Values calls VALUES clause.
-func (s *InsertStmt) Values(vals ...interface{}) ifc.ValuesMP {
+func (s *InsertStmt) Values(vals ...interface{}) ifc.Values {
 	v := new(clause.Values)
 	for _, val := range vals {
 		v.AddValue(val)

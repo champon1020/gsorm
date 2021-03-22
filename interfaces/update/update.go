@@ -2,37 +2,37 @@ package update
 
 import "github.com/champon1020/mgorm/interfaces"
 
-// StmtMP is interface for returned value of mgorm.Update.
-type StmtMP interface {
-	Model(interface{}) ModelMP
-	Set(...interface{}) SetMP
+// Stmt is interface which is returned by mgorm.Update.
+type Stmt interface {
+	Model(interface{}) Model
+	Set(...interface{}) Set
 }
 
-// ModelMP is interface for returned value of (*UpdateStmt).Model.
-type ModelMP interface {
-	Where(string, ...interface{}) WhereMP
+// Model is interface which is returned by (*UpdateStmt).Model.
+type Model interface {
+	Where(string, ...interface{}) Where
 	interfaces.ExecCallable
 }
 
-// SetMP is interface for returned value of (*UpdateStmt).Set.
-type SetMP interface {
-	Where(string, ...interface{}) WhereMP
+// Set is interface which is returned by (*UpdateStmt).Set.
+type Set interface {
+	Where(string, ...interface{}) Where
 	interfaces.ExecCallable
 }
 
-// WhereMP is interface for returned value of (*UpdateStmt).Where.
-type WhereMP interface {
-	And(string, ...interface{}) AndMP
-	Or(string, ...interface{}) OrMP
+// Where is interface which is returned by (*UpdateStmt).Where.
+type Where interface {
+	And(string, ...interface{}) And
+	Or(string, ...interface{}) Or
 	interfaces.ExecCallable
 }
 
-// AndMP is interface for returned value of (*UpdateStmt).And.
-type AndMP interface {
+// And is interface which is returned by (*UpdateStmt).And.
+type And interface {
 	interfaces.ExecCallable
 }
 
-// OrMP is interface for returned value of (*UpdateStmt).Or.
-type OrMP interface {
+// Or is interface which is returned by (*UpdateStmt).Or.
+type Or interface {
 	interfaces.ExecCallable
 }

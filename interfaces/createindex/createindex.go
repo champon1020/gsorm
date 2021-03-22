@@ -2,12 +2,12 @@ package createindex
 
 import "github.com/champon1020/mgorm/interfaces"
 
-// IndexMP is method provider which is returned by mgorm.CreateIndex.
-type IndexMP interface {
-	On(string, ...string) OnMP
+// Index is interface which is returned by mgorm.CreateIndex.
+type Index interface {
+	On(string, ...string) On
 }
 
-// OnMP is method provider which is returned by (*CreateIndexStmt).On.
-type OnMP interface {
+// On is interface which is returned by (*CreateIndexStmt).On.
+type On interface {
 	interfaces.MigrateCallable
 }

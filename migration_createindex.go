@@ -57,7 +57,7 @@ func (s *CreateIndexStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // On calls ON clause.
-func (s *CreateIndexStmt) On(table string, cols ...string) ifc.OnMP {
+func (s *CreateIndexStmt) On(table string, cols ...string) ifc.On {
 	s.call(&mig.On{Table: table, Columns: cols})
 	return s
 }

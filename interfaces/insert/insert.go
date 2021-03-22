@@ -4,25 +4,25 @@ import (
 	"github.com/champon1020/mgorm/interfaces"
 )
 
-// StmtMP is interface for returned value of mgorm.Insert.
-type StmtMP interface {
-	Model(interface{}) ModelMP
-	Select(interfaces.QueryCallable) SelectMP
-	Values(...interface{}) ValuesMP
+// Stmt is interface which is returned by mgorm.Insert.
+type Stmt interface {
+	Model(interface{}) Model
+	Select(interfaces.QueryCallable) Select
+	Values(...interface{}) Values
 }
 
-// ModelMP is interface for returned value of (*InsertStmt).Model.
-type ModelMP interface {
+// Model is interface which is returned by (*InsertStmt).Model.
+type Model interface {
 	interfaces.ExecCallable
 }
 
-// SelectMP is interface for returned value of (*InsertStmt).Select.
-type SelectMP interface {
+// Select is interface which is returned by (*InsertStmt).Select.
+type Select interface {
 	interfaces.ExecCallable
 }
 
-// ValuesMP is interface for returned value of (*InsertStmt).Values.
-type ValuesMP interface {
-	Values(...interface{}) ValuesMP
+// Values is interface which is returned by (*InsertStmt).Values.
+type Values interface {
+	Values(...interface{}) Values
 	interfaces.ExecCallable
 }

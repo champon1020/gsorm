@@ -67,7 +67,7 @@ func (s *DeleteStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // From calls FROM clause.
-func (s *DeleteStmt) From(tables ...string) ifc.FromMP {
+func (s *DeleteStmt) From(tables ...string) ifc.From {
 	f := new(clause.From)
 	for _, t := range tables {
 		f.AddTable(t)
@@ -77,19 +77,19 @@ func (s *DeleteStmt) From(tables ...string) ifc.FromMP {
 }
 
 // Where calls WHERE clause.
-func (s *DeleteStmt) Where(expr string, vals ...interface{}) ifc.WhereMP {
+func (s *DeleteStmt) Where(expr string, vals ...interface{}) ifc.Where {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *DeleteStmt) And(expr string, vals ...interface{}) ifc.AndMP {
+func (s *DeleteStmt) And(expr string, vals ...interface{}) ifc.And {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *DeleteStmt) Or(expr string, vals ...interface{}) ifc.OrMP {
+func (s *DeleteStmt) Or(expr string, vals ...interface{}) ifc.Or {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }

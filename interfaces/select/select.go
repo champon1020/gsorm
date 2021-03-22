@@ -5,117 +5,117 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
-// StmtMP is interface for returned value of mgorm.Select.
-type StmtMP interface {
-	From(...string) FromMP
+// Stmt is interface which is returned by mgorm.Select.
+type Stmt interface {
+	From(...string) From
 }
 
-// FromMP is interface for returned value of (*SelectStmt).From.
-type FromMP interface {
-	Join(string) JoinMP
-	LeftJoin(string) JoinMP
-	RightJoin(string) JoinMP
-	FullJoin(string) JoinMP
-	Where(string, ...interface{}) WhereMP
-	GroupBy(...string) GroupByMP
-	OrderBy(...string) OrderByMP
-	Limit(int) LimitMP
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// From is interface which is returned by (*SelectStmt).From.
+type From interface {
+	Join(string) Join
+	LeftJoin(string) Join
+	RightJoin(string) Join
+	FullJoin(string) Join
+	Where(string, ...interface{}) Where
+	GroupBy(...string) GroupBy
+	OrderBy(...string) OrderBy
+	Limit(int) Limit
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
-// JoinMP is interface for returned value of (*SelectStmt).Join.
-type JoinMP interface {
-	On(string, ...interface{}) OnMP
+// Join is interface which is returned by (*SelectStmt).Join.
+type Join interface {
+	On(string, ...interface{}) On
 }
 
-// OnMP is interface for returned value of (*SelectStmt).On.
-type OnMP interface {
-	Where(string, ...interface{}) WhereMP
-	GroupBy(...string) GroupByMP
-	OrderBy(...string) OrderByMP
-	Limit(int) LimitMP
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// On is interface which is returned by (*SelectStmt).On.
+type On interface {
+	Where(string, ...interface{}) Where
+	GroupBy(...string) GroupBy
+	OrderBy(...string) OrderBy
+	Limit(int) Limit
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
-// WhereMP is interface for returned value of (*SelectStmt).Where.
-type WhereMP interface {
-	And(string, ...interface{}) AndMP
-	Or(string, ...interface{}) OrMP
-	GroupBy(...string) GroupByMP
-	OrderBy(...string) OrderByMP
-	Limit(int) LimitMP
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// Where is interface which is returned by (*SelectStmt).Where.
+type Where interface {
+	And(string, ...interface{}) And
+	Or(string, ...interface{}) Or
+	GroupBy(...string) GroupBy
+	OrderBy(...string) OrderBy
+	Limit(int) Limit
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
-// AndMP is interface for returned value of (*SelectStmt).And.
-type AndMP interface {
-	GroupBy(...string) GroupByMP
-	OrderBy(...string) OrderByMP
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// And is interface which is returned by (*SelectStmt).And.
+type And interface {
+	GroupBy(...string) GroupBy
+	OrderBy(...string) OrderBy
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
-// OrMP is interface for returned value of (*SelectStmt).Or.
-type OrMP interface {
-	GroupBy(...string) GroupByMP
-	OrderBy(...string) OrderByMP
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// Or is interface which is returned by (*SelectStmt).Or.
+type Or interface {
+	GroupBy(...string) GroupBy
+	OrderBy(...string) OrderBy
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
-// GroupByMP is interface for returned value of (*SelectStmt).GroupBy.
-type GroupByMP interface {
-	Having(string, ...interface{}) HavingMP
-	OrderBy(...string) OrderByMP
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// GroupBy is interface which is returned by (*SelectStmt).GroupBy.
+type GroupBy interface {
+	Having(string, ...interface{}) Having
+	OrderBy(...string) OrderBy
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
-// HavingMP is interface for returned value of (*SelectStmt).Having.
-type HavingMP interface {
-	OrderBy(...string) OrderByMP
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// Having is interface which is returned by (*SelectStmt).Having.
+type Having interface {
+	OrderBy(...string) OrderBy
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
-// OrderByMP is interface for returned value of (*SelectStmt).OrderBy.
-type OrderByMP interface {
-	Limit(int) LimitMP
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// OrderBy is interface which is returned by (*SelectStmt).OrderBy.
+type OrderBy interface {
+	Limit(int) Limit
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
-// LimitMP is interface for returned value of (*SelectStmt).Limit.
-type LimitMP interface {
-	Offset(int) OffsetMP
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// Limit is interface which is returned by (*SelectStmt).Limit.
+type Limit interface {
+	Offset(int) Offset
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
-// OffsetMP is interface for returned value of (*SelectStmt).Offset.
-type OffsetMP interface {
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// Offset is interface which is returned by (*SelectStmt).Offset.
+type Offset interface {
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
-// UnionMP is interface for returned value of (*SelectStmt).Union.
-type UnionMP interface {
-	OrderBy(...string) OrderByMP
-	Limit(int) LimitMP
-	Union(syntax.Stmt) UnionMP
-	UnionAll(syntax.Stmt) UnionMP
+// Union is interface which is returned by (*SelectStmt).Union.
+type Union interface {
+	OrderBy(...string) OrderBy
+	Limit(int) Limit
+	Union(syntax.Stmt) Union
+	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }

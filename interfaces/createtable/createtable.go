@@ -2,76 +2,76 @@ package createtable
 
 import "github.com/champon1020/mgorm/interfaces"
 
-// TableMP is method provider which is returned by mgorm.CreateTable.
-type TableMP interface {
-	Model(interface{}) ModelMP
-	Column(string, string) ColumnMP
+// Table is interface which is returned by mgorm.CreateTable.
+type Table interface {
+	Model(interface{}) Model
+	Column(string, string) Column
 }
 
-// ModelMP is method provider which is returned by (*CreateTableStmt).Model.
-type ModelMP interface {
+// Model is interface which is returned by (*CreateTableStmt).Model.
+type Model interface {
 	interfaces.MigrateCallable
 }
 
-// ColumnMP is method provider which is returned by (*CreateTableStmt).Column.
-type ColumnMP interface {
-	Column(string, string) ColumnMP
-	NotNull() NotNullMP
-	AutoInc() AutoIncMP // Only MySQL
-	Default(interface{}) DefaultMP
-	Cons(string) ConsMP
+// Column is interface which is returned by (*CreateTableStmt).Column.
+type Column interface {
+	Column(string, string) Column
+	NotNull() NotNull
+	AutoInc() AutoInc // Only MySQL
+	Default(interface{}) Default
+	Cons(string) Cons
 	interfaces.MigrateCallable
 }
 
-// NotNullMP is method provider which is returned by (*CreateTableStmt).NotNull.
-type NotNullMP interface {
-	Column(string, string) ColumnMP
-	Default(interface{}) DefaultMP
-	AutoInc() AutoIncMP
-	Cons(string) ConsMP
+// NotNull is interface which is returned by (*CreateTableStmt).NotNull.
+type NotNull interface {
+	Column(string, string) Column
+	Default(interface{}) Default
+	AutoInc() AutoInc
+	Cons(string) Cons
 	interfaces.MigrateCallable
 }
 
-// DefaultMP is method provider which is returned by (*CreateTableStmt).Default.
-type DefaultMP interface {
-	Column(string, string) ColumnMP
-	Cons(string) ConsMP
+// Default is interface which is returned by (*CreateTableStmt).Default.
+type Default interface {
+	Column(string, string) Column
+	Cons(string) Cons
 	interfaces.MigrateCallable
 }
 
-// AutoIncMP is method provider which is returned by (*CreateTableStmt).AutoInc.
-type AutoIncMP interface {
-	Column(string, string) ColumnMP
-	Cons(string) ConsMP
+// AutoInc is interface which is returned by (*CreateTableStmt).AutoInc.
+type AutoInc interface {
+	Column(string, string) Column
+	Cons(string) Cons
 	interfaces.MigrateCallable
 }
 
-// ConsMP is method provider which is returned by (*CreateTableStmt).Cons.
-type ConsMP interface {
-	Unique(...string) UniqueMP
-	Primary(...string) PrimaryMP
-	Foreign(...string) ForeignMP
+// Cons is interface which is returned by (*CreateTableStmt).Cons.
+type Cons interface {
+	Unique(...string) Unique
+	Primary(...string) Primary
+	Foreign(...string) Foreign
 }
 
-// UniqueMP is method provider which is returned by (*CreateTableStmt).Unique.
-type UniqueMP interface {
-	Cons(string) ConsMP
+// Unique is interface which is returned by (*CreateTableStmt).Unique.
+type Unique interface {
+	Cons(string) Cons
 	interfaces.MigrateCallable
 }
 
-// PrimaryMP is method provider which is returned by (*CreateTableStmt).Primary.
-type PrimaryMP interface {
-	Cons(string) ConsMP
+// Primary is interface which is returned by (*CreateTableStmt).Primary.
+type Primary interface {
+	Cons(string) Cons
 	interfaces.MigrateCallable
 }
 
-// ForeignMP is method provider which is returned by (*CreateTableStmt).Foreign.
-type ForeignMP interface {
-	Ref(string, string) RefMP
+// Foreign is interface which is returned by (*CreateTableStmt).Foreign.
+type Foreign interface {
+	Ref(string, string) Ref
 }
 
-// RefMP is method provider which is returned by (*CreateTableStmt).Ref.
-type RefMP interface {
-	Cons(string) ConsMP
+// Ref is interface which is returned by (*CreateTableStmt).Ref.
+type Ref interface {
+	Cons(string) Cons
 	interfaces.MigrateCallable
 }

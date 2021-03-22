@@ -61,7 +61,7 @@ func (s *DropIndexStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // On calls ON clause.
-func (s *DropIndexStmt) On(table string) ifc.OnMP {
+func (s *DropIndexStmt) On(table string) ifc.On {
 	s.call(&mig.On{Table: table})
 	return s
 }

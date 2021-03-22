@@ -208,61 +208,61 @@ func convertToDBType(t reflect.Type, d internal.SQLDriver) string {
 }
 
 // Model sets model to CreateTableStmt.
-func (s *CreateTableStmt) Model(model interface{}) ifc.ModelMP {
+func (s *CreateTableStmt) Model(model interface{}) ifc.Model {
 	s.model = model
 	return s
 }
 
 // Column calls table column definition.
-func (s *CreateTableStmt) Column(col, typ string) ifc.ColumnMP {
+func (s *CreateTableStmt) Column(col, typ string) ifc.Column {
 	s.call(&mig.Column{Col: col, Type: typ})
 	return s
 }
 
 // NotNull calls NOT NULL option.
-func (s *CreateTableStmt) NotNull() ifc.NotNullMP {
+func (s *CreateTableStmt) NotNull() ifc.NotNull {
 	s.call(&mig.NotNull{})
 	return s
 }
 
 // AutoInc calls AUTO_INCREMENT option (only MySQL).
-func (s *CreateTableStmt) AutoInc() ifc.AutoIncMP {
+func (s *CreateTableStmt) AutoInc() ifc.AutoInc {
 	s.call(&mig.AutoInc{})
 	return s
 }
 
 // Default calls DEFAULT option.
-func (s *CreateTableStmt) Default(val interface{}) ifc.DefaultMP {
+func (s *CreateTableStmt) Default(val interface{}) ifc.Default {
 	s.call(&mig.Default{Value: val})
 	return s
 }
 
 // Cons calls CONSTRAINT option.
-func (s *CreateTableStmt) Cons(key string) ifc.ConsMP {
+func (s *CreateTableStmt) Cons(key string) ifc.Cons {
 	s.call(&mig.Cons{Key: key})
 	return s
 }
 
 // Unique calls UNIQUE keyword.
-func (s *CreateTableStmt) Unique(cols ...string) ifc.UniqueMP {
+func (s *CreateTableStmt) Unique(cols ...string) ifc.Unique {
 	s.call(&mig.Unique{Columns: cols})
 	return s
 }
 
 // Primary calls PRIMARY KEY keyword.
-func (s *CreateTableStmt) Primary(cols ...string) ifc.PrimaryMP {
+func (s *CreateTableStmt) Primary(cols ...string) ifc.Primary {
 	s.call(&mig.Primary{Columns: cols})
 	return s
 }
 
 // Foreign calls FOREIGN KEY keyword.
-func (s *CreateTableStmt) Foreign(cols ...string) ifc.ForeignMP {
+func (s *CreateTableStmt) Foreign(cols ...string) ifc.Foreign {
 	s.call(&mig.Foreign{Columns: cols})
 	return s
 }
 
 // Ref calls REFERENCES keyword.
-func (s *CreateTableStmt) Ref(table, col string) ifc.RefMP {
+func (s *CreateTableStmt) Ref(table, col string) ifc.Ref {
 	s.call(&mig.Ref{Table: table, Column: col})
 	return s
 }

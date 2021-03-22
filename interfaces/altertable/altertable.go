@@ -1,106 +1,106 @@
-package alter
+package altertable
 
 import "github.com/champon1020/mgorm/interfaces"
 
-// TableMP is method interfaces which is returned by mgorm.AlterTable.
-type TableMP interface {
-	Rename(string) RenameMP
-	AddColumn(string, string) AddColumnMP
-	DropColumn(string) DropColumnMP
-	RenameColumn(string, string) RenameColumnMP
-	AddCons(string) AddConsMP
-	DropPrimary(string) DropPrimaryMP
-	DropForeign(string) DropForeignMP
-	DropUnique(string) DropUniqueMP
+// Table is interface which is returned by mgorm.AlterTable.
+type Table interface {
+	Rename(string) Rename
+	AddColumn(string, string) AddColumn
+	DropColumn(string) DropColumn
+	RenameColumn(string, string) RenameColumn
+	AddCons(string) AddCons
+	DropPrimary(string) DropPrimary
+	DropForeign(string) DropForeign
+	DropUnique(string) DropUnique
 }
 
-// RenameMP is method interfaces which is returned by (*AlterTableStmt).Rename.
-type RenameMP interface {
-	TableMP
+// Rename is interface which is returned by (*AlterTableStmt).Rename.
+type Rename interface {
+	Table
 	interfaces.MigrateCallable
 }
 
-// AddColumnMP is method interfaces which is returned by (*AlterTableStmt).AddColumn.
-type AddColumnMP interface {
-	TableMP
-	NotNull() NotNullMP
-	AutoInc() AutoIncMP // Only MySQL
-	Default(interface{}) DefaultMP
+// AddColumn is interface which is returned by (*AlterTableStmt).AddColumn.
+type AddColumn interface {
+	Table
+	NotNull() NotNull
+	AutoInc() AutoInc // Only MySQL
+	Default(interface{}) Default
 }
 
-// DropColumnMP is method interfaces which is returned by (*AlterTableStmt).DropColumn.
-type DropColumnMP interface {
-	TableMP
+// DropColumn is interface which is returned by (*AlterTableStmt).DropColumn.
+type DropColumn interface {
+	Table
 	interfaces.MigrateCallable
 }
 
-// RenameColumnMP is method interfaces which is returned by (*AlterTableStmt).RenameColumn.
-type RenameColumnMP interface {
-	TableMP
+// RenameColumn is interface which is returned by (*AlterTableStmt).RenameColumn.
+type RenameColumn interface {
+	Table
 	interfaces.MigrateCallable
 }
 
-// NotNullMP is method interfaces which is returned by (*AlterTableStmt).NotNull.
-type NotNullMP interface {
-	TableMP
-	Default(interface{}) DefaultMP
-	AutoInc() AutoIncMP
+// NotNull is interface which is returned by (*AlterTableStmt).NotNull.
+type NotNull interface {
+	Table
+	Default(interface{}) Default
+	AutoInc() AutoInc
 }
 
-// DefaultMP is method interfaces which is returned by (*AlterTableStmt).Default.
-type DefaultMP interface {
-	TableMP
+// Default is interface which is returned by (*AlterTableStmt).Default.
+type Default interface {
+	Table
 }
 
-// AutoIncMP is method interfaces which is returned by (*AlterTableStmt).AutoInc.
-type AutoIncMP interface {
-	TableMP
+// AutoInc is interface which is returned by (*AlterTableStmt).AutoInc.
+type AutoInc interface {
+	Table
 }
 
-// AddConsMP is method interfaces which is returned by (*AlterTableStmt).AddCons.
-type AddConsMP interface {
-	Unique(...string) UniqueMP
-	Primary(...string) PrimaryMP
-	Foreign(...string) ForeignMP
+// AddCons is interface which is returned by (*AlterTableStmt).AddCons.
+type AddCons interface {
+	Unique(...string) Unique
+	Primary(...string) Primary
+	Foreign(...string) Foreign
 }
 
-// DropUniqueMP is method interfaces which is returned by (*AlterTableStmt).DropUnique.
-type DropUniqueMP interface {
-	TableMP
+// DropUnique is interface which is returned by (*AlterTableStmt).DropUnique.
+type DropUnique interface {
+	Table
 	interfaces.MigrateCallable
 }
 
-// DropPrimaryMP is method interfaces which is returned by (*AlterTableStmt).DropPrimary.
-type DropPrimaryMP interface {
-	TableMP
+// DropPrimary is interface which is returned by (*AlterTableStmt).DropPrimary.
+type DropPrimary interface {
+	Table
 	interfaces.MigrateCallable
 }
 
-// DropForeignMP is method interfaces which is returned by (*AlterTableStmt).DropForeign.
-type DropForeignMP interface {
-	TableMP
+// DropForeign is interface which is returned by (*AlterTableStmt).DropForeign.
+type DropForeign interface {
+	Table
 	interfaces.MigrateCallable
 }
 
-// UniqueMP is method interfaces which is returned by (*AlterTableStmt).Unique.
-type UniqueMP interface {
-	TableMP
+// Unique is interface which is returned by (*AlterTableStmt).Unique.
+type Unique interface {
+	Table
 	interfaces.MigrateCallable
 }
 
-// PrimaryMP is method interfaces which is returned by (*AlterTableStmt).Primary.
-type PrimaryMP interface {
-	TableMP
+// Primary is interface which is returned by (*AlterTableStmt).Primary.
+type Primary interface {
+	Table
 	interfaces.MigrateCallable
 }
 
-// ForeignMP is method interfaces which is returned by (*AlterTableStmt).Foreign.
-type ForeignMP interface {
-	Ref(string, string) RefMP
+// Foreign is interface which is returned by (*AlterTableStmt).Foreign.
+type Foreign interface {
+	Ref(string, string) Ref
 }
 
-// RefMP is method interfaces which is returned by (*AlterTableStmt).Ref.
-type RefMP interface {
-	TableMP
+// Ref is interface which is returned by (*AlterTableStmt).Ref.
+type Ref interface {
+	Table
 	interfaces.MigrateCallable
 }

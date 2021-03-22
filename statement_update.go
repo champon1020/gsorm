@@ -147,13 +147,13 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // Model sets model to UpdateStmt.
-func (s *UpdateStmt) Model(model interface{}) ifc.ModelMP {
+func (s *UpdateStmt) Model(model interface{}) ifc.Model {
 	s.model = model
 	return s
 }
 
 // Set calls SET clause.
-func (s *UpdateStmt) Set(vals ...interface{}) ifc.SetMP {
+func (s *UpdateStmt) Set(vals ...interface{}) ifc.Set {
 	if s.cmd == nil {
 		s.throw(errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError))
 		return s
@@ -171,19 +171,19 @@ func (s *UpdateStmt) Set(vals ...interface{}) ifc.SetMP {
 }
 
 // Where calls WHERE clause.
-func (s *UpdateStmt) Where(expr string, vals ...interface{}) ifc.WhereMP {
+func (s *UpdateStmt) Where(expr string, vals ...interface{}) ifc.Where {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *UpdateStmt) And(expr string, vals ...interface{}) ifc.AndMP {
+func (s *UpdateStmt) And(expr string, vals ...interface{}) ifc.And {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *UpdateStmt) Or(expr string, vals ...interface{}) ifc.OrMP {
+func (s *UpdateStmt) Or(expr string, vals ...interface{}) ifc.Or {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }
