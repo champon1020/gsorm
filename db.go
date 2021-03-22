@@ -8,6 +8,33 @@ import (
 	"github.com/champon1020/mgorm/internal"
 )
 
+// Conn is database connection like DB or Tx. This is also implemented by MockDB and MockTx.
+type Conn interface {
+	getDriver() internal.SQLDriver
+	Query(string, ...interface{}) (*sql.Rows, error)
+	Exec(string, ...interface{}) (sql.Result, error)
+}
+
+// sqlDB is interface for sql.DB.
+type sqlDB interface {
+	Query(string, ...interface{}) (*sql.Rows, error)
+	Exec(string, ...interface{}) (sql.Result, error)
+	Ping() error
+	SetConnMaxLifetime(n time.Duration)
+	SetMaxIdleConns(n int)
+	SetMaxOpenConns(n int)
+	Close() error
+	Begin() (*sql.Tx, error)
+}
+
+// sqlTx is interface for sql.Tx.
+type sqlTx interface {
+	Query(string, ...interface{}) (*sql.Rows, error)
+	Exec(string, ...interface{}) (sql.Result, error)
+	Commit() error
+	Rollback() error
+}
+
 // DB is a database handle representing a pool of zero or more underlying connections. It's safe for concurrent use by multiple goroutines.
 type DB struct {
 	conn   sqlDB
