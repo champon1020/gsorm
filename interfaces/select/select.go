@@ -1,7 +1,7 @@
 package xselect
 
 import (
-	"github.com/champon1020/mgorm/provider"
+	"github.com/champon1020/mgorm/interfaces"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -22,7 +22,7 @@ type FromMP interface {
 	Limit(int) LimitMP
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }
 
 // JoinMP is interface for returned value of (*SelectStmt).Join.
@@ -38,7 +38,7 @@ type OnMP interface {
 	Limit(int) LimitMP
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }
 
 // WhereMP is interface for returned value of (*SelectStmt).Where.
@@ -50,7 +50,7 @@ type WhereMP interface {
 	Limit(int) LimitMP
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }
 
 // AndMP is interface for returned value of (*SelectStmt).And.
@@ -59,7 +59,7 @@ type AndMP interface {
 	OrderBy(...string) OrderByMP
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }
 
 // OrMP is interface for returned value of (*SelectStmt).Or.
@@ -68,7 +68,7 @@ type OrMP interface {
 	OrderBy(...string) OrderByMP
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }
 
 // GroupByMP is interface for returned value of (*SelectStmt).GroupBy.
@@ -77,7 +77,7 @@ type GroupByMP interface {
 	OrderBy(...string) OrderByMP
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }
 
 // HavingMP is interface for returned value of (*SelectStmt).Having.
@@ -85,7 +85,7 @@ type HavingMP interface {
 	OrderBy(...string) OrderByMP
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }
 
 // OrderByMP is interface for returned value of (*SelectStmt).OrderBy.
@@ -93,7 +93,7 @@ type OrderByMP interface {
 	Limit(int) LimitMP
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }
 
 // LimitMP is interface for returned value of (*SelectStmt).Limit.
@@ -101,14 +101,14 @@ type LimitMP interface {
 	Offset(int) OffsetMP
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }
 
 // OffsetMP is interface for returned value of (*SelectStmt).Offset.
 type OffsetMP interface {
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }
 
 // UnionMP is interface for returned value of (*SelectStmt).Union.
@@ -117,5 +117,5 @@ type UnionMP interface {
 	Limit(int) LimitMP
 	Union(syntax.Stmt) UnionMP
 	UnionAll(syntax.Stmt) UnionMP
-	provider.QueryCallable
+	interfaces.QueryCallable
 }

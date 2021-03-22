@@ -5,12 +5,12 @@ import (
 	"reflect"
 
 	"github.com/champon1020/mgorm/errors"
+	"github.com/champon1020/mgorm/interfaces"
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/provider"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 
-	prInsert "github.com/champon1020/mgorm/provider/insert"
+	ifc "github.com/champon1020/mgorm/interfaces/insert"
 )
 
 // InsertStmt is INSERT statement.
@@ -175,19 +175,19 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // Model sets model to InsertStmt.
-func (s *InsertStmt) Model(model interface{}) prInsert.ModelMP {
+func (s *InsertStmt) Model(model interface{}) ifc.ModelMP {
 	s.model = model
 	return s
 }
 
 // Select calls SELECT statement.
-func (s *InsertStmt) Select(sel provider.QueryCallable) prInsert.SelectMP {
+func (s *InsertStmt) Select(sel interfaces.QueryCallable) ifc.SelectMP {
 	s.sel = sel
 	return s
 }
 
 // Values calls VALUES clause.
-func (s *InsertStmt) Values(vals ...interface{}) prInsert.ValuesMP {
+func (s *InsertStmt) Values(vals ...interface{}) ifc.ValuesMP {
 	v := new(clause.Values)
 	for _, val := range vals {
 		v.AddValue(val)

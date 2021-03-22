@@ -9,7 +9,7 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 
-	prUpdate "github.com/champon1020/mgorm/provider/update"
+	ifc "github.com/champon1020/mgorm/interfaces/update"
 )
 
 // UpdateStmt is UPDATE statement..
@@ -147,13 +147,13 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // Model sets model to UpdateStmt.
-func (s *UpdateStmt) Model(model interface{}) prUpdate.ModelMP {
+func (s *UpdateStmt) Model(model interface{}) ifc.ModelMP {
 	s.model = model
 	return s
 }
 
 // Set calls SET clause.
-func (s *UpdateStmt) Set(vals ...interface{}) prUpdate.SetMP {
+func (s *UpdateStmt) Set(vals ...interface{}) ifc.SetMP {
 	if s.cmd == nil {
 		s.throw(errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError))
 		return s
@@ -171,19 +171,19 @@ func (s *UpdateStmt) Set(vals ...interface{}) prUpdate.SetMP {
 }
 
 // Where calls WHERE clause.
-func (s *UpdateStmt) Where(expr string, vals ...interface{}) prUpdate.WhereMP {
+func (s *UpdateStmt) Where(expr string, vals ...interface{}) ifc.WhereMP {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *UpdateStmt) And(expr string, vals ...interface{}) prUpdate.AndMP {
+func (s *UpdateStmt) And(expr string, vals ...interface{}) ifc.AndMP {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *UpdateStmt) Or(expr string, vals ...interface{}) prUpdate.OrMP {
+func (s *UpdateStmt) Or(expr string, vals ...interface{}) ifc.OrMP {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }

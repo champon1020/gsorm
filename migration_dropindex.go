@@ -8,7 +8,7 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
 
-	prDrop "github.com/champon1020/mgorm/provider/drop"
+	ifc "github.com/champon1020/mgorm/interfaces/dropindex"
 )
 
 // DropIndexStmt is DROP INDEX statement.
@@ -61,7 +61,7 @@ func (s *DropIndexStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // On calls ON clause.
-func (s *DropIndexStmt) On(table string) prDrop.OnMP {
+func (s *DropIndexStmt) On(table string) ifc.OnMP {
 	s.call(&mig.On{Table: table})
 	return s
 }

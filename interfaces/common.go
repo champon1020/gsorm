@@ -1,4 +1,4 @@
-package provider
+package interfaces
 
 import "github.com/champon1020/mgorm/syntax"
 

@@ -8,7 +8,7 @@ import (
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
 
-	prCreate "github.com/champon1020/mgorm/provider/create"
+	ifc "github.com/champon1020/mgorm/interfaces/createindex"
 )
 
 // CreateIndexStmt is CREATE INDEX statement.
@@ -57,7 +57,7 @@ func (s *CreateIndexStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // On calls ON clause.
-func (s *CreateIndexStmt) On(table string, cols ...string) prCreate.OnMP {
+func (s *CreateIndexStmt) On(table string, cols ...string) ifc.OnMP {
 	s.call(&mig.On{Table: table, Columns: cols})
 	return s
 }
