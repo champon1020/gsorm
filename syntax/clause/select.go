@@ -16,10 +16,12 @@ func (s *Select) Name() string {
 	return "SELECT"
 }
 
-// AddColumn appends column to Select.
-func (s *Select) AddColumn(col string) {
-	c := syntax.NewColumn(col)
-	s.Columns = append(s.Columns, *c)
+// AddColumns appends column to Select.
+func (s *Select) AddColumns(cols ...string) {
+	for _, c := range cols {
+		col := syntax.NewColumn(c)
+		s.Columns = append(s.Columns, *col)
+	}
 }
 
 // String returns function call with string.

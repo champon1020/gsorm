@@ -37,8 +37,10 @@ func NewMock() *MockDB {
 // Select calls SELECT command.
 func Select(conn Conn, cols ...string) prSelect.StmtMP {
 	sel := new(clause.Select)
-	for _, c := range cols {
-		sel.AddColumn(c)
+	if len(cols) == 0 {
+		sel.AddColumns("*")
+	} else {
+		sel.AddColumns(cols...)
 	}
 	s := &SelectStmt{cmd: sel}
 	s.conn = conn
@@ -49,9 +51,7 @@ func Select(conn Conn, cols ...string) prSelect.StmtMP {
 func Insert(conn Conn, table string, cols ...string) prInsert.StmtMP {
 	i := new(clause.Insert)
 	i.AddTable(table)
-	for _, c := range cols {
-		i.AddColumn(c)
-	}
+	i.AddColumns(cols...)
 	s := &InsertStmt{cmd: i}
 	s.conn = conn
 	return s
@@ -81,7 +81,7 @@ func Count(conn Conn, col string, alias ...string) prSelect.StmtMP {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
 	sel := new(clause.Select)
-	sel.AddColumn(c)
+	sel.AddColumns(c)
 	s := &SelectStmt{cmd: sel}
 	s.conn = conn
 	return s
@@ -94,7 +94,7 @@ func Avg(conn Conn, col string, alias ...string) prSelect.StmtMP {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
 	sel := new(clause.Select)
-	sel.AddColumn(c)
+	sel.AddColumns(c)
 	s := &SelectStmt{cmd: sel}
 	s.conn = conn
 	return s
@@ -107,7 +107,7 @@ func Sum(conn Conn, col string, alias ...string) prSelect.StmtMP {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
 	sel := new(clause.Select)
-	sel.AddColumn(c)
+	sel.AddColumns(c)
 	s := &SelectStmt{cmd: sel}
 	s.conn = conn
 	return s
@@ -120,7 +120,7 @@ func Min(conn Conn, col string, alias ...string) prSelect.StmtMP {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
 	sel := new(clause.Select)
-	sel.AddColumn(c)
+	sel.AddColumns(c)
 	s := &SelectStmt{cmd: sel}
 	s.conn = conn
 	return s
@@ -133,7 +133,7 @@ func Max(conn Conn, col string, alias ...string) prSelect.StmtMP {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
 	sel := new(clause.Select)
-	sel.AddColumn(c)
+	sel.AddColumns(c)
 	s := &SelectStmt{cmd: sel}
 	s.conn = conn
 	return s
