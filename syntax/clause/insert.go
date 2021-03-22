@@ -22,10 +22,12 @@ func (i *Insert) AddTable(table string) {
 	i.Table = *syntax.NewTable(table)
 }
 
-// AddColumn appends column to Insert.
-func (i *Insert) AddColumn(col string) {
-	column := syntax.NewColumn(col)
-	i.Columns = append(i.Columns, *column)
+// AddColumns appends columns to Insert.
+func (i *Insert) AddColumns(cols ...string) {
+	for _, c := range cols {
+		col := syntax.NewColumn(c)
+		i.Columns = append(i.Columns, *col)
+	}
 }
 
 // String returns function call with string.
