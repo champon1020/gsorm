@@ -110,6 +110,25 @@ func (p *RowsParser) Parse() (*reflect.Value, error) {
 	return nil, nil
 }
 
+// ParseMapSlice converts slice or array of map to reflect.Value.
+func (p *RowsParser) ParseMapSlice(target reflect.Type) (*reflect.Value, error) {
+	slice := reflect.New(target).Elem()
+
+	for p.Next() {
+		item, err := p.ParseMap(target.Elem())
+		if err != nil {
+			return nil, err
+		}
+		slice = reflect.Append(slice, *item)
+	}
+
+	if p.Error != nil {
+		return nil, p.Error
+	}
+
+	return &slice, nil
+}
+
 // ParseStructSlice converts slice or array of struct to reflect.Value.
 func (p *RowsParser) ParseStructSlice(target reflect.Type) (*reflect.Value, error) {
 	p.ColumnField = p.columnsAndFields(target.Elem())
@@ -131,7 +150,7 @@ func (p *RowsParser) ParseStructSlice(target reflect.Type) (*reflect.Value, erro
 }
 
 // ParseSlice converts slice or array to reflect.Value.
-// If the type of elements of slice or array is struct, ParseStructSlice should be used.
+// If the type of elements of slice or array is struct or map, ParseStructSlice or ParseMapSlice should be used.
 func (p *RowsParser) ParseSlice(target reflect.Type) (*reflect.Value, error) {
 	if len(p.Cols) != 1 {
 		msg := fmt.Sprintf("Column length must be 1 but got %d", len(p.Cols))
@@ -152,6 +171,17 @@ func (p *RowsParser) ParseSlice(target reflect.Type) (*reflect.Value, error) {
 	}
 
 	return &slice, nil
+}
+
+// ParseMap converts map to reflect.Value.
+func (p *RowsParser) ParseMap(target reflect.Type) (*reflect.Value, error) {
+	item := reflect.MakeMap(target)
+	for i := 0; i < len(p.Vals); i++ {
+		key := reflect.ValueOf(p.Cols[i])
+		val := p.BytesParser.ParseAuto(p.Vals[i])
+		item.SetMapIndex(key, *val)
+	}
+	return &item, nil
 }
 
 // ParseStruct converts struct to reflect.Value.

@@ -1,7 +1,6 @@
 package internal_test
 
 import (
-	"math"
 	"testing"
 	"time"
 
@@ -58,6 +57,43 @@ type OtherTypesModel struct {
 	Time       time.Time `mgorm:"time"`
 	TimeANSIC  time.Time `mgorm:"time_ansic,layout=time.ANSIC"`
 	TimeFormat time.Time `mgorm:"time_format,layout=2006-01-02"`
+}
+
+func TestRowsParser_ParseMapSlice(t *testing.T) {
+	testCases := []struct {
+		RowsCols []string
+		RowsVals [][]string
+		Model    interface{}
+		Expected interface{}
+	}{
+		{
+			[]string{"int", "int8", "int16", "int32", "int64"},
+			[][]string{
+				{"1", "127", "32767", "2147483647", "9223372036854775807"},
+				{"-1", "-128", "-32768", "-2147483648", "-9223372036854775808"},
+			},
+			&[]map[string]interface{}{},
+			[]map[string]interface{}{
+				{"int": 1, "int8": 127, "int16": 32767, "int32": 2147483647, "int64": 9223372036854775807},
+				{"int": -1, "int8": -128, "int16": -32768, "int32": -2147483648, "int64": -9223372036854775808},
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		p, err := internal.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
+
+		v, err := p.ParseMapSlice(p.Model)
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
+		assert.Equal(t, testCase.Expected, v.Interface())
+	}
 }
 
 func TestRowsParser_ParseStructSlice(t *testing.T) {
@@ -128,6 +164,62 @@ func TestRowsParser_ParseSlice(t *testing.T) {
 	}
 }
 
+func TestRowsParser_ParseMap(t *testing.T) {
+	testCases := []struct {
+		RowsCols []string
+		RowsVals [][]string
+		Model    interface{}
+		Expected interface{}
+	}{
+		{
+			[]string{"int", "int8", "int16", "int32", "int64"},
+			[][]string{{"-9223372036854775808", "127", "32767", "2147483647", "9223372036854775807"}},
+			&map[string]interface{}{},
+			map[string]interface{}{
+				"int":   -9223372036854775808,
+				"int8":  127,
+				"int16": 32767,
+				"int32": 2147483647,
+				"int64": 9223372036854775807,
+			},
+		},
+		{
+			[]string{"float32", "float64"},
+			[][]string{{"3.14159265358979", "3.141592653589793238462643383279"}},
+			&map[string]interface{}{},
+			map[string]interface{}{
+				"float32": 3.14159265358979,
+				"float64": 3.141592653589793238462643383279,
+			},
+		},
+		{
+			[]string{"bool", "time"},
+			[][]string{{"true", "2021-01-02T03:04:05Z"}},
+			&map[string]interface{}{},
+			map[string]interface{}{
+				"bool": true,
+				"time": time.Date(2021, time.January, 2, 3, 4, 5, 0, time.UTC),
+			},
+		},
+	}
+
+	for _, testCase := range testCases {
+		p, err := internal.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
+
+		p.Next()
+		v, err := p.ParseMap(p.Model)
+		if err != nil {
+			t.Errorf("Error was occurred: %v", err)
+			continue
+		}
+		assert.Equal(t, testCase.Expected, v.Interface())
+	}
+}
+
 func TestRowsParser_ParseStruct(t *testing.T) {
 	testCases := []struct {
 		RowsCols []string
@@ -149,9 +241,9 @@ func TestRowsParser_ParseStruct(t *testing.T) {
 		},
 		{
 			[]string{"float32", "float64"},
-			[][]string{{"1.1", "2.2"}},
+			[][]string{{"3.14159265358979", "3.141592653589793238462643383279"}},
 			&FloatModel{},
-			FloatModel{F32: 1.1, F64: 2.2},
+			FloatModel{F32: 3.14159265358979, F64: 3.141592653589793238462643383279},
 		},
 		{
 			[]string{"bool", "time", "time_ansic", "time_format"},
@@ -257,15 +349,15 @@ func TestRowsParser_ParseVar(t *testing.T) {
 		},
 		{
 			[]string{"float32"},
-			[][]string{{"1.401298464324817070923729583289916131280e-45"}},
+			[][]string{{"3.14159265358979"}},
 			&fModel.F32,
-			float32(math.SmallestNonzeroFloat32),
+			float32(3.14159265358979),
 		},
 		{
 			[]string{"float64"},
-			[][]string{{"4.940656458412465441765687928682213723651e-324"}},
+			[][]string{{"3.141592653589793238462643383279"}},
 			&fModel.F64,
-			float64(math.SmallestNonzeroFloat64),
+			float64(3.141592653589793238462643383279),
 		},
 		{
 			[]string{"bool"},

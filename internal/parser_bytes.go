@@ -33,7 +33,7 @@ type BytesParserOption struct {
 func (p *BytesParser) Parse(bytes []byte, target reflect.Type, opt ...BytesParserOption) (*reflect.Value, error) {
 	switch target.Kind() {
 	case reflect.String:
-		return p.String(bytes)
+		return p.String(bytes), nil
 	case reflect.Int:
 		return p.Int(bytes)
 	case reflect.Int8:
@@ -74,10 +74,28 @@ func (p *BytesParser) Parse(bytes []byte, target reflect.Type, opt ...BytesParse
 	return nil, errors.New(msg, errors.InvalidTypeError)
 }
 
+// ParseAuto converts bytes to reflect.Value with auto type casting.
+// Use Parse if possible, since this function will execute if statements multiple times.
+func (p *BytesParser) ParseAuto(bytes []byte) *reflect.Value {
+	if v, err := p.Int(bytes); err == nil {
+		return v
+	}
+	if v, err := p.Float64(bytes); err == nil {
+		return v
+	}
+	if v, err := p.Bool(bytes); err == nil {
+		return v
+	}
+	if v, err := p.Time(bytes, time.RFC3339); err == nil {
+		return v
+	}
+	return p.String(bytes)
+}
+
 // String converts bytes to reflect.Value via string.
-func (p *BytesParser) String(bytes []byte) (*reflect.Value, error) {
+func (p *BytesParser) String(bytes []byte) *reflect.Value {
 	v := reflect.ValueOf(string(bytes))
-	return &v, nil
+	return &v
 }
 
 // Int converts bytes to reflect.Value via int.
