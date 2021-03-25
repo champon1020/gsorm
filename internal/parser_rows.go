@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"database/sql"
 	"fmt"
 	"reflect"
 	"time"
@@ -9,10 +8,17 @@ import (
 	"github.com/champon1020/mgorm/errors"
 )
 
+// Rows is interface for *sql.Rows.
+type Rows interface {
+	Columns() ([]string, error)
+	Next() bool
+	Scan(...interface{}) error
+}
+
 // RowsParser is parser for sql.Rows.
 type RowsParser struct {
 	// SQL rows.
-	rows *sql.Rows
+	Rows Rows
 
 	// Column names.
 	Cols []string
@@ -37,13 +43,13 @@ type RowsParser struct {
 }
 
 // NewRowsParser creates RowsParser instance.
-func NewRowsParser(rows *sql.Rows, model interface{}) (*RowsParser, error) {
+func NewRowsParser(rows Rows, model interface{}) (*RowsParser, error) {
 	cols, err := rows.Columns()
 	if err != nil {
 		return nil, errors.New(err.Error(), errors.DBColumnError)
 	}
 
-	vals := make([][]byte, 0, len(cols))
+	vals := make([][]byte, len(cols))
 	valsPtr := make([]interface{}, 0, len(cols))
 	for i := 0; i < len(vals); i++ {
 		valsPtr = append(valsPtr, &vals[i])
@@ -55,7 +61,7 @@ func NewRowsParser(rows *sql.Rows, model interface{}) (*RowsParser, error) {
 	}
 
 	parser := &RowsParser{
-		rows:        rows,
+		Rows:        rows,
 		Cols:        cols,
 		Vals:        vals,
 		ValsPtr:     valsPtr,
@@ -67,12 +73,14 @@ func NewRowsParser(rows *sql.Rows, model interface{}) (*RowsParser, error) {
 
 // Next advances to next rows.
 func (p *RowsParser) Next() bool {
-	next := p.rows.Next()
-	if err := p.rows.Scan(p.ValsPtr...); err != nil {
+	if !p.Rows.Next() {
+		return false
+	}
+	if err := p.Rows.Scan(p.ValsPtr...); err != nil {
 		p.Error = err
 		return false
 	}
-	return next
+	return true
 }
 
 // Parse converts sql.Rows to reflect.Value.
@@ -115,6 +123,10 @@ func (p *RowsParser) ParseStructSlice(target reflect.Type) (*reflect.Value, erro
 		slice = reflect.Append(slice, *item)
 	}
 
+	if p.Error != nil {
+		return nil, p.Error
+	}
+
 	return &slice, nil
 }
 
@@ -128,11 +140,15 @@ func (p *RowsParser) ParseSlice(target reflect.Type) (*reflect.Value, error) {
 
 	slice := reflect.New(target).Elem()
 	for p.Next() {
-		item, err := p.ParseSlice(target.Elem())
+		item, err := p.ParseVar(target.Elem())
 		if err != nil {
 			return nil, err
 		}
 		slice = reflect.Append(slice, *item)
+	}
+
+	if p.Error != nil {
+		return nil, p.Error
 	}
 
 	return &slice, nil
