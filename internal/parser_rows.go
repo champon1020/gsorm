@@ -86,12 +86,21 @@ func (p *RowsParser) Next() bool {
 // Parse converts sql.Rows to reflect.Value.
 func (p *RowsParser) Parse() (*reflect.Value, error) {
 	switch p.Model.Kind() {
-	case reflect.Slice, reflect.Array:
+	case reflect.Slice,
+		reflect.Array:
 		if p.Model.Elem().Kind() == reflect.Struct {
 			return p.ParseStructSlice(p.Model)
 		}
+		if p.Model.Elem().Kind() == reflect.Map {
+			return p.ParseMapSlice(p.Model)
+		}
+		return p.ParseSlice(p.Model)
 	case reflect.Struct:
+		p.Next()
+		return p.ParseStruct(p.Model)
 	case reflect.Map:
+		p.Next()
+		return p.ParseMap(p.Model)
 	case reflect.Int,
 		reflect.Int8,
 		reflect.Int16,
@@ -106,8 +115,12 @@ func (p *RowsParser) Parse() (*reflect.Value, error) {
 		reflect.Float64,
 		reflect.Bool,
 		reflect.String:
+		p.Next()
+		return p.ParseVar(p.Model)
 	}
-	return nil, nil
+
+	msg := fmt.Sprintf("Type %v is not supported", p.Model.Kind())
+	return nil, errors.New(msg, errors.InvalidTypeError)
 }
 
 // ParseMapSlice converts slice or array of map to reflect.Value.

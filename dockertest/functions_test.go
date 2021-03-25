@@ -14,7 +14,7 @@ func TestMaxMin(t *testing.T) {
 	}{
 		// SELECT MIN(emp_no) FROM employees;
 		{
-			mgorm.Min(db, "emp_no").
+			mgorm.Min(db, "emp_no", "emp_no").
 				From("employees").(*mgorm.SelectStmt),
 			&Employee{
 				EmpNo: 10001,
@@ -23,7 +23,7 @@ func TestMaxMin(t *testing.T) {
 
 		// SELECT MAX(emp_no) FROM employees;
 		{
-			mgorm.Max(db, "emp_no").
+			mgorm.Max(db, "emp_no", "emp_no").
 				From("employees").(*mgorm.SelectStmt),
 			&Employee{
 				EmpNo: 10010,
@@ -58,14 +58,14 @@ func TestCountSum(t *testing.T) {
 	}{
 		// SELECT COUNT(emp_no) FROM salaries;
 		{
-			mgorm.Count(db, "emp_no").
+			mgorm.Count(db, "emp_no", "emp_no").
 				From("salaries").(*mgorm.SelectStmt),
 			&cnt,
 		},
 
 		// SELECT SUM(salary) FROM salaries;
 		{
-			mgorm.Sum(db, "salary").
+			mgorm.Sum(db, "salary", "salary").
 				From("salaries").(*mgorm.SelectStmt),
 			&sum,
 		},
@@ -95,7 +95,7 @@ func TestAvg(t *testing.T) {
 	}{
 		// SELECT AVG(salary) FROM salaries;
 		{
-			mgorm.Avg(db, "salary").
+			mgorm.Avg(db, "salary", "salary").
 				From("salaries").(*mgorm.SelectStmt),
 			&avg,
 		},

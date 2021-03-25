@@ -10,18 +10,30 @@ import (
 func TestGroupBy(t *testing.T) {
 	testCases := []struct {
 		Stmt   *mgorm.SelectStmt
-		Result map[string]int
+		Result []map[string]interface{}
 	}{
 		// SELECT title, COUNT(title) FROM titles GROUP BY title;
 		{
 			mgorm.Select(db, "title", "COUNT(title)").
 				From("titles").
 				GroupBy("title").(*mgorm.SelectStmt),
-			map[string]int{
-				"Engineer":        1,
-				"Senior Engineer": 4,
-				"Senior Staff":    2,
-				"Staff":           3,
+			[]map[string]interface{}{
+				{
+					"title":        "Engineer",
+					"COUNT(title)": 1,
+				},
+				{
+					"title":        "Senior Engineer",
+					"COUNT(title)": 4,
+				},
+				{
+					"title":        "Senior Staff",
+					"COUNT(title)": 2,
+				},
+				{
+					"title":        "Staff",
+					"COUNT(title)": 3,
+				},
 			},
 		},
 
@@ -31,16 +43,25 @@ func TestGroupBy(t *testing.T) {
 				From("titles").
 				GroupBy("title").
 				Having("COUNT(title) != ?", 1).(*mgorm.SelectStmt),
-			map[string]int{
-				"Senior Engineer": 4,
-				"Senior Staff":    2,
-				"Staff":           3,
+			[]map[string]interface{}{
+				{
+					"title":        "Senior Engineer",
+					"COUNT(title)": 4,
+				},
+				{
+					"title":        "Senior Staff",
+					"COUNT(title)": 2,
+				},
+				{
+					"title":        "Staff",
+					"COUNT(title)": 3,
+				},
 			},
 		},
 	}
 
 	for i, testCase := range testCases {
-		model := make(map[string]int)
+		model := make([]map[string]interface{}, 10)
 		if err := testCase.Stmt.Query(&model); err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			t.Errorf("Executed SQL: %s", testCase.Stmt.String())

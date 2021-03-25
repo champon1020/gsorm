@@ -104,23 +104,23 @@ func RunTestWithBuild(m *testing.M) {
 
 type Employee struct {
 	EmpNo     int
-	BirthDate time.Time `layout:"2006-01-02"`
+	BirthDate time.Time `mgorm:"layout=2006-01-02"`
 	FirstName string
 	LastName  string
 	Gender    string
-	HireDate  time.Time `layout:"2006-01-02"`
+	HireDate  time.Time `mgorm:"layout=2006-01-02"`
 }
 
 type Salary struct {
 	EmpNo    int
 	Salary   int
-	FromDate time.Time `layout:"2006-01-02"`
-	ToDate   time.Time `layout:"2006-01-02"`
+	FromDate time.Time `mgorm:"layout=2006-01-02"`
+	ToDate   time.Time `mgorm:"layout=2006-01-02"`
 }
 
 type Title struct {
 	EmpNo    int
 	Title    string
-	FromDate time.Time `layout:"2006-01-02"`
-	ToDate   time.Time `layout:"2006-01-02"`
+	FromDate time.Time `mgorm:"layout=2006-01-02"`
+	ToDate   time.Time `mgorm:"layout=2006-01-02"`
 }
