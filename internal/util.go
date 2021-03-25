@@ -109,43 +109,6 @@ func typeStringToKind(typ string) reflect.Type {
 	return nil
 }
 
-// TimeFormat returns layout of date.
-func TimeFormat(layout string) string {
-	switch layout {
-	case "time.ANSIC":
-		return time.ANSIC
-	case "time.UnixDate":
-		return time.UnixDate
-	case "time.RubyDate":
-		return time.RubyDate
-	case "time.RFC822":
-		return time.RFC822
-	case "time.RFC822Z":
-		return time.RFC822Z
-	case "time.RFC850":
-		return time.RFC850
-	case "time.RFC1123":
-		return time.RFC1123
-	case "time.RFC1123Z":
-		return time.RFC1123Z
-	case "time.RFC3339":
-		return time.RFC3339
-	case "time.RFC3339Nano":
-		return time.RFC3339Nano
-	case "time.Kitchen":
-		return time.Kitchen
-	case "time.Stamp":
-		return time.Stamp
-	case "time.StampMilli":
-		return time.StampMilli
-	case "time.StampMicro":
-		return time.StampMicro
-	case "time.StampNano":
-		return time.StampNano
-	}
-	return layout
-}
-
 // ColumnsAndFields generates map of column index and field index.
 func ColumnsAndFields(cols []string, modelTyp reflect.Type) map[int]int {
 	candf := make(map[int]int)

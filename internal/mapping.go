@@ -1,14 +1,6 @@
 package internal
 
-import (
-	"database/sql"
-	"fmt"
-	"reflect"
-	"time"
-
-	"github.com/champon1020/mgorm/errors"
-)
-
+/*
 // MapRowsToModel executes query and sets rows to model structure.
 func MapRowsToModel(rows *sql.Rows, model interface{}) error {
 	mTyp := reflect.TypeOf(model).Elem()
@@ -300,3 +292,4 @@ func value2Var(vTyp reflect.Type, val Str) (*reflect.Value, error) {
 
 	return &v, nil
 }
+*/

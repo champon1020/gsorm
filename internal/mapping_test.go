@@ -1,15 +1,6 @@
 package internal_test
 
-import (
-	"reflect"
-	"testing"
-	"time"
-
-	"github.com/champon1020/mgorm/internal"
-	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
-)
-
+/*
 func TestValues2Fields(t *testing.T) {
 	type Car struct {
 		S   string    //0
@@ -203,3 +194,4 @@ func TestValue2Var(t *testing.T) {
 		assert.Equal(t, testCase.Expected.Interface(), v.Interface())
 	}
 }
+*/
