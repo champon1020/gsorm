@@ -61,18 +61,6 @@ func ToString(v interface{}, quotes bool) string {
 	return reflect.TypeOf(v).String()
 }
 
-// mapKeyType returns map key type with reflect.Type.
-func mapKeyType(typ reflect.Type) reflect.Type {
-	key := strings.Split(strings.Split(typ.String(), "[")[1], "]")[0]
-	return typeStringToKind(key)
-}
-
-// mapValueType returns map value type with reflect.Type.
-func mapValueType(typ reflect.Type) reflect.Type {
-	val := strings.Split(typ.String(), "]")[1]
-	return typeStringToKind(val)
-}
-
 func typeStringToKind(typ string) reflect.Type {
 	switch typ {
 	case "string":
