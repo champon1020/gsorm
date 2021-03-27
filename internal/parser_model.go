@@ -6,51 +6,53 @@ import (
 	"github.com/champon1020/mgorm/errors"
 )
 
-type ModelParser struct {
-	Model       interface{}
+// InsertModelParser is parser for insert statement.
+type InsertModelParser struct {
+	Model       reflect.Value
 	ModelType   reflect.Type
 	Cols        []string
 	ColumnField map[int]int
 }
 
-func NewModelParser(model interface{}) (*ModelParser, error) {
+// NewInsertModelParser creates InsertModelParser instance.
+func NewInsertModelParser(cols []string, model interface{}) (*InsertModelParser, error) {
 	mTyp := reflect.TypeOf(model)
 	if mTyp.Kind() != reflect.Ptr {
 		return nil, errors.New("Model must be pointer", errors.InvalidTypeError)
 	}
 
-	parser := &ModelParser{
-		Model:     model,
+	parser := &InsertModelParser{
+		Model:     reflect.ValueOf(model).Elem(),
 		ModelType: mTyp.Elem(),
+		Cols:      cols,
 	}
 	return parser, nil
 }
 
-func (p *ModelParser) Parse() (*SQL, error) {
-	var sql *SQL
-	model := reflect.ValueOf(p.Model)
+// Parse converts model to SQL.
+func (p *InsertModelParser) Parse() (*SQL, error) {
+	var sql SQL
 
 	switch p.ModelType.Kind() {
-	case reflect.Slice,
-		reflect.Array:
+	case reflect.Slice, reflect.Array:
 		if p.ModelType.Elem().Kind() == reflect.Struct {
-			p.ParseStructSlice(sql, model)
-			return sql, nil
+			p.ParseStructSlice(&sql, p.Model)
+			return &sql, nil
 		}
 		if p.ModelType.Elem().Kind() == reflect.Map {
-			if err := p.ParseMapSlice(sql, model); err != nil {
+			if err := p.ParseMapSlice(&sql, p.Model); err != nil {
 				return nil, err
 			}
-			return sql, nil
+			return &sql, nil
 		}
 	case reflect.Struct:
-		p.ParseStruct(sql, model)
-		return sql, nil
+		p.ParseStruct(&sql, p.Model)
+		return &sql, nil
 	case reflect.Map:
-		if err := p.ParseMap(sql, model); err != nil {
+		if err := p.ParseMap(&sql, p.Model); err != nil {
 			return nil, err
 		}
-		return sql, nil
+		return &sql, nil
 	case reflect.Int,
 		reflect.Int8,
 		reflect.Int16,
@@ -70,7 +72,8 @@ func (p *ModelParser) Parse() (*SQL, error) {
 	return nil, nil
 }
 
-func (p *ModelParser) ParseMapSlice(sql *SQL, model reflect.Value) error {
+// ParseMapSlice parses slice or array of map to SQL.
+func (p *InsertModelParser) ParseMapSlice(sql *SQL, model reflect.Value) error {
 	for i := 0; i < model.Len(); i++ {
 		if i > 0 {
 			sql.Write(",")
@@ -82,8 +85,9 @@ func (p *ModelParser) ParseMapSlice(sql *SQL, model reflect.Value) error {
 	return nil
 }
 
-func (p *ModelParser) ParseStructSlice(sql *SQL, model reflect.Value) {
-	p.ColumnField = p.columnsAndFields(model.Type())
+// ParseStructSlice parses slice or array of struct to SQL.
+func (p *InsertModelParser) ParseStructSlice(sql *SQL, model reflect.Value) {
+	p.ColumnField = p.columnsAndFields(model.Type().Elem())
 	for i := 0; i < model.Len(); i++ {
 		if i > 0 {
 			sql.Write(",")
@@ -92,7 +96,8 @@ func (p *ModelParser) ParseStructSlice(sql *SQL, model reflect.Value) {
 	}
 }
 
-func (p *ModelParser) ParseMap(sql *SQL, model reflect.Value) error {
+// ParseMap parses map to SQL.
+func (p *InsertModelParser) ParseMap(sql *SQL, model reflect.Value) error {
 	sql.Write("(")
 	for i, c := range p.Cols {
 		if i > 0 {
@@ -110,7 +115,8 @@ func (p *ModelParser) ParseMap(sql *SQL, model reflect.Value) error {
 	return nil
 }
 
-func (p *ModelParser) ParseStruct(sql *SQL, model reflect.Value) {
+// ParseStruct parses struct to SQL.
+func (p *InsertModelParser) ParseStruct(sql *SQL, model reflect.Value) {
 	if p.ColumnField == nil {
 		p.ColumnField = p.columnsAndFields(model.Type())
 	}
@@ -125,7 +131,7 @@ func (p *ModelParser) ParseStruct(sql *SQL, model reflect.Value) {
 	sql.Write(")")
 }
 
-func (p *ModelParser) columnsAndFields(target reflect.Type) map[int]int {
+func (p *InsertModelParser) columnsAndFields(target reflect.Type) map[int]int {
 	cf := make(map[int]int)
 	for i, col := range p.Cols {
 		for j := 0; j < target.NumField(); j++ {
