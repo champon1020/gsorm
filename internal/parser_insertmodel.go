@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/champon1020/mgorm/errors"
@@ -45,6 +46,10 @@ func (p *InsertModelParser) Parse() (*SQL, error) {
 			}
 			return &sql, nil
 		}
+		if err := p.ParseVarSlice(&sql, p.Model); err != nil {
+			return nil, err
+		}
+		return &sql, nil
 	case reflect.Struct:
 		p.ParseStruct(&sql, p.Model)
 		return &sql, nil
@@ -67,9 +72,14 @@ func (p *InsertModelParser) Parse() (*SQL, error) {
 		reflect.Float64,
 		reflect.Bool,
 		reflect.String:
+		if err := p.ParseVar(&sql, p.Model); err != nil {
+			return nil, err
+		}
+		return &sql, nil
 	}
 
-	return nil, nil
+	msg := fmt.Sprintf("Type %v is not supported", p.ModelType.Kind())
+	return nil, errors.New(msg, errors.InvalidTypeError)
 }
 
 // ParseMapSlice parses slice or array of map to SQL.
@@ -94,6 +104,20 @@ func (p *InsertModelParser) ParseStructSlice(sql *SQL, model reflect.Value) {
 		}
 		p.ParseStruct(sql, model.Index(i))
 	}
+}
+
+// ParseVarSlice parses slice or array of variable to SQL.
+func (p *InsertModelParser) ParseVarSlice(sql *SQL, model reflect.Value) error {
+	for i := 0; i < model.Len(); i++ {
+		if i > 0 {
+			sql.Write(",")
+		}
+		err := p.ParseVar(sql, model.Index(i))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // ParseMap parses map to SQL.
@@ -137,6 +161,18 @@ func (p *InsertModelParser) ParseStruct(sql *SQL, model reflect.Value) {
 		sql.Write(s)
 	}
 	sql.Write(")")
+}
+
+// ParseVar parses variable to SQL.
+func (p *InsertModelParser) ParseVar(sql *SQL, model reflect.Value) error {
+	if len(p.Cols) != 1 {
+		msg := fmt.Sprintf("Column length must be 1 but got %d", len(p.Cols))
+		return errors.New(msg, errors.DBColumnError)
+	}
+
+	s := ToString(model.Interface(), nil)
+	sql.Write(fmt.Sprintf("(%s)", s))
+	return nil
 }
 
 func (p *InsertModelParser) columnsAndFields(target reflect.Type) map[int]int {

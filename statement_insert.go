@@ -108,70 +108,18 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 	ref = ref.Elem()
 
 	sql.Write("VALUES")
-	switch ref.Kind() {
-	case reflect.Slice, reflect.Array:
-		// Type of slice element.
-		typ := reflect.TypeOf(ref.Interface()).Elem()
-
-		// If undelying type of slice element is struct.
-		if typ.Kind() == reflect.Struct {
-			candf := internal.ColumnsAndFields(cols, typ)
-			for i := 0; i < ref.Len(); i++ {
-				if i > 0 {
-					sql.Write(",")
-				}
-				sql.Write("(")
-				for j := 0; j < len(cols); j++ {
-					if j > 0 {
-						sql.Write(",")
-					}
-					vStr := internal.ToString(ref.Index(i).Field(candf[j]).Interface(), nil)
-					sql.Write(vStr)
-				}
-				sql.Write(")")
-			}
-			return nil
-		}
-
-		for i := 0; i < ref.Len(); i++ {
-			if i > 0 {
-				sql.Write(",")
-			}
-			vStr := internal.ToString(ref.Index(i).Interface(), nil)
-			sql.Write(fmt.Sprintf("(%s)", vStr))
-		}
-		return nil
-	case reflect.Struct:
-		candf := internal.ColumnsAndFields(cols, reflect.TypeOf(ref.Interface()))
-		sql.Write("(")
-		for j := 0; j < len(cols); j++ {
-			if j > 0 {
-				sql.Write(",")
-			}
-			vStr := internal.ToString(ref.Field(candf[j]).Interface(), nil)
-			sql.Write(vStr)
-		}
-		sql.Write(")")
-		return nil
-	case reflect.Map:
-		sql.Write("(")
-		for i, c := range cols {
-			if i > 0 {
-				sql.Write(",")
-			}
-			v := ref.MapIndex(reflect.ValueOf(c))
-			if !v.IsValid() {
-				return errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError)
-			}
-			vStr := internal.ToString(v.Interface(), nil)
-			sql.Write(vStr)
-		}
-		sql.Write(")")
-		return nil
+	parser, err := internal.NewInsertModelParser(cols, model)
+	if err != nil {
+		return err
 	}
 
-	msg := fmt.Sprintf("Type %s is not supported for (*InsertStmt).Model", reflect.TypeOf(model).String())
-	return errors.New(msg, errors.InvalidTypeError)
+	modelSQL, err := parser.Parse()
+	if err != nil {
+		return err
+	}
+
+	sql.Write(modelSQL.String())
+	return nil
 }
 
 // Model sets model to InsertStmt.

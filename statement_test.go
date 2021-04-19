@@ -248,19 +248,6 @@ func TestInsertStmt_BuildSQLWithModel_Fail(t *testing.T) {
 				return err
 			},
 		},
-		{
-			errors.New("Type *int is not supported for (*InsertStmt).Model", errors.InvalidTypeError).(*errors.Error),
-			func() error {
-				// Prepare for test.
-				model := 10000
-				s := mgorm.Insert(nil, "table", "column").Model(&model).(*mgorm.InsertStmt)
-
-				// Actual build.
-				var sql internal.SQL
-				err := mgorm.InsertStmtBuildSQL(s, &sql)
-				return err
-			},
-		},
 	}
 
 	for _, testCase := range testCases {
