@@ -105,10 +105,10 @@ func (p *InsertModelParser) ParseMap(sql *SQL, model reflect.Value) error {
 		}
 		v := model.MapIndex(reflect.ValueOf(c))
 		if !v.IsValid() {
-			msg := "Column names must be included in oneof map keys"
+			msg := "Column names must be included in one of map keys"
 			return errors.New(msg, errors.InvalidSyntaxError)
 		}
-		s := ToString(v.Interface(), true)
+		s := ToString(v.Interface(), nil)
 		sql.Write(s)
 	}
 	sql.Write(")")
@@ -121,11 +121,19 @@ func (p *InsertModelParser) ParseStruct(sql *SQL, model reflect.Value) {
 		p.ColumnField = p.columnsAndFields(model.Type())
 	}
 	sql.Write("(")
+	tags := ExtractTags(reflect.TypeOf(model.Interface()))
 	for i := 0; i < len(p.Cols); i++ {
 		if i > 0 {
 			sql.Write(",")
 		}
-		s := ToString(model.Field(p.ColumnField[i]).Interface(), true)
+
+		var opt *ToStringOpt
+		if tags[p.ColumnField[i]].Layout != "" {
+			opt = &ToStringOpt{Quotes: true, TimeFormat: tags[p.ColumnField[i]].Layout}
+		} else {
+			opt = nil
+		}
+		s := ToString(model.Field(p.ColumnField[i]).Interface(), opt)
 		sql.Write(s)
 	}
 	sql.Write(")")

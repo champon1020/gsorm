@@ -55,12 +55,13 @@ func TestToStringWithQuotes(t *testing.T) {
 		{u16, "8"},
 		{u32, "9"},
 		{u64, "10"},
-		{true, "true"},
+		{true, "1"},
+		{false, "0"},
 		{f32, "10.1"},
 		{f64, "100.1"},
 		{
 			[]interface{}{10, "str", true},
-			`10, 'str', true`,
+			`10, 'str', 1`,
 		},
 		{
 			map[string]string{"key": "value"},
@@ -73,7 +74,7 @@ func TestToStringWithQuotes(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := internal.ToString(testCase.Value, true)
+		res := internal.ToString(testCase.Value, nil)
 		assert.Equal(t, testCase.Result, res)
 	}
 }
@@ -87,7 +88,7 @@ func TestToStringWituhoutQuotes(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := internal.ToString(testCase.Value, false)
+		res := internal.ToString(testCase.Value, &internal.ToStringOpt{Quotes: false})
 		assert.Equal(t, testCase.Result, res)
 	}
 }

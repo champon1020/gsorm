@@ -1,6 +1,7 @@
 package internal_test
 
 import (
+	"math"
 	"testing"
 	"time"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestModelParser_ParseMapSlice(t *testing.T) {
+func TestInsertModelParser_ParseMapSlice(t *testing.T) {
 	testCases := []struct {
 		Cols     []string
 		Model    interface{}
@@ -39,7 +40,7 @@ func TestModelParser_ParseMapSlice(t *testing.T) {
 	}
 }
 
-func TestModelParser_ParseStructSlice(t *testing.T) {
+func TestInsertModelParser_ParseStructSlice(t *testing.T) {
 	testCases := []struct {
 		Cols     []string
 		Model    interface{}
@@ -70,7 +71,7 @@ func TestModelParser_ParseStructSlice(t *testing.T) {
 	}
 }
 
-func TestModelParser_ParseMap(t *testing.T) {
+func TestInsertModelParser_ParseMap(t *testing.T) {
 	testCases := []struct {
 		Cols     []string
 		Model    interface{}
@@ -90,10 +91,10 @@ func TestModelParser_ParseMap(t *testing.T) {
 		{
 			[]string{"float32", "float64"},
 			&map[string]interface{}{
-				"float32": 3.14159265358979,
-				"float64": 3.141592653589793238462643383279,
+				"float32": float32(math.Pi),
+				"float64": float64(math.Pi),
 			},
-			"(3.14159265358979, 3.141592653589793238462643383279)",
+			"(3.1415927, 3.141592653589793)",
 		},
 		{
 			[]string{"bool", "time"},
@@ -101,7 +102,7 @@ func TestModelParser_ParseMap(t *testing.T) {
 				"bool": true,
 				"time": time.Date(2021, time.January, 2, 3, 4, 5, 0, time.UTC),
 			},
-			"(1, '2021-01-02T03:04:05Z')",
+			"(1, '2021-01-02 03:04:05')",
 		},
 	}
 
@@ -120,7 +121,7 @@ func TestModelParser_ParseMap(t *testing.T) {
 	}
 }
 
-func TestModelParser_ParseStruct(t *testing.T) {
+func TestInsertModelParser_ParseStruct(t *testing.T) {
 	testCases := []struct {
 		Cols     []string
 		Model    interface{}
@@ -138,8 +139,8 @@ func TestModelParser_ParseStruct(t *testing.T) {
 		},
 		{
 			[]string{"float32", "float64"},
-			&FloatModel{F32: 3.14159265358979, F64: 3.141592653589793238462643383279},
-			"(3.14159265358979, 3.141592653589793238462643383279)",
+			&FloatModel{F32: math.Pi, F64: math.Pi},
+			"(3.1415927, 3.141592653589793)",
 		},
 		{
 			[]string{"bool", "time", "time_ansic", "time_format"},
@@ -149,7 +150,7 @@ func TestModelParser_ParseStruct(t *testing.T) {
 				TimeANSIC:  time.Date(2021, time.March, 25, 22, 13, 30, 0, time.UTC),
 				TimeFormat: time.Date(2021, time.April, 1, 0, 0, 0, 0, time.UTC),
 			},
-			"(1, '2021-01-02T03:04:05Z', 'Wed Mar 25 22:13:30 2021', '2021-04-01')",
+			"(1, '2021-01-02 03:04:05', 'Thu Mar 25 22:13:30 2021', '2021-04-01')",
 		},
 	}
 

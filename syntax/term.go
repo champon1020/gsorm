@@ -78,7 +78,7 @@ type Eq struct {
 func (e *Eq) Build() string {
 	s := e.LHS
 	s += " = "
-	s += internal.ToString(e.RHS, true)
+	s += internal.ToString(e.RHS, nil)
 	return s
 }
 

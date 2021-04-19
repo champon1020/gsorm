@@ -125,7 +125,7 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 					if j > 0 {
 						sql.Write(",")
 					}
-					vStr := internal.ToString(ref.Index(i).Field(candf[j]).Interface(), true)
+					vStr := internal.ToString(ref.Index(i).Field(candf[j]).Interface(), nil)
 					sql.Write(vStr)
 				}
 				sql.Write(")")
@@ -137,7 +137,7 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 			if i > 0 {
 				sql.Write(",")
 			}
-			vStr := internal.ToString(ref.Index(i).Interface(), true)
+			vStr := internal.ToString(ref.Index(i).Interface(), nil)
 			sql.Write(fmt.Sprintf("(%s)", vStr))
 		}
 		return nil
@@ -148,7 +148,7 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 			if j > 0 {
 				sql.Write(",")
 			}
-			vStr := internal.ToString(ref.Field(candf[j]).Interface(), true)
+			vStr := internal.ToString(ref.Field(candf[j]).Interface(), nil)
 			sql.Write(vStr)
 		}
 		sql.Write(")")
@@ -163,7 +163,7 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 			if !v.IsValid() {
 				return errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError)
 			}
-			vStr := internal.ToString(v.Interface(), true)
+			vStr := internal.ToString(v.Interface(), nil)
 			sql.Write(vStr)
 		}
 		sql.Write(")")

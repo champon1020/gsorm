@@ -23,7 +23,7 @@ func (h *Having) String() string {
 	s := fmt.Sprintf("%q", h.Expr)
 	if len(h.Values) > 0 {
 		s += ", "
-		s += internal.ToString(h.Values, true)
+		s += internal.ToString(h.Values, nil)
 	}
 	return fmt.Sprintf("%s(%s)", h.Name(), s)
 }

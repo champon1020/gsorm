@@ -28,7 +28,7 @@ func TestDefault_Build(t *testing.T) {
 		},
 		{
 			&mig.Default{Value: true},
-			&syntax.StmtSet{Keyword: "DEFAULT", Value: "true"},
+			&syntax.StmtSet{Keyword: "DEFAULT", Value: "1"},
 		},
 		{
 			&mig.Default{Value: time.Date(2021, time.January, 1, 0, 0, 0, 0, time.UTC)},

@@ -184,12 +184,11 @@ func TestRowsParser_ParseMap(t *testing.T) {
 			},
 		},
 		{
-			[]string{"float32", "float64"},
-			[][]string{{"3.14159265358979", "3.141592653589793238462643383279"}},
+			[]string{"float64"},
+			[][]string{{"3.141592653589793238462643383279"}},
 			&map[string]interface{}{},
 			map[string]interface{}{
-				"float32": 3.14159265358979,
-				"float64": 3.141592653589793238462643383279,
+				"float64": 3.141592653589793,
 			},
 		},
 		{
@@ -241,9 +240,9 @@ func TestRowsParser_ParseStruct(t *testing.T) {
 		},
 		{
 			[]string{"float32", "float64"},
-			[][]string{{"3.14159265358979", "3.141592653589793238462643383279"}},
+			[][]string{{"3.141592653589793238462643383279", "3.141592653589793238462643383279"}},
 			&FloatModel{},
-			FloatModel{F32: 3.14159265358979, F64: 3.141592653589793238462643383279},
+			FloatModel{F32: 3.1415927, F64: 3.141592653589793},
 		},
 		{
 			[]string{"bool", "time", "time_ansic", "time_format"},
@@ -349,15 +348,15 @@ func TestRowsParser_ParseVar(t *testing.T) {
 		},
 		{
 			[]string{"float32"},
-			[][]string{{"3.14159265358979"}},
+			[][]string{{"3.141592653589793238462643383279"}},
 			&fModel.F32,
-			float32(3.14159265358979),
+			float32(3.1415927),
 		},
 		{
 			[]string{"float64"},
 			[][]string{{"3.141592653589793238462643383279"}},
 			&fModel.F64,
-			float64(3.141592653589793238462643383279),
+			float64(3.141592653589793),
 		},
 		{
 			[]string{"bool"},

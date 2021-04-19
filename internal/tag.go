@@ -42,7 +42,16 @@ func (t *Tag) Lookup(tag string) bool {
 	return false
 }
 
-// ExtractTag extracts the field tag.
+// ExtractTags extracts the struct field tags from struct.
+func ExtractTags(t reflect.Type) []*Tag {
+	tags := make([]*Tag, t.NumField())
+	for i := 0; i < t.NumField(); i++ {
+		tags[i] = ExtractTag(t.Field(i))
+	}
+	return tags
+}
+
+// ExtractTag extracts the struct field tag.
 func ExtractTag(f reflect.StructField) *Tag {
 	t := &Tag{}
 	jsonTag := f.Tag.Get("json")

@@ -23,7 +23,7 @@ func (o *Or) String() string {
 	s := fmt.Sprintf("%q", o.Expr)
 	if len(o.Values) > 0 {
 		s += ", "
-		s += internal.ToString(o.Values, true)
+		s += internal.ToString(o.Values, nil)
 	}
 	return fmt.Sprintf("%s(%s)", o.Name(), s)
 }
