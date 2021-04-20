@@ -116,34 +116,18 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 	ref = ref.Elem()
 
 	sql.Write("SET")
-	switch ref.Kind() {
-	case reflect.Struct:
-		idxC2F := internal.ColumnsAndFields(cols, reflect.TypeOf(ref.Interface()))
-		for i, c := range cols {
-			if i > 0 {
-				sql.Write(",")
-			}
-			vStr := internal.ToString(ref.Field(idxC2F[i]).Interface(), nil)
-			sql.Write(fmt.Sprintf("%s = %s", c, vStr))
-		}
-		return nil
-	case reflect.Map:
-		for i, c := range cols {
-			if i > 0 {
-				sql.Write(",")
-			}
-			v := ref.MapIndex(reflect.ValueOf(c))
-			if !v.IsValid() {
-				return errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError)
-			}
-			vStr := internal.ToString(v.Interface(), nil)
-			sql.Write(fmt.Sprintf("%s = %s", c, vStr))
-		}
-		return nil
+	parser, err := internal.NewUpdateModelParser(cols, model)
+	if err != nil {
+		return err
 	}
 
-	msg := fmt.Sprintf("Type %s is not supported for (*UpdateStmt).Model", reflect.TypeOf(model).String())
-	return errors.New(msg, errors.InvalidTypeError)
+	modelSQL, err := parser.Parse()
+	if err != nil {
+		return err
+	}
+
+	sql.Write(modelSQL.String())
+	return nil
 }
 
 // Model sets model to UpdateStmt.

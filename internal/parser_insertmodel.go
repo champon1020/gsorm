@@ -7,7 +7,7 @@ import (
 	"github.com/champon1020/mgorm/errors"
 )
 
-// InsertModelParser is parser for insert statement.
+// InsertModelParser is the model parser for insert statement.
 type InsertModelParser struct {
 	Model       reflect.Value
 	ModelType   reflect.Type

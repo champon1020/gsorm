@@ -651,7 +651,7 @@ func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 			},
 		},
 		{
-			errors.New("Type *[]int is not supported for (*UpdateStmt).Model", errors.InvalidTypeError).(*errors.Error),
+			errors.New("Type slice is not supported", errors.InvalidTypeError).(*errors.Error),
 			func() error {
 				// Prepare for test.
 				model := []int{1000}
