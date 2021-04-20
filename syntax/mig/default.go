@@ -19,6 +19,6 @@ func (d *Default) Keyword() string {
 func (d *Default) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())
-	ss.WriteValue(internal.ToString(d.Value, true))
+	ss.WriteValue(internal.ToString(d.Value, nil))
 	return ss, nil
 }

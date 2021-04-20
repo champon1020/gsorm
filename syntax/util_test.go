@@ -38,7 +38,7 @@ func TestBuildForExpression(t *testing.T) {
 		{
 			"IN lhs (?, ?, ?)",
 			[]interface{}{"rhs", 100, true},
-			`IN lhs ('rhs', 100, true)`,
+			`IN lhs ('rhs', 100, 1)`,
 		},
 		{
 			"lhs LIKE %%?%%",

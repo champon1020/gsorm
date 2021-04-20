@@ -10,6 +10,13 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+// Mock is mock database conneciton pool.
+type Mock interface {
+	Conn
+	Complete() error
+	CompareWith(Stmt) (interface{}, error)
+}
+
 // MockDB is mock databse connection pool.
 // This structure stores mainly what query will be executed and what value will be returned.
 type MockDB struct {

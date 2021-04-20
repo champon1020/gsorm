@@ -29,7 +29,7 @@ func Test_ExtractTag(t *testing.T) {
 				FK:      "FK_a",
 				Ref:     "reftbl(refcol)",
 				UC:      "UC_a",
-				Layout:  "time.RFC3339",
+				Layout:  "2006-01-02T15:04:05Z07:00",
 			},
 		},
 		{

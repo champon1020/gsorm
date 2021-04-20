@@ -3,6 +3,7 @@ package internal
 import (
 	"reflect"
 	"strings"
+	"time"
 )
 
 // Tag stores the field tag contents.
@@ -41,7 +42,16 @@ func (t *Tag) Lookup(tag string) bool {
 	return false
 }
 
-// ExtractTag extracts the field tag.
+// ExtractTags extracts the struct field tags from struct.
+func ExtractTags(t reflect.Type) []*Tag {
+	tags := make([]*Tag, t.NumField())
+	for i := 0; i < t.NumField(); i++ {
+		tags[i] = ExtractTag(t.Field(i))
+	}
+	return tags
+}
+
+// ExtractTag extracts the struct field tag.
 func ExtractTag(f reflect.StructField) *Tag {
 	t := &Tag{}
 	jsonTag := f.Tag.Get("json")
@@ -77,8 +87,45 @@ func ExtractTag(f reflect.StructField) *Tag {
 		case "uc":
 			t.UC = eq[1]
 		case "layout":
-			t.Layout = eq[1]
+			t.Layout = timeFormat(eq[1])
 		}
 	}
 	return t
+}
+
+// timeFormat returns layout of date.
+func timeFormat(layout string) string {
+	switch layout {
+	case "time.ANSIC":
+		return time.ANSIC
+	case "time.UnixDate":
+		return time.UnixDate
+	case "time.RubyDate":
+		return time.RubyDate
+	case "time.RFC822":
+		return time.RFC822
+	case "time.RFC822Z":
+		return time.RFC822Z
+	case "time.RFC850":
+		return time.RFC850
+	case "time.RFC1123":
+		return time.RFC1123
+	case "time.RFC1123Z":
+		return time.RFC1123Z
+	case "time.RFC3339":
+		return time.RFC3339
+	case "time.RFC3339Nano":
+		return time.RFC3339Nano
+	case "time.Kitchen":
+		return time.Kitchen
+	case "time.Stamp":
+		return time.Stamp
+	case "time.StampMilli":
+		return time.StampMilli
+	case "time.StampMicro":
+		return time.StampMicro
+	case "time.StampNano":
+		return time.StampNano
+	}
+	return layout
 }

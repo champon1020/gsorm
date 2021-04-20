@@ -24,7 +24,7 @@ func (v *Values) AddValue(val interface{}) {
 
 // String returns function call with string.
 func (v *Values) String() string {
-	s := internal.ToString(v.Values, true)
+	s := internal.ToString(v.Values, nil)
 	return fmt.Sprintf("%s(%s)", v.Name(), s)
 }
 
@@ -37,7 +37,7 @@ func (v *Values) Build() (*syntax.StmtSet, error) {
 		if i != 0 {
 			ss.WriteValue(",")
 		}
-		ss.WriteValue(internal.ToString(v, true))
+		ss.WriteValue(internal.ToString(v, nil))
 	}
 	ss.WriteValue(")")
 	return ss, nil

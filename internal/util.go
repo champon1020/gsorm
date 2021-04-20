@@ -22,27 +22,61 @@ func SnakeCase(str string) (snake string) {
 	return
 }
 
-// ToString convert the value of interface to string.
-// If quotes is true, attache double quotes to string value.
-func ToString(v interface{}, quotes bool) string {
+// ToStringOpt is the option of ToString.
+type ToStringOpt struct {
+	Quotes     bool
+	TimeFormat string
+}
+
+// ToString converts the type of value to string.
+// If quotes is true, it attaches single quotes to returned value.
+// Default conversion format is as follows:
+//  str (string)                            -> "str" (If quotes == true, "'str'")
+//  0 (int, intN)                           -> "0"
+//  0 (uint, uintN)                         -> "0"
+//  1.0 (floatN)                            -> "1.00000"
+//  true (bool)                             -> "1" (If false, "0")
+//  2006-01-02T15:04:05Z00:00 (time.Time)   -> "2006-01-02 15:04:05"
+//  nil                                     -> "nil"
+func ToString(v interface{}, opt *ToStringOpt) string {
 	if v == nil {
 		return "nil"
 	}
 
+	if opt == nil {
+		opt = &ToStringOpt{Quotes: true, TimeFormat: "2006-01-02 15:04:05"}
+	}
+
 	switch v := v.(type) {
 	case string:
-		if quotes {
+		if opt.Quotes {
 			return fmt.Sprintf("'%s'", v)
 		}
 		return v
-	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+	case int,
+		int8,
+		int16,
+		int32,
+		int64,
+		uint,
+		uint8,
+		uint16,
+		uint32,
+		uint64:
 		return fmt.Sprintf("%d", v)
 	case float32, float64:
-		return strings.TrimRight(strings.TrimRight(fmt.Sprintf("%F", v), "0"), ".")
+		return strings.TrimRight(strings.TrimRight(fmt.Sprintf("%v", v), "0"), ".")
 	case bool:
-		return fmt.Sprintf("%v", v)
+		if v {
+			return "1"
+		}
+		return "0"
 	case time.Time:
-		return fmt.Sprintf("'%s'", v.Format("2006-01-02 15:04:05"))
+		t := v.Format(opt.TimeFormat)
+		if opt.Quotes {
+			return fmt.Sprintf("'%s'", t)
+		}
+		return t
 	}
 
 	typ := reflect.TypeOf(v).Kind()
@@ -53,97 +87,12 @@ func ToString(v interface{}, quotes bool) string {
 			if i != 0 {
 				s += ", "
 			}
-			s += ToString(vals.Index(i).Interface(), true)
+			s += ToString(vals.Index(i).Interface(), opt)
 		}
 		return s
 	}
 
 	return reflect.TypeOf(v).String()
-}
-
-// mapKeyType returns map key type with reflect.Type.
-func mapKeyType(typ reflect.Type) reflect.Type {
-	key := strings.Split(strings.Split(typ.String(), "[")[1], "]")[0]
-	return typeStringToKind(key)
-}
-
-// mapValueType returns map value type with reflect.Type.
-func mapValueType(typ reflect.Type) reflect.Type {
-	val := strings.Split(typ.String(), "]")[1]
-	return typeStringToKind(val)
-}
-
-func typeStringToKind(typ string) reflect.Type {
-	switch typ {
-	case "string":
-		return reflect.TypeOf("")
-	case "int":
-		return reflect.TypeOf(0)
-	case "int8":
-		return reflect.TypeOf(int8(0))
-	case "int16":
-		return reflect.TypeOf(int16(0))
-	case "int32":
-		return reflect.TypeOf(int32(0))
-	case "int64":
-		return reflect.TypeOf(int64(0))
-	case "uint":
-		return reflect.TypeOf(uint(0))
-	case "uint8":
-		return reflect.TypeOf(uint8(0))
-	case "uint16":
-		return reflect.TypeOf(uint16(0))
-	case "uint32":
-		return reflect.TypeOf(uint32(0))
-	case "uint64":
-		return reflect.TypeOf(uint64(0))
-	case "float32":
-		return reflect.TypeOf(float32(0.0))
-	case "float64":
-		return reflect.TypeOf(float64(0.0))
-	case "bool":
-		return reflect.TypeOf(false)
-	case "time.Time":
-		return reflect.TypeOf(time.Time{})
-	}
-	return nil
-}
-
-// TimeFormat returns layout of date.
-func TimeFormat(layout string) string {
-	switch layout {
-	case "time.ANSIC":
-		return time.ANSIC
-	case "time.UnixDate":
-		return time.UnixDate
-	case "time.RubyDate":
-		return time.RubyDate
-	case "time.RFC822":
-		return time.RFC822
-	case "time.RFC822Z":
-		return time.RFC822Z
-	case "time.RFC850":
-		return time.RFC850
-	case "time.RFC1123":
-		return time.RFC1123
-	case "time.RFC1123Z":
-		return time.RFC1123Z
-	case "time.RFC3339":
-		return time.RFC3339
-	case "time.RFC3339Nano":
-		return time.RFC3339Nano
-	case "time.Kitchen":
-		return time.Kitchen
-	case "time.Stamp":
-		return time.Stamp
-	case "time.StampMilli":
-		return time.StampMilli
-	case "time.StampMicro":
-		return time.StampMicro
-	case "time.StampNano":
-		return time.StampNano
-	}
-	return layout
 }
 
 // ColumnsAndFields generates map of column index and field index.

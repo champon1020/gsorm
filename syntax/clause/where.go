@@ -23,7 +23,7 @@ func (w *Where) String() string {
 	s := fmt.Sprintf("%q", w.Expr)
 	if len(w.Values) > 0 {
 		s += ", "
-		s += internal.ToString(w.Values, true)
+		s += internal.ToString(w.Values, nil)
 	}
 	return fmt.Sprintf("%s(%s)", w.Name(), s)
 }

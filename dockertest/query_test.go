@@ -74,20 +74,50 @@ func TestQueryWithStruct(t *testing.T) {
 
 func TestQueryWithMap(t *testing.T) {
 	stmt := mgorm.Select(db, "emp_no", "first_name").From("employees")
-	result := map[int]string{
-		10001: "Georgi",
-		10002: "Bezalel",
-		10003: "Parto",
-		10004: "Chirstian",
-		10005: "Kyoichi",
-		10006: "Anneke",
-		10007: "Tzvetan",
-		10008: "Saniya",
-		10009: "Sumant",
-		10010: "Duangkaew",
+	result := []map[string]interface{}{
+		{
+			"emp_no":     10001,
+			"first_name": "Georgi",
+		},
+		{
+			"emp_no":     10002,
+			"first_name": "Bezalel",
+		},
+		{
+			"emp_no":     10003,
+			"first_name": "Parto",
+		},
+		{
+			"emp_no":     10004,
+			"first_name": "Chirstian",
+		},
+		{
+			"emp_no":     10005,
+			"first_name": "Kyoichi",
+		},
+		{
+			"emp_no":     10006,
+			"first_name": "Anneke",
+		},
+		{
+			"emp_no":     10007,
+			"first_name": "Tzvetan",
+		},
+		{
+			"emp_no":     10008,
+			"first_name": "Saniya",
+		},
+		{
+			"emp_no":     10009,
+			"first_name": "Sumant",
+		},
+		{
+			"emp_no":     10010,
+			"first_name": "Duangkaew",
+		},
 	}
 
-	model := make(map[int]string)
+	model := make([]map[string]interface{}, 10)
 	if err := stmt.Query(&model); err != nil {
 		t.Errorf("Error was occurred: %v", err)
 		t.Errorf("Executed SQL: %s", stmt.String())
