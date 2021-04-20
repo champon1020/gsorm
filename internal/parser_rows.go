@@ -57,7 +57,7 @@ func NewRowsParser(rows Rows, model interface{}) (*RowsParser, error) {
 
 	mTyp := reflect.TypeOf(model)
 	if mTyp.Kind() != reflect.Ptr {
-		return nil, errors.New("Model must be pointer", errors.InvalidTypeError)
+		return nil, errors.New("model must be pointer", errors.InvalidTypeError)
 	}
 
 	parser := &RowsParser{

@@ -95,42 +95,6 @@ func ToString(v interface{}, opt *ToStringOpt) string {
 	return reflect.TypeOf(v).String()
 }
 
-func typeStringToKind(typ string) reflect.Type {
-	switch typ {
-	case "string":
-		return reflect.TypeOf("")
-	case "int":
-		return reflect.TypeOf(0)
-	case "int8":
-		return reflect.TypeOf(int8(0))
-	case "int16":
-		return reflect.TypeOf(int16(0))
-	case "int32":
-		return reflect.TypeOf(int32(0))
-	case "int64":
-		return reflect.TypeOf(int64(0))
-	case "uint":
-		return reflect.TypeOf(uint(0))
-	case "uint8":
-		return reflect.TypeOf(uint8(0))
-	case "uint16":
-		return reflect.TypeOf(uint16(0))
-	case "uint32":
-		return reflect.TypeOf(uint32(0))
-	case "uint64":
-		return reflect.TypeOf(uint64(0))
-	case "float32":
-		return reflect.TypeOf(float32(0.0))
-	case "float64":
-		return reflect.TypeOf(float64(0.0))
-	case "bool":
-		return reflect.TypeOf(false)
-	case "time.Time":
-		return reflect.TypeOf(time.Time{})
-	}
-	return nil
-}
-
 // ColumnsAndFields generates map of column index and field index.
 func ColumnsAndFields(cols []string, modelTyp reflect.Type) map[int]int {
 	candf := make(map[int]int)
