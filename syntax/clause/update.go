@@ -8,8 +8,7 @@ import (
 
 // Update is UPDATE clause.
 type Update struct {
-	Table   syntax.Table
-	Columns []string
+	Table syntax.Table
 }
 
 // Name returns clause keyword.
@@ -22,17 +21,9 @@ func (u *Update) AddTable(table string) {
 	u.Table = *syntax.NewTable(table)
 }
 
-// AddColumns appends columns to Update.
-func (u *Update) AddColumns(cols []string) {
-	u.Columns = cols
-}
-
 // String returns function call with string.
 func (u *Update) String() string {
 	s := fmt.Sprintf("%q", u.Table.Build())
-	for _, c := range u.Columns {
-		s += fmt.Sprintf(", %q", c)
-	}
 	return fmt.Sprintf("%s(%s)", u.Name(), s)
 }
 

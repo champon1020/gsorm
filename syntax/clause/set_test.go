@@ -15,15 +15,8 @@ func TestSet_String(t *testing.T) {
 		Result string
 	}{
 		{
-			&clause.Set{Eqs: []syntax.Eq{{LHS: "lhs", RHS: "rhs"}}},
-			`SET("rhs")`,
-		},
-		{
-			&clause.Set{Eqs: []syntax.Eq{
-				{LHS: "lhs", RHS: "rhs"},
-				{LHS: "lhs", RHS: 10},
-			}},
-			`SET("rhs", 10)`,
+			&clause.Set{Column: "col", Value: 10},
+			`SET(col, 10)`,
 		},
 	}
 
@@ -39,15 +32,12 @@ func TestSet_Build(t *testing.T) {
 		Result *syntax.StmtSet
 	}{
 		{
-			&clause.Set{Eqs: []syntax.Eq{{LHS: "lhs", RHS: "rhs"}}},
+			&clause.Set{Column: "lhs", Value: "rhs"},
 			&syntax.StmtSet{Keyword: "SET", Value: `lhs = 'rhs'`},
 		},
 		{
-			&clause.Set{Eqs: []syntax.Eq{
-				{LHS: "lhs1", RHS: 10},
-				{LHS: "lhs2", RHS: "rhs2"},
-			}},
-			&syntax.StmtSet{Keyword: "SET", Value: `lhs1 = 10, lhs2 = 'rhs2'`},
+			&clause.Set{Column: "lhs1", Value: 10},
+			&syntax.StmtSet{Keyword: "SET", Value: `lhs1 = 10`},
 		},
 	}
 

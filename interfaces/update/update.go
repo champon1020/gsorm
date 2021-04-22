@@ -4,8 +4,8 @@ import "github.com/champon1020/mgorm/interfaces"
 
 // Stmt is interface which is returned by mgorm.Update.
 type Stmt interface {
-	Model(interface{}) Model
-	Set(...interface{}) Set
+	Model(model interface{}, cols ...string) Model
+	Set(col string, val interface{}) Set
 }
 
 // Model is interface which is returned by (*UpdateStmt).Model.
@@ -16,6 +16,7 @@ type Model interface {
 
 // Set is interface which is returned by (*UpdateStmt).Set.
 type Set interface {
+	Set(col string, val interface{}) Set
 	Where(string, ...interface{}) Where
 	interfaces.ExecCallable
 }

@@ -224,7 +224,7 @@ func TestInsertStmt_BuildSQLWithModel_Fail(t *testing.T) {
 		Build       func() error
 	}{
 		{
-			errors.New("Model must be pointer", errors.InvalidValueError).(*errors.Error),
+			errors.New("model must be pointer", errors.InvalidTypeError).(*errors.Error),
 			func() error {
 				// Prepare for test.
 				s := mgorm.Insert(nil, "", "").Model(1000).(*mgorm.InsertStmt)
@@ -512,8 +512,9 @@ func TestUpdateStmt_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Update(nil, "sample", "id", "first_name").
-				Set(10000, "Taro").
+			mgorm.Update(nil, "sample").
+				Set("id", 10000).
+				Set("first_name", "Taro").
 				Where("id = ?", 20000).
 				And("first_name = ? OR first_name = ?", "Jiro", "Hanako").(*mgorm.UpdateStmt),
 			`UPDATE sample SET id = 10000, first_name = 'Taro' ` +
@@ -521,8 +522,9 @@ func TestUpdateStmt_String(t *testing.T) {
 				`AND (first_name = 'Jiro' OR first_name = 'Hanako')`,
 		},
 		{
-			mgorm.Update(nil, "sample", "id", "first_name").
-				Set(10000, "Taro").
+			mgorm.Update(nil, "sample").
+				Set("id", 10000).
+				Set("first_name", "Taro").
 				Where("id = ?", 20000).
 				Or("first_name = ? AND last_name = ?", "Jiro", "Sato").(*mgorm.UpdateStmt),
 			`UPDATE sample SET id = 10000, first_name = 'Taro' ` +
@@ -530,22 +532,15 @@ func TestUpdateStmt_String(t *testing.T) {
 				`OR (first_name = 'Jiro' AND last_name = 'Sato')`,
 		},
 		{
-			mgorm.Update(nil, "sample", "id", "first_name").
-				Model(&model1).
+			mgorm.Update(nil, "sample").
+				Model(&model1, "id", "first_name").
 				Where("id = ?", 20000).(*mgorm.UpdateStmt),
 			`UPDATE sample SET id = 10000, first_name = 'Taro' ` +
 				`WHERE id = 20000`,
 		},
 		{
-			mgorm.Update(nil, "sample", "id").
-				Model(10000).
-				Where("id = ?", 20000).(*mgorm.UpdateStmt),
-			`UPDATE sample SET id = 10000 ` +
-				`WHERE id = 20000`,
-		},
-		{
-			mgorm.Update(nil, "sample", "id", "first_name").
-				Model(&model2).
+			mgorm.Update(nil, "sample").
+				Model(&model2, "id", "first_name").
 				Where("id = ?", 20000).(*mgorm.UpdateStmt),
 			`UPDATE sample SET id = 10000, first_name = 'Taro' ` +
 				`WHERE id = 20000`,
@@ -572,7 +567,7 @@ func TestUpdateStmt_BuildSQLWithClauses_Fail(t *testing.T) {
 			errors.New("clause.Join is not supported for UPDATE statement", errors.InvalidTypeError).(*errors.Error),
 			func() error {
 				// Prepare for test.
-				s := mgorm.Update(nil, "", "").(*mgorm.UpdateStmt)
+				s := mgorm.Update(nil, "table").(*mgorm.UpdateStmt)
 				s.ExportedSetCalled(&clause.Join{})
 
 				// Actual build.
@@ -608,33 +603,6 @@ func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 		Build       func() error
 	}{
 		{
-			errors.New(
-				"If you set variable to Model, number of columns must be 1, not 2",
-				errors.InvalidSyntaxError).(*errors.Error),
-			func() error {
-				// Prepare for test.
-				s := mgorm.Update(nil, "table", "column1", "column2").Model(1000).(*mgorm.UpdateStmt)
-
-				// Actual build.
-				var sql internal.SQL
-				err := mgorm.UpdateStmtBuildSQL(s, &sql)
-				return err
-			},
-		},
-		{
-			errors.New("If model is not variable, model must be pointer", errors.InvalidValueError).(*errors.Error),
-			func() error {
-				// Prepare for test.
-				model := make(map[string]interface{})
-				s := mgorm.Update(nil, "table", "column").Model(model).(*mgorm.UpdateStmt)
-
-				// Actual build.
-				var sql internal.SQL
-				err := mgorm.UpdateStmtBuildSQL(s, &sql)
-				return err
-			},
-		},
-		{
 			errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError).(*errors.Error),
 			func() error {
 				// Prepare for test.
@@ -642,7 +610,7 @@ func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 					"id":   1000,
 					"name": "Taro",
 				}
-				s := mgorm.Update(nil, "sample", "id", "first_name").Model(&model).(*mgorm.UpdateStmt)
+				s := mgorm.Update(nil, "sample").Model(&model, "id", "first_name").(*mgorm.UpdateStmt)
 
 				// Actual build.
 				var sql internal.SQL
@@ -655,7 +623,7 @@ func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 			func() error {
 				// Prepare for test.
 				model := []int{1000}
-				s := mgorm.Update(nil, "sample", "id", "first_name").Model(&model).(*mgorm.UpdateStmt)
+				s := mgorm.Update(nil, "sample").Model(&model, "id", "first_name").(*mgorm.UpdateStmt)
 
 				// Actual build.
 				var sql internal.SQL
@@ -675,51 +643,6 @@ func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 		if !ok {
 			t.Errorf("Error type is invalid")
 			continue
-		}
-		if !actualErr.Is(testCase.ExpectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
-		}
-	}
-}
-
-func TestUpdateStmt_Set_Fail(t *testing.T) {
-	testCases := []struct {
-		ExpectedErr *errors.Error
-		Build       func() []error
-	}{
-		{
-			errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError).(*errors.Error),
-			func() []error {
-				// Prepare for test.
-				s := new(mgorm.UpdateStmt)
-
-				// Actual build.
-				s.Set("")
-				return s.ExportedGetErrors()
-			},
-		},
-		{
-			errors.New("Number of values is not equal to that of columns", errors.InvalidValueError).(*errors.Error),
-			func() []error {
-				// Actual build.
-				s := mgorm.Update(nil, "sample", "id").Set(10, "Taro").(*mgorm.UpdateStmt)
-				return s.ExportedGetErrors()
-			},
-		},
-	}
-
-	for _, testCase := range testCases {
-		errs := testCase.Build()
-		if len(errs) == 0 {
-			t.Errorf("Error was not occurred")
-			return
-		}
-		actualErr, ok := errs[0].(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			return
 		}
 		if !actualErr.Is(testCase.ExpectedErr) {
 			t.Errorf("Different error was occurred")
