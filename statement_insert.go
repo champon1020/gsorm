@@ -101,12 +101,6 @@ func (s *InsertStmt) buildSQLWithClauses(sql *internal.SQL) error {
 
 // buildSQLWithModel builds SQL statement from model.
 func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
-	ref := reflect.ValueOf(model)
-	if ref.Kind() != reflect.Ptr {
-		return errors.New("Model must be pointer", errors.InvalidValueError)
-	}
-	ref = ref.Elem()
-
 	sql.Write("VALUES")
 	parser, err := internal.NewInsertModelParser(cols, model)
 	if err != nil {

@@ -15,8 +15,9 @@ import (
 // UpdateStmt is UPDATE statement..
 type UpdateStmt struct {
 	stmt
-	model interface{}
-	cmd   *clause.Update
+	model     interface{}
+	modelCols []string
+	cmd       *clause.Update
 }
 
 // String returns SQL statement with string.
@@ -50,7 +51,7 @@ func (s *UpdateStmt) buildSQL(sql *internal.SQL) error {
 
 	if s.model != nil {
 		cols := []string{}
-		cols = append(cols, s.cmd.Columns...)
+		cols = append(cols, s.modelCols...)
 		if err = s.buildSQLWithModel(cols, s.model, sql); err != nil {
 			return err
 		}
@@ -64,17 +65,29 @@ func (s *UpdateStmt) buildSQL(sql *internal.SQL) error {
 
 // buildSQLWithClauses builds SQL statement from called clauses.
 func (s *UpdateStmt) buildSQLWithClauses(sql *internal.SQL) error {
-	for _, e := range s.called {
+	for i, e := range s.called {
 		switch e := e.(type) {
-		case *clause.Set,
-			*clause.Where,
+		case *clause.Where,
 			*clause.And,
 			*clause.Or:
-			s, err := e.Build()
+			ss, err := e.Build()
 			if err != nil {
 				return err
 			}
-			sql.Write(s.Build())
+			sql.Write(ss.Build())
+		case *clause.Set:
+			ss, err := e.Build()
+			if err != nil {
+				return err
+			}
+			if i == 0 {
+				sql.Write(ss.Build())
+			} else if _, ok := s.called[i-1].(*clause.Set); !ok {
+				sql.Write(ss.Build())
+			} else {
+				sql.Write(",")
+				sql.Write(ss.Value)
+			}
 		default:
 			msg := fmt.Sprintf("%s is not supported for UPDATE statement", reflect.TypeOf(e).Elem().String())
 			return errors.New(msg, errors.InvalidTypeError)
@@ -85,36 +98,6 @@ func (s *UpdateStmt) buildSQLWithClauses(sql *internal.SQL) error {
 
 // buildSQLWithModel builds SQL statement from model.
 func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
-	ref := reflect.ValueOf(model)
-	switch ref.Kind() {
-	case reflect.Int,
-		reflect.Int8,
-		reflect.Int16,
-		reflect.Int32,
-		reflect.Int64,
-		reflect.Uint,
-		reflect.Uint8,
-		reflect.Uint16,
-		reflect.Uint32,
-		reflect.Uint64,
-		reflect.Float32,
-		reflect.Float64,
-		reflect.Bool,
-		reflect.String:
-		if len(cols) != 1 {
-			msg := fmt.Sprintf("If you set variable to Model, number of columns must be 1, not %d", len(cols))
-			return errors.New(msg, errors.InvalidSyntaxError)
-		}
-		vStr := internal.ToString(ref.Interface(), nil)
-		sql.Write(fmt.Sprintf("SET %s = %s", cols[0], vStr))
-		return nil
-	}
-
-	if ref.Kind() != reflect.Ptr {
-		return errors.New("If model is not variable, model must be pointer", errors.InvalidValueError)
-	}
-	ref = ref.Elem()
-
 	sql.Write("SET")
 	parser, err := internal.NewUpdateModelParser(cols, model)
 	if err != nil {
@@ -131,26 +114,15 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // Model sets model to UpdateStmt.
-func (s *UpdateStmt) Model(model interface{}) ifc.Model {
+func (s *UpdateStmt) Model(model interface{}, cols ...string) ifc.Model {
 	s.model = model
+	s.modelCols = cols
 	return s
 }
 
 // Set calls SET clause.
-func (s *UpdateStmt) Set(vals ...interface{}) ifc.Set {
-	if s.cmd == nil {
-		s.throw(errors.New("(*UpdateStmt).cmd is nil", errors.InvalidValueError))
-		return s
-	}
-	if len(s.cmd.Columns) != len(vals) {
-		s.throw(errors.New("Number of values is not equal to that of columns", errors.InvalidValueError))
-		return s
-	}
-	set := new(clause.Set)
-	for i, c := range s.cmd.Columns {
-		set.AddEq(c, vals[i])
-	}
-	s.call(set)
+func (s *UpdateStmt) Set(col string, val interface{}) ifc.Set {
+	s.call(&clause.Set{Column: col, Value: val})
 	return s
 }
 

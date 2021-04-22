@@ -141,14 +141,6 @@ func ExecSamples(db *mgorm.DB, i int) (string, bool, error) {
 		// VALUES (10000, "1997-04-30", "Taro", "Yokohama", "M", "2020-01-02");
 		mgorm.Insert(db, "employees", "emp_no", "birth_date", "first_name", "last_name", "gender", "hire_date").
 			Values(10000, "1997-04-30", "Taro", "Yokohama", "M", "2020-01-02"),
-
-		// UPDATE employees
-		// SET emp_no=9999, birth_date="1997-03-30", first_name="Hanako", last_name="Tokyo", gender="F",
-		//     hire_date="2020-02-02"
-		// WHERE emp_no = 10000;
-		mgorm.Update(db, "employees", "emp_no", "birth_date", "first_name", "last_name", "gender", "hire_date").
-			Set(9999, "1997-03-30", "Hanako", "Tokyo", "F", "2020-02-02").
-			Where("emp_no = ?", 10000),
 	}
 	next := true
 	if len(execSamples) <= i+1 {

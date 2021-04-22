@@ -22,20 +22,6 @@ func TestUpdate_String(t *testing.T) {
 			&clause.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
 			`UPDATE("table AS t")`,
 		},
-		{
-			&clause.Update{
-				Table:   syntax.Table{Name: "table", Alias: "t"},
-				Columns: []string{"column"},
-			},
-			`UPDATE("table AS t", "column")`,
-		},
-		{
-			&clause.Update{
-				Table:   syntax.Table{Name: "table", Alias: "t"},
-				Columns: []string{"column1", "column2"},
-			},
-			`UPDATE("table AS t", "column1", "column2")`,
-		},
 	}
 
 	for _, testCase := range testCases {
@@ -55,20 +41,6 @@ func TestUpdate_Build(t *testing.T) {
 		},
 		{
 			&clause.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
-			&syntax.StmtSet{Keyword: "UPDATE", Value: "table AS t"},
-		},
-		{
-			&clause.Update{
-				Table:   syntax.Table{Name: "table", Alias: "t"},
-				Columns: []string{"column"},
-			},
-			&syntax.StmtSet{Keyword: "UPDATE", Value: "table AS t"},
-		},
-		{
-			&clause.Update{
-				Table:   syntax.Table{Name: "table", Alias: "t"},
-				Columns: []string{"column1", "column2"},
-			},
 			&syntax.StmtSet{Keyword: "UPDATE", Value: "table AS t"},
 		},
 	}

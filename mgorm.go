@@ -62,10 +62,9 @@ func Insert(conn Conn, table string, cols ...string) ifinsert.Stmt {
 }
 
 // Update calls UPDATE command.
-func Update(conn Conn, table string, cols ...string) ifupdate.Stmt {
+func Update(conn Conn, table string) ifupdate.Stmt {
 	u := new(clause.Update)
 	u.AddTable(table)
-	u.AddColumns(cols)
 	s := &UpdateStmt{cmd: u}
 	s.conn = conn
 	return s
