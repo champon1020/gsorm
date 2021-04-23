@@ -276,12 +276,6 @@ func TestAlterTable_String(t *testing.T) {
 		// ADD COLUMN action.
 		{
 			mgorm.AlterTable(mgorm.ExportedMySQLDB, "person").
-				AddColumn("id", "INT").NotNull().AutoInc().(*mgorm.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`ADD COLUMN id INT NOT NULL AUTO_INCREMENT`,
-		},
-		{
-			mgorm.AlterTable(mgorm.ExportedMySQLDB, "person").
 				AddColumn("id", "SERIAL").NotNull().(*mgorm.AlterTableStmt),
 			`ALTER TABLE person ` +
 				`ADD COLUMN id SERIAL NOT NULL`,

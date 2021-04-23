@@ -227,12 +227,6 @@ func (s *CreateTableStmt) NotNull() ifc.NotNull {
 	return s
 }
 
-// AutoInc calls AUTO_INCREMENT option (only MySQL).
-func (s *CreateTableStmt) AutoInc() ifc.AutoInc {
-	s.call(&mig.AutoInc{})
-	return s
-}
-
 // Default calls DEFAULT option.
 func (s *CreateTableStmt) Default(val interface{}) ifc.Default {
 	s.call(&mig.Default{Value: val})
