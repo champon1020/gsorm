@@ -32,6 +32,9 @@ type Join interface {
 
 // On is interface which is returned by (*SelectStmt).On.
 type On interface {
+	Join(string) Join
+	LeftJoin(string) Join
+	RightJoin(string) Join
 	Where(string, ...interface{}) Where
 	GroupBy(...string) GroupBy
 	OrderBy(...string) OrderBy
