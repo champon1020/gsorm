@@ -76,18 +76,27 @@ func TestMock_TransactionExpectation(t *testing.T) {
 		t.Errorf("Error was occurred: %+v", err)
 		return
 	}
-	tx1.Commit()
+
+	if err := tx1.Commit(); err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
 
 	if err := mgorm.Insert(tx2, "table2", "column1", "column2").Values(10, "str").Exec(); err != nil {
 		t.Errorf("Error was occurred: %+v", err)
 		return
 	}
+
 	model2 := new([]string)
 	if err := mgorm.Select(tx2, "column2").From("table2").Query(model2); err != nil {
 		t.Errorf("Error was occurred: %+v", err)
 		return
 	}
-	tx2.Rollback()
+
+	if err := tx2.Rollback(); err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
 
 	// Test phase.
 	if err := mock.Complete(); err != nil {
@@ -181,7 +190,7 @@ func TestMockDB_Complete_Transaction_Fail(t *testing.T) {
 		t.Errorf("Error was occured: %+v", err)
 		return
 	}
-	if err := mgorm.Insert(tx, "table1", "column1", "column2").Values(10, "str").Exec(); err != nil {
+	if err = mgorm.Insert(tx, "table1", "column1", "column2").Values(10, "str").Exec(); err != nil {
 		t.Errorf("Error was occurred: %+v", err)
 		return
 	}

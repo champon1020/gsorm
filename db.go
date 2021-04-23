@@ -35,7 +35,8 @@ type sqlTx interface {
 	Rollback() error
 }
 
-// DB is a database handle representing a pool of zero or more underlying connections. It's safe for concurrent use by multiple goroutines.
+// DB is a database handle representing a pool of zero or more underlying connections.
+// It's safe for concurrent use by multiple goroutines.
 type DB struct {
 	conn   sqlDB
 	driver internal.SQLDriver
@@ -97,7 +98,8 @@ func (db *DB) SetMaxOpenConns(n int) error {
 	return nil
 }
 
-// Close closes the database and prevents new queries from starting. Close then waits for all queries that have started processing on the server to finish.
+// Close closes the database and prevents new queries from starting.
+// Close then waits for all queries that have started processing on the server to finish.
 func (db *DB) Close() error {
 	if db.conn == nil {
 		return failure.New(errFailedDBConnection, failure.Message("mgorm.DB.conn is nil"))
