@@ -1,12 +1,11 @@
 package internal
 
 import (
-	"fmt"
 	"reflect"
 	"strconv"
 	"time"
 
-	"github.com/champon1020/mgorm/errors"
+	"github.com/morikuni/failure"
 )
 
 // BytesParser is parser for value whose type is []byte.
@@ -70,8 +69,10 @@ func (p *BytesParser) Parse(bytes []byte, target reflect.Type, opt ...BytesParse
 		}
 	}
 
-	msg := fmt.Sprintf("%s is not supported for BytesParser", target.String())
-	return nil, errors.New(msg, errors.InvalidTypeError)
+	err := failure.New(errInvalidType,
+		failure.Context{"type": target.String()},
+		failure.Message("invalid type for BytesParser"))
+	return nil, err
 }
 
 // ParseAuto converts bytes to reflect.Value with auto type casting.

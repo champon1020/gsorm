@@ -15,7 +15,7 @@ func (d *DropDB) Keyword() string {
 	return "DROP DATABASE"
 }
 
-// BUild makes DROP DATABASE clause with syntax.StmtSet.
+// Build makes DROP DATABASE clause with syntax.StmtSet.
 func (d *DropDB) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())

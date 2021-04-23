@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
+	"github.com/morikuni/failure"
 
 	ifc "github.com/champon1020/mgorm/interfaces/createtable"
 )
@@ -48,8 +48,8 @@ func (s *CreateTableStmt) buildSQLWithClauses(sql *internal.SQL) error {
 	for len(s.called) > 0 {
 		e := s.headClause()
 		if e == nil {
-			msg := "Called clauses have already been processed but SQL is not completed."
-			return errors.New(msg, errors.InvalidSyntaxError)
+			return failure.New(errInvalidSyntax,
+				failure.Message("the SQL statement is not completed or the syntax is not supported"))
 		}
 
 		switch e := e.(type) {
@@ -80,8 +80,9 @@ func (s *CreateTableStmt) buildSQLWithClauses(sql *internal.SQL) error {
 				return err
 			}
 		default:
-			msg := fmt.Sprintf("%v is not supported for CREATE TABLE", reflect.TypeOf(e).String())
-			return errors.New(msg, errors.InvalidTypeError)
+			return failure.New(errInvalidClause,
+				failure.Context{"clause": reflect.TypeOf(e).String()},
+				failure.Message("invalid clause for CREATE TABLE"))
 		}
 	}
 	sql.Write(")")
@@ -91,12 +92,12 @@ func (s *CreateTableStmt) buildSQLWithClauses(sql *internal.SQL) error {
 func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 	typ := reflect.TypeOf(s.model)
 	if typ.Kind() != reflect.Ptr {
-		return errors.New("Model must be pointer", errors.InvalidValueError)
+		return failure.New(errInvalidValue, failure.Message("model must be pointer"))
 	}
 
 	typ = typ.Elem()
 	if typ.Kind() != reflect.Struct {
-		return errors.New("Type of model must be pointer of struct", errors.InvalidTypeError)
+		return failure.New(errInvalidValue, failure.Message("model must be pointer of struct"))
 	}
 
 	var (
@@ -128,8 +129,9 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 		} else {
 			dbtyp := convertToDBType(f.Type, s.conn.getDriver())
 			if dbtyp == "" {
-				msg := fmt.Sprintf("Type of %v is not supported for database column", f.Type)
-				return errors.New(msg, errors.InvalidTypeError)
+				return failure.New(errInvalidType,
+					failure.Context{"type": f.Type.String()},
+					failure.Message("invalid type for database column"))
 			}
 			sql.Write(dbtyp)
 		}

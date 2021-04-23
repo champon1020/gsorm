@@ -1,12 +1,11 @@
 package mgorm
 
 import (
-	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
+	"github.com/morikuni/failure"
 
 	ifc "github.com/champon1020/mgorm/interfaces/altertable"
 )
@@ -36,8 +35,8 @@ func (s *AlterTableStmt) buildSQL(sql *internal.SQL) error {
 	for len(s.called) > 0 {
 		e := s.headClause()
 		if e == nil {
-			msg := "Called clauses have already been processed but SQL is not completed."
-			return errors.New(msg, errors.InvalidSyntaxError)
+			return failure.New(errInvalidSyntax,
+				failure.Message("the SQL statement is not completed or the syntax is not supported"))
 		}
 
 		switch e := e.(type) {
@@ -75,8 +74,9 @@ func (s *AlterTableStmt) buildSQL(sql *internal.SQL) error {
 				return err
 			}
 		default:
-			msg := fmt.Sprintf("%v is not supported for ALTER TABLE statement", reflect.TypeOf(e).String())
-			return errors.New(msg, errors.InvalidTypeError)
+			return failure.New(errInvalidClause,
+				failure.Context{"clause": reflect.TypeOf(e).String()},
+				failure.Message("invalid clause for ALTER TABLE"))
 		}
 	}
 

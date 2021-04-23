@@ -1,12 +1,11 @@
 package mgorm
 
 import (
-	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
+	"github.com/morikuni/failure"
 
 	ifc "github.com/champon1020/mgorm/interfaces/createindex"
 )
@@ -48,8 +47,9 @@ func (s *CreateIndexStmt) buildSQL(sql *internal.SQL) error {
 			sql.Write(ss.Build())
 			s.advanceClause()
 		default:
-			msg := fmt.Sprintf("%v is not supported for CREATE INDEX statement", reflect.TypeOf(e).String())
-			return errors.New(msg, errors.InvalidTypeError)
+			return failure.New(errInvalidClause,
+				failure.Context{"clause": reflect.TypeOf(e).String()},
+				failure.Message("invalid clause for CREATE INDEX"))
 		}
 	}
 

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
+	"github.com/morikuni/failure"
 )
 
 // Stmt is interface for DeleteStmt, InsertStmt, SelectStmt, and so on.
@@ -70,12 +70,12 @@ func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt Stmt, model interf
 
 		rows, err := conn.Query(sql.String())
 		if err != nil {
-			return errors.New(err.Error(), errors.DBQueryError)
+			return failure.Wrap(err)
 		}
 
 		defer rows.Close()
 		if err := internal.MapRowsToModel(rows, model); err != nil {
-			return err
+			return failure.Translate(err, errFailedParse)
 		}
 		return nil
 	case Mock:
@@ -86,18 +86,20 @@ func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt Stmt, model interf
 
 		v := reflect.ValueOf(returned)
 		if v.Kind() == reflect.Ptr {
-			return errors.New("Returned value must not be pointer", errors.InvalidValueError)
+			return failure.New(errInvalidValue, failure.Message("returned valud must not be pointer"))
 		}
 		mv := reflect.ValueOf(model)
 		if mv.Kind() != reflect.Ptr {
-			return errors.New("Model must be pointer", errors.InvalidPointerError)
+			return failure.New(errInvalidValue, failure.Message("model must be pointer"))
 		}
 
 		mv.Elem().Set(v)
 		return nil
 	}
 
-	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return failure.New(errInvalidValue,
+		failure.Context{"conn": reflect.TypeOf(s.conn).String()},
+		failure.Message("conn can be *DB, *Tx, *MockDB or *MockTx"))
 }
 
 func (s *stmt) exec(buildSQL func(*internal.SQL) error, stmt Stmt) error {
@@ -112,7 +114,7 @@ func (s *stmt) exec(buildSQL func(*internal.SQL) error, stmt Stmt) error {
 			return err
 		}
 		if _, err := conn.Exec(sql.String()); err != nil {
-			return errors.New(err.Error(), errors.DBQueryError)
+			return failure.Wrap(err)
 		}
 		return nil
 	case Mock:
@@ -123,5 +125,7 @@ func (s *stmt) exec(buildSQL func(*internal.SQL) error, stmt Stmt) error {
 		return nil
 	}
 
-	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return failure.New(errInvalidValue,
+		failure.Context{"conn": reflect.TypeOf(s.conn).String()},
+		failure.Message("type of conn can be *DB, *Tx, *MockDB or *MockTx"))
 }

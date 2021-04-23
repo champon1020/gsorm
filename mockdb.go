@@ -2,12 +2,11 @@ package mgorm
 
 import (
 	"database/sql"
-	"fmt"
 	"time"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/google/go-cmp/cmp"
+	"github.com/morikuni/failure"
 )
 
 // Mock is mock database conneciton pool.
@@ -74,12 +73,17 @@ func (m *MockDB) Begin() (*MockTx, error) {
 	expected := m.popExpected()
 	tx := m.nextTx()
 	if tx == nil || expected == nil {
-		return nil, errors.New("mgorm.(*MockDB).Begin was executed but not expected", errors.MockError)
+		err := failure.New(errInvalidMockExpectation,
+			failure.Context{"expected": "none"},
+			failure.Message("mgorm.MockDB.Begin is not expected"))
+		return nil, err
 	}
 	_, ok := expected.(*expectedBegin)
 	if !ok {
-		msg := fmt.Sprintf("mgorm.(*MockDB).Begin was executed but %s is expected", expected.String())
-		return nil, errors.New(msg, errors.MockError)
+		err := failure.New(errInvalidMockExpectation,
+			failure.Context{"expected": expected.String()},
+			failure.Message("mgorm.MockDB.Begin is not expected"))
+		return nil, err
 	}
 	return tx, nil
 }
@@ -122,8 +126,9 @@ func (m *MockDB) Return(v interface{}) {
 // Complete checks whether all of expected statements was executed or not.
 func (m *MockDB) Complete() error {
 	if len(m.expected) != 0 {
-		msg := fmt.Sprintf("No query was executed, but %s is expected", m.expected[0].String())
-		return errors.New(msg, errors.MockError)
+		return failure.New(errInvalidMockExpectation,
+			failure.Context{"expected": m.expected[0].String(), "actual": "none"},
+			failure.Message("invalid mock expectation"))
 	}
 	for _, tx := range m.tx {
 		if err := tx.Complete(); err != nil {
@@ -137,13 +142,17 @@ func (m *MockDB) Complete() error {
 func (m *MockDB) CompareWith(s Stmt) (interface{}, error) {
 	expected := m.popExpected()
 	if expected == nil {
-		msg := fmt.Sprintf("%s was executed but not expected", s.FuncString())
-		return nil, errors.New(msg, errors.MockError)
+		err := failure.New(errInvalidMockExpectation,
+			failure.Context{"expected": "none", "actual": s.FuncString()},
+			failure.Message("invalid mock expectation"))
+		return nil, err
 	}
 	eq, ok := expected.(*expectedQuery)
 	if !ok {
-		msg := fmt.Sprintf("%s was executed but %s is expected", s.FuncString(), expected.String())
-		return nil, errors.New(msg, errors.MockError)
+		err := failure.New(errInvalidMockExpectation,
+			failure.Context{"expected": expected.String(), "actual": s.FuncString()},
+			failure.Message("invalid mock expectation"))
+		return nil, err
 	}
 	return eq.willReturn, compareStmts(eq.stmt, s)
 }
@@ -190,10 +199,10 @@ func (m *MockTx) Query(string, ...interface{}) (*sql.Rows, error) {
 func (m *MockTx) Commit() error {
 	expected := m.popExpected()
 	if expected == nil {
-		return errors.New("mgorm.(*MockTx).Commit was executed but not expected", errors.MockError)
+		return failure.New(errInvalidMockExpectation, failure.Message("mgorm.MockTx.Commit is not expected"))
 	}
 	if _, ok := expected.(*expectedCommit); !ok {
-		return errors.New("mgorm.(*MockTx).Commit was executed but not expected", errors.MockError)
+		return failure.New(errInvalidMockExpectation, failure.Message("mgorm.MockTx.Commit is not expected"))
 	}
 	return nil
 }
@@ -202,10 +211,10 @@ func (m *MockTx) Commit() error {
 func (m *MockTx) Rollback() error {
 	expected := m.popExpected()
 	if expected == nil {
-		return errors.New("mgorm.(*MockTx).Rollback was executed but not expected", errors.MockError)
+		return failure.New(errInvalidMockExpectation, failure.Message("mgorm.MockTx.Rollback is not expected"))
 	}
 	if _, ok := expected.(*expectedRollback); !ok {
-		return errors.New("mgorm.(*MockTx).Rollback was executed but not expected", errors.MockError)
+		return failure.New(errInvalidMockExpectation, failure.Message("mgorm.MockTx.Rollback is not expected"))
 	}
 	return nil
 }
@@ -246,8 +255,9 @@ func (m *MockTx) Return(v interface{}) {
 // Complete checks whether all of expected statements was executed or not.
 func (m *MockTx) Complete() error {
 	if len(m.expected) != 0 {
-		msg := fmt.Sprintf("No query was executed, but %s is expected", m.expected[0].String())
-		return errors.New(msg, errors.MockError)
+		return failure.New(errInvalidMockExpectation,
+			failure.Context{"expected": m.expected[0].String(), "actual": "none"},
+			failure.Message("invalid mock expectation"))
 	}
 	return nil
 }
@@ -256,13 +266,17 @@ func (m *MockTx) Complete() error {
 func (m *MockTx) CompareWith(s Stmt) (interface{}, error) {
 	expected := m.popExpected()
 	if expected == nil {
-		msg := fmt.Sprintf("%s was executed but not expected", s.FuncString())
-		return nil, errors.New(msg, errors.MockError)
+		err := failure.New(errInvalidMockExpectation,
+			failure.Context{"expected": "none", "actual": s.FuncString()},
+			failure.Message("invalid mock expectation"))
+		return nil, err
 	}
 	eq, ok := expected.(*expectedQuery)
 	if !ok {
-		msg := fmt.Sprintf("%s was executed but %s is expected", s.FuncString(), expected.String())
-		return nil, errors.New(msg, errors.MockError)
+		err := failure.New(errInvalidMockExpectation,
+			failure.Context{"expected": expected.String(), "actual": s.FuncString()},
+			failure.Message("invalid mock expectation"))
+		return nil, err
 	}
 	return eq.willReturn, compareStmts(eq.stmt, s)
 }
@@ -272,13 +286,17 @@ func compareStmts(expected Stmt, actual Stmt) error {
 	expectedCalled := expected.Called()
 	actualCalled := actual.Called()
 	if len(expectedCalled) != len(actualCalled) {
-		msg := fmt.Sprintf("%s was executed but %s is expected", actual.FuncString(), expected.FuncString())
-		return errors.New(msg, errors.MockError)
+		err := failure.New(errInvalidMockExpectation,
+			failure.Context{"expected": expected.FuncString(), "actual": actual.FuncString()},
+			failure.Message("invalid mock expectation"))
+		return err
 	}
 	for i, e := range expectedCalled {
 		if diff := cmp.Diff(actualCalled[i], e); diff != "" {
-			msg := fmt.Sprintf("%s was executed but %s is expected", actual.FuncString(), expected.FuncString())
-			return errors.New(msg, errors.MockError)
+			err := failure.New(errInvalidMockExpectation,
+				failure.Context{"expected": expected.FuncString(), "actual": actual.FuncString()},
+				failure.Message("invalid mock expectation"))
+			return err
 		}
 	}
 	return nil
@@ -287,23 +305,12 @@ func compareStmts(expected Stmt, actual Stmt) error {
 // expectation can be implemented by expected operation.
 type expectation interface {
 	String() string
-	completed() bool
-}
-
-// expectedOp is common expectation.
-type expectedOp struct {
-	done bool
-}
-
-func (e *expectedOp) completed() bool {
-	return e.done
 }
 
 // expectedQuery is expectation of executing query.
 type expectedQuery struct {
 	stmt       Stmt
 	willReturn interface{}
-	expectedOp
 }
 
 func (e *expectedQuery) String() string {
@@ -311,28 +318,22 @@ func (e *expectedQuery) String() string {
 }
 
 // expectedBegin is expectation of beginning transaction.
-type expectedBegin struct {
-	expectedOp
-}
+type expectedBegin struct{}
 
 func (e *expectedBegin) String() string {
-	return "mgorm.(*MockDB).Begin"
+	return "mgorm.MockDB.Begin"
 }
 
 // expectedCommit is expectation of transaction commit.
-type expectedCommit struct {
-	expectedOp
-}
+type expectedCommit struct{}
 
 func (e *expectedCommit) String() string {
-	return "mgorm.(*MockTx).Commit"
+	return "mgorm.MockTx.Commit"
 }
 
 // expectedRollback is expectation of transaction rollback.
-type expectedRollback struct {
-	expectedOp
-}
+type expectedRollback struct{}
 
 func (e *expectedRollback) String() string {
-	return "mgorm.(*MockTx).Rollback"
+	return "mgorm.MockTx.Rollback"
 }

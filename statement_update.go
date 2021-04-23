@@ -1,13 +1,12 @@
 package mgorm
 
 import (
-	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
+	"github.com/morikuni/failure"
 
 	ifc "github.com/champon1020/mgorm/interfaces/update"
 )
@@ -89,8 +88,9 @@ func (s *UpdateStmt) buildSQLWithClauses(sql *internal.SQL) error {
 				sql.Write(ss.Value)
 			}
 		default:
-			msg := fmt.Sprintf("%s is not supported for UPDATE statement", reflect.TypeOf(e).Elem().String())
-			return errors.New(msg, errors.InvalidTypeError)
+			return failure.New(errInvalidClause,
+				failure.Context{"clause": reflect.TypeOf(e).Elem().String()},
+				failure.Message("invalid clause for UPDATE"))
 		}
 	}
 	return nil
@@ -106,7 +106,7 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 
 	modelSQL, err := parser.Parse()
 	if err != nil {
-		return err
+		return failure.Translate(err, errFailedParse)
 	}
 
 	sql.Write(modelSQL.String())

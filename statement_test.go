@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/clause"
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -51,11 +51,11 @@ func TestDeleteStmt_String(t *testing.T) {
 
 func TestDeleteStmt_BuildSQL_Fail(t *testing.T) {
 	testCases := []struct {
-		ExpectedErr *errors.Error
-		Build       func() error
+		ExpectedError failure.StringCode
+		Build         func() error
 	}{
 		{
-			errors.New("clause.Join is not supported for DELETE statement", errors.InvalidSyntaxError).(*errors.Error),
+			mgorm.ErrInvalidClause,
 			func() error {
 				// Prepare for test.
 				s := mgorm.Delete(nil).(*mgorm.DeleteStmt)
@@ -71,19 +71,10 @@ func TestDeleteStmt_BuildSQL_Fail(t *testing.T) {
 
 	for _, testCase := range testCases {
 		err := testCase.Build()
-		if err == nil {
-			t.Errorf("Error was not occurred")
-			continue
-		}
-		actualErr, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			continue
-		}
-		if !actualErr.Is(testCase.ExpectedErr) {
+		if !failure.Is(err, testCase.ExpectedError) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+			t.Errorf("  Expected: %+v", testCase.ExpectedError)
+			t.Errorf("  Actual:   %+v", err)
 		}
 	}
 }
@@ -181,11 +172,11 @@ func TestInsertStmt_String(t *testing.T) {
 
 func TestInsertStmt_BuildSQLWithClauses_Fail(t *testing.T) {
 	testCases := []struct {
-		ExpectedErr *errors.Error
-		Build       func() error
+		ExpectedError failure.StringCode
+		Build         func() error
 	}{
 		{
-			errors.New("clause.Set is not supported for INSERT statement", errors.InvalidSyntaxError).(*errors.Error),
+			mgorm.ErrInvalidClause,
 			func() error {
 				// Prepare for test.
 				s := mgorm.Insert(nil, "", "").(*mgorm.InsertStmt)
@@ -201,30 +192,21 @@ func TestInsertStmt_BuildSQLWithClauses_Fail(t *testing.T) {
 
 	for _, testCase := range testCases {
 		err := testCase.Build()
-		if err == nil {
-			t.Errorf("Error was not occurred")
-			continue
-		}
-		actualErr, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			continue
-		}
-		if !actualErr.Is(testCase.ExpectedErr) {
+		if !failure.Is(err, testCase.ExpectedError) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+			t.Errorf("  Expected: %+v", testCase.ExpectedError)
+			t.Errorf("  Actual:   %+v", err)
 		}
 	}
 }
 
 func TestInsertStmt_BuildSQLWithModel_Fail(t *testing.T) {
 	testCases := []struct {
-		ExpectedErr *errors.Error
-		Build       func() error
+		ExpectedError failure.StringCode
+		Build         func() error
 	}{
 		{
-			errors.New("model must be pointer", errors.InvalidTypeError).(*errors.Error),
+			mgorm.ErrFailedParse,
 			func() error {
 				// Prepare for test.
 				s := mgorm.Insert(nil, "", "").Model(1000).(*mgorm.InsertStmt)
@@ -236,7 +218,7 @@ func TestInsertStmt_BuildSQLWithModel_Fail(t *testing.T) {
 			},
 		},
 		{
-			errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError).(*errors.Error),
+			mgorm.ErrFailedParse,
 			func() error {
 				// Prepare for test.
 				model := make(map[string]interface{})
@@ -252,19 +234,10 @@ func TestInsertStmt_BuildSQLWithModel_Fail(t *testing.T) {
 
 	for _, testCase := range testCases {
 		err := testCase.Build()
-		if err == nil {
-			t.Errorf("Error was not occurred")
-			continue
-		}
-		actualErr, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			continue
-		}
-		if !actualErr.Is(testCase.ExpectedErr) {
+		if !failure.Is(err, testCase.ExpectedError) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+			t.Errorf("  Expected: %+v", testCase.ExpectedError)
+			t.Errorf("  Actual:   %+v", err)
 		}
 	}
 }
@@ -461,11 +434,11 @@ func TestSelectStmt_String(t *testing.T) {
 
 func TestStmt_BuildQuerySQL_Fail(t *testing.T) {
 	testCases := []struct {
-		ExpectedErr *errors.Error
-		Build       func() error
+		ExpectedError failure.StringCode
+		Build         func() error
 	}{
 		{
-			errors.New(`clause.Values is not supported for SELECT statement`, errors.InvalidSyntaxError).(*errors.Error),
+			mgorm.ErrInvalidClause,
 			func() error {
 				// Prepare for test.
 				s := mgorm.Select(nil, "").(*mgorm.SelectStmt)
@@ -481,19 +454,10 @@ func TestStmt_BuildQuerySQL_Fail(t *testing.T) {
 
 	for _, testCase := range testCases {
 		err := testCase.Build()
-		if err == nil {
-			t.Errorf("Error was not occurred")
-			continue
-		}
-		actualErr, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			continue
-		}
-		if !actualErr.Is(testCase.ExpectedErr) {
+		if !failure.Is(err, testCase.ExpectedError) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+			t.Errorf("  Expected: %+v", testCase.ExpectedError)
+			t.Errorf("  Actual:   %+v", err)
 		}
 	}
 }
@@ -560,11 +524,11 @@ func TestUpdateStmt_String(t *testing.T) {
 
 func TestUpdateStmt_BuildSQLWithClauses_Fail(t *testing.T) {
 	testCases := []struct {
-		ExpectedErr *errors.Error
-		Build       func() error
+		ExpectedError failure.StringCode
+		Build         func() error
 	}{
 		{
-			errors.New("clause.Join is not supported for UPDATE statement", errors.InvalidTypeError).(*errors.Error),
+			mgorm.ErrInvalidClause,
 			func() error {
 				// Prepare for test.
 				s := mgorm.Update(nil, "table").(*mgorm.UpdateStmt)
@@ -580,30 +544,21 @@ func TestUpdateStmt_BuildSQLWithClauses_Fail(t *testing.T) {
 
 	for _, testCase := range testCases {
 		err := testCase.Build()
-		if err == nil {
-			t.Errorf("Error was not occurred")
-			continue
-		}
-		actualErr, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			continue
-		}
-		if !actualErr.Is(testCase.ExpectedErr) {
+		if !failure.Is(err, testCase.ExpectedError) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+			t.Errorf("  Expected: %+v", testCase.ExpectedError)
+			t.Errorf("  Actual:   %+v", err)
 		}
 	}
 }
 
 func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 	testCases := []struct {
-		ExpectedErr *errors.Error
-		Build       func() error
+		ExpectedError failure.StringCode
+		Build         func() error
 	}{
 		{
-			errors.New("Column names must be included in one of map keys", errors.InvalidSyntaxError).(*errors.Error),
+			mgorm.ErrFailedParse,
 			func() error {
 				// Prepare for test.
 				model := map[string]interface{}{
@@ -619,7 +574,7 @@ func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 			},
 		},
 		{
-			errors.New("Type slice is not supported", errors.InvalidTypeError).(*errors.Error),
+			mgorm.ErrFailedParse,
 			func() error {
 				// Prepare for test.
 				model := []int{1000}
@@ -635,19 +590,10 @@ func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 
 	for _, testCase := range testCases {
 		err := testCase.Build()
-		if err == nil {
-			t.Errorf("Error was not occurred")
-			continue
-		}
-		actualErr, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
-			continue
-		}
-		if !actualErr.Is(testCase.ExpectedErr) {
+		if !failure.Is(err, testCase.ExpectedError) {
 			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", testCase.ExpectedErr.Error(), testCase.ExpectedErr.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+			t.Errorf("  Expected: %+v", testCase.ExpectedError)
+			t.Errorf("  Actual:   %+v", err)
 		}
 	}
 }

@@ -1,13 +1,12 @@
 package mgorm
 
 import (
-	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
+	"github.com/morikuni/failure"
 )
 
 // migStmt stores information about database migration query.
@@ -61,14 +60,16 @@ func (s *migStmt) migration(buildSQL func(*internal.SQL) error) error {
 			return err
 		}
 		if _, err := conn.Exec(sql.String()); err != nil {
-			return errors.New(err.Error(), errors.DBQueryError)
+			return failure.Wrap(err)
 		}
 		return nil
 	case *MockDB, *MockTx:
 		return nil
 	}
 
-	return errors.New("Type of conn must be *DB, *Tx, *MockDB or *MockTx", errors.InvalidValueError)
+	return failure.New(errInvalidValue,
+		failure.Context{"conn": reflect.TypeOf(s.conn).String()},
+		failure.Message("conn can be *DB, *Tx, *MockDB or *MockTx"))
 }
 
 func (s *migStmt) buildColumnOptSQL(sql *internal.SQL) error {
@@ -88,7 +89,8 @@ func (s *migStmt) buildColumnOptSQL(sql *internal.SQL) error {
 			sql.Write(ss.Build())
 		case *mig.AutoInc:
 			if s.conn.getDriver() == internal.PSQL {
-				return errors.New("AUTO_INCREMENT clause is not allowed in PostgreSQL", errors.InvalidSyntaxError)
+				return failure.New(errInvalidSyntax,
+					failure.Message("AUTO_INCREMENT is not allowed in PostgreSQL"))
 			}
 			ss, err := e.Build()
 			if err != nil {
@@ -108,8 +110,8 @@ func (s *migStmt) buildColumnOptSQL(sql *internal.SQL) error {
 func (s *migStmt) buildConstraintSQL(sql *internal.SQL) error {
 	e := s.headClause()
 	if e == nil {
-		msg := "Called claues have already been processed but SQL statement is not completed."
-		return errors.New(msg, errors.InvalidSyntaxError)
+		return failure.New(errInvalidSyntax,
+			failure.Message("the SQL statement is not completed or the syntax is not supported"))
 	}
 
 	switch e := e.(type) {
@@ -131,15 +133,16 @@ func (s *migStmt) buildConstraintSQL(sql *internal.SQL) error {
 		return s.buildRefSQL(sql)
 	}
 
-	msg := fmt.Sprintf("%v is not supported for CONSTRAINT statement", reflect.TypeOf(e).String())
-	return errors.New(msg, errors.InvalidTypeError)
+	return failure.New(errInvalidClause,
+		failure.Context{"clause": reflect.TypeOf(e).String()},
+		failure.Message("invalid clause for CONSTRAINT"))
 }
 
 func (s *migStmt) buildRefSQL(sql *internal.SQL) error {
 	e := s.headClause()
 	if e == nil {
-		msg := "Called claues have already been processed but SQL statement is not completed."
-		return errors.New(msg, errors.InvalidSyntaxError)
+		return failure.New(errInvalidSyntax,
+			failure.Message("the SQL statement is not completed or the syntax is not supported"))
 	}
 
 	switch e := e.(type) {
@@ -153,6 +156,7 @@ func (s *migStmt) buildRefSQL(sql *internal.SQL) error {
 		return nil
 	}
 
-	msg := fmt.Sprintf("%v is not supported for CONSTRAINT FOREIGN KEY statement", reflect.TypeOf(e).String())
-	return errors.New(msg, errors.InvalidTypeError)
+	return failure.New(errInvalidClause,
+		failure.Context{"clause": reflect.TypeOf(e).String()},
+		failure.Message("invalid clause for FOREIGN KEY"))
 }

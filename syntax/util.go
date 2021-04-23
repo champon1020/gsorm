@@ -2,16 +2,20 @@ package syntax
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/morikuni/failure"
 )
 
 // BuildForExpression makes StmtSet with expr and values.
 func BuildForExpression(expr string, vals ...interface{}) (string, error) {
 	if strings.Count(expr, "?") != len(vals) {
-		return "", errors.New("Length of values is not valid", errors.InvalidValueError)
+		err := failure.New(errInvalidArgument,
+			failure.Context{"expr": fmt.Sprintf("'%s'", expr), "length of values": strconv.Itoa(len(vals))},
+			failure.Message("length of values is not valid"))
+		return "", err
 	}
 
 	values := []interface{}{}

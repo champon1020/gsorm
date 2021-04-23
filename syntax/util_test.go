@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/syntax"
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -69,12 +69,12 @@ func TestBuildForExpression_Fail(t *testing.T) {
 	testCases := []struct {
 		Expr          string
 		Values        []interface{}
-		ExpectedError error
+		ExpectedError failure.StringCode
 	}{
 		{
 			"lhs = ? AND rhs = ?",
 			[]interface{}{10},
-			errors.New("Length of values is not valid", errors.InvalidValueError),
+			syntax.ErrInvalidArgument,
 		},
 	}
 
@@ -84,16 +84,9 @@ func TestBuildForExpression_Fail(t *testing.T) {
 			t.Errorf("Error is not occurred")
 			continue
 		}
-		actualError, ok := err.(*errors.Error)
-		if !ok {
-			t.Errorf("Error type is invalid")
+		if !failure.Is(err, syntax.ErrInvalidArgument) {
+			t.Errorf("Different error")
 			continue
-		}
-		resultError := testCase.ExpectedError.(*errors.Error)
-		if !resultError.Is(actualError) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %s, Code: %d", resultError.Error(), resultError.Code)
-			t.Errorf("  Actual:   %s, Code: %d", actualError.Error(), actualError.Code)
 		}
 	}
 }

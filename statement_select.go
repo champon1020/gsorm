@@ -1,13 +1,12 @@
 package mgorm
 
 import (
-	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
+	"github.com/morikuni/failure"
 
 	ifc "github.com/champon1020/mgorm/interfaces/select"
 )
@@ -68,8 +67,9 @@ func (s *SelectStmt) buildSQL(sql *internal.SQL) error {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("%s is not supported for SELECT statement", reflect.TypeOf(e).Elem().String())
-			return errors.New(msg, errors.InvalidSyntaxError)
+			return failure.New(errInvalidClause,
+				failure.Context{"clause": reflect.TypeOf(e).Elem().String()},
+				failure.Message("invalid clause for SELECT"))
 		}
 	}
 
