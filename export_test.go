@@ -5,6 +5,17 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 )
 
+const (
+	ErrInvalidValue           = errInvalidValue
+	ErrInvalidClause          = errInvalidClause
+	ErrInvalidSyntax          = errInvalidSyntax
+	ErrInvalidType            = errInvalidType
+	ErrFailedParse            = errFailedParse
+	ErrInvalidMockExpectation = errInvalidMockExpectation
+	ErrFailedDBConnection     = errFailedDBConnection
+	ErrFailedTxConnection     = errFailedTxConnection
+)
+
 // Exported values which is declared in db.go.
 func (db *DB) ExportedSetConn(conn sqlDB) {
 	db.conn = conn

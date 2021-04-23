@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/errors"
+	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -108,28 +108,19 @@ func TestDB_Ping(t *testing.T) {
 }
 
 func TestDB_Ping_Fail(t *testing.T) {
-	expectedErr := errors.New("DB conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedDBConnection
 
 	// Prepare for test.
 	db := new(mgorm.DB)
 
 	// Actual process.
 	err := db.Ping()
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -150,28 +141,18 @@ func TestDB_Exec(t *testing.T) {
 }
 
 func TestDB_Exec_Fail(t *testing.T) {
-	expectedErr := errors.New("DB conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedDBConnection
 
 	// Prepare for test.
 	db := new(mgorm.DB)
 
 	// Actual process.
 	_, err := db.Exec("")
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
-
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -192,28 +173,19 @@ func TestDB_Query(t *testing.T) {
 }
 
 func TestDB_Query_Fail(t *testing.T) {
-	expectedErr := errors.New("DB conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedDBConnection
 
 	// Prepare for test.
 	db := new(mgorm.DB)
 
 	// Actual process.
 	_, err := db.Query("")
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -234,28 +206,19 @@ func TestDB_SetConnMaxLifetime(t *testing.T) {
 }
 
 func TestDB_SetConnMaxLifetime_Fail(t *testing.T) {
-	expectedErr := errors.New("DB conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedDBConnection
 
 	// Prepare for test.
 	db := new(mgorm.DB)
 
 	// Actual process.
 	err := db.SetConnMaxLifetime(0)
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -276,28 +239,19 @@ func TestDB_SetMaxIdleConns(t *testing.T) {
 }
 
 func TestDB_SetMaxIdleConns_Fail(t *testing.T) {
-	expectedErr := errors.New("DB conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedDBConnection
 
 	// Prepare for test.
 	db := new(mgorm.DB)
 
 	// Actual process.
 	err := db.SetMaxIdleConns(0)
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -318,28 +272,19 @@ func TestDB_SetMaxOpenConns(t *testing.T) {
 }
 
 func TestDB_SetMaxOpenConns_Fail(t *testing.T) {
-	expectedErr := errors.New("DB conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedDBConnection
 
 	// Prepare for test.
 	db := new(mgorm.DB)
 
 	// Actual process.
 	err := db.SetMaxOpenConns(0)
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -360,28 +305,19 @@ func TestDB_Close(t *testing.T) {
 }
 
 func TestDB_Close_Fail(t *testing.T) {
-	expectedErr := errors.New("DB conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedDBConnection
 
 	// Prepare for test.
 	db := new(mgorm.DB)
 
 	// Actual process.
 	err := db.Close()
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -402,54 +338,36 @@ func TestDB_Begin(t *testing.T) {
 }
 
 func TestDB_Begin_Fail(t *testing.T) {
-	expectedErr := errors.New("DB conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedDBConnection
 
 	// Prepare for test.
 	db := new(mgorm.DB)
 
 	// Actual process.
 	_, err := db.Begin()
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
 func TestTx_Ping_Fail(t *testing.T) {
-	expectedErr := errors.New("Tx db is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedTxConnection
 
 	// Prepare for test.
 	tx := new(mgorm.Tx)
 
 	// Actual process.
 	err := tx.Ping()
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -470,28 +388,19 @@ func TestTx_Exec(t *testing.T) {
 }
 
 func TestTx_Exec_Fail(t *testing.T) {
-	expectedErr := errors.New("Tx conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedTxConnection
 
 	// Prepare for test.
 	tx := new(mgorm.Tx)
 
 	// Actual process.
 	_, err := tx.Exec("")
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -512,28 +421,19 @@ func TestTx_Query(t *testing.T) {
 }
 
 func TestTx_Query_Fail(t *testing.T) {
-	expectedErr := errors.New("Tx conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedTxConnection
 
 	// Prepare for test.
 	tx := new(mgorm.Tx)
 
 	// Actual process.
 	_, err := tx.Query("")
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -554,28 +454,19 @@ func TestTx_Commit(t *testing.T) {
 }
 
 func TestTx_Commit_Fail(t *testing.T) {
-	expectedErr := errors.New("Tx conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedTxConnection
 
 	// Prepare for test.
 	tx := new(mgorm.Tx)
 
 	// Actual process.
 	err := tx.Commit()
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }
 
@@ -596,27 +487,18 @@ func TestTx_Rollback(t *testing.T) {
 }
 
 func TestTx_Rollback_Fail(t *testing.T) {
-	expectedErr := errors.New("Tx conn is nil", errors.InvalidValueError).(*errors.Error)
+	expectedError := mgorm.ErrFailedTxConnection
 
 	// Prepare for test.
 	tx := new(mgorm.Tx)
 
 	// Actual process.
 	err := tx.Rollback()
-	if err == nil {
-		t.Errorf("Error was not occurred")
-		return
-	}
 
 	// Validate if expected error was occurred.
-	actualErr, ok := err.(*errors.Error)
-	if !ok {
-		t.Errorf("Error type is invalid")
-		return
-	}
-	if !actualErr.Is(expectedErr) {
+	if !failure.Is(err, expectedError) {
 		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %s, Code: %d", expectedErr.Error(), expectedErr.Code)
-		t.Errorf("  Actual:   %s, Code: %d", actualErr.Error(), actualErr.Code)
+		t.Errorf("  Expected: %+v", expectedError)
+		t.Errorf("  Actual:   %+v", err)
 	}
 }

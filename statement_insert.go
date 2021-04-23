@@ -1,14 +1,13 @@
 package mgorm
 
 import (
-	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/errors"
 	"github.com/champon1020/mgorm/interfaces"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
+	"github.com/morikuni/failure"
 
 	ifc "github.com/champon1020/mgorm/interfaces/insert"
 )
@@ -92,8 +91,9 @@ func (s *InsertStmt) buildSQLWithClauses(sql *internal.SQL) error {
 			}
 			sql.Write(s.Build())
 		default:
-			msg := fmt.Sprintf("%s is not supported for INSERT statement", reflect.TypeOf(e).Elem().String())
-			return errors.New(msg, errors.InvalidSyntaxError)
+			return failure.New(errInvalidClause,
+				failure.Context{"clause": reflect.TypeOf(e).Elem().String()},
+				failure.Message("invalid clause for INSERT"))
 		}
 	}
 	return nil
@@ -104,12 +104,12 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 	sql.Write("VALUES")
 	parser, err := internal.NewInsertModelParser(cols, model)
 	if err != nil {
-		return err
+		return failure.Translate(err, errFailedParse)
 	}
 
 	modelSQL, err := parser.Parse()
 	if err != nil {
-		return err
+		return failure.Translate(err, errFailedParse)
 	}
 
 	sql.Write(modelSQL.String())

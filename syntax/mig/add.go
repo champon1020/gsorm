@@ -29,7 +29,7 @@ type AddCons struct {
 	Key string
 }
 
-// Name returns clause keyword.
+// Keyword returns clause keyword.
 func (a *AddCons) Keyword() string {
 	return "ADD CONSTRAINT"
 }

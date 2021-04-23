@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/errors"
+	"github.com/morikuni/failure"
 )
 
 // UpdateModelParser is the model parser for update statement.
@@ -19,7 +19,8 @@ type UpdateModelParser struct {
 func NewUpdateModelParser(cols []string, model interface{}) (*UpdateModelParser, error) {
 	mTyp := reflect.TypeOf(model)
 	if mTyp.Kind() != reflect.Ptr {
-		return nil, errors.New("model must be pointer", errors.InvalidTypeError)
+		err := failure.New(errInvalidValue, failure.Message("model must be a pointer"))
+		return nil, err
 	}
 
 	parser := &UpdateModelParser{
@@ -45,8 +46,10 @@ func (p *UpdateModelParser) Parse() (*SQL, error) {
 		return &sql, nil
 	}
 
-	msg := fmt.Sprintf("Type %v is not supported", p.ModelType.Kind())
-	return nil, errors.New(msg, errors.InvalidTypeError)
+	err := failure.New(errInvalidType,
+		failure.Context{"type": p.ModelType.Kind().String()},
+		failure.Message("invalid type for internal.InsertModelParser.Parse"))
+	return nil, err
 }
 
 // ParseMap parses map to SQL.
@@ -57,8 +60,8 @@ func (p *UpdateModelParser) ParseMap(sql *SQL, model reflect.Value) error {
 		}
 		v := model.MapIndex(reflect.ValueOf(c))
 		if !v.IsValid() {
-			msg := "Column names must be included in one of map keys"
-			return errors.New(msg, errors.InvalidSyntaxError)
+			return failure.New(errInvalidSyntax,
+				failure.Message("column names must be included in one of map keys"))
 		}
 		s := ToString(v.Interface(), nil)
 		sql.Write(fmt.Sprintf("%s = %s", c, s))

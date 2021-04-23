@@ -1,11 +1,11 @@
 package internal
 
 import (
-	"fmt"
 	"reflect"
+	"strconv"
 	"time"
 
-	"github.com/champon1020/mgorm/errors"
+	"github.com/morikuni/failure"
 )
 
 // Rows is interface for *sql.Rows.
@@ -46,7 +46,7 @@ type RowsParser struct {
 func NewRowsParser(rows Rows, model interface{}) (*RowsParser, error) {
 	cols, err := rows.Columns()
 	if err != nil {
-		return nil, errors.New(err.Error(), errors.DBColumnError)
+		return nil, failure.Wrap(err)
 	}
 
 	vals := make([][]byte, len(cols))
@@ -57,7 +57,8 @@ func NewRowsParser(rows Rows, model interface{}) (*RowsParser, error) {
 
 	mTyp := reflect.TypeOf(model)
 	if mTyp.Kind() != reflect.Ptr {
-		return nil, errors.New("model must be pointer", errors.InvalidTypeError)
+		err := failure.New(errInvalidValue, failure.Message("model must be a pointer"))
+		return nil, err
 	}
 
 	parser := &RowsParser{
@@ -119,8 +120,10 @@ func (p *RowsParser) Parse() (*reflect.Value, error) {
 		return p.ParseVar(p.Model)
 	}
 
-	msg := fmt.Sprintf("Type %v is not supported", p.Model.Kind())
-	return nil, errors.New(msg, errors.InvalidTypeError)
+	err := failure.New(errInvalidType,
+		failure.Context{"type": p.Model.Kind().String()},
+		failure.Message("invalid type for internal.InsertModelParser.Parse"))
+	return nil, err
 }
 
 // ParseMapSlice converts slice or array of map to reflect.Value.
@@ -166,8 +169,10 @@ func (p *RowsParser) ParseStructSlice(target reflect.Type) (*reflect.Value, erro
 // If the type of elements of slice or array is struct or map, ParseStructSlice or ParseMapSlice should be used.
 func (p *RowsParser) ParseSlice(target reflect.Type) (*reflect.Value, error) {
 	if len(p.Cols) != 1 {
-		msg := fmt.Sprintf("Column length must be 1 but got %d", len(p.Cols))
-		return nil, errors.New(msg, errors.DBColumnError)
+		err := failure.New(errInvalidSyntax,
+			failure.Context{"numColumns": strconv.Itoa(len(p.Cols))},
+			failure.Message("invalid number of columns"))
+		return nil, err
 	}
 
 	slice := reflect.New(target).Elem()
@@ -207,8 +212,10 @@ func (p *RowsParser) ParseStruct(target reflect.Type) (*reflect.Value, error) {
 	for i := 0; i < len(p.Vals); i++ {
 		fIdx := p.ColumnField[i]
 		if !item.Field(fIdx).CanSet() {
-			msg := fmt.Sprintf("Cannot set to field %d of %s", fIdx, target.String())
-			return nil, errors.New(msg, errors.UnchangeableError)
+			err := failure.New(errInvalidSyntax,
+				failure.Context{"model": target.String(), "fieldIndex": strconv.Itoa(fIdx)},
+				failure.Message("cannot change the value of the field"))
+			return nil, err
 		}
 
 		opt := BytesParserOption{}
@@ -233,8 +240,10 @@ func (p *RowsParser) ParseStruct(target reflect.Type) (*reflect.Value, error) {
 // ParseVar converts variable to reflect.Value.
 func (p *RowsParser) ParseVar(target reflect.Type) (*reflect.Value, error) {
 	if len(p.Cols) != 1 {
-		msg := fmt.Sprintf("Column length must be 1 but got %d", len(p.Cols))
-		return nil, errors.New(msg, errors.DBColumnError)
+		err := failure.New(errInvalidSyntax,
+			failure.Context{"numColumns": strconv.Itoa(len(p.Cols))},
+			failure.Message("invalid number of columns"))
+		return nil, err
 	}
 
 	item, err := p.BytesParser.Parse(p.Vals[0], target)
