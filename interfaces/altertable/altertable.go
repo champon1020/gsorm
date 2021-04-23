@@ -24,7 +24,6 @@ type Rename interface {
 type AddColumn interface {
 	Table
 	NotNull() NotNull
-	AutoInc() AutoInc // Only MySQL
 	Default(interface{}) Default
 }
 
@@ -44,16 +43,10 @@ type RenameColumn interface {
 type NotNull interface {
 	Table
 	Default(interface{}) Default
-	AutoInc() AutoInc
 }
 
 // Default is interface which is returned by (*AlterTableStmt).Default.
 type Default interface {
-	Table
-}
-
-// AutoInc is interface which is returned by (*AlterTableStmt).AutoInc.
-type AutoInc interface {
 	Table
 }
 

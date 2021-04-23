@@ -87,16 +87,6 @@ func (s *migStmt) buildColumnOptSQL(sql *internal.SQL) error {
 				return err
 			}
 			sql.Write(ss.Build())
-		case *mig.AutoInc:
-			if s.conn.getDriver() == internal.PSQL {
-				return failure.New(errInvalidSyntax,
-					failure.Message("AUTO_INCREMENT is not allowed in PostgreSQL"))
-			}
-			ss, err := e.Build()
-			if err != nil {
-				return err
-			}
-			sql.Write(ss.Build())
 		default:
 			return nil
 		}

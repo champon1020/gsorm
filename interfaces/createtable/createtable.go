@@ -17,7 +17,6 @@ type Model interface {
 type Column interface {
 	Column(string, string) Column
 	NotNull() NotNull
-	AutoInc() AutoInc // Only MySQL
 	Default(interface{}) Default
 	Cons(string) Cons
 	interfaces.MigrateCallable
@@ -27,20 +26,12 @@ type Column interface {
 type NotNull interface {
 	Column(string, string) Column
 	Default(interface{}) Default
-	AutoInc() AutoInc
 	Cons(string) Cons
 	interfaces.MigrateCallable
 }
 
 // Default is interface which is returned by (*CreateTableStmt).Default.
 type Default interface {
-	Column(string, string) Column
-	Cons(string) Cons
-	interfaces.MigrateCallable
-}
-
-// AutoInc is interface which is returned by (*CreateTableStmt).AutoInc.
-type AutoInc interface {
 	Column(string, string) Column
 	Cons(string) Cons
 	interfaces.MigrateCallable
