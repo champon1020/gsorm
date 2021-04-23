@@ -42,7 +42,7 @@ func TestDeleteStmt_String(t *testing.T) {
 		actual := testCase.Stmt.String()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
-			t.Errorf("Error was occurred: %v", errs[0])
+			t.Errorf("Error was occurred: %+v", errs[0])
 			continue
 		}
 		assert.Equal(t, testCase.Expected, actual)
@@ -163,7 +163,7 @@ func TestInsertStmt_String(t *testing.T) {
 		actual := testCase.Stmt.String()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
-			t.Errorf("Error was occurred: %v", errs[0])
+			t.Errorf("Error was occurred: %+v", errs[0])
 			continue
 		}
 		assert.Equal(t, testCase.Expected, actual)
@@ -363,6 +363,15 @@ func TestSelectStmt_String(t *testing.T) {
 				`LIMIT 5`,
 		},
 		{
+			mgorm.Select(nil).
+				From("employees AS e").
+				Join("titles AS t").On("t.emp_no = e.emp_no").
+				LeftJoin("departments AS d").On("d.dept_no = e.dept_no").(*mgorm.SelectStmt),
+			`SELECT * FROM employees AS e ` +
+				`INNER JOIN titles AS t ON t.emp_no = e.emp_no ` +
+				`LEFT JOIN departments AS d ON d.dept_no = e.dept_no`,
+		},
+		{
 			mgorm.Select(nil, "title", "COUNT(title)").
 				From("titles").
 				GroupBy("title").(*mgorm.SelectStmt),
@@ -425,7 +434,7 @@ func TestSelectStmt_String(t *testing.T) {
 		actual := testCase.Stmt.String()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
-			t.Errorf("Error was occurred: %v", errs[0])
+			t.Errorf("Error was occurred: %+v", errs[0])
 			continue
 		}
 		assert.Equal(t, testCase.Expected, actual)
@@ -515,7 +524,7 @@ func TestUpdateStmt_String(t *testing.T) {
 		actual := testCase.Stmt.String()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
-			t.Errorf("Error was occurred: %v", errs[0])
+			t.Errorf("Error was occurred: %+v", errs[0])
 			continue
 		}
 		assert.Equal(t, testCase.Expected, actual)
