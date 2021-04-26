@@ -107,23 +107,17 @@ type Having interface {
 // OrderBy is interface which is returned by (*SelectStmt).OrderBy.
 type OrderBy interface {
 	Limit(int) Limit
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
 // Limit is interface which is returned by (*SelectStmt).Limit.
 type Limit interface {
 	Offset(int) Offset
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
 // Offset is interface which is returned by (*SelectStmt).Offset.
 type Offset interface {
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
