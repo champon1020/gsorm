@@ -15,16 +15,16 @@ func TestOn_String(t *testing.T) {
 		Result string
 	}{
 		{
-			&clause.On{Expr: "lhs = rhs"},
-			`ON("lhs = rhs")`,
+			&clause.On{Expr: "table1.column = table2.column"},
+			`ON("table1.column = table2.column")`,
 		},
 		{
-			&clause.On{Expr: "lhs = ?", Values: []interface{}{10}},
-			`ON("lhs = ?", 10)`,
+			&clause.On{Expr: "table1.column = ?", Values: []interface{}{"table2.column"}},
+			`ON("table1.column = ?", 'table2.column')`,
 		},
 		{
-			&clause.On{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			`ON("lhs1 = ? AND lhs2 = ?", 10, 'str')`,
+			&clause.On{Expr: "table1.column = ? AND table2.column = ?", Values: []interface{}{"table3.column", "table4.column"}},
+			`ON("table1.column = ? AND table2.column = ?", 'table3.column', 'table4.column')`,
 		},
 	}
 
@@ -40,16 +40,12 @@ func TestOn_Build(t *testing.T) {
 		Result *syntax.StmtSet
 	}{
 		{
-			&clause.On{Expr: "lhs = rhs"},
-			&syntax.StmtSet{Keyword: "ON", Value: "lhs = rhs"},
+			&clause.On{Expr: "table1.column = table2.column"},
+			&syntax.StmtSet{Keyword: "ON", Value: "table1.column = table2.column"},
 		},
 		{
-			&clause.On{Expr: "lhs = ?", Values: []interface{}{10}},
-			&syntax.StmtSet{Keyword: "ON", Value: "lhs = 10"},
-		},
-		{
-			&clause.On{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			&syntax.StmtSet{Keyword: "ON", Value: `lhs1 = 10 AND lhs2 = 'str'`},
+			&clause.On{Expr: "table1.column = ?", Values: []interface{}{"table2.column"}},
+			&syntax.StmtSet{Keyword: "ON", Value: `table1.column = table2.column`},
 		},
 	}
 
@@ -62,13 +58,5 @@ func TestOn_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestOn_Build_Fail(t *testing.T) {
-	a := &clause.On{Expr: "column = ?"}
-	_, err := a.Build()
-	if err == nil {
-		t.Errorf("Error was not occurred")
 	}
 }

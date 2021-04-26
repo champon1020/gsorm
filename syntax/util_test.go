@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBuildForExpression(t *testing.T) {
+func TestBuildExpr(t *testing.T) {
 	testCases := []struct {
 		Expr     string
 		Values   []interface{}
@@ -60,12 +60,12 @@ func TestBuildForExpression(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual, _ := syntax.BuildForExpression(testCase.Expr, testCase.Values...)
+		actual, _ := syntax.BuildExpr(testCase.Expr, testCase.Values...)
 		assert.Equal(t, testCase.Expected, actual)
 	}
 }
 
-func TestBuildForExpression_Fail(t *testing.T) {
+func TestBuildExpr_Fail(t *testing.T) {
 	testCases := []struct {
 		Expr          string
 		Values        []interface{}
@@ -79,7 +79,7 @@ func TestBuildForExpression_Fail(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		_, err := syntax.BuildForExpression(testCase.Expr, testCase.Values...)
+		_, err := syntax.BuildExpr(testCase.Expr, testCase.Values...)
 		if err == nil {
 			t.Errorf("Error is not occurred")
 			continue

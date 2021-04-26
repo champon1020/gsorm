@@ -30,7 +30,7 @@ func (h *Having) String() string {
 
 // Build makes HAVING clause with syntax.StmtSet.
 func (h *Having) Build() (*syntax.StmtSet, error) {
-	s, err := syntax.BuildForExpression(h.Expr, h.Values...)
+	s, err := syntax.BuildExpr(h.Expr, h.Values...)
 	if err != nil {
 		return nil, err
 	}

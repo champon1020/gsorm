@@ -30,7 +30,7 @@ func (o *Or) String() string {
 
 // Build makes OR clause with syntax.StmtSet.
 func (o *Or) Build() (*syntax.StmtSet, error) {
-	s, err := syntax.BuildForExpression(o.Expr, o.Values...)
+	s, err := syntax.BuildExpr(o.Expr, o.Values...)
 	if err != nil {
 		return nil, err
 	}

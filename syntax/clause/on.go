@@ -30,7 +30,7 @@ func (o *On) String() string {
 
 // Build makes ON clause with syntax.StmtSet.
 func (o *On) Build() (*syntax.StmtSet, error) {
-	s, err := syntax.BuildForExpression(o.Expr, o.Values...)
+	s, err := syntax.BuildExprWithoutQuotes(o.Expr, o.Values...)
 	if err != nil {
 		return nil, err
 	}
