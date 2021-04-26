@@ -9,8 +9,21 @@ import (
 	"github.com/morikuni/failure"
 )
 
-// BuildForExpression makes StmtSet with expr and values.
-func BuildForExpression(expr string, vals ...interface{}) (string, error) {
+// BuildExpr assigns the values to '?' of the expression.
+func BuildExpr(expr string, vals ...interface{}) (string, error) {
+	return buildExprWithOpt(&buildExprOpt{quotes: true}, expr, vals...)
+}
+
+// BuildExprWithoutQuotes assigns the values to '?' of the expression with single quotes.
+func BuildExprWithoutQuotes(expr string, vals ...interface{}) (string, error) {
+	return buildExprWithOpt(&buildExprOpt{quotes: false}, expr, vals...)
+}
+
+type buildExprOpt struct {
+	quotes bool
+}
+
+func buildExprWithOpt(option *buildExprOpt, expr string, vals ...interface{}) (string, error) {
 	if strings.Count(expr, "?") != len(vals) {
 		err := failure.New(errInvalidArgument,
 			failure.Context{"expr": fmt.Sprintf("'%s'", expr), "length of values": strconv.Itoa(len(vals))},
@@ -24,7 +37,8 @@ func BuildForExpression(expr string, vals ...interface{}) (string, error) {
 			values = append(values, fmt.Sprintf("(%s)", stmt.String()))
 			continue
 		}
-		values = append(values, internal.ToString(v, nil))
+		opt := &internal.ToStringOpt{Quotes: option.quotes}
+		values = append(values, internal.ToString(v, opt))
 	}
 
 	return fmt.Sprintf(strings.ReplaceAll(expr, "?", "%s"), values...), nil

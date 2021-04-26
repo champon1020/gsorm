@@ -30,7 +30,7 @@ func (a *And) String() string {
 
 // Build makes AND clause with syntax.StmtSet.
 func (a *And) Build() (*syntax.StmtSet, error) {
-	s, err := syntax.BuildForExpression(a.Expr, a.Values...)
+	s, err := syntax.BuildExpr(a.Expr, a.Values...)
 	if err != nil {
 		return nil, err
 	}
