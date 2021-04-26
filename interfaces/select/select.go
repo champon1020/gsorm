@@ -18,6 +18,7 @@ type From interface {
 	FullJoin(string) Join
 	Where(string, ...interface{}) Where
 	GroupBy(...string) GroupBy
+	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
 	Limit(int) Limit
 	Union(syntax.Stmt) Union
@@ -37,6 +38,7 @@ type On interface {
 	RightJoin(string) Join
 	Where(string, ...interface{}) Where
 	GroupBy(...string) GroupBy
+	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
 	Limit(int) Limit
 	Union(syntax.Stmt) Union
@@ -49,6 +51,7 @@ type Where interface {
 	And(string, ...interface{}) And
 	Or(string, ...interface{}) Or
 	GroupBy(...string) GroupBy
+	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
 	Limit(int) Limit
 	Union(syntax.Stmt) Union
@@ -58,8 +61,12 @@ type Where interface {
 
 // And is interface which is returned by (*SelectStmt).And.
 type And interface {
+	And(string, ...interface{}) And
+	Or(string, ...interface{}) Or
 	GroupBy(...string) GroupBy
+	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
+	Limit(int) Limit
 	Union(syntax.Stmt) Union
 	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
@@ -67,8 +74,12 @@ type And interface {
 
 // Or is interface which is returned by (*SelectStmt).Or.
 type Or interface {
+	And(string, ...interface{}) And
+	Or(string, ...interface{}) Or
 	GroupBy(...string) GroupBy
+	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
+	Limit(int) Limit
 	Union(syntax.Stmt) Union
 	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
@@ -78,6 +89,7 @@ type Or interface {
 type GroupBy interface {
 	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
+	Limit(int) Limit
 	Union(syntax.Stmt) Union
 	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable
@@ -86,6 +98,7 @@ type GroupBy interface {
 // Having is interface which is returned by (*SelectStmt).Having.
 type Having interface {
 	OrderBy(...string) OrderBy
+	Limit(int) Limit
 	Union(syntax.Stmt) Union
 	UnionAll(syntax.Stmt) Union
 	interfaces.QueryCallable

@@ -30,10 +30,14 @@ type Where interface {
 
 // And is interface which is returned by (*UpdateStmt).And.
 type And interface {
+	And(string, ...interface{}) And
+	Or(string, ...interface{}) Or
 	interfaces.ExecCallable
 }
 
 // Or is interface which is returned by (*UpdateStmt).Or.
 type Or interface {
+	And(string, ...interface{}) And
+	Or(string, ...interface{}) Or
 	interfaces.ExecCallable
 }
