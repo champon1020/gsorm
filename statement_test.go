@@ -10,45 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDeleteStmt_String(t *testing.T) {
-	testCases := []struct {
-		Stmt     *mgorm.DeleteStmt
-		Expected string
-	}{
-		{
-			mgorm.Delete(nil).From("sample").(*mgorm.DeleteStmt),
-			`DELETE FROM sample`,
-		},
-		{
-			mgorm.Delete(nil).From("sample").
-				Where("id = ?", 10000).(*mgorm.DeleteStmt),
-			`DELETE FROM sample WHERE id = 10000`,
-		},
-		{
-			mgorm.Delete(nil).From("sample").
-				Where("id = ?", 10000).
-				And("name = ? OR name = ?", "Taro", "Jiro").(*mgorm.DeleteStmt),
-			`DELETE FROM sample WHERE id = 10000 AND (name = 'Taro' OR name = 'Jiro')`,
-		},
-		{
-			mgorm.Delete(nil).From("sample").
-				Where("id = ?", 10000).
-				Or("name = ? AND nickname = ?", "Taro", "TaroTaro").(*mgorm.DeleteStmt),
-			`DELETE FROM sample WHERE id = 10000 OR (name = 'Taro' AND nickname = 'TaroTaro')`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
-		errs := testCase.Stmt.ExportedGetErrors()
-		if len(errs) > 0 {
-			t.Errorf("Error was occurred: %+v", errs[0])
-			continue
-		}
-		assert.Equal(t, testCase.Expected, actual)
-	}
-}
-
 func TestDeleteStmt_BuildSQL_Fail(t *testing.T) {
 	testCases := []struct {
 		ExpectedError failure.StringCode

@@ -22,10 +22,12 @@ type Where interface {
 
 // And is interface which is returned by (*Stmt).And.
 type And interface {
+	And(string, ...interface{}) And
 	interfaces.ExecCallable
 }
 
 // Or is interface which is returned by (*Or).Or.
 type Or interface {
+	Or(string, ...interface{}) Or
 	interfaces.ExecCallable
 }
