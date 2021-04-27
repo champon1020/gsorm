@@ -43,11 +43,13 @@ func TestDeleteStmt_Where(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Delete(nil).From("employees").Where("emp_no = 1001").(*mgorm.DeleteStmt),
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = 1001").(*mgorm.DeleteStmt),
 			`DELETE FROM employees WHERE emp_no = 1001`,
 		},
 		{
-			mgorm.Delete(nil).From("employees").Where("emp_no = ?", 1001).(*mgorm.DeleteStmt),
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).(*mgorm.DeleteStmt),
 			`DELETE FROM employees WHERE emp_no = 1001`,
 		},
 	}
@@ -228,6 +230,224 @@ func TestInsertStmt_Model(t *testing.T) {
 			`INSERT INTO employees (first_name) VALUES ('Taro'), ('Jiro')`,
 		},
 	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestSelectStmt_From(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestSelectStmt_Join(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+func TestSelectStmt_LeftJoin(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+func TestSelectStmt_RightJoin(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+func TestSelectStmt_Where(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestSelectStmt_And(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestSelectStmt_Or(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestSelectStmt_GroupBy(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestSelectStmt_Having(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestSelectStmt_Union(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestSelectStmt_UnionAll(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestSelectStmt_OrderBy(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestSelectStmt_Limit(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.SelectStmt
+		Expected string
+	}{}
 
 	for _, testCase := range testCases {
 		actual := testCase.Stmt.String()
