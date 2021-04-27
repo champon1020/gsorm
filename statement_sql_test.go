@@ -137,3 +137,105 @@ func TestDeleteStmt_Or(t *testing.T) {
 		assert.Equal(t, testCase.Expected, actual)
 	}
 }
+
+func TestInsertStmt_Values(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.InsertStmt
+		Expected string
+	}{
+		{
+			mgorm.Insert(nil, "employees", "emp_no", "first_name").
+				Values(1001, "Taro").(*mgorm.InsertStmt),
+			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`,
+		},
+		{
+			mgorm.Insert(nil, "employees", "emp_no", "first_name").
+				Values(1001, "Taro").
+				Values(1002, "Jiro").(*mgorm.InsertStmt),
+			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro'), (1002, 'Jiro')`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestInsertStmt_Select(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.InsertStmt
+		Expected string
+	}{
+		{
+			mgorm.Insert(nil, "dept_manager").Select(mgorm.Select(nil).From("dept_emp")).(*mgorm.InsertStmt),
+			`INSERT INTO dept_manager SELECT * FROM dept_emp`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestInsertStmt_Model(t *testing.T) {
+	type Employee struct {
+		ID        int `mgorm:"emp_no"`
+		FirstName string
+	}
+	structModel := Employee{ID: 1001, FirstName: "Taro"}
+	structSlice := []Employee{{ID: 1001, FirstName: "Taro"}, {ID: 1002, FirstName: "Jiro"}}
+	mapModel := map[string]interface{}{"emp_no": 1001, "first_name": "Taro"}
+	mapSlice := []map[string]interface{}{
+		{"emp_no": 1001, "first_name": "Taro"},
+		{"emp_no": 1002, "first_name": "Jiro"},
+	}
+	varSlice := []string{"Taro", "Jiro"}
+
+	testCases := []struct {
+		Stmt     *mgorm.InsertStmt
+		Expected string
+	}{
+		{
+			mgorm.Insert(nil, "employees", "emp_no", "first_name").Model(&structModel).(*mgorm.InsertStmt),
+			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`,
+		},
+		{
+			mgorm.Insert(nil, "employees", "emp_no", "first_name").Model(&structSlice).(*mgorm.InsertStmt),
+			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro'), (1002, 'Jiro')`,
+		},
+		{
+			mgorm.Insert(nil, "employees", "emp_no", "first_name").Model(&mapModel).(*mgorm.InsertStmt),
+			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`,
+		},
+		{
+			mgorm.Insert(nil, "employees", "emp_no", "first_name").Model(&mapSlice).(*mgorm.InsertStmt),
+			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro'), (1002, 'Jiro')`,
+		},
+		{
+			mgorm.Insert(nil, "employees", "first_name").Model(&varSlice).(*mgorm.InsertStmt),
+			`INSERT INTO employees (first_name) VALUES ('Taro'), ('Jiro')`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
