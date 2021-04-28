@@ -190,7 +190,7 @@ err := mgorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 また，代入規則は以下に従います．
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が`()`内に展開されます．
+- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
 - 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない値はそのまま展開される．
 
@@ -218,7 +218,7 @@ err := mgorm.Select(db).From("employees").
 
 err := mgorm.Select(db).From("employees").
     Where("first_name LIKE ?", "%Taro").Query(&model)
-// SELECT * FROM employees
+// SELECT * FROM employees
 //      WHERE first_name LIKE '%Taro';
 
 err := mgorm.Select(db).From("employees").
@@ -252,7 +252,7 @@ err := mgorm.Select(db).From("employees").
 また，代入規則は以下に従います．
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が`()`内に展開されます．
+- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
 - 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない場合，値はそのまま展開される．
 
@@ -334,7 +334,7 @@ err := mgorm.Select(db).From("employees").
 また，代入規則は以下に従います．
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が`()`内に展開されます．
+- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
 - 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない場合，値はそのまま展開される．
 
@@ -429,7 +429,7 @@ err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
 また，代入規則は以下に従います．
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が`()`内に展開されます．
+- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
 - 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない場合，値はそのまま展開される．
 
@@ -448,22 +448,71 @@ err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
 // SELECT emp_no, AVG(salary) FROM salaries
 //      GROUP BY emp_no
 //      HAVING AVG(salary) > 130000;
+
+err := mgorm.Select(db).From("employees").
+    Having("first_name = ?", "Taro").Query(&model)
+// SELECT * FROM employees
+//      HAVING first_name = 'Taro';
+
+err := mgorm.Select(db).From("employees").
+    Having("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
+// SELECT * FROM employees
+//      HAVING birth_date = '2006-01-02 00:00:00';
+
+err := mgorm.Select(db).From("employees").
+    Having("first_name LIKE ?", "%Taro").Query(&model)
+// SELECT * FROM employees
+//      HAVING first_name LIKE '%Taro';
+
+err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
+    GroupBy("emp_no").
+    Having("AVG(salary) BETWEEN ? AND ?", 100000, 130000).Query(&model)
+// SELECT emp_no, AVG(salary) FROM salaries
+//      GROUP BY emp_no
+//      HAVING AVG(salary) BETWEEN 100000 AND 130000;
+
+err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
+    GroupBy("emp_no").
+    Having("AVG(salary) IN (?)", []int{100000, 130000}).Query(&model)
+// SELECT emp_no, AVG(salary) FROM salaries
+//      GROUP BY emp_no
+//      HAVING AVG(salary) IN (100000, 130000);
+
+err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
+    GroupBy("emp_no").
+    Having("AVG(salary) IN (?)", [2]int{100000, 130000}).Query(&model)
+// SELECT emp_no, AVG(salary) FROM salaries
+//      GROUP BY emp_no
+//      HAVING AVG(salary) IN (100000, 130000);
+
+err := mgorm.Select(db).From("employees").
+    Having("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
+// SELECT * FROM employees
+//      HAVING emp_no IN (SELECT emp_no FROM dept_manager);
 ```
 
 
 ## Union
-`Union`は引数に`*mgorm.SelectStmt`型を受け取ります．
-つまり，`mgorm.Select`による文を受け取ることができます．
+`Union`はUNION句を呼び出します．
 
-`Union`と同様に`UnionAll`も使用することができます．
+引数に`*mgorm.SelectStmt`を指定します．
 
 #### 例
 ```go
 mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
     Union(mgorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
 // SELECT * FROM employees
-//  UNION (SELECT * FROM departments);
+//      UNION (SELECT * FROM departments);
+```
 
+
+## UnionAll
+`UnionAll`はUNION ALL句を呼び出します．
+
+引数に`*mgorm.SelectStmt`を指定します．
+
+#### 例
+```go
 mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
     UnionAll(mgorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
 // SELECT * FROM employees
@@ -472,46 +521,57 @@ mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 
 
 ## OrderBy
-`OrderBy`は引数に複数のカラム名をstring型で受け取ります．
+`OrderBy`はORDER BY句を呼び出します．
 
-必要であれば，カラム名に`DESC`や`ASC`などの順序の方向も含めてください．
-`DESC`や`ASC`は小文字でも問題ありません．
+引数に複数カラム名を指定できます．
+このとき，カラム名に`DESC`や`ASC`を含めることができます．
+`DESC`や`ASC`は`desc`や`asc`でも問題ありません．
 
 #### 例
 ```go
 err := mgorm.Select(db).From("employees").
     OrderBy("birth_date").Query(&model)
 // SELECT * FROM employees
-//  ORDER BY birth_date;
+//      ORDER BY birth_date;
 
 err := mgorm.Select(db).From("employees").
     OrderBy("hire_date DESC").Query(&model)
 // SELECT * FROM employees
-//  ORDER BY hire_date DESC;
+//      ORDER BY hire_date DESC;
+
+err := mgorm.Select(db).From("employees").
+    OrderBy("hire_date desc").Query(&model)
+// SELECT * FROM employees
+//      ORDER BY hire_date desc;
 
 err := mgorm.Select(db).From("employees").
     OrderBy("birth_date").
     OrderBy("hire_date DESC").Query(&model)
 // SELECT id FROM people
-//  ORDER BY birth_date
-//  ORDER BY hire_date DESC;
+//      ORDER BY birth_date
+//      ORDER BY hire_date DESC;
 ```
 
 
 ## Limit
-`Limit`は引数にint型を受け取ります．
+`Limit`はLIMIT句を呼び出します．
+
+引数にlimitを指定します．
 
 #### 例
 ```go
 err := mgorm.Select(db).From("employees").
     Limit(10).Query(&model)
 // SELECT * FROM employees
-//  LIMIT 10;
+//      LIMIT 10;
 ```
 
 
 ## Offset
-`Offset`は引数にint型を受け取ります．
+`Offset`はOFFSET句を呼び出します．
+
+引数にoffsetを指定します．
+
 `Offset`は`Limit`の直後のみ呼び出すことができます．
 
 #### 例
@@ -520,6 +580,6 @@ err := mgorm.Select(db).From("employees").
     Limit(10).
     Offset(5).Query(&model)
 // SELECT * FROM employees
-//  LIMIT 10
-//  OFFSET 5;
+//      LIMIT 10
+//      OFFSET 5;
 ```
