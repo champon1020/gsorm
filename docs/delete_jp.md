@@ -105,9 +105,9 @@ err := mgorm.Delete(db).From("employees").
 //      WHERE first_name LIKE '%Taro';
 
 err := mgorm.Delete(db).From("employees").
-    Where("birth_date BETWEEN ? AND ?", 1001, 1002).Query(&model)
+    Where("emp_no BETWEEN ? AND ?", 1001, 1003).Query(&model)
 // DELETE FROM employees
-//      WHERE emp_no BETWEEN 1001 AND 1002;
+//      WHERE emp_no BETWEEN 1001 AND 1003;
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no IN (?)", []int{1001, 1002}).Query(&model)
@@ -194,10 +194,10 @@ err := mgorm.Delete(db).From("employees").
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
-    And("birth_date BETWEEN ? AND ?", 1001, 1002).Query(&model)
+    And("emp_no BETWEEN ? AND ?", 1001, 1003).Query(&model)
 // DELETE FROM employees
 //      WHERE emp_no = 1001
-//      AND (emp_no BETWEEN 1001 AND 1002);
+//      AND (emp_no BETWEEN 1001 AND 1003);
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
@@ -290,10 +290,10 @@ err := mgorm.Delete(db).From("employees").
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
-    Or("birth_date BETWEEN ? AND ?", 1001, 1002).Query(&model)
+    Or("emp_no BETWEEN ? AND ?", 1001, 1003).Query(&model)
 // DELETE FROM employees
 //      WHERE emp_no = 1001
-//      OR (emp_no BETWEEN 1001 AND 1002);
+//      OR (emp_no BETWEEN 1001 AND 1003);
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).

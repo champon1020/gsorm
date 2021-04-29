@@ -2,6 +2,7 @@ package mgorm_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/champon1020/mgorm"
 	"github.com/stretchr/testify/assert"
@@ -52,6 +53,41 @@ func TestDeleteStmt_Where(t *testing.T) {
 				Where("emp_no = ?", 1001).(*mgorm.DeleteStmt),
 			`DELETE FROM employees WHERE emp_no = 1001`,
 		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("first_name = ?", "Taro").(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE first_name = 'Taro'`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE birth_date = '2006-01-02 00:00:00'`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("first_name LIKE ?", "%Taro").(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE first_name LIKE '%Taro'`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no BETWEEN ? AND ?", 1001, 1003).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no BETWEEN 1001 AND 1003`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no IN (?)", []int{1001, 1002}).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no IN (1001, 1002)`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no IN (?)", [2]int{1001, 1002}).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no IN (1001, 1002)`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no IN (SELECT emp_no FROM dept_manager)`,
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -71,8 +107,32 @@ func TestDeleteStmt_And(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Delete(nil).
-				From("employees").
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				And("emp_no = 1002").(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 AND (emp_no = 1002)`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				And("emp_no = ?", 1002).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 AND (emp_no = 1002)`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				And("first_name = ? OR first_name = ?", "Taro", "Jiro").(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 AND (first_name = 'Taro' OR first_name = 'Jiro')`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				And("emp_no = ?", 1002).
+				And("emp_no = ?", 1003).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 AND (emp_no = 1002) AND (emp_no = 1003)`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
 				Where("emp_no = ?", 1001).
 				And("first_name = ?", "Taro").(*mgorm.DeleteStmt),
 			`DELETE FROM employees WHERE emp_no = 1001 AND (first_name = 'Taro')`,
@@ -80,15 +140,38 @@ func TestDeleteStmt_And(t *testing.T) {
 		{
 			mgorm.Delete(nil).From("employees").
 				Where("emp_no = ?", 1001).
-				And("first_name = ? OR last_name = ?", "Taro", "Sato").(*mgorm.DeleteStmt),
-			`DELETE FROM employees WHERE emp_no = 1001 AND (first_name = 'Taro' OR last_name = 'Sato')`,
+				And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 AND (birth_date = '2006-01-02 00:00:00')`,
 		},
 		{
 			mgorm.Delete(nil).From("employees").
 				Where("emp_no = ?", 1001).
-				And("first_name = ?", "Taro").
-				And("last_name = ?", "Sato").(*mgorm.DeleteStmt),
-			`DELETE FROM employees WHERE emp_no = 1001 AND (first_name = 'Taro') AND (last_name = 'Sato')`,
+				And("first_name LIKE ?", "%Taro").(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 AND (first_name LIKE '%Taro')`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				And("emp_no BETWEEN ? AND ?", 1001, 1003).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 AND (emp_no BETWEEN 1001 AND 1003)`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				And("emp_no IN (?)", []int{1001, 1002}).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 AND (emp_no IN (1001, 1002))`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				And("emp_no IN (?)", [2]int{1001, 1002}).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 AND (emp_no IN (1001, 1002))`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				And("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 AND (emp_no IN (SELECT emp_no FROM dept_manager))`,
 		},
 	}
 
@@ -111,6 +194,12 @@ func TestDeleteStmt_Or(t *testing.T) {
 		{
 			mgorm.Delete(nil).From("employees").
 				Where("emp_no = ?", 1001).
+				Or("emp_no = 1002").(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 OR (emp_no = 1002)`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
 				Or("emp_no = ?", 1002).(*mgorm.DeleteStmt),
 			`DELETE FROM employees WHERE emp_no = 1001 OR (emp_no = 1002)`,
 		},
@@ -126,6 +215,48 @@ func TestDeleteStmt_Or(t *testing.T) {
 				Or("emp_no = ?", 1002).
 				Or("emp_no = ?", 1003).(*mgorm.DeleteStmt),
 			`DELETE FROM employees WHERE emp_no = 1001 OR (emp_no = 1002) OR (emp_no = 1003)`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				Or("first_name = ?", "Taro").(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 OR (first_name = 'Taro')`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				Or("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 OR (birth_date = '2006-01-02 00:00:00')`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				Or("first_name LIKE ?", "%Taro").(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 OR (first_name LIKE '%Taro')`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				Or("emp_no BETWEEN ? AND ?", 1001, 1003).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 OR (emp_no BETWEEN 1001 AND 1003)`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				Or("emp_no IN (?)", []int{1001, 1002}).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 OR (emp_no IN (1001, 1002))`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				Or("emp_no IN (?)", [2]int{1001, 1002}).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 OR (emp_no IN (1001, 1002))`,
+		},
+		{
+			mgorm.Delete(nil).From("employees").
+				Where("emp_no = ?", 1001).
+				Or("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).(*mgorm.DeleteStmt),
+			`DELETE FROM employees WHERE emp_no = 1001 OR (emp_no IN (SELECT emp_no FROM dept_manager))`,
 		},
 	}
 
