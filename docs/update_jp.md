@@ -13,12 +13,12 @@ mgorm.Update(db).Set(10, "employees").
     Set("gender", "W").
     Set("hire_date", time.Date(2019, time.September, 1, 0, 0, 0, 0, time.UTC)).Exec()
 // UPDATE employees
-//      SET emp_no=1001,
-//          birth_date='1995-07-07',
-//          first_name='Hanako',
-//          last_name='Suzuki',
-//          gender='W',
-//          hire_date='2019-09-01';
+//      SET emp_no = 1001,
+//          birth_date = '1995-07-07',
+//          first_name = 'Hanako',
+//          last_name = 'Suzuki',
+//          gender = 'W',
+//          hire_date = '2019-09-01';
 ```
 
 
@@ -79,8 +79,8 @@ err := mgorm.Update(db, "employees").
     Set("first_name", "Hanako").
     Set("last_name", "Suzuki").Exec()
 // UPDATE employees
-//      SET first_name='Hanako',
-//          last_name='Suzuki';
+//      SET first_name = 'Hanako',
+//          last_name = 'Suzuki';
 ```
 
 
@@ -102,63 +102,63 @@ err := mgorm.Update(db, "employees").
     Set("first_name", "Hanako").
     Where("emp_no = 1001").Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001;
 
 err := mgorm.Update(db, "employees").
     Set("first_name", "Hanako").
     Where("emp_no = ?", 1001).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001;
 
 err := mgorm.Update(db, "employees").
     Set("first_name", "Hanako").
     Where("first_name = ?", "Taro").Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE first_name = 'Taro';
 
 err := mgorm.Update(db, "employees").
     Set("first_name", "Hanako").
     Where("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE birth_date = '2006-01-02 00:00:00';
 
 err := mgorm.Update(db).From("employees").
     Set("first_name", "Hanako").
     Where("first_name LIKE ?", "%Taro").Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE first_name LIKE '%Taro';
 
 err := mgorm.Update(db).From("employees").
     Set("first_name", "Hanako").
     Where("emp_no BETWEEN ? AND ?", 1001, 1003).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no BETWEEN 1001 AND 1003;
 
 err := mgorm.Update(db).From("employees").
     Set("first_name", "Hanako").
     Where("emp_no IN (?)", []int{1001, 1002}).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no IN (1001, 1002);
 
 err := mgorm.Update(db).From("employees").
     Set("first_name", "Hanako").
     Where("emp_no IN (?)", [2]int{1001, 1002}).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no IN (1001, 1002);
 
 err := mgorm.Update(db).From("employees").
     Set("first_name", "Hanako").
     Where("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no IN (SELECT emp_no FROM dept_manager);
 ```
 
@@ -185,25 +185,25 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no = 1002").Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      AND (emp_no = 1002);
 
 err := mgorm.Update(db).From("employees").
     Set("first_name", "Hanako").
     Where("emp_no = ?", 1001).
-    And("emp_no = ?", "Taro", "Sato").Exec()
+    And("emp_no = ?", 1002).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
-//      AND (first_name = 1002);
+//      AND (emp_no = 1002);
 
 err := mgorm.Update(db).From("employees").
     Set("first_name", "Hanako").
     Where("emp_no = ?", 1001).
     And("first_name = ? OR first_name = ?", "Taro", "Jiro").Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      AND (first_name = 'Taro' OR first_name = 'Jiro');
 
@@ -213,7 +213,7 @@ err := mgorm.Update(db).From("employees").
     And("emp_no = ?", 1002).
     And("emp_no = ?", 1003).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      AND (emp_no = 1002);
 //      AND (emp_no = 1003);
@@ -223,7 +223,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      AND (birth_date = '2006-01-02 00:00:00');
 
@@ -232,7 +232,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     And("first_name LIKE ?", "%Taro").Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      AND (first_name LIKE '%Taro');
 
@@ -241,7 +241,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no BETWEEN ? AND ?", 1001, 1003).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      AND (emp_no BETWEEN 1001 AND 1003);
 
@@ -250,7 +250,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no IN (?)", []int{1001, 1002}).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      AND (emp_no IN (1001, 1002));
 
@@ -259,7 +259,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no IN (?)", [2]int{1001, 1002}).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      AND (emp_no IN (1001, 1002));
 
@@ -268,7 +268,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      AND (emp_no IN (SELECT emp_no FROM dept_manager));
 ```
@@ -295,25 +295,25 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no = 1002").Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002);
 
 err := mgorm.Update(db).From("employees").
     Set("first_name", "Hanako").
     Where("emp_no = ?", 1001).
-    Or("emp_no = ?", "Taro", "Sato").Exec()
+    Or("emp_no = ?", 1002).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
-//      OR (first_name = 1002);
+//      OR (emp_no = 1002);
 
 err := mgorm.Update(db).From("employees").
     Set("first_name", "Hanako").
     Where("emp_no = ?", 1001).
     Or("emp_no = ? AND first_name = ?", 1002, "Taro").Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002 OR first_name = 'Taro');
 
@@ -323,7 +323,7 @@ err := mgorm.Update(db).From("employees").
     Or("emp_no = ?", 1002).
     Or("emp_no = ?", 1003).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002);
 //      OR (emp_no = 1003);
@@ -333,7 +333,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      OR (birth_date = '2006-01-02 00:00:00');
 
@@ -342,7 +342,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("first_name LIKE ?", "%Taro").Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      OR (first_name LIKE '%Taro');
 
@@ -351,7 +351,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no BETWEEN ? AND ?", 1001, 1003).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      OR (emp_no BETWEEN 1001 AND 1003);
 
@@ -360,7 +360,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no IN (?)", []int{1001, 1002}).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      OR (emp_no IN (1001, 1002));
 
@@ -369,7 +369,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no IN (?)", [2]int{1001, 1002}).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      OR (emp_no IN (1001, 1002));
 
@@ -378,7 +378,7 @@ err := mgorm.Update(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Exec()
 // UPDATE employees
-//      SET first_name='Hanako'
+//      SET first_name = 'Hanako'
 //      WHERE emp_no = 1001
 //      OR (emp_no IN (SELECT emp_no FROM dept_manager));
 ```
@@ -389,7 +389,7 @@ err := mgorm.Update(db).From("employees").
 
 引数にはモデルのポインタ，複数カラム名をしてします．
 
-モデルには構造体のポインタ，マップのポインタ，構造体のスライスのポインタ，マップのスライスのポインタ，事前定義型のスライスのポインタのいずれかを指定します．
+モデルには構造体のポインタ，マップのポインタのいずれかを指定します．
 
 構造体もしくは構造体のスライスをマッピングする際，対象のカラム名はフィールド名もしくはフィールドタグから推定されます．
 
@@ -411,8 +411,8 @@ emp1 := Employee{ID: 1000, FirstName: "Taro"}
 mgorm.Update(db, "employees").
     Model(&emp1, "emp_no", "first_name").Exec()
 // UPDATE employees
-//  SET emp_no=1000,
-//      first_name='Taro';
+//  SET emp_no = 1000,
+//      first_name = 'Taro';
 
 emp2 = Employee{
     EmpNo: 1000,
@@ -426,10 +426,10 @@ emp2 = Employee{
 mgorm.Update(db, "employees").
     Model(&emp2).Exec()
 // UPDATE employees
-//  SET emp_no=1000,
-//      birth_date='1965-04-04 00:00:00'
-//      first_name='Taro',
-//      last_name='Sato',
-//      gender='M',
-//      hire_date='1988-04-01';
+//  SET emp_no = 1000,
+//      birth_date = '1965-04-04 00:00:00'
+//      first_name = 'Taro',
+//      last_name = 'Sato',
+//      gender = 'M',
+//      hire_date = '1988-04-01';
 ```

@@ -150,10 +150,10 @@ err := mgorm.Delete(db).From("employees").
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
-    And("emp_no = ?", "Taro", "Sato").Exec()
+    And("emp_no = ?", 1002).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
-//      AND (first_name = 1002);
+//      AND (emp_no = 1002);
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).

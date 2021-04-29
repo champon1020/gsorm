@@ -932,3 +932,366 @@ func TestSelectStmt_Limit(t *testing.T) {
 		assert.Equal(t, testCase.Expected, actual)
 	}
 }
+
+func TestUpdateStmt_Set(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.UpdateStmt
+		Expected string
+	}{
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako'`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Set("last_name", "Suzuki").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako', last_name = 'Suzuki'`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestUpdateStmt_Where(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.UpdateStmt
+		Expected string
+	}{
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = 1001").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("first_name = ?", "Taro").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE first_name = 'Taro'`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE birth_date = '2006-01-02 00:00:00'`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("first_name LIKE ?", "%Taro").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE first_name LIKE '%Taro'`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no BETWEEN ? AND ?", 1001, 1003).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no BETWEEN 1001 AND 1003`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no IN (?)", []int{1001, 1002}).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no IN (1001, 1002)`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no IN (?)", [2]int{1001, 1002}).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no IN (1001, 1002)`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no IN (SELECT emp_no FROM dept_manager)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestUpdateStmt_And(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.UpdateStmt
+		Expected string
+	}{
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				And("emp_no = 1002").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`AND (emp_no = 1002)`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				And("emp_no = ?", 1002).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`AND (emp_no = 1002)`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				And("first_name = ? OR first_name = ?", "Taro", "Jiro").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`AND (first_name = 'Taro' OR first_name = 'Jiro')`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				And("emp_no = ?", 1002).
+				And("emp_no = ?", 1003).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`AND (emp_no = 1002) ` +
+				`AND (emp_no = 1003)`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`AND (birth_date = '2006-01-02 00:00:00')`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				And("first_name LIKE ?", "%Taro").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`AND (first_name LIKE '%Taro')`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				And("emp_no BETWEEN ? AND ?", 1001, 1003).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`AND (emp_no BETWEEN 1001 AND 1003)`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				And("emp_no IN (?)", []int{1001, 1002}).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`AND (emp_no IN (1001, 1002))`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				And("emp_no IN (?)", [2]int{1001, 1002}).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`AND (emp_no IN (1001, 1002))`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				And("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`AND (emp_no IN (SELECT emp_no FROM dept_manager))`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestUpdateStmt_Or(t *testing.T) {
+	testCases := []struct {
+		Stmt     *mgorm.UpdateStmt
+		Expected string
+	}{
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				Or("emp_no = 1002").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`OR (emp_no = 1002)`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				Or("emp_no = ?", 1002).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`OR (emp_no = 1002)`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				Or("first_name = ? OR first_name = ?", "Taro", "Jiro").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`OR (first_name = 'Taro' OR first_name = 'Jiro')`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				Or("emp_no = ?", 1002).
+				Or("emp_no = ?", 1003).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`OR (emp_no = 1002) ` +
+				`OR (emp_no = 1003)`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				Or("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`OR (birth_date = '2006-01-02 00:00:00')`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				Or("first_name LIKE ?", "%Taro").(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`OR (first_name LIKE '%Taro')`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				Or("emp_no BETWEEN ? AND ?", 1001, 1003).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`OR (emp_no BETWEEN 1001 AND 1003)`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				Or("emp_no IN (?)", []int{1001, 1002}).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`OR (emp_no IN (1001, 1002))`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				Or("emp_no IN (?)", [2]int{1001, 1002}).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`OR (emp_no IN (1001, 1002))`,
+		},
+		{
+			mgorm.Update(nil, "employees").
+				Set("first_name", "Hanako").
+				Where("emp_no = ?", 1001).
+				Or("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).(*mgorm.UpdateStmt),
+			`UPDATE employees SET first_name = 'Hanako' ` +
+				`WHERE emp_no = 1001 ` +
+				`OR (emp_no IN (SELECT emp_no FROM dept_manager))`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestUpdateStmt_Model(t *testing.T) {
+	type Employee struct {
+		ID        int `mgorm:"emp_no"`
+		FirstName string
+	}
+	structModel := Employee{ID: 1001, FirstName: "Taro"}
+	mapModel := map[string]interface{}{"emp_no": 1001, "first_name": "Taro"}
+
+	testCases := []struct {
+		Stmt     *mgorm.UpdateStmt
+		Expected string
+	}{
+		{
+			mgorm.Update(nil, "employees").Model(&structModel, "emp_no", "first_name").(*mgorm.UpdateStmt),
+			`UPDATE employees SET emp_no = 1001, first_name = 'Taro'`,
+		},
+		{
+			mgorm.Update(nil, "employees").Model(&mapModel, "emp_no", "first_name").(*mgorm.UpdateStmt),
+			`UPDATE employees SET emp_no = 1001, first_name = 'Taro'`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
