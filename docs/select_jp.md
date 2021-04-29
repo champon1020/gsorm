@@ -292,13 +292,6 @@ err := mgorm.Select(db).From("employees").
 
 err := mgorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
-    And("first_name = ?", "Taro").Query(&model)
-// SELECT * FROM employees
-//      WHERE emp_no = 1001
-//      AND (first_name = 'Taro');
-
-err := mgorm.Select(db).From("employees").
-    Where("emp_no = ?", 1001).
     And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
@@ -387,13 +380,6 @@ err := mgorm.Select(db).From("employees").
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002)
 //      OR (emp_no = 1003);
-
-err := mgorm.Select(db).From("employees").
-    Where("emp_no = ?", 1001).
-    Or("first_name = ?", "Taro").Query(&model)
-// SELECT * FROM employees
-//      WHERE emp_no = 1001
-//      OR (first_name = 'Taro');
 
 err := mgorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).

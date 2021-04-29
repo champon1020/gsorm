@@ -134,12 +134,6 @@ func TestDeleteStmt_And(t *testing.T) {
 		{
 			mgorm.Delete(nil).From("employees").
 				Where("emp_no = ?", 1001).
-				And("first_name = ?", "Taro").(*mgorm.DeleteStmt),
-			`DELETE FROM employees WHERE emp_no = 1001 AND (first_name = 'Taro')`,
-		},
-		{
-			mgorm.Delete(nil).From("employees").
-				Where("emp_no = ?", 1001).
 				And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*mgorm.DeleteStmt),
 			`DELETE FROM employees WHERE emp_no = 1001 AND (birth_date = '2006-01-02 00:00:00')`,
 		},
@@ -215,12 +209,6 @@ func TestDeleteStmt_Or(t *testing.T) {
 				Or("emp_no = ?", 1002).
 				Or("emp_no = ?", 1003).(*mgorm.DeleteStmt),
 			`DELETE FROM employees WHERE emp_no = 1001 OR (emp_no = 1002) OR (emp_no = 1003)`,
-		},
-		{
-			mgorm.Delete(nil).From("employees").
-				Where("emp_no = ?", 1001).
-				Or("first_name = ?", "Taro").(*mgorm.DeleteStmt),
-			`DELETE FROM employees WHERE emp_no = 1001 OR (first_name = 'Taro')`,
 		},
 		{
 			mgorm.Delete(nil).From("employees").
@@ -605,12 +593,6 @@ func TestSelectStmt_And(t *testing.T) {
 		{
 			mgorm.Select(nil).From("employees").
 				Where("emp_no = ?", 1001).
-				And("first_name = ?", "Taro").(*mgorm.SelectStmt),
-			`SELECT * FROM employees WHERE emp_no = 1001 AND (first_name = 'Taro')`,
-		},
-		{
-			mgorm.Select(nil).From("employees").
-				Where("emp_no = ?", 1001).
 				And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*mgorm.SelectStmt),
 			`SELECT * FROM employees WHERE emp_no = 1001 AND (birth_date = '2006-01-02 00:00:00')`,
 		},
@@ -686,12 +668,6 @@ func TestSelectStmt_Or(t *testing.T) {
 				Or("emp_no = ?", 1002).
 				Or("emp_no = ?", 1003).(*mgorm.SelectStmt),
 			`SELECT * FROM employees WHERE emp_no = 1001 OR (emp_no = 1002) OR (emp_no = 1003)`,
-		},
-		{
-			mgorm.Select(nil).From("employees").
-				Where("emp_no = ?", 1001).
-				Or("first_name = ?", "Taro").(*mgorm.SelectStmt),
-			`SELECT * FROM employees WHERE emp_no = 1001 OR (first_name = 'Taro')`,
 		},
 		{
 			mgorm.Select(nil).From("employees").

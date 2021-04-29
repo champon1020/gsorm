@@ -36,7 +36,7 @@ mgorm.Insert(db, "employees", "emp_no", "first_name").
 {} repetition (0 to n times)
 
 mgorm.Insert
-    [.Values {.Values} | .Select | .Model]
+    (.Values {.Values}) | .Select | .Model
     .Exec
 ```
 
