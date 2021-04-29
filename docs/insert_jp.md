@@ -1,78 +1,102 @@
 # Insert
-`mgorm.Insert`を使用したとき，`Exec`を呼び出すことでテーブルにカラムを挿入することができます．
+`mgorm.Insert`はINSERT句を呼び出します．
+
+引数にはデータベースのコネクション(`mgorm.Conn`)，テーブル名，カラム名を指定します．
+
+カラム名は複数指定することができます．
+カラム名は空でも問題ありません．
 
 #### 例
 ```go
 mgorm.Insert(db, "employees").
-    Values(1000, "1996-03-09", "Taro", "Sato", "M", "2020-04-01").Exec()
+    Values(1001, "1996-03-09", "Taro", "Sato", "M", "2020-04-01").Exec()
 // INSERT INTO employees
-//  VALUES (1000, '1996-03-09', 'Taro', 'Sato', 'M', '2020-04-01');
+//      VALUES (1001, '1996-03-09', 'Taro', 'Sato', 'M', '2020-04-01');
 
 mgorm.Insert(db, "employees", "emp_no", "first_name").
-    Values(1000, "Taro").Exec()
+    Values(1001, "Taro").Exec()
 // INSERT INTO employees (emp_no, first_name)
-//  VALUES (1000, 'Taro');
+//      VALUES (1001, 'Taro');
 ```
 
 
 # Methods
-`mgorm.Insert`で使用できるメソッドを以下に示します．
+`mgorm.Insert`に使用できるメソッドは以下です．
 
 - [Values](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#values)
 - [Select](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#select)
 - [Model](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#model)
 
-```
-[]: optional, |: or, {}: block, **: able to use many times
+これらのメソッドは以下のEBNFに従って実行することができます．
 
-mgorm.Insert(DB, table, columns...)
-    {.Values(values...)** | .Select(*mgorm.SelectStmt) | .Model(model)}
-    .Exec()
+```
+| alternation
+() grouping
+[] option (0 to 1 times)
+{} repetition (0 to n times)
+
+mgorm.Insert
+    (.Values {.Values}) | .Select | .Model
+    .Exec
+```
+
+例えば以下の実装はコンパイルエラーを吐き出します．
+
+```go
+// NG
+err := mgorm.Insert(db).Exec()
+
+// NG
+err := mgorm.Insert(db).
+    Model(model1).
+    Model(model2).Exec()
 ```
 
 
 ## Values
-`mgorm.Insert`を用いてカラムを挿入するとき，`Values`を用いることで値を挿入することができます．
-`Values`は連続で複数回使用することができます．
+`Values`はVALUES句を呼び出します．
+
+引数には複数値を指定します．
+
+`Values`は複数回呼び出すことができます．
 
 #### 例
 ```go
-mgorm.Insert(db, "employees", "emp_no", "first_name").
-    Values(1000, "Taro").Exec()
+err := mgorm.Insert(db, "employees", "emp_no", "first_name").
+    Values(1001, "Taro").Exec()
 // INSERT INTO employees (emp_no, first_name)
-//  VALUES (1000, 'Taro');
+//      VALUES (1001, 'Taro');
 
-mgorm.Insert(db, "employees", "emp_no", "first_name").
-    Values(1000, "Taro").Values(2000, "Jiro").Exec()
+err := mgorm.Insert(db, "employees", "emp_no", "first_name").
+    Values(1001, "Taro").
+    Values(1002, "Jiro").Exec()
 // INSERT INTO employees (emp_no, first_name)
-//  VALUES (1000, 'Taro'), (2000, 'Jiro');
+//      VALUES (1001, 'Taro'), (1002, 'Jiro');
 ```
 
 
 ## Select
-`Select`を用いることでINSERT INTO ... SELECTという文を実行することができます．
-これは`mgorm.Select`とは異なる関数(メソッド)です．
+`Select`はINSERT INTO ... SELECT構文を呼び出します．
 
-`Select`は引数に`mgorm.SelectStmt`を受け取ります．
+引数には`mgorm.SelectStmt`を指定します．
 
 #### 例
 ```go
-mgorm.Insert(db, "dept_manager").
+err := mgorm.Insert(db, "dept_manager").
     Select(mgorm.Select(nil).From("dept_emp")).Exec()
 // INSERT INTO dept_manager
-//  SELECT * FROM dept_emp;
+//      SELECT * FROM dept_emp;
 ```
 
 
 ## Model
-`mgorm.Insert`を使用すとき，`Model`を使用することで構造体をマッピングしてカラムを挿入することができます．
+`Model`は構造体をマッピングします．
 
-`Model`は引数として構造体のポインタ，構造体スライスのポインタ，マップ型のポインタなどを受け取ることができます．
+引数には構造体のポインタ，マップのポインタ，構造体のスライスのポインタ，マップのスライスのポインタ，事前定義型のスライスのポインタのいずれかを指定します．
 
-また，フィールドタグを変更することで対応するカラム名を変更することができます．
-指定しない場合は，フィールド名のスネークケースとなります．
+構造体もしくは構造体のスライスをマッピングする際，対象のカラム名はフィールド名もしくはフィールドタグから推定されます．
 
-Modelの型やタグについての詳細は[Model]()に記載されています．
+Modelについての詳細は[Model](https://github.com/champon1020/mgorm/blob/main/docs/model_jp.md)に記載されています．
 
 #### 例
 ```go
@@ -81,10 +105,10 @@ type Employee struct {
     FirstName string
 }
 
-employees := []Employee{{ID: 1000, FirstName: "Taro"}, {ID: 2000, FirstName: "Jiro"}}
+employees := []Employee{{ID: 1001, FirstName: "Taro"}, {ID: 1002, FirstName: "Jiro"}}
 
-mgorm.Insert(db, "employees", "emp_no", "first_name").
+err := mgorm.Insert(db, "employees", "emp_no", "first_name").
     Model(&employees).Exec()
 // INSERT INTO employees (emp_no, first_name)
-//  VALUES (1000, 'Taro'), (2000, 'Jiro');
+//  VALUES (1001, 'Taro'), (1002, 'Jiro');
 ```

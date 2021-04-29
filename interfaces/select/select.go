@@ -7,22 +7,22 @@ import (
 
 // Stmt is interface which is returned by mgorm.Select.
 type Stmt interface {
-	From(...string) From
+	From(tables ...string) From
 }
 
 // From is interface which is returned by (*SelectStmt).From.
 type From interface {
-	Join(string) Join
-	LeftJoin(string) Join
-	RightJoin(string) Join
-	FullJoin(string) Join
-	Where(string, ...interface{}) Where
-	GroupBy(...string) GroupBy
-	Having(string, ...interface{}) Having
-	OrderBy(...string) OrderBy
-	Limit(int) Limit
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
+	Join(table string) Join
+	LeftJoin(table string) Join
+	RightJoin(table string) Join
+	FullJoin(table string) Join
+	Where(expr string, vals ...interface{}) Where
+	GroupBy(cols ...string) GroupBy
+	Having(expr string, vals ...interface{}) Having
+	OrderBy(cols ...string) OrderBy
+	Limit(limit int) Limit
+	Union(selectStmt syntax.Stmt) Union
+	UnionAll(selectStmt syntax.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -106,6 +106,7 @@ type Having interface {
 
 // OrderBy is interface which is returned by (*SelectStmt).OrderBy.
 type OrderBy interface {
+	OrderBy(...string) OrderBy
 	Limit(int) Limit
 	interfaces.QueryCallable
 }

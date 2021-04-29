@@ -38,11 +38,11 @@ func TestUnion_Build(t *testing.T) {
 	}{
 		{
 			&clause.Union{Stmt: mgorm.Select(nil, "*").From("table")},
-			&syntax.StmtSet{Keyword: "UNION", Value: "SELECT * FROM table"},
+			&syntax.StmtSet{Keyword: "UNION", Value: "(SELECT * FROM table)"},
 		},
 		{
 			&clause.Union{Stmt: mgorm.Select(nil, "*").From("table"), All: true},
-			&syntax.StmtSet{Keyword: "UNION ALL", Value: "SELECT * FROM table"},
+			&syntax.StmtSet{Keyword: "UNION ALL", Value: "(SELECT * FROM table)"},
 		},
 	}
 

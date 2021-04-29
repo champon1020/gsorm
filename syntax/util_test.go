@@ -51,7 +51,7 @@ func TestBuildExpr(t *testing.T) {
 			"lhs BETWEEN 10 AND 100",
 		},
 		{
-			"IN ?",
+			"IN (?)",
 			[]interface{}{mgorm.Select(nil, "*").
 				From("table").
 				Where("lhs = ?", "rhs")},

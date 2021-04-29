@@ -30,6 +30,6 @@ func (u *Union) String() string {
 func (u *Union) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(u.Name())
-	ss.WriteValue(u.Stmt.String())
+	ss.WriteValue(fmt.Sprintf("(%s)", u.Stmt.String()))
 	return ss, nil
 }

@@ -6,9 +6,9 @@ import (
 
 // Stmt is interface which is returned by mgorm.Insert.
 type Stmt interface {
-	Model(interface{}) Model
-	Select(interfaces.QueryCallable) Select
-	Values(...interface{}) Values
+	Model(model interface{}) Model
+	Select(selectStmt interfaces.QueryCallable) Select
+	Values(vals ...interface{}) Values
 }
 
 // Model is interface which is returned by (*InsertStmt).Model.
@@ -23,6 +23,6 @@ type Select interface {
 
 // Values is interface which is returned by (*InsertStmt).Values.
 type Values interface {
-	Values(...interface{}) Values
+	Values(vals ...interface{}) Values
 	interfaces.ExecCallable
 }
