@@ -261,67 +261,83 @@ err := mgorm.Select(db).From("employees").
 #### 例
 ```go
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     And("emp_no = 1002").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      AND emp_no = 1002;
+//      AND (emp_no = 1002);
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     And("emp_no = ?", 1002).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      AND emp_no = 1002;
+//      AND (emp_no = 1002);
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
+    And("first_name = ? OR first_name = ?", "Taro", "Jiro").Query(&model)
+// SELECT * FROM employees
+//      WHERE emp_no = 1001
+//      AND (first_name = 'Taro' OR first_name = 'Jiro');
+
+err := mgorm.Select(db).From("employees").
+    Where("emp_no = ?", 1001).
+    And("emp_no = ?", 1002).
+    And("emp_no = ?", 1003).Exec()
+// SELECT * FROM employees
+//      WHERE emp_no = 1001
+//      AND (emp_no = 1002);
+//      AND (emp_no = 1003);
+
+err := mgorm.Select(db).From("employees").
+    Where("emp_no = ?", 1001).
     And("first_name = ?", "Taro").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      AND first_name = 'Taro';
+//      AND (first_name = 'Taro');
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      AND birth_date = '2006-01-02 00:00:00';
+//      AND (birth_date = '2006-01-02 00:00:00');
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     And("first_name LIKE ?", "%Taro").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      AND first_name LIKE '%Taro';
+//      AND (first_name LIKE '%Taro');
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     And("birth_date BETWEEN ? AND ?", 1001, 1002).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      AND emp_no BETWEEN 1001 AND 1002;
+//      AND (emp_no BETWEEN 1001 AND 1002);
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     And("emp_no IN (?)", []int{1001, 1002}).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      AND emp_no IN (1001, 1002);
+//      AND (emp_no IN (1001, 1002));
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     And("emp_no IN (?)", [2]int{1001, 1002}).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      AND emp_no IN (1001, 1002);
+//      AND (emp_no IN (1001, 1002));
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     And("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      AND emp_no IN (SELECT emp_no FROM dept_manager);
+//      AND (emp_no IN (SELECT emp_no FROM dept_manager));
 ```
 
 
@@ -343,67 +359,83 @@ err := mgorm.Select(db).From("employees").
 #### 例
 ```go
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     Or("emp_no = 1002").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      OR emp_no = 1002;
+//      OR (emp_no = 1002);
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     Or("emp_no = ?", 1002).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      OR emp_no = 1002;
+//      OR (emp_no = 1002);
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
+    Or("emp_no = ? AND first_name = ?", 1002, "Taro").Query(&model)
+// SELECT * FROM employees
+//      WHERE emp_no = 1001
+//      OR (emp_no = 1002 AND first_name = 'Taro');
+
+err := mgorm.Select(db).From("employees").
+    Where("emp_no = ?", 1001).
+    Or("emp_no = ?", 1002).
+    Or("emp_no = ?", 1003).Exec()
+// SELECT * FROM employees
+//      WHERE emp_no = 1001
+//      OR (emp_no = 1002)
+//      OR (emp_no = 1003);
+
+err := mgorm.Select(db).From("employees").
+    Where("emp_no = ?", 1001).
     Or("first_name = ?", "Taro").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      OR first_name = 'Taro';
+//      OR (first_name = 'Taro');
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     Or("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      OR birth_date = '2006-01-02 00:00:00';
+//      OR (birth_date = '2006-01-02 00:00:00');
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     Or("first_name LIKE ?", "%Taro").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      OR first_name LIKE '%Taro';
+//      OR (first_name LIKE '%Taro');
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     Or("birth_date BETWEEN ? AND ?", 1001, 1002).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      OR emp_no BETWEEN 1001 AND 1002;
+//      OR (emp_no BETWEEN 1001 AND 1002);
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     Or("emp_no IN (?)", []int{1001, 1002}).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      OR emp_no IN (1001, 1002);
+//      OR (emp_no IN (1001, 1002));
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     Or("emp_no IN (?)", [2]int{1001, 1002}).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      OR emp_no IN (1001, 1002);
+//      OR (emp_no IN (1001, 1002));
 
 err := mgorm.Select(db).From("employees").
-    Where("emp_no = 1001").
+    Where("emp_no = ?", 1001).
     Or("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
-//      OR emp_no IN (SELECT emp_no FROM dept_manager);
+//      OR (emp_no IN (SELECT emp_no FROM dept_manager));
 ```
 
 

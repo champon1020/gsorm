@@ -70,8 +70,12 @@ err := mgorm.Delete(db).From("employees AS e").Exec()
 ## Where
 `Where`はWHERE句を呼び出します．
 
-第1引数に条件式，第2引数に値を指定できます．
-この際，条件式における`?`に値が代入されます．
+第1引数に条件式，第2引数以降に複数値を指定できます． この際，条件式における`?`に値が代入されます． また，代入規則は以下に従います．
+
+- 値がstring型もしくはtime.Time型の場合，値はシングルクオートで囲まれます．
+- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
+- 値が*mgorm.SelectStmt型の場合，SELECT文が展開されます．
+- 以上の条件に該当しない値はそのまま展開される．
 
 #### 例
 ```go
@@ -84,6 +88,41 @@ err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001;
+
+err := mgorm.Delete(db).From("employees").
+    Where("first_name = ?", "Taro").Query(&model)
+// DELETE FROM employees
+//      WHERE first_name = 'Taro';
+
+err := mgorm.Delete(db).From("employees").
+    Where("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
+// DELETE FROM employees
+//      WHERE birth_date = '2006-01-02 00:00:00';
+
+err := mgorm.Delete(db).From("employees").
+    Where("first_name LIKE ?", "%Taro").Query(&model)
+// DELETE FROM employees
+//      WHERE first_name LIKE '%Taro';
+
+err := mgorm.Delete(db).From("employees").
+    Where("birth_date BETWEEN ? AND ?", 1001, 1002).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no BETWEEN 1001 AND 1002;
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no IN (?)", []int{1001, 1002}).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no IN (1001, 1002);
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no IN (?)", [2]int{1001, 1002}).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no IN (1001, 1002);
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no IN (SELECT emp_no FROM dept_manager);
 ```
 
 
@@ -91,8 +130,12 @@ err := mgorm.Delete(db).From("employees").
 `And`はAND句を呼び出します．
 このとき実行されるSQLは，条件式が`()`で括られた形となります．
 
-第1引数に条件式，第2引数に値を指定できます．
-この際，条件式における`?`に値が代入されます．
+第1引数に条件式，第2引数以降に複数値を指定できます． この際，条件式における`?`に値が代入されます． また，代入規則は以下に従います．
+
+- 値がstring型もしくはtime.Time型の場合，値はシングルクオートで囲まれます．
+- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
+- 値が*mgorm.SelectStmt型の場合，SELECT文が展開されます．
+- 以上の条件に該当しない値はそのまま展開される．
 
 `And`は複数回呼び出すことができます．
 
@@ -100,26 +143,82 @@ err := mgorm.Delete(db).From("employees").
 ```go
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
-    And("first_name = ?", "Taro").Exec()
+    And("emp_no = 1002").Exec()
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      AND (emp_no = 1002);
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    And("emp_no = ?", "Taro", "Sato").Exec()
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      AND (first_name = 1002);
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    And("first_name = ? OR first_name = ?", "Taro", "Jiro").Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      AND (first_name = 'Taro' OR first_name = 'Jiro');
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    And("emp_no = ?", 1002).
+    And("emp_no = ?", 1003).Exec()
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      AND (emp_no = 1002);
+//      AND (emp_no = 1003);
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    And("first_name = ?", "Taro").Query(&model)
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      AND (first_name = 'Taro');
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
-    And("first_name = ? OR last_name = ?", "Taro", "Sato").Exec()
+    And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
 // DELETE FROM employees
 //      WHERE emp_no = 1001
-//      AND (first_name = 'Taro' OR last_name = 'Sato');
+//      AND (birth_date = '2006-01-02 00:00:00');
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
-    And("first_name = ?", "Taro").
-    And("last_name = ?", "Sato").Exec()
+    And("first_name LIKE ?", "%Taro").Query(&model)
 // DELETE FROM employees
 //      WHERE emp_no = 1001
-//      AND (first_name = 'Taro');
-//      AND (last_name = 'Sato');
+//      AND (first_name LIKE '%Taro');
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    And("birth_date BETWEEN ? AND ?", 1001, 1002).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      AND (emp_no BETWEEN 1001 AND 1002);
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    And("emp_no IN (?)", []int{1001, 1002}).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      AND (emp_no IN (1001, 1002));
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    And("emp_no IN (?)", [2]int{1001, 1002}).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      AND (emp_no IN (1001, 1002));
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    And("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      AND (emp_no IN (SELECT emp_no FROM dept_manager));
 ```
 
 
@@ -127,8 +226,12 @@ err := mgorm.Delete(db).From("employees").
 `Or`はOR句を呼び出します．
 このとき実行されるSQLは，条件式が`()`で括られた形となります．
 
-第1引数に条件式，第2引数に値を指定できます．
-この際，条件式における`?`に値が代入されます．
+第1引数に条件式，第2引数以降に複数値を指定できます． この際，条件式における`?`に値が代入されます． また，代入規則は以下に従います．
+
+- 値がstring型もしくはtime.Time型の場合，値はシングルクオートで囲まれます．
+- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
+- 値が*mgorm.SelectStmt型の場合，SELECT文が展開されます．
+- 以上の条件に該当しない値はそのまま展開される．
 
 `Or`は複数回呼び出すことができます．
 
@@ -136,17 +239,24 @@ err := mgorm.Delete(db).From("employees").
 ```go
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
-    Or("emp_no = ?", 1002).Exec()
+    Or("emp_no = 1002").Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002);
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
-    Or("emp_no = ? AND first_name = ?", 1002, "Taro").Exec()
+    Or("emp_no = ?", 1002).Exec()
 // DELETE FROM employees
 //  WHERE emp_no = 1001
-//  OR (emp_no = 1002 AND first_name = 'Taro');
+//  OR (emp_no = 1002);
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    Or("emp_no = ? AND first_name = ?", 1002, "Taro").Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      OR (emp_no = 1002 AND first_name = 'Taro');
 
 err := mgorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
@@ -156,4 +266,53 @@ err := mgorm.Delete(db).From("employees").
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002)
 //      OR (emp_no = 1003);
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    Or("first_name = ?", "Taro").Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      OR (first_name = 'Taro');
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    Or("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      OR (birth_date = '2006-01-02 00:00:00');
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    Or("first_name LIKE ?", "%Taro").Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      OR (first_name LIKE '%Taro');
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    Or("birth_date BETWEEN ? AND ?", 1001, 1002).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      OR (emp_no BETWEEN 1001 AND 1002);
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    Or("emp_no IN (?)", []int{1001, 1002}).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      OR (emp_no IN (1001, 1002));
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    Or("emp_no IN (?)", [2]int{1001, 1002}).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      OR (emp_no IN (1001, 1002));
+
+err := mgorm.Delete(db).From("employees").
+    Where("emp_no = ?", 1001).
+    Or("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
+// DELETE FROM employees
+//      WHERE emp_no = 1001
+//      OR (emp_no IN (SELECT emp_no FROM dept_manager));
 ```
