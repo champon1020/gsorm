@@ -1,9 +1,9 @@
 package mgorm
 
 import (
-	"database/sql"
 	"fmt"
 
+	"github.com/champon1020/mgorm/database"
 	ifaltertable "github.com/champon1020/mgorm/interfaces/altertable"
 	ifcreatedb "github.com/champon1020/mgorm/interfaces/createdb"
 	ifcreateindex "github.com/champon1020/mgorm/interfaces/createindex"
@@ -15,178 +15,116 @@ import (
 	ifinsert "github.com/champon1020/mgorm/interfaces/insert"
 	ifselect "github.com/champon1020/mgorm/interfaces/select"
 	ifupdate "github.com/champon1020/mgorm/interfaces/update"
-	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax/clause"
-	"github.com/champon1020/mgorm/syntax/mig"
+	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/mgorm/statement/migration"
 )
 
-// New creates DB.
-func New(dn, dsn string) (*DB, error) {
-	db, err := sql.Open(dn, dsn)
-	if err != nil {
-		return nil, err
-	}
-	if dn == "psql" {
-		return &DB{conn: db, driver: internal.PSQL}, nil
-	}
-	return &DB{conn: db, driver: internal.MySQL}, nil
+// Open opens the database connection.
+func Open(dn, dsn string) (database.DB, error) {
+	return database.NewDB(dn, dsn)
 }
 
-// NewMock creates MockDB.
-func NewMock() *MockDB {
-	mock := new(MockDB)
-	return mock
+// OpenMock opens the mock database connection.
+func OpenMock() database.MockDB {
+	return database.NewMockDB()
 }
 
 // Select calls SELECT command.
-func Select(conn Conn, cols ...string) ifselect.Stmt {
-	sel := new(clause.Select)
-	if len(cols) == 0 {
-		sel.AddColumns("*")
-	} else {
-		sel.AddColumns(cols...)
-	}
-	s := &SelectStmt{cmd: sel}
-	s.conn = conn
-	return s
+func Select(conn database.Conn, cols ...string) ifselect.Stmt {
+	return statement.NewSelectStmt(conn, cols...)
 }
 
 // Insert calls INSERT command.
-func Insert(conn Conn, table string, cols ...string) ifinsert.Stmt {
-	i := new(clause.Insert)
-	i.AddTable(table)
-	i.AddColumns(cols...)
-	s := &InsertStmt{cmd: i}
-	s.conn = conn
-	return s
+func Insert(conn database.Conn, table string, cols ...string) ifinsert.Stmt {
+	return statement.NewInsertStmt(conn, table, cols...)
 }
 
 // Update calls UPDATE command.
-func Update(conn Conn, table string) ifupdate.Stmt {
-	u := new(clause.Update)
-	u.AddTable(table)
-	s := &UpdateStmt{cmd: u}
-	s.conn = conn
-	return s
+func Update(conn database.Conn, table string) ifupdate.Stmt {
+	return statement.NewUpdateStmt(conn, table)
 }
 
 // Delete calls DELETE command.
-func Delete(conn Conn) ifdelete.Stmt {
-	s := &DeleteStmt{cmd: &clause.Delete{}}
-	s.conn = conn
-	return s
+func Delete(conn database.Conn) ifdelete.Stmt {
+	return statement.NewDeleteStmt(conn)
 }
 
 // Count calls COUNT function.
-func Count(conn Conn, col string, alias ...string) ifselect.Stmt {
+func Count(conn database.Conn, col string, alias ...string) ifselect.Stmt {
 	c := fmt.Sprintf("COUNT(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	sel := new(clause.Select)
-	sel.AddColumns(c)
-	s := &SelectStmt{cmd: sel}
-	s.conn = conn
-	return s
+	return statement.NewSelectStmt(conn, c)
 }
 
 // Avg calls AVG function.
-func Avg(conn Conn, col string, alias ...string) ifselect.Stmt {
+func Avg(conn database.Conn, col string, alias ...string) ifselect.Stmt {
 	c := fmt.Sprintf("AVG(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	sel := new(clause.Select)
-	sel.AddColumns(c)
-	s := &SelectStmt{cmd: sel}
-	s.conn = conn
-	return s
+	return statement.NewSelectStmt(conn, c)
 }
 
 // Sum calls SUM function.
-func Sum(conn Conn, col string, alias ...string) ifselect.Stmt {
+func Sum(conn database.Conn, col string, alias ...string) ifselect.Stmt {
 	c := fmt.Sprintf("SUM(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	sel := new(clause.Select)
-	sel.AddColumns(c)
-	s := &SelectStmt{cmd: sel}
-	s.conn = conn
-	return s
+	return statement.NewSelectStmt(conn, c)
 }
 
 // Min calls MIN function.
-func Min(conn Conn, col string, alias ...string) ifselect.Stmt {
+func Min(conn database.Conn, col string, alias ...string) ifselect.Stmt {
 	c := fmt.Sprintf("MIN(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	sel := new(clause.Select)
-	sel.AddColumns(c)
-	s := &SelectStmt{cmd: sel}
-	s.conn = conn
-	return s
+	return statement.NewSelectStmt(conn, c)
 }
 
 // Max calls MAX function.
-func Max(conn Conn, col string, alias ...string) ifselect.Stmt {
+func Max(conn database.Conn, col string, alias ...string) ifselect.Stmt {
 	c := fmt.Sprintf("MAX(%s)", col)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
-	sel := new(clause.Select)
-	sel.AddColumns(c)
-	s := &SelectStmt{cmd: sel}
-	s.conn = conn
-	return s
+	return statement.NewSelectStmt(conn, c)
 }
 
 // CreateDB calls CREATE DATABASE command.
-func CreateDB(conn Conn, dbName string) ifcreatedb.DB {
-	s := &CreateDBStmt{cmd: &mig.CreateDB{DBName: dbName}}
-	s.conn = conn
-	return s
+func CreateDB(conn database.Conn, dbName string) ifcreatedb.DB {
+	return migration.NewCreateDBStmt(conn, dbName)
 }
 
 // CreateIndex calls CREATE INDEX command.
-func CreateIndex(conn Conn, idx string) ifcreateindex.Index {
-	s := &CreateIndexStmt{cmd: &mig.CreateIndex{IdxName: idx}}
-	s.conn = conn
-	return s
+func CreateIndex(conn database.Conn, idx string) ifcreateindex.Index {
+	return migration.NewCreateIndexStmt(conn, idx)
 }
 
 // CreateTable calls CREATE TABLE command.
-func CreateTable(conn Conn, table string) ifcreatetable.Table {
-	s := &CreateTableStmt{cmd: &mig.CreateTable{Table: table}}
-	s.conn = conn
-	return s
+func CreateTable(conn database.Conn, table string) ifcreatetable.Table {
+	return migration.NewCreateTableStmt(conn, table)
 }
 
 // DropDB calls DROP DATABASE command.
-func DropDB(conn Conn, dbName string) ifdropdb.DB {
-	s := &DropDBStmt{cmd: &mig.DropDB{DBName: dbName}}
-	s.conn = conn
-	return s
+func DropDB(conn database.Conn, dbName string) ifdropdb.DB {
+	return migration.NewDropDBStmt(conn, dbName)
 }
 
 // DropIndex calls DROP INDEX command.
-func DropIndex(conn Conn, idx string) ifdropindex.Index {
-	s := &DropIndexStmt{cmd: &mig.DropIndex{IdxName: idx}}
-	s.conn = conn
-	return s
+func DropIndex(conn database.Conn, idx string) ifdropindex.Index {
+	return migration.NewDropIndexStmt(conn, idx)
 }
 
 // DropTable calls DROP TABLE command.
-func DropTable(conn Conn, table string) ifdroptable.Table {
-	s := &DropTableStmt{cmd: &mig.DropTable{Table: table}}
-	s.conn = conn
-	return s
+func DropTable(conn database.Conn, table string) ifdroptable.Table {
+	return migration.NewDropTableStmt(conn, table)
 }
 
 // AlterTable calls ALTER TABLE command.
-func AlterTable(conn Conn, table string) ifaltertable.Table {
-	s := &AlterTableStmt{cmd: &mig.AlterTable{Table: table}}
-	s.conn = conn
-	return s
+func AlterTable(conn database.Conn, table string) ifaltertable.Table {
+	return migration.NewAlterTableStmt(conn, table)
 }
