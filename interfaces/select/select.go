@@ -106,6 +106,7 @@ type Having interface {
 
 // OrderBy is interface which is returned by (*SelectStmt).OrderBy.
 type OrderBy interface {
+	OrderBy(...string) OrderBy
 	Limit(int) Limit
 	interfaces.QueryCallable
 }

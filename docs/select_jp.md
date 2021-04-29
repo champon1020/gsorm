@@ -91,7 +91,7 @@ err := mgorm.Select(db, "e.emp_no").From("employees AS e").Query(&model)
 // SELECT e.emp_no FROM employees AS e;
 
 err := mgorm.Select(db, "e.emp_no").From("employees as e").Query(&model)
-// SELECT e.emp_no FROM employees as e;
+// SELECT e.emp_no FROM employees AS e;
 
 err := mgorm.Select(db, "emp_no", "dept_no").From("employees", "departments").Query(&model)
 // SELECT emp_no, dept_no FROM employees, departments;
@@ -533,8 +533,8 @@ err := mgorm.Select(db).From("employees").
 ```go
 mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
     Union(mgorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
-// SELECT * FROM employees
-//      UNION (SELECT * FROM departments);
+// SELECT emp_no, dept_no FROM dept_manager
+//      UNION (SELECT emp_no, dept_no FROM dept_emp);
 ```
 
 
@@ -547,8 +547,8 @@ mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 ```go
 mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
     UnionAll(mgorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
-// SELECT * FROM employees
-//  UNION ALL (SELECT * FROM departments);
+// SELECT emp_no, dept_no FROM dept_manager
+//  UNION ALL (SELECT emp_no, dept_no FROM dept_emp);
 ```
 
 
@@ -567,14 +567,14 @@ err := mgorm.Select(db).From("employees").
 //      ORDER BY birth_date;
 
 err := mgorm.Select(db).From("employees").
-    OrderBy("hire_date DESC").Query(&model)
+    OrderBy("birth_date DESC").Query(&model)
 // SELECT * FROM employees
-//      ORDER BY hire_date DESC;
+//      ORDER BY birth_date DESC;
 
 err := mgorm.Select(db).From("employees").
-    OrderBy("hire_date desc").Query(&model)
+    OrderBy("birth_date desc").Query(&model)
 // SELECT * FROM employees
-//      ORDER BY hire_date desc;
+//      ORDER BY birth_date desc;
 
 err := mgorm.Select(db).From("employees").
     OrderBy("birth_date").
