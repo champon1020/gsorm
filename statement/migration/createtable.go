@@ -236,7 +236,7 @@ func (s *CreateTableStmt) Foreign(cols ...string) ifc.Foreign {
 }
 
 // Ref calls REFERENCES keyword.
-func (s *CreateTableStmt) Ref(table, col string) ifc.Ref {
-	s.call(&mig.Ref{Table: table, Column: col})
+func (s *CreateTableStmt) Ref(table string, cols ...string) ifc.Ref {
+	s.call(&mig.Ref{Table: table, Columns: cols})
 	return s
 }

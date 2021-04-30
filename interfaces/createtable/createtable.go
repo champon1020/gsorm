@@ -58,7 +58,7 @@ type Primary interface {
 
 // Foreign is interface which is returned by (*CreateTableStmt).Foreign.
 type Foreign interface {
-	Ref(string, string) Ref
+	Ref(string, ...string) Ref
 }
 
 // Ref is interface which is returned by (*CreateTableStmt).Ref.

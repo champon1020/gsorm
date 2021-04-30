@@ -13,7 +13,7 @@ import (
 func TestCreateTable_String(t *testing.T) {
 	type Model struct {
 		ID          int       `mgorm:"notnull=t,pk=PK_id"`
-		CountryCode string    `mgorm:"typ=CHAR(3),notnull=t,default='0',fk=FK_country_code:country(code)"`
+		CountryCode string    `mgorm:"typ=CHAR(3),notnull=t,default='0',fk=FK_country_code:country (code)"`
 		Name        string    `mgorm:"typ=VARCHAR(16),notnull=t,default='anonymous',uc=UC_name"`
 		Nickname    string    `mgorm:"typ=VARCHAR(32),uc=UC_name"`
 		BirthDate   time.Time `mgorm:"notnull=t"`
@@ -43,7 +43,7 @@ func TestCreateTable_String(t *testing.T) {
 				`birth_date DATE NOT NULL, ` +
 				`CONSTRAINT UC_name UNIQUE (name, nickname), ` +
 				`CONSTRAINT PK_id PRIMARY KEY (id), ` +
-				`CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country(code)` +
+				`CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country (code)` +
 				`)`,
 		},
 		{
@@ -57,7 +57,7 @@ func TestCreateTable_String(t *testing.T) {
 				`birth_date DATE NOT NULL, ` +
 				`CONSTRAINT UC_name UNIQUE (name, nickname), ` +
 				`CONSTRAINT PK_id PRIMARY KEY (id), ` +
-				`CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country(code)` +
+				`CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country (code)` +
 				`)`,
 		},
 	}
