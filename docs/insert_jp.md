@@ -8,12 +8,12 @@
 
 #### 例
 ```go
-mgorm.Insert(db, "employees").
+err := mgorm.Insert(db, "employees").
     Values(1001, "1996-03-09", "Taro", "Sato", "M", "2020-04-01").Exec()
 // INSERT INTO employees
 //      VALUES (1001, '1996-03-09', 'Taro', 'Sato', 'M', '2020-04-01');
 
-mgorm.Insert(db, "employees", "emp_no", "first_name").
+err := mgorm.Insert(db, "employees", "emp_no", "first_name").
     Values(1001, "Taro").Exec()
 // INSERT INTO employees (emp_no, first_name)
 //      VALUES (1001, 'Taro');
