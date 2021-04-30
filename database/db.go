@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/morikuni/failure"
 )
 
@@ -20,38 +20,28 @@ type sqlDB interface {
 	Begin() (*sql.Tx, error)
 }
 
-// DB is the interface of database.
-type DB interface {
-	Conn
-	SetConnMaxLifetime(n time.Duration) error
-	SetMaxIdleConns(n int) error
-	SetMaxOpenConns(n int) error
-	Close() error
-	Begin() (Tx, error)
-}
-
 // db is a database handle representing a pool of zero or more underlying connections.
 // It's safe for concurrent use by multiple goroutines.
 type db struct {
 	conn   sqlDB
-	Driver internal.SQLDriver
+	driver SQLDriver
 }
 
 // NewDB creates the DB instance.
-func NewDB(dn, dsn string) (DB, error) {
+func NewDB(dn, dsn string) (domain.DB, error) {
 	d, err := sql.Open(dn, dsn)
 	if err != nil {
 		return nil, err
 	}
 	if dn == "psql" {
-		return &db{conn: d, Driver: internal.PSQL}, nil
+		return &db{conn: d, driver: PsqlDriver}, nil
 	}
-	return &db{conn: d, Driver: internal.MySQL}, nil
+	return &db{conn: d, driver: MysqlDriver}, nil
 }
 
 // GetDriver returns sql driver.
-func (d *db) GetDriver() internal.SQLDriver {
-	return d.Driver
+func (d *db) GetDriver() int {
+	return int(d.driver)
 }
 
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.
@@ -115,7 +105,7 @@ func (d *db) Close() error {
 }
 
 // Begin starts a transaction. The default isolation level is dependent on the driver.
-func (d *db) Begin() (Tx, error) {
+func (d *db) Begin() (domain.Tx, error) {
 	if d.conn == nil {
 		return nil, failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
 	}

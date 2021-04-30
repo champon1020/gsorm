@@ -3,7 +3,7 @@ package migration
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/morikuni/failure"
@@ -17,7 +17,7 @@ type DropIndexStmt struct {
 	cmd *mig.DropIndex
 }
 
-func NewDropIndexStmt(conn database.Conn, idx string) *DropIndexStmt {
+func NewDropIndexStmt(conn domain.Conn, idx string) *DropIndexStmt {
 	stmt := &DropIndexStmt{cmd: &mig.DropIndex{IdxName: idx}}
 	stmt.conn = conn
 	return stmt

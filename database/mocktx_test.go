@@ -6,6 +6,7 @@ import (
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/database"
 	"github.com/google/go-cmp/cmp"
+	"github.com/morikuni/failure"
 )
 
 func TestMock_TransactionExpectation(t *testing.T) {
@@ -79,5 +80,151 @@ func TestMock_TransactionExpectation(t *testing.T) {
 	}
 	if diff := cmp.Diff(*model2, expectedReturn2); diff != "" {
 		t.Errorf("Differs: (-want +got)\n%s", diff)
+	}
+}
+
+func TestMockTx_Commit_Fail(t *testing.T) {
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB()
+		_ = mock.ExpectBegin()
+
+		// Actual process.
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occured: %+v", err)
+			return
+		}
+		err = tx.Commit()
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB()
+		mocktx := mock.ExpectBegin()
+		mocktx.ExpectRollback()
+
+		// Actual process.
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occured: %+v", err)
+			return
+		}
+		err = tx.Commit()
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+}
+
+func TestMockTx_Rollback_Fail(t *testing.T) {
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB()
+		_ = mock.ExpectBegin()
+
+		// Actual process.
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occured: %+v", err)
+			return
+		}
+		err = tx.Rollback()
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB()
+		mocktx := mock.ExpectBegin()
+		mocktx.ExpectCommit()
+
+		// Actual process.
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occured: %+v", err)
+			return
+		}
+		err = tx.Rollback()
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+}
+
+func TestMockTx_CompareWith(t *testing.T) {
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB()
+		_ = mock.ExpectBegin()
+
+		// Actual process.
+		model := new([]int)
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occurred: %+v", err)
+			return
+		}
+		err = mgorm.Select(tx, "column1").From("table").Query(model)
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB()
+		mocktx := mock.ExpectBegin()
+		mocktx.ExpectCommit()
+
+		// Actual process.
+		model := new([]int)
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occurred: %+v", err)
+			return
+		}
+		err = mgorm.Select(tx, "column1").From("table").Query(model)
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
 	}
 }

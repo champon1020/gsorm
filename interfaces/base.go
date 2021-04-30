@@ -25,11 +25,3 @@ type MigrateCallable interface {
 	Migrate() error
 	String() string
 }
-
-// Stmt is interface for DeleteStmt, InsertStmt, SelectStmt, and so on.
-type Stmt interface {
-	String() string
-	FuncString() string
-	Called() []syntax.Clause
-	Cmd() syntax.Clause
-}

@@ -1,10 +1,10 @@
-package internal
+package database
 
 // SQLDriver is SQL driver.
 type SQLDriver int
 
 // SQL driver list.
 const (
-	PSQL SQLDriver = iota
-	MySQL
+	PsqlDriver SQLDriver = iota
+	MysqlDriver
 )

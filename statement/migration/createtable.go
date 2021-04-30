@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/morikuni/failure"
@@ -21,7 +22,7 @@ type CreateTableStmt struct {
 	cmd   *mig.CreateTable
 }
 
-func NewCreateTableStmt(conn database.Conn, table string) *CreateTableStmt {
+func NewCreateTableStmt(conn domain.Conn, table string) *CreateTableStmt {
 	stmt := &CreateTableStmt{cmd: &mig.CreateTable{Table: table}}
 	stmt.conn = conn
 	return stmt
@@ -186,7 +187,7 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 }
 
 // convertToDBType converts golang type to database type.
-func convertToDBType(t reflect.Type, d internal.SQLDriver) string {
+func convertToDBType(t reflect.Type, d database.SQLDriver) string {
 	switch t.Kind() {
 	case reflect.String:
 		return "VARCHAR(128)"

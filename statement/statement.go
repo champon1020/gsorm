@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/database"
-	"github.com/champon1020/mgorm/interfaces"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/morikuni/failure"
@@ -13,7 +12,7 @@ import (
 
 // stmt stores information about query.
 type stmt struct {
-	conn   database.Conn
+	conn   domain.Conn
 	called []syntax.Clause
 	errors []error
 }
@@ -50,29 +49,13 @@ func (s *stmt) funcString(cmd syntax.Clause) string {
 	return str
 }
 
-func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt interfaces.Stmt, model interface{}) error {
+func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt domain.Stmt, model interface{}) error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
 	}
 
 	switch conn := s.conn.(type) {
-	case database.DB, database.Tx:
-		var sql internal.SQL
-		if err := buildSQL(&sql); err != nil {
-			return err
-		}
-
-		rows, err := conn.Query(sql.String())
-		if err != nil {
-			return failure.Wrap(err)
-		}
-
-		defer rows.Close()
-		if err := internal.MapRowsToModel(rows, model); err != nil {
-			return failure.Translate(err, errFailedParse)
-		}
-		return nil
-	case database.Mock:
+	case domain.Mock:
 		returned, err := conn.CompareWith(stmt)
 		if err != nil || returned == nil {
 			return err
@@ -89,6 +72,22 @@ func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt interfaces.Stmt, m
 
 		mv.Elem().Set(v)
 		return nil
+	case domain.DB, domain.Tx:
+		var sql internal.SQL
+		if err := buildSQL(&sql); err != nil {
+			return err
+		}
+
+		rows, err := conn.Query(sql.String())
+		if err != nil {
+			return failure.Wrap(err)
+		}
+
+		defer rows.Close()
+		if err := internal.MapRowsToModel(rows, model); err != nil {
+			return failure.Translate(err, errFailedParse)
+		}
+		return nil
 	}
 
 	return failure.New(errInvalidValue,
@@ -96,25 +95,25 @@ func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt interfaces.Stmt, m
 		failure.Message("conn can be *DB, *Tx, *MockDB or *MockTx"))
 }
 
-func (s *stmt) exec(buildSQL func(*internal.SQL) error, stmt interfaces.Stmt) error {
+func (s *stmt) exec(buildSQL func(*internal.SQL) error, stmt domain.Stmt) error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
 	}
 
 	switch conn := s.conn.(type) {
-	case database.DB, database.Tx:
+	case domain.Mock:
+		_, err := conn.CompareWith(stmt)
+		if err != nil {
+			return err
+		}
+		return nil
+	case domain.DB, domain.Tx:
 		var sql internal.SQL
 		if err := buildSQL(&sql); err != nil {
 			return err
 		}
 		if _, err := conn.Exec(sql.String()); err != nil {
 			return failure.Wrap(err)
-		}
-		return nil
-	case database.Mock:
-		_, err := conn.CompareWith(stmt)
-		if err != nil {
-			return err
 		}
 		return nil
 	}

@@ -16,31 +16,19 @@ func TestAlterTable_String(t *testing.T) {
 	}{
 		// RENAME TO action.
 		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
-				Rename("human").(*migration.AlterTableStmt),
-			`ALTER TABLE person RENAME TO human`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedPSQLDB, "person").
+			mgorm.AlterTable(nil, "person").
 				Rename("human").(*migration.AlterTableStmt),
 			`ALTER TABLE person RENAME TO human`,
 		},
 		// ADD COLUMN action.
 		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
-				AddColumn("id", "SERIAL").NotNull().(*migration.AlterTableStmt),
+			mgorm.AlterTable(nil, "person").
+				AddColumn("id", "INT").NotNull().(*migration.AlterTableStmt),
 			`ALTER TABLE person ` +
-				`ADD COLUMN id SERIAL NOT NULL`,
+				`ADD COLUMN id INT NOT NULL`,
 		},
 		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
-				AddColumn("birth_date", "DATE").NotNull().
-				Default(time.Date(2021, time.January, 2, 0, 0, 0, 0, time.UTC)).(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`ADD COLUMN birth_date DATE NOT NULL DEFAULT '2021-01-02 00:00:00'`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedPSQLDB, "person").
+			mgorm.AlterTable(nil, "person").
 				AddColumn("birth_date", "DATE").NotNull().
 				Default(time.Date(2021, time.January, 2, 0, 0, 0, 0, time.UTC)).(*migration.AlterTableStmt),
 			`ALTER TABLE person ` +
@@ -48,103 +36,36 @@ func TestAlterTable_String(t *testing.T) {
 		},
 		// DROP COLUMN action.
 		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
-				DropColumn("nickname").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`DROP COLUMN nickname`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedPSQLDB, "person").
+			mgorm.AlterTable(nil, "person").
 				DropColumn("nickname").(*migration.AlterTableStmt),
 			`ALTER TABLE person ` +
 				`DROP COLUMN nickname`,
 		},
 		// RENAME COLUMN action.
 		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
-				RenameColumn("name", "first_name").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`RENAME COLUMN name TO first_name`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedPSQLDB, "person").
+			mgorm.AlterTable(nil, "person").
 				RenameColumn("name", "first_name").(*migration.AlterTableStmt),
 			`ALTER TABLE person ` +
 				`RENAME COLUMN name TO first_name`,
 		},
 		// ADD CONSTRAINT action.
 		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
+			mgorm.AlterTable(nil, "person").
 				AddCons("UC_name").Unique("name", "nickname").(*migration.AlterTableStmt),
 			`ALTER TABLE person ` +
 				`ADD CONSTRAINT UC_name UNIQUE (name, nickname)`,
 		},
 		{
-			mgorm.AlterTable(migration.ExportedPSQLDB, "person").
-				AddCons("UC_name").Unique("name", "nickname").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`ADD CONSTRAINT UC_name UNIQUE (name, nickname)`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
+			mgorm.AlterTable(nil, "person").
 				AddCons("PK_id").Primary("id").(*migration.AlterTableStmt),
 			`ALTER TABLE person ` +
 				`ADD CONSTRAINT PK_id PRIMARY KEY (id)`,
 		},
 		{
-			mgorm.AlterTable(migration.ExportedPSQLDB, "person").
-				AddCons("PK_id").Primary("id").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`ADD CONSTRAINT PK_id PRIMARY KEY (id)`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
+			mgorm.AlterTable(nil, "person").
 				AddCons("FK_country_code").Foreign("country_code").Ref("country", "code").(*migration.AlterTableStmt),
 			`ALTER TABLE person ` +
 				`ADD CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country(code)`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedPSQLDB, "person").
-				AddCons("FK_country_code").Foreign("country_code").Ref("country", "code").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`ADD CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country(code)`,
-		},
-		// DROP CONSTRAINT action.
-		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
-				DropUnique("UC_name").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`DROP INDEX UC_name`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedPSQLDB, "person").
-				DropUnique("UC_name").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`DROP CONSTRAINT UC_name`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
-				DropPrimary("PK_id").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`DROP PRIMARY KEY`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedPSQLDB, "person").
-				DropPrimary("PK_id").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`DROP CONSTRAINT PK_id`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedMySQLDB, "person").
-				DropForeign("FK_country_code").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`DROP FOREIGN KEY FK_country_code`,
-		},
-		{
-			mgorm.AlterTable(migration.ExportedPSQLDB, "person").
-				DropForeign("FK_country_code").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`DROP CONSTRAINT FK_country_code`,
 		},
 	}
 

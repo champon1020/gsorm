@@ -3,7 +3,7 @@ package migration
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
@@ -12,7 +12,7 @@ import (
 
 // migStmt stores information about database migration query.
 type migStmt struct {
-	conn   database.Conn
+	conn   domain.Conn
 	called []syntax.MigClause
 	errors []error
 }
@@ -55,7 +55,9 @@ func (s *migStmt) migration(buildSQL func(*internal.SQL) error) error {
 	}
 
 	switch conn := s.conn.(type) {
-	case database.DB, database.Tx:
+	case domain.Mock:
+		return nil
+	case domain.DB, domain.Tx:
 		var sql internal.SQL
 		if err := buildSQL(&sql); err != nil {
 			return err
@@ -63,8 +65,6 @@ func (s *migStmt) migration(buildSQL func(*internal.SQL) error) error {
 		if _, err := conn.Exec(sql.String()); err != nil {
 			return failure.Wrap(err)
 		}
-		return nil
-	case database.MockDB:
 		return nil
 	}
 

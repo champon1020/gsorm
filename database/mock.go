@@ -1,20 +1,13 @@
 package database
 
 import (
-	"github.com/champon1020/mgorm/interfaces"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/google/go-cmp/cmp"
 	"github.com/morikuni/failure"
 )
 
-// Mock is mock database conneciton pool.
-type Mock interface {
-	Conn
-	Complete() error
-	CompareWith(interfaces.Stmt) (interface{}, error)
-}
-
 // compareStmts compares two statements. If their are different, returns error.
-func compareStmts(expected interfaces.Stmt, actual interfaces.Stmt) error {
+func compareStmts(expected domain.Stmt, actual domain.Stmt) error {
 	expectedCalled := expected.Called()
 	actualCalled := actual.Called()
 	if len(expectedCalled) != len(actualCalled) {
@@ -41,7 +34,7 @@ type expectation interface {
 
 // ExpectedQuery is expectation of executing query.
 type ExpectedQuery struct {
-	stmt       interfaces.Stmt
+	stmt       domain.Stmt
 	willReturn interface{}
 }
 

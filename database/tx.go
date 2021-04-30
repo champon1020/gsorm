@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/morikuni/failure"
 )
 
@@ -15,21 +15,14 @@ type sqlTx interface {
 	Rollback() error
 }
 
-// Tx is the interface of database transaction.
-type Tx interface {
-	Conn
-	Commit() error
-	Rollback() error
-}
-
 // tx is an in-progress database transaction.
 type tx struct {
-	db   DB
+	db   domain.DB
 	conn sqlTx
 }
 
 // GetDriver returns sql driver.
-func (t *tx) GetDriver() internal.SQLDriver {
+func (t *tx) GetDriver() int {
 	return t.db.GetDriver()
 }
 

@@ -1,7 +1,7 @@
 package migration
 
 import (
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
 )
@@ -12,7 +12,7 @@ type CreateDBStmt struct {
 	cmd *mig.CreateDB
 }
 
-func NewCreateDBStmt(conn database.Conn, dbName string) *CreateDBStmt {
+func NewCreateDBStmt(conn domain.Conn, dbName string) *CreateDBStmt {
 	stmt := &CreateDBStmt{cmd: &mig.CreateDB{DBName: dbName}}
 	stmt.conn = conn
 	return stmt

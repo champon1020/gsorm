@@ -14,11 +14,7 @@ func TestCreateDB_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateDB(migration.ExportedMySQLDB, "sample").(*migration.CreateDBStmt),
-			`CREATE DATABASE sample`,
-		},
-		{
-			mgorm.CreateDB(migration.ExportedPSQLDB, "sample").(*migration.CreateDBStmt),
+			mgorm.CreateDB(nil, "sample").(*migration.CreateDBStmt),
 			`CREATE DATABASE sample`,
 		},
 	}

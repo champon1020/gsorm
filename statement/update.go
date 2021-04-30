@@ -3,7 +3,7 @@ package statement
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
@@ -20,7 +20,7 @@ type UpdateStmt struct {
 	cmd       *clause.Update
 }
 
-func NewUpdateStmt(conn database.Conn, table string) *UpdateStmt {
+func NewUpdateStmt(conn domain.Conn, table string) *UpdateStmt {
 	u := new(clause.Update)
 	u.AddTable(table)
 	stmt := &UpdateStmt{cmd: u}

@@ -14,11 +14,7 @@ func TestDropDB_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.DropDB(migration.ExportedMySQLDB, "person").(*migration.DropDBStmt),
-			`DROP DATABASE person`,
-		},
-		{
-			mgorm.DropDB(migration.ExportedPSQLDB, "person").(*migration.DropDBStmt),
+			mgorm.DropDB(nil, "person").(*migration.DropDBStmt),
 			`DROP DATABASE person`,
 		},
 	}

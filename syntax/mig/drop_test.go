@@ -3,7 +3,7 @@ package mig_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/database"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/google/go-cmp/cmp"
@@ -107,11 +107,11 @@ func TestDropPrimary_Build(t *testing.T) {
 		Expected    *syntax.StmtSet
 	}{
 		{
-			&mig.DropPrimary{Driver: internal.PSQL, Key: "key"},
+			&mig.DropPrimary{Driver: database.PsqlDriver, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP CONSTRAINT", Value: "key"},
 		},
 		{
-			&mig.DropPrimary{Driver: internal.MySQL, Key: "key"},
+			&mig.DropPrimary{Driver: database.MysqlDriver, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP PRIMARY KEY"},
 		},
 	}
@@ -134,11 +134,11 @@ func TestDropForeign_Build(t *testing.T) {
 		Expected    *syntax.StmtSet
 	}{
 		{
-			&mig.DropForeign{Driver: internal.PSQL, Key: "key"},
+			&mig.DropForeign{Driver: database.PsqlDriver, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP CONSTRAINT", Value: "key"},
 		},
 		{
-			&mig.DropForeign{Driver: internal.MySQL, Key: "key"},
+			&mig.DropForeign{Driver: database.MysqlDriver, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP FOREIGN KEY", Value: "key"},
 		},
 	}
@@ -161,11 +161,11 @@ func TestDropUnique_Build(t *testing.T) {
 		Expected   *syntax.StmtSet
 	}{
 		{
-			&mig.DropUnique{Driver: internal.PSQL, Key: "key"},
+			&mig.DropUnique{Driver: database.PsqlDriver, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP CONSTRAINT", Value: "key"},
 		},
 		{
-			&mig.DropUnique{Driver: internal.MySQL, Key: "key"},
+			&mig.DropUnique{Driver: database.MysqlDriver, Key: "key"},
 			&syntax.StmtSet{Keyword: "DROP INDEX", Value: "key"},
 		},
 	}

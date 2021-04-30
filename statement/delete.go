@@ -3,7 +3,7 @@ package statement
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
@@ -18,7 +18,7 @@ type DeleteStmt struct {
 	cmd *clause.Delete
 }
 
-func NewDeleteStmt(conn database.Conn) *DeleteStmt {
+func NewDeleteStmt(conn domain.Conn) *DeleteStmt {
 	stmt := &DeleteStmt{cmd: &clause.Delete{}}
 	stmt.conn = conn
 	return stmt

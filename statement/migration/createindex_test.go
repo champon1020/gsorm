@@ -14,22 +14,12 @@ func TestCreateIndex_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateIndex(migration.ExportedMySQLDB, "IDX_id").
+			mgorm.CreateIndex(nil, "IDX_id").
 				On("person", "id").(*migration.CreateIndexStmt),
 			`CREATE INDEX IDX_id ON person (id)`,
 		},
 		{
-			mgorm.CreateIndex(migration.ExportedMySQLDB, "IDX_id").
-				On("person", "id", "name").(*migration.CreateIndexStmt),
-			`CREATE INDEX IDX_id ON person (id, name)`,
-		},
-		{
-			mgorm.CreateIndex(migration.ExportedPSQLDB, "IDX_id").
-				On("person", "id").(*migration.CreateIndexStmt),
-			`CREATE INDEX IDX_id ON person (id)`,
-		},
-		{
-			mgorm.CreateIndex(migration.ExportedPSQLDB, "IDX_id").
+			mgorm.CreateIndex(nil, "IDX_id").
 				On("person", "id", "name").(*migration.CreateIndexStmt),
 			`CREATE INDEX IDX_id ON person (id, name)`,
 		},

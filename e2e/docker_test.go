@@ -9,14 +9,14 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/go-sql-driver/mysql"
 	"github.com/ory/dockertest/v3"
 )
 
 const TIMEOUT = 20 * time.Second
 
-var db *database.DB
+var db domain.DB
 
 func TestMain(m *testing.M) {
 	if os.Getenv("MGORM_CI") == "true" {

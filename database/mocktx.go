@@ -3,33 +3,22 @@ package database
 import (
 	"database/sql"
 
-	"github.com/champon1020/mgorm/interfaces"
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/morikuni/failure"
 )
-
-type MockTx interface {
-	Mock
-	Commit() error
-	Rollback() error
-	ExpectCommit()
-	ExpectRollback()
-	Expect(stmt interfaces.Stmt) MockTx
-	Return(v interface{})
-}
 
 // mockTx is mock transaction.
 type mockTx struct {
 	// Parent mock database.
-	db MockDB
+	db domain.MockDB
 
 	// Expected statements.
 	expected []expectation
 }
 
 // GetDriver returns sql driver.
-func (m *mockTx) GetDriver() internal.SQLDriver {
-	return 0
+func (m *mockTx) GetDriver() int {
+	return -1
 }
 
 // Ping is dummy function.
@@ -92,7 +81,7 @@ func (m *mockTx) ExpectRollback() {
 }
 
 // Expect appends expected statement.
-func (m *mockTx) Expect(s interfaces.Stmt) MockTx {
+func (m *mockTx) Expect(s domain.Stmt) domain.MockTx {
 	m.expected = append(m.expected, &ExpectedQuery{stmt: s})
 	return m
 }
@@ -115,7 +104,7 @@ func (m *mockTx) Complete() error {
 }
 
 // CompareWith compares expected statement with executed statement.
-func (m *mockTx) CompareWith(s interfaces.Stmt) (interface{}, error) {
+func (m *mockTx) CompareWith(s domain.Stmt) (interface{}, error) {
 	expected := m.popExpected()
 	if expected == nil {
 		err := failure.New(errInvalidMockExpectation,

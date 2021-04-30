@@ -1,7 +1,7 @@
 package migration
 
 import (
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
 )
@@ -12,7 +12,7 @@ type DropDBStmt struct {
 	cmd *mig.DropDB
 }
 
-func NewDropDBStmt(conn database.Conn, dbName string) *DropDBStmt {
+func NewDropDBStmt(conn domain.Conn, dbName string) *DropDBStmt {
 	stmt := &DropDBStmt{cmd: &mig.DropDB{DBName: dbName}}
 	stmt.conn = conn
 	return stmt

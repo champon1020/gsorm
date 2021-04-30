@@ -3,7 +3,7 @@ package migration
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/morikuni/failure"
@@ -17,7 +17,7 @@ type CreateIndexStmt struct {
 	cmd *mig.CreateIndex
 }
 
-func NewCreateIndexStmt(conn database.Conn, idx string) *CreateIndexStmt {
+func NewCreateIndexStmt(conn domain.Conn, idx string) *CreateIndexStmt {
 	stmt := &CreateIndexStmt{cmd: &mig.CreateIndex{IdxName: idx}}
 	stmt.conn = conn
 	return stmt

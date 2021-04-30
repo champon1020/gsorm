@@ -14,12 +14,11 @@ func TestDropIndex_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.DropIndex(migration.ExportedMySQLDB, "IDX_id").
-				On("person").(*migration.DropIndexStmt),
+			mgorm.DropIndex(nil, "IDX_id").On("person").(*migration.DropIndexStmt),
 			`DROP INDEX IDX_id ON person`,
 		},
 		{
-			mgorm.DropIndex(migration.ExportedPSQLDB, "IDX_id").(*migration.DropIndexStmt),
+			mgorm.DropIndex(nil, "IDX_id").(*migration.DropIndexStmt),
 			`DROP INDEX IDX_id`,
 		},
 	}

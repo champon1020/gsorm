@@ -4,23 +4,9 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/champon1020/mgorm/interfaces"
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/morikuni/failure"
 )
-
-type MockDB interface {
-	Mock
-	Ping() error
-	SetConnMaxLifetime(n time.Duration) error
-	SetMaxIdleConns(n int) error
-	SetMaxOpenConns(n int) error
-	Close() error
-	Begin() (MockTx, error)
-	ExpectBegin() MockTx
-	Expect(stmt interfaces.Stmt) MockDB
-	Return(v interface{})
-}
 
 // mockDB is mock databse connection pool.
 // This structure stores mainly what query will be executed and what value will be returned.
@@ -29,20 +15,20 @@ type mockDB struct {
 	expected []expectation
 
 	// Begun transactions.
-	tx []MockTx
+	tx []domain.MockTx
 
 	// How many times transaction has begun.
 	txItr int
 }
 
 // NewMockDB creates MockDB instance.
-func NewMockDB() MockDB {
+func NewMockDB() domain.MockDB {
 	return &mockDB{}
 }
 
 // GetDriver returns sql driver.
-func (m *mockDB) GetDriver() internal.SQLDriver {
-	return 0
+func (m *mockDB) GetDriver() int {
+	return -1
 }
 
 // Ping is dummy function.
@@ -81,7 +67,7 @@ func (m *mockDB) Close() error {
 }
 
 // Begin starts the mock transaction.
-func (m *mockDB) Begin() (MockTx, error) {
+func (m *mockDB) Begin() (domain.MockTx, error) {
 	expected := m.popExpected()
 	tx := m.nextTx()
 	if tx == nil || expected == nil {
@@ -101,7 +87,7 @@ func (m *mockDB) Begin() (MockTx, error) {
 }
 
 // nextTx pops begun transaction.
-func (m *mockDB) nextTx() MockTx {
+func (m *mockDB) nextTx() domain.MockTx {
 	if len(m.tx) <= m.txItr {
 		return nil
 	}
@@ -115,7 +101,7 @@ func (m *mockDB) incrementTx() {
 }
 
 // ExpectBegin appends operation of beginning transaction to expected.
-func (m *mockDB) ExpectBegin() MockTx {
+func (m *mockDB) ExpectBegin() domain.MockTx {
 	tx := &mockTx{db: m}
 	m.tx = append(m.tx, tx)
 	m.expected = append(m.expected, &expectedBegin{})
@@ -123,7 +109,7 @@ func (m *mockDB) ExpectBegin() MockTx {
 }
 
 // Expect appends expected statement.
-func (m *mockDB) Expect(s interfaces.Stmt) MockDB {
+func (m *mockDB) Expect(s domain.Stmt) domain.MockDB {
 	m.expected = append(m.expected, &ExpectedQuery{stmt: s})
 	return m
 }
@@ -151,7 +137,7 @@ func (m *mockDB) Complete() error {
 }
 
 // CompareWith compares expected statement with executed statement.
-func (m *mockDB) CompareWith(s interfaces.Stmt) (interface{}, error) {
+func (m *mockDB) CompareWith(s domain.Stmt) (interface{}, error) {
 	expected := m.popExpected()
 	if expected == nil {
 		err := failure.New(errInvalidMockExpectation,

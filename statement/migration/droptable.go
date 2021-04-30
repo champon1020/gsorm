@@ -1,7 +1,7 @@
 package migration
 
 import (
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
 )
@@ -12,7 +12,7 @@ type DropTableStmt struct {
 	cmd *mig.DropTable
 }
 
-func NewDropTableStmt(conn database.Conn, table string) *DropTableStmt {
+func NewDropTableStmt(conn domain.Conn, table string) *DropTableStmt {
 	stmt := &DropTableStmt{cmd: &mig.DropTable{Table: table}}
 	stmt.conn = conn
 	return stmt
