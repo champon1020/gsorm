@@ -12,11 +12,6 @@ type ExportedDB = db
 type ExportedTx = tx
 type ExportedMockDB = mockDB
 
-// Exported values which is declared in mockdb.go.
-var (
-	CompareStmts = compareStmts
-)
-
 // Exported values which is declared in db.go.
 func (d *db) ExportedSetConn(conn sqlDB) {
 	d.conn = conn

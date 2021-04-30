@@ -81,3 +81,33 @@ func TestInsertStmt_BuildSQLWithModel_Fail(t *testing.T) {
 		}
 	}
 }
+
+func TestInsertStmt_CompareStmts(t *testing.T) {
+	testCases := []struct {
+		ExpectedStmt  *statement.InsertStmt
+		ActualStmt    *statement.InsertStmt
+		ExpectedError failure.StringCode
+	}{
+		{
+			mgorm.Insert(nil, "table").Values(10).(*statement.InsertStmt),
+			mgorm.Insert(nil, "table").Values(10).Values(100).(*statement.InsertStmt),
+			statement.ErrInvalidValue,
+		},
+		{
+			mgorm.Insert(nil, "table").Values(10).(*statement.InsertStmt),
+			mgorm.Insert(nil, "table").Values(10, 100).(*statement.InsertStmt),
+			statement.ErrInvalidValue,
+		},
+	}
+
+	for _, testCase := range testCases {
+		err := testCase.ExpectedStmt.CompareWith(testCase.ActualStmt)
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, testCase.ExpectedError) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", testCase.ExpectedError)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+}

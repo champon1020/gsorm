@@ -117,16 +117,13 @@ func (m *mockDB) ExpectBegin() domain.MockTx {
 }
 
 // Expect appends expected statement.
-func (m *mockDB) Expect(s domain.Stmt) domain.MockDB {
-	m.expected = append(m.expected, &ExpectedQuery{stmt: s})
-	return m
+func (m *mockDB) Expect(s domain.Stmt) {
+	m.expected = append(m.expected, &expectedQuery{stmt: s})
 }
 
-// Return appends value which is to be returned with query.
-func (m *mockDB) Return(v interface{}) {
-	if e, ok := m.expected[len(m.expected)-1].(*ExpectedQuery); ok {
-		e.willReturn = v
-	}
+// ExpectWithReturn appends expected statement with value which is to be returned with query.
+func (m *mockDB) ExpectWithReturn(s domain.Stmt, v interface{}) {
+	m.expected = append(m.expected, &expectedQuery{stmt: s, willReturn: v})
 }
 
 // Complete checks whether all of expected statements was executed or not.
@@ -153,14 +150,17 @@ func (m *mockDB) CompareWith(s domain.Stmt) (interface{}, error) {
 			failure.Message("invalid mock expectation"))
 		return nil, err
 	}
-	eq, ok := expected.(*ExpectedQuery)
+	eq, ok := expected.(*expectedQuery)
 	if !ok {
 		err := failure.New(errInvalidMockExpectation,
 			failure.Context{"expected": expected.String(), "actual": s.FuncString()},
 			failure.Message("invalid mock expectation"))
 		return nil, err
 	}
-	return eq.willReturn, compareStmts(eq.stmt, s)
+	if err := eq.stmt.CompareWith(s); err != nil {
+		return nil, failure.Translate(err, errInvalidMockExpectation)
+	}
+	return eq.willReturn, nil
 }
 
 // popExpected pops expected operation.

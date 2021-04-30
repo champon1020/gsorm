@@ -39,3 +39,33 @@ func TestDeleteStmt_BuildSQL_Fail(t *testing.T) {
 		}
 	}
 }
+
+func TestDeleteStmt_CompareStmts_Fail(t *testing.T) {
+	testCases := []struct {
+		ExpectedStmt  *statement.DeleteStmt
+		ActualStmt    *statement.DeleteStmt
+		ExpectedError failure.StringCode
+	}{
+		{
+			mgorm.Delete(nil).From("table").(*statement.DeleteStmt),
+			mgorm.Delete(nil).From("table").Where("column1 = ?", 10).(*statement.DeleteStmt),
+			statement.ErrInvalidValue,
+		},
+		{
+			mgorm.Delete(nil).From("table").Where("column1 = ?", 10).(*statement.DeleteStmt),
+			mgorm.Delete(nil).From("table").Where("column1 = ?", 100).(*statement.DeleteStmt),
+			statement.ErrInvalidValue,
+		},
+	}
+
+	for _, testCase := range testCases {
+		err := testCase.ExpectedStmt.CompareWith(testCase.ActualStmt)
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, testCase.ExpectedError) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", testCase.ExpectedError)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+}

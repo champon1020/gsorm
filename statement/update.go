@@ -43,6 +43,12 @@ func (s *UpdateStmt) Cmd() syntax.Clause {
 	return s.cmd
 }
 
+// CompareWith compares the statements and returns error if the statements is not same.
+// In this case, same means that stmt.cmd and stmt.called is corresponding.
+func (s *UpdateStmt) CompareWith(targetStmt domain.Stmt) error {
+	return s.compareWith(s.Cmd(), targetStmt)
+}
+
 // Exec executes SQL statement without mapping to model.
 // If type of conn is mgorm.MockDB, compare statements between called and expected.
 func (s *UpdateStmt) Exec() error {

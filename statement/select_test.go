@@ -39,3 +39,33 @@ func TestSelectStmt_BuildQuerySQL_Fail(t *testing.T) {
 		}
 	}
 }
+
+func TestSelectStmt_CompareStmts_Fail(t *testing.T) {
+	testCases := []struct {
+		ExpectedStmt  *statement.SelectStmt
+		ActualStmt    *statement.SelectStmt
+		ExpectedError failure.StringCode
+	}{
+		{
+			mgorm.Select(nil, "column1").From("table").(*statement.SelectStmt),
+			mgorm.Select(nil, "column1").From("table").Where("column1 = ?", 10).(*statement.SelectStmt),
+			statement.ErrInvalidValue,
+		},
+		{
+			mgorm.Select(nil, "column1").From("table").Where("column1 = ?", 10).(*statement.SelectStmt),
+			mgorm.Select(nil, "column1").From("table").Where("column1 = ?", 100).(*statement.SelectStmt),
+			statement.ErrInvalidValue,
+		},
+	}
+
+	for _, testCase := range testCases {
+		err := testCase.ExpectedStmt.CompareWith(testCase.ActualStmt)
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, testCase.ExpectedError) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", testCase.ExpectedError)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+}

@@ -40,6 +40,8 @@ type Mock interface {
 	Conn
 	Complete() error
 	CompareWith(Stmt) (interface{}, error)
+	Expect(s Stmt)
+	ExpectWithReturn(s Stmt, v interface{})
 }
 
 type MockDB interface {
@@ -50,8 +52,6 @@ type MockDB interface {
 	Close() error
 	Begin() (MockTx, error)
 	ExpectBegin() MockTx
-	Expect(stmt Stmt) MockDB
-	Return(v interface{})
 }
 
 type MockTx interface {
@@ -60,6 +60,4 @@ type MockTx interface {
 	Rollback() error
 	ExpectCommit()
 	ExpectRollback()
-	Expect(stmt Stmt) MockTx
-	Return(v interface{})
 }

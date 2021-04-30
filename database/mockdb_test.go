@@ -15,7 +15,7 @@ func TestMock_Expectation(t *testing.T) {
 	// Test phase.
 	mock := database.NewMockDB("")
 	mock.Expect(mgorm.Insert(nil, "table", "column1", "column2").Values(10, "str"))
-	mock.Expect(mgorm.Select(nil, "column1").From("table")).Return(expectedReturn)
+	mock.ExpectWithReturn(mgorm.Select(nil, "column1").From("table"), expectedReturn)
 
 	// Actual process.
 	if err := mgorm.Insert(mock, "table", "column1", "column2").Values(10, "str").Exec(); err != nil {

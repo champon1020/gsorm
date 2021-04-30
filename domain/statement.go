@@ -8,4 +8,5 @@ type Stmt interface {
 	FuncString() string
 	Called() []syntax.Clause
 	Cmd() syntax.Clause
+	CompareWith(targetStmt Stmt) error
 }

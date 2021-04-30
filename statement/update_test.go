@@ -85,3 +85,33 @@ func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 		}
 	}
 }
+
+func TestUpdateStmt_CompareStmts(t *testing.T) {
+	testCases := []struct {
+		ExpectedStmt  *statement.UpdateStmt
+		ActualStmt    *statement.UpdateStmt
+		ExpectedError failure.StringCode
+	}{
+		{
+			mgorm.Update(nil, "table").Set("col1", 10).(*statement.UpdateStmt),
+			mgorm.Update(nil, "table").Set("col1", 10).Set("col2", 100).(*statement.UpdateStmt),
+			statement.ErrInvalidValue,
+		},
+		{
+			mgorm.Update(nil, "table").Set("col1", 10).(*statement.UpdateStmt),
+			mgorm.Update(nil, "table").Set("col1", 100).(*statement.UpdateStmt),
+			statement.ErrInvalidValue,
+		},
+	}
+
+	for _, testCase := range testCases {
+		err := testCase.ExpectedStmt.CompareWith(testCase.ActualStmt)
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, testCase.ExpectedError) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", testCase.ExpectedError)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+}

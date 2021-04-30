@@ -7,6 +7,7 @@ import (
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
+	"github.com/google/go-cmp/cmp"
 	"github.com/morikuni/failure"
 )
 
@@ -47,6 +48,26 @@ func (s *stmt) funcString(cmd syntax.Clause) string {
 		str += fmt.Sprintf(".%s", e.String())
 	}
 	return str
+}
+
+func (s *stmt) compareWith(cmd syntax.Clause, targetStmt domain.Stmt) error {
+	expected := s.Called()
+	actual := targetStmt.Called()
+	if len(expected) != len(actual) {
+		err := failure.New(errInvalidValue,
+			failure.Context{"expected": s.funcString(cmd), "actual": targetStmt.FuncString()},
+			failure.Message("statements comparison is failed"))
+		return err
+	}
+	for i, e := range expected {
+		if diff := cmp.Diff(actual[i], e); diff != "" {
+			err := failure.New(errInvalidValue,
+				failure.Context{"expected": s.funcString(cmd), "actual": targetStmt.FuncString()},
+				failure.Message("statements comparison is failed"))
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt domain.Stmt, model interface{}) error {
