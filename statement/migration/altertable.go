@@ -17,6 +17,7 @@ type AlterTableStmt struct {
 	cmd *mig.AlterTable
 }
 
+// NewAlterTableStmt creates AlterTableStmt instance.
 func NewAlterTableStmt(conn domain.Conn, table string) *AlterTableStmt {
 	stmt := &AlterTableStmt{cmd: &mig.AlterTable{Table: table}}
 	stmt.conn = conn
