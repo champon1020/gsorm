@@ -7,6 +7,5 @@ const (
 	errInvalidClause      failure.StringCode = "InvalidClause"
 	errInvalidSyntax      failure.StringCode = "InvalidSyntax"
 	errInvalidType        failure.StringCode = "InvalidType"
-	errFailedParse        failure.StringCode = "FailedParse"
 	errFailedDBConnection failure.StringCode = "FailedDBConnection"
 )

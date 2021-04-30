@@ -68,7 +68,7 @@ func RunTestWithBuild(m *testing.M) {
 	}
 
 	// Connect to database.
-	if err := pool.Retry(func() error {
+	if err = pool.Retry(func() error {
 		db, err = mgorm.Open(
 			"mysql",
 			fmt.Sprintf("root:toor@tcp(localhost:%s)/employees", resource.GetPort("3306/tcp")),
