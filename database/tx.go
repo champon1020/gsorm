@@ -22,7 +22,7 @@ type tx struct {
 }
 
 // GetDriver returns sql driver.
-func (t *tx) GetDriver() int {
+func (t *tx) GetDriver() domain.SQLDriver {
 	return t.db.GetDriver()
 }
 

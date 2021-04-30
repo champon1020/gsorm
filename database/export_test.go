@@ -1,5 +1,7 @@
 package database
 
+import "github.com/champon1020/mgorm/domain"
+
 const (
 	ErrInvalidMockExpectation = errInvalidMockExpectation
 	ErrFailedDBConnection     = errFailedDBConnection
@@ -20,7 +22,7 @@ func (d *db) ExportedSetConn(conn sqlDB) {
 	d.conn = conn
 }
 
-func (d *db) ExportedSetDriver(driver SQLDriver) {
+func (d *db) ExportedSetDriver(driver domain.SQLDriver) {
 	d.driver = driver
 }
 

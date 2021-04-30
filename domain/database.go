@@ -2,12 +2,17 @@ package domain
 
 import (
 	"database/sql"
+	"reflect"
 	"time"
 )
 
+type SQLDriver interface {
+	LookupDefaultType(typ reflect.Type) string
+}
+
 // Conn is database connection like DB or Tx. This is also implemented by MockDB and MockTx.
 type Conn interface {
-	GetDriver() int
+	GetDriver() SQLDriver
 	Ping() error
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 	Exec(query string, args ...interface{}) (sql.Result, error)

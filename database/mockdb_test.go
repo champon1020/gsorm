@@ -13,7 +13,7 @@ func TestMock_Expectation(t *testing.T) {
 	expectedReturn := []int{10, 20, 30}
 
 	// Test phase.
-	mock := database.NewMockDB()
+	mock := database.NewMockDB("")
 	mock.Expect(mgorm.Insert(nil, "table", "column1", "column2").Values(10, "str"))
 	mock.Expect(mgorm.Select(nil, "column1").From("table")).Return(expectedReturn)
 
@@ -80,7 +80,7 @@ func TestMockDB_Complete_Fail(t *testing.T) {
 	expectedErr := database.ErrInvalidMockExpectation
 
 	// Test phase.
-	mock := database.NewMockDB()
+	mock := database.NewMockDB("")
 	mock.Expect(mgorm.Insert(nil, "table1", "column1", "column2").Values(10, "str"))
 	mock.Expect(mgorm.Insert(nil, "table2", "column1", "column2").Values(10, "str"))
 
@@ -105,7 +105,7 @@ func TestMockDB_Complete_Transaction_Fail(t *testing.T) {
 	expectedErr := database.ErrInvalidMockExpectation
 
 	// Test phase.
-	mock := database.NewMockDB()
+	mock := database.NewMockDB("")
 	mocktx := mock.ExpectBegin()
 	mocktx.Expect(mgorm.Insert(nil, "table1", "column1", "column2").Values(10, "str"))
 	mocktx.Expect(mgorm.Insert(nil, "table2", "column1", "column2").Values(10, "str"))
@@ -137,7 +137,7 @@ func TestMockDB_CompareWith(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB()
+		mock := database.NewMockDB("")
 
 		// Actual process.
 		model := new([]int)
@@ -154,7 +154,7 @@ func TestMockDB_CompareWith(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB()
+		mock := database.NewMockDB("")
 		_ = mock.ExpectBegin()
 
 		// Actual process.

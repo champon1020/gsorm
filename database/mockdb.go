@@ -19,16 +19,24 @@ type mockDB struct {
 
 	// How many times transaction has begun.
 	txItr int
+
+	driver domain.SQLDriver
 }
 
 // NewMockDB creates MockDB instance.
-func NewMockDB() domain.MockDB {
+func NewMockDB(drv string) domain.MockDB {
+	if drv == "mysql" {
+		return &mockDB{driver: MysqlDriver}
+	}
+	if drv == "psql" {
+		return &mockDB{driver: PsqlDriver}
+	}
 	return &mockDB{}
 }
 
 // GetDriver returns sql driver.
-func (m *mockDB) GetDriver() int {
-	return -1
+func (m *mockDB) GetDriver() domain.SQLDriver {
+	return m.driver
 }
 
 // Ping is dummy function.

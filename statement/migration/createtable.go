@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"time"
 
-	"github.com/champon1020/mgorm/database"
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax/mig"
@@ -135,7 +133,10 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 		if tag.Lookup("typ") {
 			sql.Write(tag.Type)
 		} else {
-			dbtyp := convertToDBType(f.Type, s.conn.GetDriver())
+			if s.conn == nil {
+				return failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
+			}
+			dbtyp := s.conn.GetDriver().LookupDefaultType(f.Type)
 			if dbtyp == "" {
 				return failure.New(errInvalidType,
 					failure.Context{"type": f.Type.String()},
@@ -184,37 +185,6 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 	}
 	sql.Write(")")
 	return nil
-}
-
-// convertToDBType converts golang type to database type.
-func convertToDBType(t reflect.Type, d database.SQLDriver) string {
-	switch t.Kind() {
-	case reflect.String:
-		return "VARCHAR(128)"
-	case reflect.Int,
-		reflect.Int8,
-		reflect.Int16,
-		reflect.Int32,
-		reflect.Int64,
-		reflect.Uint,
-		reflect.Uint8,
-		reflect.Uint16,
-		reflect.Uint32,
-		reflect.Uint64:
-		return "INT"
-	case reflect.Float32, reflect.Float64:
-		if d == internal.MySQL {
-			return "FLOAT"
-		}
-		return "NUMERIC"
-	case reflect.Struct:
-		if t == reflect.TypeOf(time.Time{}) {
-			return "DATE"
-		}
-	case reflect.Bool:
-		return "SMALLINT"
-	}
-	return ""
 }
 
 // Model sets model to CreateTableStmt.

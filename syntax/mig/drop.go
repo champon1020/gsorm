@@ -2,6 +2,7 @@ package mig
 
 import (
 	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -79,7 +80,7 @@ func (d *DropColumn) Build() (*syntax.StmtSet, error) {
 
 // DropPrimary is DROP PRIMARY KEY | DROP CONSTRAINT clause.
 type DropPrimary struct {
-	Driver database.SQLDriver
+	Driver domain.SQLDriver
 	Key    string
 }
 
@@ -103,7 +104,7 @@ func (d *DropPrimary) Build() (*syntax.StmtSet, error) {
 
 // DropForeign is DROP FOREIGN KEY | DROP CONSTRAINT clause.
 type DropForeign struct {
-	Driver database.SQLDriver
+	Driver domain.SQLDriver
 	Key    string
 }
 
@@ -125,7 +126,7 @@ func (d *DropForeign) Build() (*syntax.StmtSet, error) {
 
 // DropUnique is DROP UNIQUE | DROP CONSTRAINT clause.
 type DropUnique struct {
-	Driver database.SQLDriver
+	Driver domain.SQLDriver
 	Key    string
 }
 

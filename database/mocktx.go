@@ -17,8 +17,8 @@ type mockTx struct {
 }
 
 // GetDriver returns sql driver.
-func (m *mockTx) GetDriver() int {
-	return -1
+func (m *mockTx) GetDriver() domain.SQLDriver {
+	return m.db.GetDriver()
 }
 
 // Ping is dummy function.

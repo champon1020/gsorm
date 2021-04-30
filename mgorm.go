@@ -21,13 +21,13 @@ import (
 )
 
 // Open opens the database connection.
-func Open(dn, dsn string) (domain.DB, error) {
-	return database.NewDB(dn, dsn)
+func Open(driver, dsn string) (domain.DB, error) {
+	return database.NewDB(driver, dsn)
 }
 
 // OpenMock opens the mock database connection.
-func OpenMock() domain.MockDB {
-	return database.NewMockDB()
+func OpenMock(driver string) domain.MockDB {
+	return database.NewMockDB(driver)
 }
 
 // Select calls SELECT command.

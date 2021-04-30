@@ -24,7 +24,7 @@ type sqlDB interface {
 // It's safe for concurrent use by multiple goroutines.
 type db struct {
 	conn   sqlDB
-	driver SQLDriver
+	driver domain.SQLDriver
 }
 
 // NewDB creates the DB instance.
@@ -40,8 +40,8 @@ func NewDB(dn, dsn string) (domain.DB, error) {
 }
 
 // GetDriver returns sql driver.
-func (d *db) GetDriver() int {
-	return int(d.driver)
+func (d *db) GetDriver() domain.SQLDriver {
+	return d.driver
 }
 
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.

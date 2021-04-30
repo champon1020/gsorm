@@ -14,7 +14,7 @@ func TestMock_TransactionExpectation(t *testing.T) {
 	expectedReturn2 := []string{"hello", "world", "!"}
 
 	// Test phase.
-	mock := database.NewMockDB()
+	mock := database.NewMockDB("")
 	mocktx1 := mock.ExpectBegin()
 	mocktx2 := mock.ExpectBegin()
 
@@ -88,7 +88,7 @@ func TestMockTx_Commit_Fail(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB()
+		mock := database.NewMockDB("")
 		_ = mock.ExpectBegin()
 
 		// Actual process.
@@ -110,7 +110,7 @@ func TestMockTx_Commit_Fail(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB()
+		mock := database.NewMockDB("")
 		mocktx := mock.ExpectBegin()
 		mocktx.ExpectRollback()
 
@@ -136,7 +136,7 @@ func TestMockTx_Rollback_Fail(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB()
+		mock := database.NewMockDB("")
 		_ = mock.ExpectBegin()
 
 		// Actual process.
@@ -158,7 +158,7 @@ func TestMockTx_Rollback_Fail(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB()
+		mock := database.NewMockDB("")
 		mocktx := mock.ExpectBegin()
 		mocktx.ExpectCommit()
 
@@ -184,7 +184,7 @@ func TestMockTx_CompareWith(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB()
+		mock := database.NewMockDB("")
 		_ = mock.ExpectBegin()
 
 		// Actual process.
@@ -207,7 +207,7 @@ func TestMockTx_CompareWith(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB()
+		mock := database.NewMockDB("")
 		mocktx := mock.ExpectBegin()
 		mocktx.ExpectCommit()
 

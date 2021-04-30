@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm"
+	"github.com/champon1020/mgorm/database"
 	"github.com/champon1020/mgorm/statement/migration"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,13 +19,14 @@ func TestCreateTable_String(t *testing.T) {
 		BirthDate   time.Time `mgorm:"notnull=t"`
 	}
 	model := new(Model)
+	db := database.NewMockDB("mysql")
 
 	testCases := []struct {
 		Stmt     *migration.CreateTableStmt
 		Expected string
 	}{
 		{
-			mgorm.CreateTable(nil, "person").
+			mgorm.CreateTable(db, "person").
 				Column("id", "INT").NotNull().
 				Column("country_code", "CHAR(3)").NotNull().Default("0").
 				Column("name", "VARCHAR(16)").NotNull().Default("anonymous").
@@ -45,7 +47,7 @@ func TestCreateTable_String(t *testing.T) {
 				`)`,
 		},
 		{
-			mgorm.CreateTable(nil, "person").
+			mgorm.CreateTable(db, "person").
 				Model(model).(*migration.CreateTableStmt),
 			`CREATE TABLE person (` +
 				`id INT NOT NULL, ` +
