@@ -14,8 +14,8 @@ func TestCreateDB_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateDB(nil, "sample").(*migration.CreateDBStmt),
-			`CREATE DATABASE sample`,
+			mgorm.CreateDB(nil, "employees").(*migration.CreateDBStmt),
+			`CREATE DATABASE employees`,
 		},
 	}
 
