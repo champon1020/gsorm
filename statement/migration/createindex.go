@@ -17,6 +17,7 @@ type CreateIndexStmt struct {
 	cmd *mig.CreateIndex
 }
 
+// NewCreateIndexStmt creates CreateIndexStmt instance.
 func NewCreateIndexStmt(conn domain.Conn, idx string) *CreateIndexStmt {
 	stmt := &CreateIndexStmt{cmd: &mig.CreateIndex{IdxName: idx}}
 	stmt.conn = conn
