@@ -20,6 +20,7 @@ type CreateTableStmt struct {
 	cmd   *mig.CreateTable
 }
 
+// NewCreateTableStmt creates CreateTableStmt instance.
 func NewCreateTableStmt(conn domain.Conn, table string) *CreateTableStmt {
 	stmt := &CreateTableStmt{cmd: &mig.CreateTable{Table: table}}
 	stmt.conn = conn

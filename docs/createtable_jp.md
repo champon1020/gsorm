@@ -1,5 +1,7 @@
 # CreateTable
-`mgorm.CreateTable`を使用したとき，`Migrate`を呼び出すことでテーブルを作成することができます．
+`mgorm.CreateTable`はCREATE TABLE句を呼び出します．
+
+引数にはデータベースのコネクション(`mgorm.Conn`)，テーブル名を指定します．
 
 #### 例
 ```go
@@ -32,33 +34,37 @@ type Employee struct {
 
 err := mgorm.CreateTable(db, "employees").
     Model(&Employee{}).Migrate()
-// Equal to previous example.
+// Same as the previous example.
 ```
 
 
 # Methods
 `mgorm.CreateTable`で使用できるメソッドを以下に示します．
 - [Column](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#column)
-- [NotNull](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#notnull)
-- [Default](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#default)
+  - [NotNull](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#notnull)
+  - [Default](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#default)
 - [Cons](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#cons)
-- [Unique](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#unique)
-- [Primary](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#primary)
-- [Foreign](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#foreign)
-- [Ref](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#ref)
+  - [Unique](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#unique)
+  - [Primary](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#primary)
+  - [Foreign](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#foreign)
+    - [Ref](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#ref)
+
+これらのメソッドは以下のEBNFに従って実行することができます．
 
 ```
-[]: optional, |: or, {}: block, **: able to call many times
+| alternation
+() grouping
+[] option (0 to 1 times)
+{} repetition (0 to n times)
 
-mgorm.CreateTable(DB, table)
-    {.Column()
-        [.NotNull()]
-        [.Default(value)]}**
-    [.Cons(key)
-        {.Unique(columns...) | .Primary(columns...) | Foreign(columns...).Ref(ref)}]**
+Error = mgorm.CreateTable ColumnStmt { ColumnStmt } { ConstraintStmt } Migrate
+
+ColumnStmt = Column [ NotNull ] [ Default ]
+ConstraintStmt = Cons ( Unique | Primary | Foreign Ref )
 ```
 
-上図において，上のメソッドほど実行優先度が高いです．例えば以下はコンパイルエラーとなります．
+例えば以下の実装はコンパイルエラーを吐き出します．
+
 ```go
 // NG
 err := mgorm.CreateTable(db, "employees").
@@ -82,7 +88,9 @@ err := mgorm.CreateTable(db, "employees").
 
 
 ## Column
-`Column`はカラム名とデータベース型をstring型で受け取ります．
+`Column`はカラムの定義を呼び出します．
+
+引数にはカラム名と型名を指定します．
 
 `Column`は複数回び出すことができます．
 
@@ -104,6 +112,8 @@ err := mgorm.CreateTable(db, "employees").
 ```
 
 ## NotNull
+`NotNull`はNOTNULL句を呼び出します．
+
 `NotNull`は`Column`に続けて呼び出すことができます．
 
 #### 例
@@ -125,11 +135,15 @@ err := mgorm.CreateTable(db, "employees").
 
 
 ## Default
-`Default`は`Column`もしくは`NotNull`に続けて呼び出すことができます．
+`Default`はDEFAULT句を呼び出します．
 
-`Default`は引数に値を受け取ります．
-この値の型は，`mgorm`で許されている型のみ受け取ることができます．
-型についての詳細は[Type]()に記載されています．
+引数には値を指定します．
+このとき，値は以下のルールに従ってビルドされます．
+
+- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれる．
+- 以上の条件に該当しない場合，値はそのまま展開される．
+
+`Default`は`Column`に続けて呼び出すことができます．
 
 #### 例
 ```go
@@ -156,11 +170,13 @@ err := mgorm.CreateTable(db, "employees").
 
 
 ## Cons
-`Cons`は引数に鍵名をstring型で受け取り，CONSTRAINT句を呼び出します．
+`Cons`はCONSTRAINT句を呼び出します．
 
-`Cons`のみでは文を完結することができないため，[Unique]()，[Primary]()，[Foreign]()のいずれかを続けて呼び出す必要があります．
+引数には制約名を指定します．
 
-また，`Cons`を呼び出すには1回以上`Column`が呼び出されている必要があります．
+`Cons`は`Column`，`NotNull`，`Default`のいずれかに続けて呼び出すことができます．
+
+`Cons`に続けて`Unique`，`Primary`，`Foreign`のいずれかを呼び出す必要があります．
 
 #### 例
 ```go
@@ -191,7 +207,9 @@ err := mgorm.CreateTable(db, "dept_emp").
 
 
 ## Unique
-`Unique`は引数に複数のカラム名をstring型で受け取ります．
+`Unique`はUNIQUE句を呼び出します．
+
+引数には複数カラム名を指定します．
 
 `Unique`は`Cons`に続けて呼び出すことができます．
 
@@ -217,7 +235,9 @@ err := mgorm.CreateTable(db, "employees").
 
 
 ## Primary
-`Primary`は引数に複数のカラム名をstring型で受け取ります．
+`Primary`はPRIMARY KEY句を呼び出します．
+
+引数には複数カラム名を指定します．
 
 `Primary`は`Cons`に続けて呼び出すことができます．
 
@@ -243,10 +263,13 @@ err := mgorm.CreateTable(db, "employees").
 
 
 ## Foreign
-`Foreign`は引数に複数のカラム名をstring型で受け取ります．
+`Foreign`はFOREIGN KEY句を呼び出します．
+
+引数には複数カラム名を指定します．
 
 `Foreign`は`Cons`に続けて呼び出すことができます．
-また，文を完了させるためには`Foreign`に続けて`Ref`を呼び出す必要があります．
+
+`Foreign`に続けて`Ref`を呼び出す必要があります．
 
 #### 例
 ```go
@@ -270,7 +293,9 @@ err := mgorm.CreateTable(db, "dept_emp").
 
 
 ## Ref
-`Ref`は引数にテーブル名と複数のカラム名を受け取ります．
+`Ref`はREFERENCES句を呼び出します．
+
+第1引数に参照テーブル名，第2引数以降に複数の参照カラム名を指定します．
 
 `Ref`は`Foreign`に続けて呼び出すことができます．
 
