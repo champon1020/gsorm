@@ -12,6 +12,7 @@ type DropTableStmt struct {
 	cmd *mig.DropTable
 }
 
+// NewDropTableStmt creates DropTableStmt instance.
 func NewDropTableStmt(conn domain.Conn, table string) *DropTableStmt {
 	stmt := &DropTableStmt{cmd: &mig.DropTable{Table: table}}
 	stmt.conn = conn
