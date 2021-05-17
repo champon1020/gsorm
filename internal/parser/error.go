@@ -1,4 +1,4 @@
-package internal
+package parser
 
 import "github.com/morikuni/failure"
 

@@ -1,9 +1,10 @@
-package internal
+package parser
 
 import (
 	"fmt"
 	"reflect"
 
+	"github.com/champon1020/mgorm/internal"
 	"github.com/morikuni/failure"
 )
 
@@ -32,8 +33,8 @@ func NewUpdateModelParser(cols []string, model interface{}) (*UpdateModelParser,
 }
 
 // Parse converts model to SQL.
-func (p *UpdateModelParser) Parse() (*SQL, error) {
-	var sql SQL
+func (p *UpdateModelParser) Parse() (*internal.SQL, error) {
+	var sql internal.SQL
 
 	switch p.ModelType.Kind() {
 	case reflect.Struct:
@@ -53,7 +54,7 @@ func (p *UpdateModelParser) Parse() (*SQL, error) {
 }
 
 // ParseMap parses map to SQL.
-func (p *UpdateModelParser) ParseMap(sql *SQL, model reflect.Value) error {
+func (p *UpdateModelParser) ParseMap(sql *internal.SQL, model reflect.Value) error {
 	for i, c := range p.Cols {
 		if i > 0 {
 			sql.Write(",")
@@ -63,30 +64,30 @@ func (p *UpdateModelParser) ParseMap(sql *SQL, model reflect.Value) error {
 			return failure.New(errInvalidSyntax,
 				failure.Message("column names must be included in one of map keys"))
 		}
-		s := ToString(v.Interface(), nil)
+		s := internal.ToString(v.Interface(), nil)
 		sql.Write(fmt.Sprintf("%s = %s", c, s))
 	}
 	return nil
 }
 
 // ParseStruct parses struct to SQL.
-func (p *UpdateModelParser) ParseStruct(sql *SQL, model reflect.Value) {
+func (p *UpdateModelParser) ParseStruct(sql *internal.SQL, model reflect.Value) {
 	if p.ColumnField == nil {
 		p.ColumnField = p.columnsAndFields(model.Type())
 	}
-	tags := ExtractTags(reflect.TypeOf(model.Interface()))
+	tags := internal.ExtractTags(reflect.TypeOf(model.Interface()))
 	for i := 0; i < len(p.Cols); i++ {
 		if i > 0 {
 			sql.Write(",")
 		}
 
-		var opt *ToStringOpt
+		var opt *internal.ToStringOpt
 		if tags[p.ColumnField[i]].Layout != "" {
-			opt = &ToStringOpt{Quotes: true, TimeFormat: tags[p.ColumnField[i]].Layout}
+			opt = &internal.ToStringOpt{Quotes: true, TimeFormat: tags[p.ColumnField[i]].Layout}
 		} else {
 			opt = nil
 		}
-		s := ToString(model.Field(p.ColumnField[i]).Interface(), opt)
+		s := internal.ToString(model.Field(p.ColumnField[i]).Interface(), opt)
 		sql.Write(fmt.Sprintf("%s = %s", p.Cols[i], s))
 	}
 }
@@ -95,9 +96,9 @@ func (p *UpdateModelParser) columnsAndFields(target reflect.Type) map[int]int {
 	cf := make(map[int]int)
 	for i, col := range p.Cols {
 		for j := 0; j < target.NumField(); j++ {
-			c := ExtractTag(target.Field(j)).Column
+			c := internal.ExtractTag(target.Field(j)).Column
 			if c == "" {
-				c = SnakeCase(target.Field(j).Name)
+				c = internal.SnakeCase(target.Field(j).Name)
 			}
 			if col != c {
 				continue

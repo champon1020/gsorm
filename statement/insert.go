@@ -6,6 +6,7 @@ import (
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/interfaces"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/internal/parser"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
@@ -118,12 +119,12 @@ func (s *InsertStmt) buildSQLWithClauses(sql *internal.SQL) error {
 // buildSQLWithModel builds SQL statement from model.
 func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
 	sql.Write("VALUES")
-	parser, err := internal.NewInsertModelParser(cols, model)
+	p, err := parser.NewInsertModelParser(cols, model)
 	if err != nil {
 		return failure.Translate(err, errFailedParse)
 	}
 
-	modelSQL, err := parser.Parse()
+	modelSQL, err := p.Parse()
 	if err != nil {
 		return failure.Translate(err, errFailedParse)
 	}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/internal/parser"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
 	"github.com/morikuni/failure"
@@ -105,7 +106,7 @@ func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt domain.Stmt, model
 		}
 
 		defer rows.Close()
-		if err := internal.MapRowsToModel(rows, model); err != nil {
+		if err := parser.MapRowsToModel(rows, model); err != nil {
 			return failure.Translate(err, errFailedParse)
 		}
 		return nil

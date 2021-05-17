@@ -1,10 +1,11 @@
-package internal
+package parser
 
 import (
 	"reflect"
 	"strconv"
 	"time"
 
+	"github.com/champon1020/mgorm/internal"
 	"github.com/morikuni/failure"
 )
 
@@ -220,7 +221,7 @@ func (p *RowsParser) ParseStruct(target reflect.Type) (*reflect.Value, error) {
 
 		opt := BytesParserOption{}
 		if item.Field(fIdx).Type() == reflect.TypeOf(time.Time{}) {
-			tag := ExtractTag(item.Type().Field(fIdx))
+			tag := internal.ExtractTag(item.Type().Field(fIdx))
 			if tag.Lookup("layout") {
 				opt.TimeLayout = tag.Layout
 			}
@@ -258,9 +259,9 @@ func (p *RowsParser) columnsAndFields(target reflect.Type) map[int]int {
 	cf := make(map[int]int)
 	for i, col := range p.Cols {
 		for j := 0; j < target.NumField(); j++ {
-			c := ExtractTag(target.Field(j)).Column
+			c := internal.ExtractTag(target.Field(j)).Column
 			if c == "" {
-				c = SnakeCase(target.Field(j).Name)
+				c = internal.SnakeCase(target.Field(j).Name)
 			}
 			if col != c {
 				continue

@@ -1,10 +1,11 @@
-package internal
+package parser
 
 import (
 	"fmt"
 	"reflect"
 	"strconv"
 
+	"github.com/champon1020/mgorm/internal"
 	"github.com/morikuni/failure"
 )
 
@@ -33,8 +34,8 @@ func NewInsertModelParser(cols []string, model interface{}) (*InsertModelParser,
 }
 
 // Parse converts model to SQL.
-func (p *InsertModelParser) Parse() (*SQL, error) {
-	var sql SQL
+func (p *InsertModelParser) Parse() (*internal.SQL, error) {
+	var sql internal.SQL
 
 	switch p.ModelType.Kind() {
 	case reflect.Slice, reflect.Array:
@@ -87,7 +88,7 @@ func (p *InsertModelParser) Parse() (*SQL, error) {
 }
 
 // ParseMapSlice parses slice or array of map to SQL.
-func (p *InsertModelParser) ParseMapSlice(sql *SQL, model reflect.Value) error {
+func (p *InsertModelParser) ParseMapSlice(sql *internal.SQL, model reflect.Value) error {
 	for i := 0; i < model.Len(); i++ {
 		if i > 0 {
 			sql.Write(",")
@@ -100,7 +101,7 @@ func (p *InsertModelParser) ParseMapSlice(sql *SQL, model reflect.Value) error {
 }
 
 // ParseStructSlice parses slice or array of struct to SQL.
-func (p *InsertModelParser) ParseStructSlice(sql *SQL, model reflect.Value) {
+func (p *InsertModelParser) ParseStructSlice(sql *internal.SQL, model reflect.Value) {
 	p.ColumnField = p.columnsAndFields(model.Type().Elem())
 	for i := 0; i < model.Len(); i++ {
 		if i > 0 {
@@ -111,7 +112,7 @@ func (p *InsertModelParser) ParseStructSlice(sql *SQL, model reflect.Value) {
 }
 
 // ParseVarSlice parses slice or array of variable to SQL.
-func (p *InsertModelParser) ParseVarSlice(sql *SQL, model reflect.Value) error {
+func (p *InsertModelParser) ParseVarSlice(sql *internal.SQL, model reflect.Value) error {
 	for i := 0; i < model.Len(); i++ {
 		if i > 0 {
 			sql.Write(",")
@@ -125,7 +126,7 @@ func (p *InsertModelParser) ParseVarSlice(sql *SQL, model reflect.Value) error {
 }
 
 // ParseMap parses map to SQL.
-func (p *InsertModelParser) ParseMap(sql *SQL, model reflect.Value) error {
+func (p *InsertModelParser) ParseMap(sql *internal.SQL, model reflect.Value) error {
 	sql.Write("(")
 	for i, c := range p.Cols {
 		if i > 0 {
@@ -136,7 +137,7 @@ func (p *InsertModelParser) ParseMap(sql *SQL, model reflect.Value) error {
 			return failure.New(errInvalidSyntax,
 				failure.Message("column names must be included in one of map keys"))
 		}
-		s := ToString(v.Interface(), nil)
+		s := internal.ToString(v.Interface(), nil)
 		sql.Write(s)
 	}
 	sql.Write(")")
@@ -144,38 +145,38 @@ func (p *InsertModelParser) ParseMap(sql *SQL, model reflect.Value) error {
 }
 
 // ParseStruct parses struct to SQL.
-func (p *InsertModelParser) ParseStruct(sql *SQL, model reflect.Value) {
+func (p *InsertModelParser) ParseStruct(sql *internal.SQL, model reflect.Value) {
 	if p.ColumnField == nil {
 		p.ColumnField = p.columnsAndFields(model.Type())
 	}
 	sql.Write("(")
-	tags := ExtractTags(reflect.TypeOf(model.Interface()))
+	tags := internal.ExtractTags(reflect.TypeOf(model.Interface()))
 	for i := 0; i < len(p.Cols); i++ {
 		if i > 0 {
 			sql.Write(",")
 		}
 
-		var opt *ToStringOpt
+		var opt *internal.ToStringOpt
 		if tags[p.ColumnField[i]].Layout != "" {
-			opt = &ToStringOpt{Quotes: true, TimeFormat: tags[p.ColumnField[i]].Layout}
+			opt = &internal.ToStringOpt{Quotes: true, TimeFormat: tags[p.ColumnField[i]].Layout}
 		} else {
 			opt = nil
 		}
-		s := ToString(model.Field(p.ColumnField[i]).Interface(), opt)
+		s := internal.ToString(model.Field(p.ColumnField[i]).Interface(), opt)
 		sql.Write(s)
 	}
 	sql.Write(")")
 }
 
 // ParseVar parses variable to SQL.
-func (p *InsertModelParser) ParseVar(sql *SQL, model reflect.Value) error {
+func (p *InsertModelParser) ParseVar(sql *internal.SQL, model reflect.Value) error {
 	if len(p.Cols) != 1 {
 		return failure.New(errInvalidSyntax,
 			failure.Context{"n_columns": strconv.Itoa(len(p.Cols))},
 			failure.Message("invalid number of columns"))
 	}
 
-	s := ToString(model.Interface(), nil)
+	s := internal.ToString(model.Interface(), nil)
 	sql.Write(fmt.Sprintf("(%s)", s))
 	return nil
 }
@@ -184,9 +185,9 @@ func (p *InsertModelParser) columnsAndFields(target reflect.Type) map[int]int {
 	cf := make(map[int]int)
 	for i, col := range p.Cols {
 		for j := 0; j < target.NumField(); j++ {
-			c := ExtractTag(target.Field(j)).Column
+			c := internal.ExtractTag(target.Field(j)).Column
 			if c == "" {
-				c = SnakeCase(target.Field(j).Name)
+				c = internal.SnakeCase(target.Field(j).Name)
 			}
 			if col != c {
 				continue
