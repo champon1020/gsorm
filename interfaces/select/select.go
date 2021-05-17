@@ -15,7 +15,6 @@ type From interface {
 	Join(table string) Join
 	LeftJoin(table string) Join
 	RightJoin(table string) Join
-	FullJoin(table string) Join
 	Where(expr string, vals ...interface{}) Where
 	GroupBy(cols ...string) GroupBy
 	Having(expr string, vals ...interface{}) Having

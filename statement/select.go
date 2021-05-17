@@ -165,14 +165,6 @@ func (s *SelectStmt) RightJoin(table string) ifc.Join {
 	return s
 }
 
-// FullJoin calls (INNER) JOIN clause.
-func (s *SelectStmt) FullJoin(table string) ifc.Join {
-	j := &clause.Join{Type: clause.FullJoin}
-	j.AddTable(table)
-	s.call(j)
-	return s
-}
-
 // On calls ON clause.
 func (s *SelectStmt) On(expr string, vals ...interface{}) ifc.On {
 	s.call(&clause.On{Expr: expr, Values: vals})
