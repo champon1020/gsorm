@@ -48,6 +48,7 @@ err := mgorm.CreateTable(db, "employees").
   - [Primary](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#primary)
   - [Foreign](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#foreign)
     - [Ref](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#ref)
+- [Model](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#model)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 
@@ -322,5 +323,40 @@ err := mgorm.CreateTable(db, "dept_emp").
 // CREATE TABLE employees (
 //      emp_no INT NOT NULL,
 //      CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no, first_name) REFERENCES employees (emp_no, first_name)
+// );
+```
+
+
+## Model
+`Model`は構造体をマッピングします．
+
+引数には構造体のポインタを指定します．
+
+構造体もしくは構造体のスライスをマッピングする際，対象のカラム名はフィールド名もしくはフィールドタグから推定されます．
+また，型やNULL，デフォルト値，制約などはフィールドタグから推定されます．
+
+Modelについての詳細は[Model]()に記載されています．
+
+#### 例
+```go
+type Employee struct {
+    ID          int         `mgorm:"emp_no typ=INT notnull=t"`
+    BirthDate   time.Time   `mgorm:"typ=DATE notnull=t"`
+    FirstName   string      `mgorm:"typ=VARCHAR(16) notnull=t"`
+    LastName    string      `mgorm:"typ=VARCHAR(14) notnull=t"`
+    Gender      string      `mgorm:"typ=ENUM('M', 'F') notnull=t"`
+    HireDate    string      `mgorm:"typ=DATE notnull=t"`
+}
+
+err := mgorm.CreateTable(db, "employees").
+    Model(&Employee{}).Migrate()
+// CREATE TABLE employees (
+//      emp_no      INT             NOT NULL,
+//      birth_date  DATE            NOT NULL,
+//      first_name  VARCHAR(14)     NOT NULL,
+//      last_name   VARCHAR(16)     NOT NULL,
+//      gender      ENUM('M', 'F')  NOT NULL,
+//      hire_date   DATE            NOT NULL,
+//      CONSTRAINT PK_employees PRIMARY KEY (emp_no)
 // );
 ```
