@@ -8,19 +8,19 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestRename_Build(t *testing.T) {
+func TestCreateDB_Build(t *testing.T) {
 	testCases := []struct {
-		Rename   *mig.Rename
+		CreateDB *mig.CreateDB
 		Expected *syntax.StmtSet
 	}{
 		{
-			&mig.Rename{Table: "table"},
-			&syntax.StmtSet{Keyword: "RENAME TO", Value: "table"},
+			&mig.CreateDB{DBName: "database"},
+			&syntax.StmtSet{Keyword: "CREATE DATABASE", Value: "database"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		actual, err := testCase.Rename.Build()
+		actual, err := testCase.CreateDB.Build()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue

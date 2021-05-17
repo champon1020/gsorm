@@ -8,19 +8,19 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestRename_Build(t *testing.T) {
+func TestAddColumn_Build(t *testing.T) {
 	testCases := []struct {
-		Rename   *mig.Rename
-		Expected *syntax.StmtSet
+		AddColumn *mig.AddColumn
+		Expected  *syntax.StmtSet
 	}{
 		{
-			&mig.Rename{Table: "table"},
-			&syntax.StmtSet{Keyword: "RENAME TO", Value: "table"},
+			&mig.AddColumn{Column: "column", Type: "type"},
+			&syntax.StmtSet{Keyword: "ADD COLUMN", Value: "column type"},
 		},
 	}
 
 	for _, testCase := range testCases {
-		actual, err := testCase.Rename.Build()
+		actual, err := testCase.AddColumn.Build()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
