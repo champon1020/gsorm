@@ -23,9 +23,9 @@ err := mgorm.Insert(db, "employees", "emp_no", "first_name").
 # Methods
 `mgorm.Insert`に使用できるメソッドは以下です．
 
-- [Values](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#values)
-- [Select](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#select)
-- [Model](https://github.com/champon1020/mgorm/tree/main/docs/insert_jp.md#model)
+- [Values](https://github.com/champon1020/mgorm/tree/main/docs/insert_ja.md#values)
+- [Select](https://github.com/champon1020/mgorm/tree/main/docs/insert_ja.md#select)
+- [Model](https://github.com/champon1020/mgorm/tree/main/docs/insert_ja.md#model)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 
@@ -96,7 +96,7 @@ err := mgorm.Insert(db, "dept_manager").
 
 構造体もしくは構造体のスライスをマッピングする際，対象のカラム名はフィールド名もしくはフィールドタグから推定されます．
 
-Modelについての詳細は[Model](https://github.com/champon1020/mgorm/blob/main/docs/model_jp.md)に記載されています．
+Modelについての詳細は[Model](https://github.com/champon1020/mgorm/blob/main/docs/model_ja.md)に記載されています．
 
 #### 例
 ```go

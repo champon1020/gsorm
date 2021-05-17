@@ -40,15 +40,15 @@ err := mgorm.CreateTable(db, "employees").
 
 # Methods
 `mgorm.CreateTable`で使用できるメソッドを以下に示します．
-- [Column](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#column)
-  - [NotNull](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#notnull)
-  - [Default](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#default)
-- [Cons](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#cons)
-  - [Unique](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#unique)
-  - [Primary](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#primary)
-  - [Foreign](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#foreign)
-    - [Ref](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#ref)
-- [Model](https://github.com/champon1020/mgorm/tree/main/docs/createtable_jp.md#model)
+- [Column](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#column)
+  - [NotNull](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#notnull)
+  - [Default](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#default)
+- [Cons](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#cons)
+  - [Unique](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#unique)
+  - [Primary](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#primary)
+  - [Foreign](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#foreign)
+    - [Ref](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#ref)
+- [Model](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#model)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 
@@ -335,7 +335,7 @@ err := mgorm.CreateTable(db, "dept_emp").
 構造体もしくは構造体のスライスをマッピングする際，対象のカラム名はフィールド名もしくはフィールドタグから推定されます．
 また，型やNULL，デフォルト値，制約などはフィールドタグから推定されます．
 
-Modelについての詳細は[Model]()に記載されています．
+Modelについての詳細は[Model](https://github.com/champon1020/mgorm/tree/main/docs/model_ja.md)に記載されています．
 
 #### 例
 ```go

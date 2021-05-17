@@ -13,10 +13,10 @@ err := mgorm.Delete(db).From("employees").Exec()
 # Methods
 `mgorm.Delete`に使用できるメソッドは以下です．
 
-- [From](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#from)
-- [Where](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#where)
-- [And](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#and)
-- [Or](https://github.com/champon1020/mgorm/tree/main/docs/delete_jp.md#or)
+- [From](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#from)
+- [Where](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#where)
+- [And](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#and)
+- [Or](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#or)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 

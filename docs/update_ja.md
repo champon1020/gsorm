@@ -25,11 +25,11 @@ mgorm.Update(db).Set(10, "employees").
 # Methods
 `mgorm.Update`で使用できるメソッドは以下です．
 
-- [Set](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#set)
-- [Where](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#where)
-- [And](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#and)
-- [Or](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#or)
-- [Model](https://github.com/champon1020/mgorm/tree/main/docs/update_jp.md#model)
+- [Set](https://github.com/champon1020/mgorm/tree/main/docs/update_ja.md#set)
+- [Where](https://github.com/champon1020/mgorm/tree/main/docs/update_ja.md#where)
+- [And](https://github.com/champon1020/mgorm/tree/main/docs/update_ja.md#and)
+- [Or](https://github.com/champon1020/mgorm/tree/main/docs/update_ja.md#or)
+- [Model](https://github.com/champon1020/mgorm/tree/main/docs/update_ja.md#model)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 
@@ -393,7 +393,7 @@ err := mgorm.Update(db).From("employees").
 
 構造体もしくは構造体のスライスをマッピングする際，対象のカラム名はフィールド名もしくはフィールドタグから推定されます．
 
-Modelについての詳細は[Model](https://github.com/champon1020/mgorm/blob/main/docs/model_jp.md)に記載されています．
+Modelについての詳細は[Model](https://github.com/champon1020/mgorm/blob/main/docs/model_ja.md)に記載されています．
 
 #### 例
 ```go

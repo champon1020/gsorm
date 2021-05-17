@@ -27,20 +27,20 @@ err := mgorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 # Methods
 `mgorm.Select`に使用できるメソッドは以下です．
 
-- [From](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#from)
-- [Join](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#join)
-- [LeftJoin](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#leftjoin)
-- [RightJoin](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#rightjoin)
-- [Where](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#where)
-- [And](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#and)
-- [Or](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#or)
-- [GroupBy](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#groupby)
-- [Having](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#having)
-- [Union](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#union)
-- [UnionAll](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#unionall)
-- [OrderBy](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#orderby)
-- [Limit](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#limit)
-- [Offset](https://github.com/champon1020/mgorm/tree/main/docs/select_jp.md#offset)
+- [From](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#from)
+- [Join](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#join)
+- [LeftJoin](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#leftjoin)
+- [RightJoin](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#rightjoin)
+- [Where](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#where)
+- [And](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#and)
+- [Or](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#or)
+- [GroupBy](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#groupby)
+- [Having](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#having)
+- [Union](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#union)
+- [UnionAll](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#unionall)
+- [OrderBy](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#orderby)
+- [Limit](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#limit)
+- [Offset](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#offset)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 

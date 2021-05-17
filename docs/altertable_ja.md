@@ -20,17 +20,17 @@ err := mgorm.AlterTable(db, "employees").
 # Methods
 `mgorm.AlterTable`に使用できるメソッドは以下です．
 
-- [Rename](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#rename)
-- [AddColumn](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#addcolumn)
-    - [NotNull](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#addcolumn.notnull)
-    - [Default](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#addcolumn.default)
-- [DropColumn](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#dropcolumn)
-- [RenameColumn](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#renamecolumn)
-- [AddCons](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#addcons)
-    - [Unique](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#addcons.unique)
-    - [Primary](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#addcons.primary)
-    - [Foreign](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#addcons.foreign)
-        - [Ref](https://github.com/champon1020/mgorm/tree/main/docs/altertable_jp.md#addcons.foreign.ref)
+- [Rename](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#rename)
+- [AddColumn](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcolumn)
+    - [NotNull](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcolumn.notnull)
+    - [Default](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcolumn.default)
+- [DropColumn](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#dropcolumn)
+- [RenameColumn](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#renamecolumn)
+- [AddCons](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons)
+    - [Unique](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons.unique)
+    - [Primary](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons.primary)
+    - [Foreign](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons.foreign)
+        - [Ref](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons.foreign.ref)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 
