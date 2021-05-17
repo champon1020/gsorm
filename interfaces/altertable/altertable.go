@@ -9,9 +9,6 @@ type Table interface {
 	DropColumn(string) DropColumn
 	RenameColumn(string, string) RenameColumn
 	AddCons(string) AddCons
-	DropPrimary(string) DropPrimary
-	DropForeign(string) DropForeign
-	DropUnique(string) DropUnique
 }
 
 // Rename is interface which is returned by (*AlterTableStmt).Rename.
@@ -56,24 +53,6 @@ type AddCons interface {
 	Unique(...string) Unique
 	Primary(...string) Primary
 	Foreign(...string) Foreign
-}
-
-// DropUnique is interface which is returned by (*AlterTableStmt).DropUnique.
-type DropUnique interface {
-	Table
-	interfaces.MigrateCallable
-}
-
-// DropPrimary is interface which is returned by (*AlterTableStmt).DropPrimary.
-type DropPrimary interface {
-	Table
-	interfaces.MigrateCallable
-}
-
-// DropForeign is interface which is returned by (*AlterTableStmt).DropForeign.
-type DropForeign interface {
-	Table
-	interfaces.MigrateCallable
 }
 
 // Unique is interface which is returned by (*AlterTableStmt).Unique.

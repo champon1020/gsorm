@@ -50,11 +50,7 @@ func (s *AlterTableStmt) buildSQL(sql *internal.SQL) error {
 		switch e := e.(type) {
 		case *mig.Rename,
 			*mig.RenameColumn,
-			*mig.DropColumn,
-			*mig.DropUnique,
-			*mig.DropPrimary,
-			*mig.DropForeign,
-			*mig.DropIndex:
+			*mig.DropColumn:
 			ss, err := e.Build()
 			if err != nil {
 				return err
@@ -130,24 +126,6 @@ func (s *AlterTableStmt) Default(val interface{}) ifc.Default {
 // AddCons calls ADD CONSTRAINT clause.
 func (s *AlterTableStmt) AddCons(key string) ifc.AddCons {
 	s.call(&mig.AddCons{Key: key})
-	return s
-}
-
-// DropUnique calls DROP INDEX | DROP CONSTRAINT clause.
-func (s *AlterTableStmt) DropUnique(key string) ifc.DropUnique {
-	s.call(&mig.DropUnique{Key: key})
-	return s
-}
-
-// DropPrimary calls DROP PRIMARY KEY | DROP CONSTRAINT clause.
-func (s *AlterTableStmt) DropPrimary(key string) ifc.DropPrimary {
-	s.call(&mig.DropPrimary{Key: key})
-	return s
-}
-
-// DropForeign calls DROP FOREIGN KEY | DROP CONSTRAINT clause.
-func (s *AlterTableStmt) DropForeign(key string) ifc.DropForeign {
-	s.call(&mig.DropForeign{Key: key})
 	return s
 }
 

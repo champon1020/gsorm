@@ -1,7 +1,6 @@
 package mig
 
 import (
-	"github.com/champon1020/mgorm/database"
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -42,24 +41,6 @@ func (d *DropTable) Build() (*syntax.StmtSet, error) {
 	return ss, nil
 }
 
-// DropIndex is DROP INDEX command.
-type DropIndex struct {
-	IdxName string
-}
-
-// Keyword returns clause keyword.
-func (d *DropIndex) Keyword() string {
-	return "DROP INDEX"
-}
-
-// Build makes DROP INDEX clause with syntax.StmtSet.
-func (d *DropIndex) Build() (*syntax.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(d.Keyword())
-	ss.WriteValue(d.IdxName)
-	return ss, nil
-}
-
 // DropColumn is DROP COLUMN clause.
 type DropColumn struct {
 	Column string
@@ -82,66 +63,4 @@ func (d *DropColumn) Build() (*syntax.StmtSet, error) {
 type DropPrimary struct {
 	Driver domain.SQLDriver
 	Key    string
-}
-
-// Keyword returns clause keyword.
-func (d *DropPrimary) Keyword() string {
-	if d.Driver == database.PsqlDriver {
-		return "DROP CONSTRAINT"
-	}
-	return "DROP PRIMARY KEY"
-}
-
-// Build makes DROP PRIMARY KEY | DROP CONSTRAINT clause.
-func (d *DropPrimary) Build() (*syntax.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(d.Keyword())
-	if d.Driver == database.PsqlDriver {
-		ss.WriteValue(d.Key)
-	}
-	return ss, nil
-}
-
-// DropForeign is DROP FOREIGN KEY | DROP CONSTRAINT clause.
-type DropForeign struct {
-	Driver domain.SQLDriver
-	Key    string
-}
-
-// Keyword returns clause keyword.
-func (d *DropForeign) Keyword() string {
-	if d.Driver == database.PsqlDriver {
-		return "DROP CONSTRAINT"
-	}
-	return "DROP FOREIGN KEY"
-}
-
-// Build makes DROP FOREIGN KEY | DROP CONSTRAINT clause.
-func (d *DropForeign) Build() (*syntax.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(d.Keyword())
-	ss.WriteValue(d.Key)
-	return ss, nil
-}
-
-// DropUnique is DROP UNIQUE | DROP CONSTRAINT clause.
-type DropUnique struct {
-	Driver domain.SQLDriver
-	Key    string
-}
-
-// Keyword returns clause keyword.
-func (d *DropUnique) Keyword() string {
-	if d.Driver == database.PsqlDriver {
-		return "DROP CONSTRAINT"
-	}
-	return "DROP INDEX"
-}
-
-// Build makes DROP INDEX KEY | DROP CONSTRAINT clause.
-func (d *DropUnique) Build() (*syntax.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(d.Keyword())
-	ss.WriteValue(d.Key)
-	return ss, nil
 }

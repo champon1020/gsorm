@@ -11,7 +11,6 @@ import (
 	ifcreatetable "github.com/champon1020/mgorm/interfaces/createtable"
 	ifdelete "github.com/champon1020/mgorm/interfaces/delete"
 	ifdropdb "github.com/champon1020/mgorm/interfaces/dropdb"
-	ifdropindex "github.com/champon1020/mgorm/interfaces/dropindex"
 	ifdroptable "github.com/champon1020/mgorm/interfaces/droptable"
 	ifinsert "github.com/champon1020/mgorm/interfaces/insert"
 	ifselect "github.com/champon1020/mgorm/interfaces/select"
@@ -113,11 +112,6 @@ func CreateTable(conn domain.Conn, table string) ifcreatetable.Table {
 // DropDB calls DROP DATABASE command.
 func DropDB(conn domain.Conn, dbName string) ifdropdb.DB {
 	return migration.NewDropDBStmt(conn, dbName)
-}
-
-// DropIndex calls DROP INDEX command.
-func DropIndex(conn domain.Conn, idx string) ifdropindex.Index {
-	return migration.NewDropIndexStmt(conn, idx)
 }
 
 // DropTable calls DROP TABLE command.
