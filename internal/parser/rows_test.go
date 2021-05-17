@@ -1,10 +1,10 @@
-package internal_test
+package parser_test
 
 import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/internal/parser"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,7 +81,7 @@ func TestRowsParser_ParseMapSlice(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		p, err := internal.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
+		p, err := parser.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
@@ -118,7 +118,7 @@ func TestRowsParser_ParseStructSlice(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		p, err := internal.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
+		p, err := parser.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
@@ -149,7 +149,7 @@ func TestRowsParser_ParseSlice(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		p, err := internal.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
+		p, err := parser.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
@@ -203,7 +203,7 @@ func TestRowsParser_ParseMap(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		p, err := internal.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
+		p, err := parser.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
@@ -258,7 +258,7 @@ func TestRowsParser_ParseStruct(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		p, err := internal.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
+		p, err := parser.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
@@ -373,7 +373,7 @@ func TestRowsParser_ParseVar(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		p, err := internal.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
+		p, err := parser.NewRowsParser(&Rows{Cols: testCase.RowsCols, Vals: testCase.RowsVals}, testCase.Model)
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue

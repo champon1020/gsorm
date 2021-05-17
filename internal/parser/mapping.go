@@ -1,4 +1,4 @@
-package internal
+package parser
 
 import (
 	"database/sql"
@@ -7,12 +7,12 @@ import (
 
 // MapRowsToModel executes query and sets rows to model structure.
 func MapRowsToModel(rows *sql.Rows, model interface{}) error {
-	parser, err := NewRowsParser(rows, model)
+	p, err := NewRowsParser(rows, model)
 	if err != nil {
 		return err
 	}
 
-	v, err := parser.Parse()
+	v, err := p.Parse()
 	if err != nil {
 		return err
 	}

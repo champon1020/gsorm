@@ -1,11 +1,11 @@
-package internal_test
+package parser_test
 
 import (
 	"math"
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/internal/parser"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -45,12 +45,12 @@ func TestUpdateModelParser_ParseMap(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		parser, err := internal.NewUpdateModelParser(testCase.Cols, testCase.Model)
+		p, err := parser.NewUpdateModelParser(testCase.Cols, testCase.Model)
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		sql, err := parser.Parse()
+		sql, err := p.Parse()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
@@ -93,12 +93,12 @@ func TestUpdateModelParser_ParseStruct(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		parser, err := internal.NewUpdateModelParser(testCase.Cols, testCase.Model)
+		p, err := parser.NewUpdateModelParser(testCase.Cols, testCase.Model)
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
 		}
-		sql, err := parser.Parse()
+		sql, err := p.Parse()
 		if err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			continue
