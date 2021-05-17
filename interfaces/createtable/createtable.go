@@ -33,6 +33,7 @@ type NotNull interface {
 // Default is interface which is returned by (*CreateTableStmt).Default.
 type Default interface {
 	Column(string, string) Column
+	NotNull() NotNull
 	Cons(string) Cons
 	interfaces.MigrateCallable
 }

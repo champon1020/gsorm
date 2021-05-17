@@ -160,6 +160,12 @@ err := mgorm.CreateTable(db, "employees").
 // );
 
 err := mgorm.CreateTable(db, "employees").
+    Column("emp_no", "INT").Default(1).NotNull().Migrate()
+// CREATE TABLE employees (
+//      emp_no INT DEFAULT 1 NOT NULL
+// );
+
+err := mgorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().Default(1).
     Column("birth_date", "DATE").NotNull().Migrate()
 // CREATE TABLE employees (
@@ -201,7 +207,7 @@ err := mgorm.CreateTable(db, "dept_emp").
     Cons("FK_dept_emp_emp_no").Foreign("emp_no").Ref("employees", "emp_no").Migrate()
 // CREATE TABLE employees (
 //      emp_no INT NOT NULL,
-//      CONSTRAINT FK_dept_emp_emp_no FOREIGN KEY (emp_no) REFERENCES employees(emp_no)
+//      CONSTRAINT FK_dept_emp_emp_no FOREIGN KEY (emp_no) REFERENCES employees (emp_no)
 // );
 ```
 
@@ -306,7 +312,7 @@ err := mgorm.CreateTable(db, "dept_emp").
     Cons("FK_dept_emp").Foreign("emp_no").Ref("employees(emp_no)").Migrate()
 // CREATE TABLE employees (
 //      emp_no INT NOT NULL,
-//      CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no) REFERENCES employees(emp_no)
+//      CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no) REFERENCES employees (emp_no)
 // );
 
 err := mgorm.CreateTable(db, "dept_emp").
@@ -315,6 +321,6 @@ err := mgorm.CreateTable(db, "dept_emp").
     Cons("FK_dept_emp").Foreign("emp_no", "first_name").Ref("employees", "emp_no", "first_name").Migrate()
 // CREATE TABLE employees (
 //      emp_no INT NOT NULL,
-//      CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no, first_name) REFERENCES employees(emp_no, first_name)
+//      CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no, first_name) REFERENCES employees (emp_no, first_name)
 // );
 ```
