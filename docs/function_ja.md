@@ -3,11 +3,11 @@ COUNTやAVGなどのfunction queryを簡単に実装するために，以下の�
 
 扱い方は`mgorm.Select`と同様です．
 
-- [Count](https://github.com/champon1020/mgorm/tree/main/docs/fnquery_jp.md#count)
-- [Sum](https://github.com/champon1020/mgorm/tree/main/docs/fnquery_jp.md#sum)
-- [Avg](https://github.com/champon1020/mgorm/tree/main/docs/fnquery_jp.md#avg)
-- [Max](https://github.com/champon1020/mgorm/tree/main/docs/fnquery_jp.md#max)
-- [Min](https://github.com/champon1020/mgorm/tree/main/docs/fnquery_jp.md#min)
+- [Count](https://github.com/champon1020/mgorm/tree/main/docs/fnquery_ja.md#count)
+- [Sum](https://github.com/champon1020/mgorm/tree/main/docs/fnquery_ja.md#sum)
+- [Avg](https://github.com/champon1020/mgorm/tree/main/docs/fnquery_ja.md#avg)
+- [Max](https://github.com/champon1020/mgorm/tree/main/docs/fnquery_ja.md#max)
+- [Min](https://github.com/champon1020/mgorm/tree/main/docs/fnquery_ja.md#min)
 
 
 ## Count

@@ -1,6 +1,6 @@
 # Model
 `Model`を使用することで構造体を用いたマッピングを行うことができます．
-このメソッドは[Insert]()，[Update]()，[CreateTable]()において使用することができます．
+このメソッドは[Insert](https://github.com/champon1020/mgorm/tree/main/docs/insert_ja.md)，[Update](https://github.com/champon1020/mgorm/tree/main/docs/update_ja.md)，[CreateTable](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md)において使用することができます．
 
 `Model`の引数には，スライス，構造体，マップ，`int`や`string`などの事前定義型を渡すことができます．
 この際，必ず参照を渡すようにしてください．
