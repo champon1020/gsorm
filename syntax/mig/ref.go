@@ -1,15 +1,13 @@
 package mig
 
 import (
-	"fmt"
-
 	"github.com/champon1020/mgorm/syntax"
 )
 
 // Ref is REFERENCES clause.
 type Ref struct {
-	Table  string
-	Column string
+	Table   string
+	Columns []string
 }
 
 // Keyword returns clause keyword.
@@ -21,6 +19,14 @@ func (r *Ref) Keyword() string {
 func (r *Ref) Build() (*syntax.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(r.Keyword())
-	ss.WriteValue(fmt.Sprintf("%s(%s)", r.Table, r.Column))
+	ss.WriteValue(r.Table)
+	ss.WriteValue("(")
+	for i, c := range r.Columns {
+		if i > 0 {
+			ss.WriteValue(",")
+		}
+		ss.WriteValue(c)
+	}
+	ss.WriteValue(")")
 	return ss, nil
 }

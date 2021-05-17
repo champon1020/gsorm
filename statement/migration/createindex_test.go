@@ -14,14 +14,14 @@ func TestCreateIndex_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateIndex(nil, "IDX_id").
-				On("person", "id").(*migration.CreateIndexStmt),
-			`CREATE INDEX IDX_id ON person (id)`,
+			mgorm.CreateIndex(nil, "IDX_emp").
+				On("employees", "emp_no").(*migration.CreateIndexStmt),
+			`CREATE INDEX IDX_emp ON employees (emp_no)`,
 		},
 		{
-			mgorm.CreateIndex(nil, "IDX_id").
-				On("person", "id", "name").(*migration.CreateIndexStmt),
-			`CREATE INDEX IDX_id ON person (id, name)`,
+			mgorm.CreateIndex(nil, "IDX_emp").
+				On("employees", "emp_no", "first_name").(*migration.CreateIndexStmt),
+			`CREATE INDEX IDX_emp ON employees (emp_no, first_name)`,
 		},
 	}
 

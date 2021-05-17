@@ -48,6 +48,7 @@ type NotNull interface {
 // Default is interface which is returned by (*AlterTableStmt).Default.
 type Default interface {
 	Table
+	NotNull() NotNull
 }
 
 // AddCons is interface which is returned by (*AlterTableStmt).AddCons.
@@ -89,7 +90,7 @@ type Primary interface {
 
 // Foreign is interface which is returned by (*AlterTableStmt).Foreign.
 type Foreign interface {
-	Ref(string, string) Ref
+	Ref(string, ...string) Ref
 }
 
 // Ref is interface which is returned by (*AlterTableStmt).Ref.

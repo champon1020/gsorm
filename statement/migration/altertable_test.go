@@ -2,70 +2,174 @@ package migration_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/statement/migration"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAlterTable_String(t *testing.T) {
+func TestAlterTableStmt_Rename(t *testing.T) {
 	testCases := []struct {
 		Stmt     *migration.AlterTableStmt
 		Expected string
 	}{
-		// RENAME TO action.
 		{
-			mgorm.AlterTable(nil, "person").
-				Rename("human").(*migration.AlterTableStmt),
-			`ALTER TABLE person RENAME TO human`,
+			mgorm.AlterTable(nil, "employees").Rename("people").(*migration.AlterTableStmt),
+			`ALTER TABLE employees RENAME TO people`,
 		},
-		// ADD COLUMN action.
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestAlterTableStmt_AddColumn(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.AlterTableStmt
+		Expected string
+	}{
 		{
-			mgorm.AlterTable(nil, "person").
-				AddColumn("id", "INT").NotNull().(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`ADD COLUMN id INT NOT NULL`,
-		},
-		{
-			mgorm.AlterTable(nil, "person").
-				AddColumn("birth_date", "DATE").NotNull().
-				Default(time.Date(2021, time.January, 2, 0, 0, 0, 0, time.UTC)).(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`ADD COLUMN birth_date DATE NOT NULL DEFAULT '2021-01-02 00:00:00'`,
-		},
-		// DROP COLUMN action.
-		{
-			mgorm.AlterTable(nil, "person").
-				DropColumn("nickname").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`DROP COLUMN nickname`,
-		},
-		// RENAME COLUMN action.
-		{
-			mgorm.AlterTable(nil, "person").
-				RenameColumn("name", "first_name").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`RENAME COLUMN name TO first_name`,
-		},
-		// ADD CONSTRAINT action.
-		{
-			mgorm.AlterTable(nil, "person").
-				AddCons("UC_name").Unique("name", "nickname").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`ADD CONSTRAINT UC_name UNIQUE (name, nickname)`,
+			mgorm.AlterTable(nil, "employees").AddColumn("nickname", "VARCHAR(64)").(*migration.AlterTableStmt),
+			`ALTER TABLE employees ADD COLUMN nickname VARCHAR(64)`,
 		},
 		{
-			mgorm.AlterTable(nil, "person").
-				AddCons("PK_id").Primary("id").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`ADD CONSTRAINT PK_id PRIMARY KEY (id)`,
+			mgorm.AlterTable(nil, "employees").
+				AddColumn("nickname", "VARCHAR(64)").
+				NotNull().(*migration.AlterTableStmt),
+			`ALTER TABLE employees ` +
+				`ADD COLUMN nickname VARCHAR(64) NOT NULL`,
 		},
 		{
-			mgorm.AlterTable(nil, "person").
-				AddCons("FK_country_code").Foreign("country_code").Ref("country", "code").(*migration.AlterTableStmt),
-			`ALTER TABLE person ` +
-				`ADD CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country(code)`,
+			mgorm.AlterTable(nil, "employees").
+				AddColumn("nickname", "VARCHAR(64)").
+				NotNull().
+				Default("none").(*migration.AlterTableStmt),
+			`ALTER TABLE employees ` +
+				`ADD COLUMN nickname VARCHAR(64) NOT NULL DEFAULT 'none'`,
+		},
+		{
+			mgorm.AlterTable(nil, "employees").
+				AddColumn("nickname", "VARCHAR(64)").
+				Default("none").(*migration.AlterTableStmt),
+			`ALTER TABLE employees ` +
+				`ADD COLUMN nickname VARCHAR(64) DEFAULT 'none'`,
+		},
+		{
+			mgorm.AlterTable(nil, "employees").
+				AddColumn("nickname", "VARCHAR(64)").
+				Default("none").
+				NotNull().(*migration.AlterTableStmt),
+			`ALTER TABLE employees ` +
+				`ADD COLUMN nickname VARCHAR(64) DEFAULT 'none' NOT NULL`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestAlterTableStmt_DropColumn(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.AlterTableStmt
+		Expected string
+	}{
+		{
+			mgorm.AlterTable(nil, "employees").DropColumn("nickname").(*migration.AlterTableStmt),
+			`ALTER TABLE employees DROP COLUMN nickname`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestAlterTableStmt_RenameColumn(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.AlterTableStmt
+		Expected string
+	}{
+		{
+			mgorm.AlterTable(nil, "employees").RenameColumn("emp_no", "id").(*migration.AlterTableStmt),
+			`ALTER TABLE employees RENAME COLUMN emp_no TO id`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestAlterTableStmt_AddCons(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.AlterTableStmt
+		Expected string
+	}{
+		{
+			mgorm.AlterTable(nil, "employees").
+				AddCons("UC_nickname").Unique("nickname").(*migration.AlterTableStmt),
+			`ALTER TABLE employees ` +
+				`ADD CONSTRAINT UC_nickname UNIQUE (nickname)`,
+		},
+		{
+			mgorm.AlterTable(nil, "employees").
+				AddCons("UC_nickname").Unique("nickname", "first_name").(*migration.AlterTableStmt),
+			`ALTER TABLE employees ` +
+				`ADD CONSTRAINT UC_nickname UNIQUE (nickname, first_name)`,
+		},
+		{
+			mgorm.AlterTable(nil, "employees").
+				AddCons("PK_emp_no").Primary("emp_no").(*migration.AlterTableStmt),
+			`ALTER TABLE employees ` +
+				`ADD CONSTRAINT PK_emp_no PRIMARY KEY (emp_no)`,
+		},
+		{
+			mgorm.AlterTable(nil, "employees").
+				AddCons("PK_emp_no").Primary("emp_no", "first_name").(*migration.AlterTableStmt),
+			`ALTER TABLE employees ` +
+				`ADD CONSTRAINT PK_emp_no PRIMARY KEY (emp_no, first_name)`,
+		},
+		{
+			mgorm.AlterTable(nil, "dept_emp").
+				AddCons("FK_emp_no").Foreign("emp_no").Ref("employees", "emp_no").(*migration.AlterTableStmt),
+			`ALTER TABLE dept_emp ` +
+				`ADD CONSTRAINT FK_emp_no ` +
+				`FOREIGN KEY (emp_no) REFERENCES employees (emp_no)`,
+		},
+		{
+			mgorm.AlterTable(nil, "dept_emp").
+				AddCons("FK_emp_no").
+				Foreign("emp_no", "from_date").
+				Ref("employees", "emp_no", "hire_date").(*migration.AlterTableStmt),
+			`ALTER TABLE dept_emp ` +
+				`ADD CONSTRAINT FK_emp_no ` +
+				`FOREIGN KEY (emp_no, from_date) REFERENCES employees (emp_no, hire_date)`,
 		},
 	}
 

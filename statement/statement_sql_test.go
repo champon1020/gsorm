@@ -266,6 +266,11 @@ func TestInsertStmt_Values(t *testing.T) {
 		Expected string
 	}{
 		{
+			mgorm.Insert(nil, "employees").
+				Values(1001, "1996-03-09", "Taro", "Sato", "M", "2020-04-01").(*statement.InsertStmt),
+			`INSERT INTO employees VALUES (1001, '1996-03-09', 'Taro', 'Sato', 'M', '2020-04-01')`,
+		},
+		{
 			mgorm.Insert(nil, "employees", "emp_no", "first_name").
 				Values(1001, "Taro").(*statement.InsertStmt),
 			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`,

@@ -17,6 +17,7 @@ type AlterTableStmt struct {
 	cmd *mig.AlterTable
 }
 
+// NewAlterTableStmt creates AlterTableStmt instance.
 func NewAlterTableStmt(conn domain.Conn, table string) *AlterTableStmt {
 	stmt := &AlterTableStmt{cmd: &mig.AlterTable{Table: table}}
 	stmt.conn = conn
@@ -169,7 +170,7 @@ func (s *AlterTableStmt) Foreign(cols ...string) ifc.Foreign {
 }
 
 // Ref calls REFERENCES keyword.
-func (s *AlterTableStmt) Ref(table, col string) ifc.Ref {
-	s.call(&mig.Ref{Table: table, Column: col})
+func (s *AlterTableStmt) Ref(table string, cols ...string) ifc.Ref {
+	s.call(&mig.Ref{Table: table, Columns: cols})
 	return s
 }

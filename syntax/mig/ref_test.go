@@ -14,8 +14,12 @@ func TestRef_Build(t *testing.T) {
 		Expected *syntax.StmtSet
 	}{
 		{
-			&mig.Ref{Table: "table", Column: "column"},
-			&syntax.StmtSet{Keyword: "REFERENCES", Value: "table(column)"},
+			&mig.Ref{Table: "table", Columns: []string{"column"}},
+			&syntax.StmtSet{Keyword: "REFERENCES", Value: "table (column)"},
+		},
+		{
+			&mig.Ref{Table: "table", Columns: []string{"column1", "column2"}},
+			&syntax.StmtSet{Keyword: "REFERENCES", Value: "table (column1, column2)"},
 		},
 	}
 

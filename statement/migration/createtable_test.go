@@ -13,7 +13,7 @@ import (
 func TestCreateTable_String(t *testing.T) {
 	type Model struct {
 		ID          int       `mgorm:"notnull=t,pk=PK_id"`
-		CountryCode string    `mgorm:"typ=CHAR(3),notnull=t,default='0',fk=FK_country_code:country(code)"`
+		CountryCode string    `mgorm:"typ=CHAR(3),notnull=t,default='0',fk=FK_country_code:country (code)"`
 		Name        string    `mgorm:"typ=VARCHAR(16),notnull=t,default='anonymous',uc=UC_name"`
 		Nickname    string    `mgorm:"typ=VARCHAR(32),uc=UC_name"`
 		BirthDate   time.Time `mgorm:"notnull=t"`
@@ -43,7 +43,7 @@ func TestCreateTable_String(t *testing.T) {
 				`birth_date DATE NOT NULL, ` +
 				`CONSTRAINT UC_name UNIQUE (name, nickname), ` +
 				`CONSTRAINT PK_id PRIMARY KEY (id), ` +
-				`CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country(code)` +
+				`CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country (code)` +
 				`)`,
 		},
 		{
@@ -57,8 +57,258 @@ func TestCreateTable_String(t *testing.T) {
 				`birth_date DATE NOT NULL, ` +
 				`CONSTRAINT UC_name UNIQUE (name, nickname), ` +
 				`CONSTRAINT PK_id PRIMARY KEY (id), ` +
-				`CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country(code)` +
+				`CONSTRAINT FK_country_code FOREIGN KEY (country_code) REFERENCES country (code)` +
 				`)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestCreateTable_Column(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.CreateTableStmt
+		Expected string
+	}{
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").(*migration.CreateTableStmt),
+			`CREATE TABLE employees (emp_no INT)`,
+		},
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").
+				Column("birth_date", "DATE").(*migration.CreateTableStmt),
+			`CREATE TABLE employees (emp_no INT, birth_date DATE)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestCreateTable_NotNull(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.CreateTableStmt
+		Expected string
+	}{
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").NotNull().(*migration.CreateTableStmt),
+			`CREATE TABLE employees (emp_no INT NOT NULL)`,
+		},
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").NotNull().
+				Column("birth_date", "DATE").(*migration.CreateTableStmt),
+			`CREATE TABLE employees (emp_no INT NOT NULL, birth_date DATE)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestCreateTable_Default(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.CreateTableStmt
+		Expected string
+	}{
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").Default(1).(*migration.CreateTableStmt),
+			`CREATE TABLE employees (emp_no INT DEFAULT 1)`,
+		},
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").NotNull().Default(1).(*migration.CreateTableStmt),
+			`CREATE TABLE employees (emp_no INT NOT NULL DEFAULT 1)`,
+		},
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").Default(1).NotNull().(*migration.CreateTableStmt),
+			`CREATE TABLE employees (emp_no INT DEFAULT 1 NOT NULL)`,
+		},
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").NotNull().Default(1).
+				Column("birth_date", "DATE").(*migration.CreateTableStmt),
+			`CREATE TABLE employees (emp_no INT NOT NULL DEFAULT 1, birth_date DATE)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestCreateTable_Cons(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.CreateTableStmt
+		Expected string
+	}{
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").NotNull().
+				Cons("UC_emp_no").Unique("emp_no").(*migration.CreateTableStmt),
+			`CREATE TABLE employees (` +
+				`emp_no INT NOT NULL, ` +
+				`CONSTRAINT UC_emp_no UNIQUE (emp_no))`,
+		},
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").NotNull().
+				Cons("PK_emp_no").Primary("emp_no").(*migration.CreateTableStmt),
+			`CREATE TABLE employees (` +
+				`emp_no INT NOT NULL, ` +
+				`CONSTRAINT PK_emp_no PRIMARY KEY (emp_no))`,
+		},
+		{
+			mgorm.CreateTable(nil, "dept_emp").
+				Column("emp_no", "INT").NotNull().
+				Cons("FK_dept_emp").Foreign("emp_no").
+				Ref("employees", "emp_no").(*migration.CreateTableStmt),
+			`CREATE TABLE dept_emp (` +
+				`emp_no INT NOT NULL, ` +
+				`CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no) REFERENCES employees (emp_no))`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestCreateTable_Unique(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.CreateTableStmt
+		Expected string
+	}{
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").NotNull().
+				Cons("UC_emp_no").Unique("emp_no").(*migration.CreateTableStmt),
+			`CREATE TABLE employees (` +
+				`emp_no INT NOT NULL, ` +
+				`CONSTRAINT UC_emp_no UNIQUE (emp_no))`,
+		},
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").NotNull().
+				Column("first_name", "VARCHAR(14)").NotNull().
+				Cons("UC_emp_no_first_name").Unique("emp_no", "first_name").(*migration.CreateTableStmt),
+			`CREATE TABLE employees (` +
+				`emp_no INT NOT NULL, ` +
+				`first_name VARCHAR(14) NOT NULL, ` +
+				`CONSTRAINT UC_emp_no_first_name UNIQUE (emp_no, first_name))`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestCreateTable_Primary(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.CreateTableStmt
+		Expected string
+	}{
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").NotNull().
+				Cons("PK_emp_no").Primary("emp_no").(*migration.CreateTableStmt),
+			`CREATE TABLE employees (` +
+				`emp_no INT NOT NULL, ` +
+				`CONSTRAINT PK_emp_no PRIMARY KEY (emp_no))`,
+		},
+		{
+			mgorm.CreateTable(nil, "employees").
+				Column("emp_no", "INT").NotNull().
+				Column("first_name", "VARCHAR(14)").NotNull().
+				Cons("PK_emp_no_first_name").Primary("emp_no", "first_name").(*migration.CreateTableStmt),
+			`CREATE TABLE employees (` +
+				`emp_no INT NOT NULL, ` +
+				`first_name VARCHAR(14) NOT NULL, ` +
+				`CONSTRAINT PK_emp_no_first_name PRIMARY KEY (emp_no, first_name))`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestCreateTable_Foreign(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.CreateTableStmt
+		Expected string
+	}{
+		{
+			mgorm.CreateTable(nil, "dept_emp").
+				Column("emp_no", "INT").NotNull().
+				Cons("FK_dept_emp").Foreign("emp_no").
+				Ref("employees", "emp_no").(*migration.CreateTableStmt),
+			`CREATE TABLE dept_emp (` +
+				`emp_no INT NOT NULL, ` +
+				`CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no) REFERENCES employees (emp_no))`,
+		},
+		{
+			mgorm.CreateTable(nil, "dept_emp").
+				Column("emp_no", "INT").NotNull().
+				Column("first_name", "VARCHAR(14)").NotNull().
+				Cons("FK_dept_emp").Foreign("emp_no", "first_name").
+				Ref("employees", "emp_no", "first_name").(*migration.CreateTableStmt),
+			`CREATE TABLE dept_emp (` +
+				`emp_no INT NOT NULL, ` +
+				`first_name VARCHAR(14) NOT NULL, ` +
+				`CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no, first_name) REFERENCES employees (emp_no, first_name))`,
 		},
 	}
 

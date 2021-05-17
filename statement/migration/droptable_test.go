@@ -14,8 +14,8 @@ func TestDropTable_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.DropTable(nil, "person").(*migration.DropTableStmt),
-			`DROP TABLE person`,
+			mgorm.DropTable(nil, "employees").(*migration.DropTableStmt),
+			`DROP TABLE employees`,
 		},
 	}
 

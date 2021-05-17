@@ -14,8 +14,8 @@ func TestDropDB_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.DropDB(nil, "person").(*migration.DropDBStmt),
-			`DROP DATABASE person`,
+			mgorm.DropDB(nil, "employees").(*migration.DropDBStmt),
+			`DROP DATABASE employees`,
 		},
 	}
 

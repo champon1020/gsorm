@@ -12,6 +12,7 @@ type CreateDBStmt struct {
 	cmd *mig.CreateDB
 }
 
+// NewCreateDBStmt creates CreateDBStmt instance.
 func NewCreateDBStmt(conn domain.Conn, dbName string) *CreateDBStmt {
 	stmt := &CreateDBStmt{cmd: &mig.CreateDB{DBName: dbName}}
 	stmt.conn = conn
