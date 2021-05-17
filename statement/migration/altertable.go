@@ -8,7 +8,7 @@ import (
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/morikuni/failure"
 
-	ifc "github.com/champon1020/mgorm/interfaces/altertable"
+	"github.com/champon1020/mgorm/interfaces/ialtertable"
 )
 
 // AlterTableStmt is ALTER TABLE statement.
@@ -88,67 +88,67 @@ func (s *AlterTableStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // Rename calls RENAME TO clause.
-func (s *AlterTableStmt) Rename(table string) ifc.Rename {
+func (s *AlterTableStmt) Rename(table string) ialtertable.Rename {
 	s.call(&mig.Rename{Table: table})
 	return s
 }
 
 // AddColumn calls ADD COLUMN clause.
-func (s *AlterTableStmt) AddColumn(col, typ string) ifc.AddColumn {
+func (s *AlterTableStmt) AddColumn(col, typ string) ialtertable.AddColumn {
 	s.call(&mig.AddColumn{Column: col, Type: typ})
 	return s
 }
 
 // DropColumn calls DROP COLUMN clause.
-func (s *AlterTableStmt) DropColumn(col string) ifc.DropColumn {
+func (s *AlterTableStmt) DropColumn(col string) ialtertable.DropColumn {
 	s.call(&mig.DropColumn{Column: col})
 	return s
 }
 
 // RenameColumn calls RENAME COLUMN clause.
-func (s *AlterTableStmt) RenameColumn(col, dest string) ifc.RenameColumn {
+func (s *AlterTableStmt) RenameColumn(col, dest string) ialtertable.RenameColumn {
 	s.call(&mig.RenameColumn{Column: col, Dest: dest})
 	return s
 }
 
 // NotNull calls NOT NULL option.
-func (s *AlterTableStmt) NotNull() ifc.NotNull {
+func (s *AlterTableStmt) NotNull() ialtertable.NotNull {
 	s.call(&mig.NotNull{})
 	return s
 }
 
 // Default calls DEFAULT option.
-func (s *AlterTableStmt) Default(val interface{}) ifc.Default {
+func (s *AlterTableStmt) Default(val interface{}) ialtertable.Default {
 	s.call(&mig.Default{Value: val})
 	return s
 }
 
 // AddCons calls ADD CONSTRAINT clause.
-func (s *AlterTableStmt) AddCons(key string) ifc.AddCons {
+func (s *AlterTableStmt) AddCons(key string) ialtertable.AddCons {
 	s.call(&mig.AddCons{Key: key})
 	return s
 }
 
 // Unique calls UNIQUE keyword.
-func (s *AlterTableStmt) Unique(cols ...string) ifc.Unique {
+func (s *AlterTableStmt) Unique(cols ...string) ialtertable.Unique {
 	s.call(&mig.Unique{Columns: cols})
 	return s
 }
 
 // Primary calls PRIMARY KEY keyword.
-func (s *AlterTableStmt) Primary(cols ...string) ifc.Primary {
+func (s *AlterTableStmt) Primary(cols ...string) ialtertable.Primary {
 	s.call(&mig.Primary{Columns: cols})
 	return s
 }
 
 // Foreign calls FOREIGN KEY keyword.
-func (s *AlterTableStmt) Foreign(cols ...string) ifc.Foreign {
+func (s *AlterTableStmt) Foreign(cols ...string) ialtertable.Foreign {
 	s.call(&mig.Foreign{Columns: cols})
 	return s
 }
 
 // Ref calls REFERENCES keyword.
-func (s *AlterTableStmt) Ref(table string, cols ...string) ifc.Ref {
+func (s *AlterTableStmt) Ref(table string, cols ...string) ialtertable.Ref {
 	s.call(&mig.Ref{Table: table, Columns: cols})
 	return s
 }

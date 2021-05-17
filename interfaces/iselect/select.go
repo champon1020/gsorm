@@ -1,4 +1,4 @@
-package xselect
+package iselect
 
 import (
 	"github.com/champon1020/mgorm/interfaces"

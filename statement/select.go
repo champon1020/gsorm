@@ -4,12 +4,11 @@ import (
 	"reflect"
 
 	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/iselect"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
-
-	ifc "github.com/champon1020/mgorm/interfaces/select"
 )
 
 // SelectStmt is SELECT statement.
@@ -96,7 +95,7 @@ func (s *SelectStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // From calls FROM clause.
-func (s *SelectStmt) From(tables ...string) ifc.From {
+func (s *SelectStmt) From(tables ...string) iselect.From {
 	f := new(clause.From)
 	for _, t := range tables {
 		f.AddTable(t)
@@ -106,43 +105,43 @@ func (s *SelectStmt) From(tables ...string) ifc.From {
 }
 
 // Where calls WHERE clause.
-func (s *SelectStmt) Where(expr string, vals ...interface{}) ifc.Where {
+func (s *SelectStmt) Where(expr string, vals ...interface{}) iselect.Where {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *SelectStmt) And(expr string, vals ...interface{}) ifc.And {
+func (s *SelectStmt) And(expr string, vals ...interface{}) iselect.And {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *SelectStmt) Or(expr string, vals ...interface{}) ifc.Or {
+func (s *SelectStmt) Or(expr string, vals ...interface{}) iselect.Or {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }
 
 // Limit calls LIMIT clause.
-func (s *SelectStmt) Limit(num int) ifc.Limit {
+func (s *SelectStmt) Limit(num int) iselect.Limit {
 	s.call(&clause.Limit{Num: num})
 	return s
 }
 
 // Offset calls OFFSET clause.
-func (s *SelectStmt) Offset(num int) ifc.Offset {
+func (s *SelectStmt) Offset(num int) iselect.Offset {
 	s.call(&clause.Offset{Num: num})
 	return s
 }
 
 // OrderBy calls ORDER BY clause.
-func (s *SelectStmt) OrderBy(cols ...string) ifc.OrderBy {
+func (s *SelectStmt) OrderBy(cols ...string) iselect.OrderBy {
 	s.call(&clause.OrderBy{Columns: cols})
 	return s
 }
 
 // Join calls (INNER) JOIN clause.
-func (s *SelectStmt) Join(table string) ifc.Join {
+func (s *SelectStmt) Join(table string) iselect.Join {
 	j := &clause.Join{Type: clause.InnerJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -150,7 +149,7 @@ func (s *SelectStmt) Join(table string) ifc.Join {
 }
 
 // LeftJoin calls (INNER) JOIN clause.
-func (s *SelectStmt) LeftJoin(table string) ifc.Join {
+func (s *SelectStmt) LeftJoin(table string) iselect.Join {
 	j := &clause.Join{Type: clause.LeftJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -158,7 +157,7 @@ func (s *SelectStmt) LeftJoin(table string) ifc.Join {
 }
 
 // RightJoin calls (INNER) JOIN clause.
-func (s *SelectStmt) RightJoin(table string) ifc.Join {
+func (s *SelectStmt) RightJoin(table string) iselect.Join {
 	j := &clause.Join{Type: clause.RightJoin}
 	j.AddTable(table)
 	s.call(j)
@@ -166,25 +165,25 @@ func (s *SelectStmt) RightJoin(table string) ifc.Join {
 }
 
 // On calls ON clause.
-func (s *SelectStmt) On(expr string, vals ...interface{}) ifc.On {
+func (s *SelectStmt) On(expr string, vals ...interface{}) iselect.On {
 	s.call(&clause.On{Expr: expr, Values: vals})
 	return s
 }
 
 // Union calls UNION clause.
-func (s *SelectStmt) Union(stmt syntax.Stmt) ifc.Union {
+func (s *SelectStmt) Union(stmt syntax.Stmt) iselect.Union {
 	s.call(&clause.Union{Stmt: stmt, All: false})
 	return s
 }
 
 // UnionAll calls UNION ALL clause.
-func (s *SelectStmt) UnionAll(stmt syntax.Stmt) ifc.Union {
+func (s *SelectStmt) UnionAll(stmt syntax.Stmt) iselect.Union {
 	s.call(&clause.Union{Stmt: stmt, All: true})
 	return s
 }
 
 // GroupBy calls GROUP BY clause.
-func (s *SelectStmt) GroupBy(cols ...string) ifc.GroupBy {
+func (s *SelectStmt) GroupBy(cols ...string) iselect.GroupBy {
 	g := new(clause.GroupBy)
 	for _, c := range cols {
 		g.AddColumn(c)
@@ -194,7 +193,7 @@ func (s *SelectStmt) GroupBy(cols ...string) ifc.GroupBy {
 }
 
 // Having calls HAVING clause.
-func (s *SelectStmt) Having(expr string, vals ...interface{}) ifc.Having {
+func (s *SelectStmt) Having(expr string, vals ...interface{}) iselect.Having {
 	s.call(&clause.Having{Expr: expr, Values: vals})
 	return s
 }

@@ -1,4 +1,4 @@
-package insert
+package iinsert
 
 import (
 	"github.com/champon1020/mgorm/interfaces"

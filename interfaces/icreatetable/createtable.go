@@ -1,4 +1,4 @@
-package createtable
+package icreatetable
 
 import "github.com/champon1020/mgorm/interfaces"
 

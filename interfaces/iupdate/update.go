@@ -1,4 +1,4 @@
-package update
+package iupdate
 
 import "github.com/champon1020/mgorm/interfaces"
 

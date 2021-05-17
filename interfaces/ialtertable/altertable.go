@@ -1,4 +1,4 @@
-package altertable
+package ialtertable
 
 import "github.com/champon1020/mgorm/interfaces"
 

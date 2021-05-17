@@ -4,12 +4,11 @@ import (
 	"reflect"
 
 	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/idelete"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
-
-	ifc "github.com/champon1020/mgorm/interfaces/delete"
 )
 
 // DeleteStmt is DELETE statement.
@@ -80,7 +79,7 @@ func (s *DeleteStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // From calls FROM clause.
-func (s *DeleteStmt) From(tables ...string) ifc.From {
+func (s *DeleteStmt) From(tables ...string) idelete.From {
 	f := new(clause.From)
 	for _, t := range tables {
 		f.AddTable(t)
@@ -90,19 +89,19 @@ func (s *DeleteStmt) From(tables ...string) ifc.From {
 }
 
 // Where calls WHERE clause.
-func (s *DeleteStmt) Where(expr string, vals ...interface{}) ifc.Where {
+func (s *DeleteStmt) Where(expr string, vals ...interface{}) idelete.Where {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *DeleteStmt) And(expr string, vals ...interface{}) ifc.And {
+func (s *DeleteStmt) And(expr string, vals ...interface{}) idelete.And {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *DeleteStmt) Or(expr string, vals ...interface{}) ifc.Or {
+func (s *DeleteStmt) Or(expr string, vals ...interface{}) idelete.Or {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }

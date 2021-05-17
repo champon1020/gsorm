@@ -1,4 +1,4 @@
-package createdb
+package icreatedb
 
 import "github.com/champon1020/mgorm/interfaces"
 

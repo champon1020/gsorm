@@ -1,4 +1,4 @@
-package droptable
+package idroptable
 
 import "github.com/champon1020/mgorm/interfaces"
 

@@ -9,7 +9,7 @@ import (
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
 
-	ifc "github.com/champon1020/mgorm/interfaces/update"
+	"github.com/champon1020/mgorm/interfaces/iupdate"
 )
 
 // UpdateStmt is UPDATE statement..
@@ -129,32 +129,32 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // Model sets model to UpdateStmt.
-func (s *UpdateStmt) Model(model interface{}, cols ...string) ifc.Model {
+func (s *UpdateStmt) Model(model interface{}, cols ...string) iupdate.Model {
 	s.model = model
 	s.modelCols = cols
 	return s
 }
 
 // Set calls SET clause.
-func (s *UpdateStmt) Set(col string, val interface{}) ifc.Set {
+func (s *UpdateStmt) Set(col string, val interface{}) iupdate.Set {
 	s.call(&clause.Set{Column: col, Value: val})
 	return s
 }
 
 // Where calls WHERE clause.
-func (s *UpdateStmt) Where(expr string, vals ...interface{}) ifc.Where {
+func (s *UpdateStmt) Where(expr string, vals ...interface{}) iupdate.Where {
 	s.call(&clause.Where{Expr: expr, Values: vals})
 	return s
 }
 
 // And calls AND clause.
-func (s *UpdateStmt) And(expr string, vals ...interface{}) ifc.And {
+func (s *UpdateStmt) And(expr string, vals ...interface{}) iupdate.And {
 	s.call(&clause.And{Expr: expr, Values: vals})
 	return s
 }
 
 // Or calls OR clause.
-func (s *UpdateStmt) Or(expr string, vals ...interface{}) ifc.Or {
+func (s *UpdateStmt) Or(expr string, vals ...interface{}) iupdate.Or {
 	s.call(&clause.Or{Expr: expr, Values: vals})
 	return s
 }

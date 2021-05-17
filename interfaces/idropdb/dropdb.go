@@ -1,4 +1,4 @@
-package dropdb
+package idropdb
 
 import "github.com/champon1020/mgorm/interfaces"
 

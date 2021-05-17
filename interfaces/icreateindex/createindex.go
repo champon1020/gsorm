@@ -1,4 +1,4 @@
-package createindex
+package icreateindex
 
 import "github.com/champon1020/mgorm/interfaces"
 

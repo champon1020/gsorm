@@ -1,4 +1,4 @@
-package delete
+package idelete
 
 import "github.com/champon1020/mgorm/interfaces"
 
