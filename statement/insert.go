@@ -10,7 +10,7 @@ import (
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
 
-	ifc "github.com/champon1020/mgorm/interfaces/insert"
+	"github.com/champon1020/mgorm/interfaces/iinsert"
 )
 
 // InsertStmt is INSERT statement.
@@ -133,19 +133,19 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // Model sets model to InsertStmt.
-func (s *InsertStmt) Model(model interface{}) ifc.Model {
+func (s *InsertStmt) Model(model interface{}) iinsert.Model {
 	s.model = model
 	return s
 }
 
 // Select calls SELECT statement.
-func (s *InsertStmt) Select(sel interfaces.QueryCallable) ifc.Select {
+func (s *InsertStmt) Select(sel interfaces.QueryCallable) iinsert.Select {
 	s.sel = sel
 	return s
 }
 
 // Values calls VALUES clause.
-func (s *InsertStmt) Values(vals ...interface{}) ifc.Values {
+func (s *InsertStmt) Values(vals ...interface{}) iinsert.Values {
 	v := new(clause.Values)
 	for _, val := range vals {
 		v.AddValue(val)

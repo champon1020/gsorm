@@ -10,7 +10,7 @@ import (
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/morikuni/failure"
 
-	ifc "github.com/champon1020/mgorm/interfaces/createtable"
+	"github.com/champon1020/mgorm/interfaces/icreatetable"
 )
 
 // CreateTableStmt is CREATE TABLE statement.
@@ -189,55 +189,55 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 }
 
 // Model sets model to CreateTableStmt.
-func (s *CreateTableStmt) Model(model interface{}) ifc.Model {
+func (s *CreateTableStmt) Model(model interface{}) icreatetable.Model {
 	s.model = model
 	return s
 }
 
 // Column calls table column definition.
-func (s *CreateTableStmt) Column(col, typ string) ifc.Column {
+func (s *CreateTableStmt) Column(col, typ string) icreatetable.Column {
 	s.call(&mig.Column{Col: col, Type: typ})
 	return s
 }
 
 // NotNull calls NOT NULL option.
-func (s *CreateTableStmt) NotNull() ifc.NotNull {
+func (s *CreateTableStmt) NotNull() icreatetable.NotNull {
 	s.call(&mig.NotNull{})
 	return s
 }
 
 // Default calls DEFAULT option.
-func (s *CreateTableStmt) Default(val interface{}) ifc.Default {
+func (s *CreateTableStmt) Default(val interface{}) icreatetable.Default {
 	s.call(&mig.Default{Value: val})
 	return s
 }
 
 // Cons calls CONSTRAINT option.
-func (s *CreateTableStmt) Cons(key string) ifc.Cons {
+func (s *CreateTableStmt) Cons(key string) icreatetable.Cons {
 	s.call(&mig.Cons{Key: key})
 	return s
 }
 
 // Unique calls UNIQUE keyword.
-func (s *CreateTableStmt) Unique(cols ...string) ifc.Unique {
+func (s *CreateTableStmt) Unique(cols ...string) icreatetable.Unique {
 	s.call(&mig.Unique{Columns: cols})
 	return s
 }
 
 // Primary calls PRIMARY KEY keyword.
-func (s *CreateTableStmt) Primary(cols ...string) ifc.Primary {
+func (s *CreateTableStmt) Primary(cols ...string) icreatetable.Primary {
 	s.call(&mig.Primary{Columns: cols})
 	return s
 }
 
 // Foreign calls FOREIGN KEY keyword.
-func (s *CreateTableStmt) Foreign(cols ...string) ifc.Foreign {
+func (s *CreateTableStmt) Foreign(cols ...string) icreatetable.Foreign {
 	s.call(&mig.Foreign{Columns: cols})
 	return s
 }
 
 // Ref calls REFERENCES keyword.
-func (s *CreateTableStmt) Ref(table string, cols ...string) ifc.Ref {
+func (s *CreateTableStmt) Ref(table string, cols ...string) icreatetable.Ref {
 	s.call(&mig.Ref{Table: table, Columns: cols})
 	return s
 }
