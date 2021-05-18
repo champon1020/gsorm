@@ -12,12 +12,12 @@ import (
 // migStmt stores information about database migration query.
 type migStmt struct {
 	conn   domain.Conn
-	called []domain.MigClause
+	called []domain.Clause
 	errors []error
 }
 
 // call appends called clause.
-func (s *migStmt) call(e domain.MigClause) {
+func (s *migStmt) call(e domain.Clause) {
 	s.called = append(s.called, e)
 }
 
@@ -27,7 +27,7 @@ func (s *migStmt) throw(e error) {
 }
 
 // headClause returns first element of called.
-func (s *migStmt) headClause() domain.MigClause {
+func (s *migStmt) headClause() domain.Clause {
 	if len(s.called) == 0 {
 		return nil
 	}
