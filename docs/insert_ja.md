@@ -23,11 +23,13 @@ err := mgorm.Insert(db, "employees", "emp_no", "first_name").
 # Methods
 `mgorm.Insert`に使用できるメソッドは以下です．
 
+- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
 - [Values](https://github.com/champon1020/mgorm/tree/main/docs/insert_ja.md#values)
 - [Select](https://github.com/champon1020/mgorm/tree/main/docs/insert_ja.md#select)
 - [Model](https://github.com/champon1020/mgorm/tree/main/docs/insert_ja.md#model)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
+但し，例外として`RawClause`は任意で呼び出すことができます．
 
 ```
 | alternation

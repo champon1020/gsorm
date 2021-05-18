@@ -27,6 +27,7 @@ err := mgorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 # Methods
 `mgorm.Select`に使用できるメソッドは以下です．
 
+- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
 - [From](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#from)
 - [Join](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#join)
 - [LeftJoin](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#leftjoin)
@@ -43,6 +44,7 @@ err := mgorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 - [Offset](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#offset)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
+但し，例外として`RawClause`は任意で呼び出すことができます．
 
 ```
 | alternation
