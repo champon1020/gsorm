@@ -29,3 +29,25 @@ func TestDropTable_String(t *testing.T) {
 		assert.Equal(t, testCase.Expected, actual)
 	}
 }
+
+func TestDropTable_RawClause(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.DropTableStmt
+		Expected string
+	}{
+		{
+			mgorm.DropTable(nil, "table").RawClause("RAW").(*migration.DropTableStmt),
+			`DROP TABLE table RAW`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}

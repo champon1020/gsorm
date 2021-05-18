@@ -29,3 +29,25 @@ func TestDropDB_String(t *testing.T) {
 		assert.Equal(t, testCase.Expected, actual)
 	}
 }
+
+func TestDropDB_RawClause(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.DropDBStmt
+		Expected string
+	}{
+		{
+			mgorm.DropDB(nil, "database").RawClause("RAW").(*migration.DropDBStmt),
+			`DROP DATABASE database RAW`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}

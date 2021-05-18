@@ -13,7 +13,6 @@ type Stmt interface {
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
-	RawClause(rs string, v ...interface{}) RawClause
 	From(t ...string) From
 	Join(t string) Join
 	LeftJoin(t string) Join

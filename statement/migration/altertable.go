@@ -5,6 +5,7 @@ import (
 
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/morikuni/failure"
 
@@ -48,7 +49,8 @@ func (s *AlterTableStmt) buildSQL(sql *internal.SQL) error {
 		}
 
 		switch e := e.(type) {
-		case *mig.Rename,
+		case *syntax.RawClause,
+			*mig.Rename,
 			*mig.RenameColumn,
 			*mig.DropColumn:
 			ss, err := e.Build()
@@ -85,6 +87,12 @@ func (s *AlterTableStmt) buildSQL(sql *internal.SQL) error {
 	}
 
 	return nil
+}
+
+// RawClause calls the raw string clause.
+func (s *AlterTableStmt) RawClause(rs string, v ...interface{}) ialtertable.RawClause {
+	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+	return s
 }
 
 // Rename calls RENAME TO clause.

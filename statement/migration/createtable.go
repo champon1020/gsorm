@@ -7,6 +7,7 @@ import (
 
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/morikuni/failure"
 
@@ -60,6 +61,13 @@ func (s *CreateTableStmt) buildSQLWithClauses(sql *internal.SQL) error {
 		}
 
 		switch e := e.(type) {
+		case *syntax.RawClause:
+			ss, err := e.Build()
+			if err != nil {
+				return err
+			}
+			sql.Write(ss.Build())
+			s.advanceClause()
 		case *mig.Column:
 			if !strings.HasSuffix(sql.String(), "(") {
 				sql.Write(",")
@@ -186,6 +194,12 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 	}
 	sql.Write(")")
 	return nil
+}
+
+// RawClause calls the raw string clause.
+func (s *CreateTableStmt) RawClause(rs string, v ...interface{}) icreatetable.RawClause {
+	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+	return s
 }
 
 // Model sets model to CreateTableStmt.

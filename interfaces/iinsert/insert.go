@@ -14,7 +14,6 @@ type Stmt interface {
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
-	RawClause(rs string, v ...interface{}) RawClause
 	Values(v ...interface{}) Values
 	interfaces.ExecCallable
 }

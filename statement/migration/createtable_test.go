@@ -73,6 +73,110 @@ func TestCreateTable_String(t *testing.T) {
 	}
 }
 
+func TestCreateTable_RawClause(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.CreateTableStmt
+		Expected string
+	}{
+		{
+			mgorm.CreateTable(nil, "table").
+				RawClause("RAW").
+				Column("column", "type").(*migration.CreateTableStmt),
+			`CREATE TABLE table (RAW, column type)`,
+		},
+		{
+			mgorm.CreateTable(nil, "table").
+				Column("column", "type").
+				RawClause("RAW").NotNull().(*migration.CreateTableStmt),
+			`CREATE TABLE table (column type RAW NOT NULL)`,
+		},
+		{
+			mgorm.CreateTable(nil, "table").
+				Column("column", "type").
+				NotNull().RawClause("RAW").Default("value").(*migration.CreateTableStmt),
+			`CREATE TABLE table (column type NOT NULL RAW DEFAULT 'value')`,
+		},
+		{
+			mgorm.CreateTable(nil, "table").
+				Column("column", "type").
+				NotNull().Default("value").
+				RawClause("RAW").
+				Cons("key").Unique("column").(*migration.CreateTableStmt),
+			`CREATE TABLE table (column type NOT NULL DEFAULT 'value' RAW, ` +
+				`CONSTRAINT key UNIQUE (column))`,
+		},
+		{
+			mgorm.CreateTable(nil, "table").
+				Column("column", "type").
+				NotNull().Default("value").
+				Cons("key").RawClause("RAW").Unique("column").(*migration.CreateTableStmt),
+			`CREATE TABLE table (column type NOT NULL DEFAULT 'value', ` +
+				`CONSTRAINT key RAW UNIQUE (column))`,
+		},
+		{
+			mgorm.CreateTable(nil, "table").
+				Column("column", "type").
+				NotNull().Default("value").
+				Cons("key").Unique("column").RawClause("RAW").(*migration.CreateTableStmt),
+			`CREATE TABLE table (column type NOT NULL DEFAULT 'value', ` +
+				`CONSTRAINT key UNIQUE (column) RAW)`,
+		},
+		{
+			mgorm.CreateTable(nil, "table").
+				Column("column", "type").
+				NotNull().Default("value").
+				Cons("key").RawClause("RAW").Primary("column").(*migration.CreateTableStmt),
+			`CREATE TABLE table (column type NOT NULL DEFAULT 'value', ` +
+				`CONSTRAINT key RAW PRIMARY KEY (column))`,
+		},
+		{
+			mgorm.CreateTable(nil, "table").
+				Column("column", "type").
+				NotNull().Default("value").
+				Cons("key").Primary("column").RawClause("RAW").(*migration.CreateTableStmt),
+			`CREATE TABLE table (column type NOT NULL DEFAULT 'value', ` +
+				`CONSTRAINT key PRIMARY KEY (column) RAW)`,
+		},
+		{
+			mgorm.CreateTable(nil, "table").
+				Column("column", "type").
+				NotNull().Default("value").
+				Cons("key").RawClause("RAW").
+				Foreign("column").Ref("table2", "column2").(*migration.CreateTableStmt),
+			`CREATE TABLE table (column type NOT NULL DEFAULT 'value', ` +
+				`CONSTRAINT key RAW FOREIGN KEY (column) REFERENCES table2 (column2))`,
+		},
+		{
+			mgorm.CreateTable(nil, "table").
+				Column("column", "type").
+				NotNull().Default("value").
+				Cons("key").Foreign("column").
+				RawClause("RAW").Ref("table2", "column2").(*migration.CreateTableStmt),
+			`CREATE TABLE table (column type NOT NULL DEFAULT 'value', ` +
+				`CONSTRAINT key FOREIGN KEY (column) RAW REFERENCES table2 (column2))`,
+		},
+		{
+			mgorm.CreateTable(nil, "table").
+				Column("column", "type").
+				NotNull().Default("value").
+				Cons("key").Foreign("column").Ref("table2", "column2").
+				RawClause("RAW").(*migration.CreateTableStmt),
+			`CREATE TABLE table (column type NOT NULL DEFAULT 'value', ` +
+				`CONSTRAINT key FOREIGN KEY (column) REFERENCES table2 (column2) RAW)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
 func TestCreateTable_Column(t *testing.T) {
 	testCases := []struct {
 		Stmt     *migration.CreateTableStmt
