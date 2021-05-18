@@ -5,6 +5,7 @@ import (
 
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/morikuni/failure"
 )
@@ -80,7 +81,8 @@ func (s *migStmt) buildColumnOptSQL(sql *internal.SQL) error {
 		}
 
 		switch e := e.(type) {
-		case *mig.NotNull,
+		case *syntax.RawClause,
+			*mig.NotNull,
 			*mig.Default:
 			ss, err := e.Build()
 			if err != nil {
@@ -102,6 +104,16 @@ func (s *migStmt) buildConstraintSQL(sql *internal.SQL) error {
 	if e == nil {
 		return failure.New(errInvalidSyntax,
 			failure.Message("the SQL statement is not completed or the syntax is not supported"))
+	}
+
+	if rc, ok := e.(*syntax.RawClause); ok {
+		ss, err := rc.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(ss.Build())
+		s.advanceClause()
+		e = s.headClause()
 	}
 
 	switch e := e.(type) {
@@ -133,6 +145,16 @@ func (s *migStmt) buildRefSQL(sql *internal.SQL) error {
 	if e == nil {
 		return failure.New(errInvalidSyntax,
 			failure.Message("the SQL statement is not completed or the syntax is not supported"))
+	}
+
+	if rc, ok := e.(*syntax.RawClause); ok {
+		ss, err := rc.Build()
+		if err != nil {
+			return err
+		}
+		sql.Write(ss.Build())
+		s.advanceClause()
+		e = s.headClause()
 	}
 
 	switch e := e.(type) {

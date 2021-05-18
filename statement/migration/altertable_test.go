@@ -8,6 +8,131 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestAlterTableStmt_RawClause(t *testing.T) {
+	testCases := []struct {
+		Stmt     *migration.AlterTableStmt
+		Expected string
+	}{
+		{
+			mgorm.AlterTable(nil, "table").
+				RawClause("RAW").
+				Rename("table").(*migration.AlterTableStmt),
+			`ALTER TABLE table RAW RENAME TO table`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				Rename("table").
+				RawClause("RAW").(*migration.AlterTableStmt),
+			`ALTER TABLE table RENAME TO table RAW`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				RawClause("RAW").
+				AddColumn("column", "type").(*migration.AlterTableStmt),
+			`ALTER TABLE table RAW ADD COLUMN column type`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				AddColumn("column", "type").
+				RawClause("RAW").NotNull().(*migration.AlterTableStmt),
+			`ALTER TABLE table ADD COLUMN column type RAW NOT NULL`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				AddColumn("column", "type").
+				NotNull().RawClause("RAW").Default("value").(*migration.AlterTableStmt),
+			`ALTER TABLE table ADD COLUMN column type NOT NULL RAW DEFAULT 'value'`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				AddColumn("column", "type").
+				NotNull().Default("value").RawClause("RAW").(*migration.AlterTableStmt),
+			`ALTER TABLE table ADD COLUMN column type NOT NULL DEFAULT 'value' RAW`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				RawClause("RAW").
+				DropColumn("column").(*migration.AlterTableStmt),
+			`ALTER TABLE table RAW DROP COLUMN column`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				DropColumn("column").
+				RawClause("RAW").(*migration.AlterTableStmt),
+			`ALTER TABLE table DROP COLUMN column RAW`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				RawClause("RAW").
+				RenameColumn("column", "dest").(*migration.AlterTableStmt),
+			`ALTER TABLE table RAW RENAME COLUMN column TO dest`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				RenameColumn("column", "dest").
+				RawClause("RAW").(*migration.AlterTableStmt),
+			`ALTER TABLE table RENAME COLUMN column TO dest RAW`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				RawClause("RAW").
+				AddCons("key").Unique("column").(*migration.AlterTableStmt),
+			`ALTER TABLE table RAW ADD CONSTRAINT key UNIQUE (column)`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				AddCons("key").RawClause("RAW").Unique("column").(*migration.AlterTableStmt),
+			`ALTER TABLE table ADD CONSTRAINT key RAW UNIQUE (column)`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				AddCons("key").Unique("column").RawClause("RAW").(*migration.AlterTableStmt),
+			`ALTER TABLE table ADD CONSTRAINT key UNIQUE (column) RAW`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				AddCons("key").RawClause("RAW").Primary("column").(*migration.AlterTableStmt),
+			`ALTER TABLE table ADD CONSTRAINT key RAW PRIMARY KEY (column)`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				AddCons("key").Primary("column").RawClause("RAW").(*migration.AlterTableStmt),
+			`ALTER TABLE table ADD CONSTRAINT key PRIMARY KEY (column) RAW`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				AddCons("key").
+				RawClause("RAW").
+				Foreign("column").Ref("table2", "column2").(*migration.AlterTableStmt),
+			`ALTER TABLE table ADD CONSTRAINT key RAW FOREIGN KEY (column) REFERENCES table2 (column2)`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				AddCons("key").Foreign("column").
+				RawClause("RAW").
+				Ref("table2", "column2").(*migration.AlterTableStmt),
+			`ALTER TABLE table ADD CONSTRAINT key FOREIGN KEY (column) RAW REFERENCES table2 (column2)`,
+		},
+		{
+			mgorm.AlterTable(nil, "table").
+				AddCons("key").Foreign("column").
+				Ref("table2", "column2").
+				RawClause("RAW").(*migration.AlterTableStmt),
+			`ALTER TABLE table ADD CONSTRAINT key FOREIGN KEY (column) REFERENCES table2 (column2) RAW`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
 func TestAlterTableStmt_Rename(t *testing.T) {
 	testCases := []struct {
 		Stmt     *migration.AlterTableStmt
