@@ -13,20 +13,20 @@ type Limit struct {
 	Num int
 }
 
-// Name returns clause keyword.
-func (l *Limit) Name() string {
+// Keyword returns clause keyword.
+func (l *Limit) Keyword() string {
 	return "LIMIT"
 }
 
 // String returns function call with string.
 func (l *Limit) String() string {
-	return fmt.Sprintf("%s(%v)", l.Name(), l.Num)
+	return fmt.Sprintf("%s(%v)", l.Keyword(), l.Num)
 }
 
 // Build makes LIMIT clause with syntax.StmtSet.
 func (l *Limit) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(l.Name())
+	ss.WriteKeyword(l.Keyword())
 	ss.WriteValue(strconv.Itoa(l.Num))
 	return ss, nil
 }

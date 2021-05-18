@@ -14,8 +14,8 @@ type Where struct {
 	Values []interface{}
 }
 
-// Name returns clause keyword.
-func (w *Where) Name() string {
+// Keyword returns clause keyword.
+func (w *Where) Keyword() string {
 	return "WHERE"
 }
 
@@ -26,7 +26,7 @@ func (w *Where) String() string {
 		s += ", "
 		s += internal.ToString(w.Values, nil)
 	}
-	return fmt.Sprintf("%s(%s)", w.Name(), s)
+	return fmt.Sprintf("%s(%s)", w.Keyword(), s)
 }
 
 // Build makes WHERE clause with syntax.StmtSet.
@@ -36,6 +36,6 @@ func (w *Where) Build() (domain.StmtSet, error) {
 		return nil, err
 	}
 	ss := &syntax.StmtSet{Value: s}
-	ss.WriteKeyword(w.Name())
+	ss.WriteKeyword(w.Keyword())
 	return ss, nil
 }

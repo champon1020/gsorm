@@ -24,8 +24,8 @@ type Join struct {
 	Type  JoinType
 }
 
-// Name returns clause keyword.
-func (j *Join) Name() string {
+// Keyword returns clause keyword.
+func (j *Join) Keyword() string {
 	return string(j.Type)
 }
 
@@ -36,13 +36,13 @@ func (j *Join) AddTable(table string) {
 
 // String returns function call with string.
 func (j *Join) String() string {
-	return fmt.Sprintf("%s(%q)", j.Name(), j.Table.Build())
+	return fmt.Sprintf("%s(%q)", j.Keyword(), j.Table.Build())
 }
 
 // Build makes JOIN clause with syntax.StmtSet.
 func (j *Join) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(j.Name())
+	ss.WriteKeyword(j.Keyword())
 	ss.WriteValue(j.Table.Build())
 	return ss, nil
 }
