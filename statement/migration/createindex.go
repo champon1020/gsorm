@@ -5,6 +5,7 @@ import (
 
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/morikuni/failure"
 
@@ -47,7 +48,8 @@ func (s *CreateIndexStmt) buildSQL(sql *internal.SQL) error {
 		}
 
 		switch e := e.(type) {
-		case *mig.On:
+		case *syntax.RawClause,
+			*mig.On:
 			ss, err := e.Build()
 			if err != nil {
 				return err
@@ -67,5 +69,11 @@ func (s *CreateIndexStmt) buildSQL(sql *internal.SQL) error {
 // On calls ON clause.
 func (s *CreateIndexStmt) On(table string, cols ...string) icreateindex.On {
 	s.call(&mig.On{Table: table, Columns: cols})
+	return s
+}
+
+// RawClause calls the raw string clause.
+func (s *CreateIndexStmt) RawClause(rs string, v ...interface{}) icreateindex.RawClause {
+	s.call(&syntax.RawClause{RawStr: rs, Values: v})
 	return s
 }
