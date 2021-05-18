@@ -6,6 +6,7 @@ import (
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/interfaces/idelete"
 	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
 )
@@ -59,15 +60,16 @@ func (s *DeleteStmt) buildSQL(sql *internal.SQL) error {
 
 	for _, e := range s.called {
 		switch e := e.(type) {
-		case *clause.From,
+		case *syntax.RawClause,
+			*clause.From,
 			*clause.Where,
 			*clause.And,
 			*clause.Or:
-			s, err := e.Build()
+			ss, err := e.Build()
 			if err != nil {
 				return err
 			}
-			sql.Write(s.Build())
+			sql.Write(ss.Build())
 		default:
 			return failure.New(errInvalidClause,
 				failure.Context{"clause": reflect.TypeOf(e).Elem().String()},
@@ -75,6 +77,12 @@ func (s *DeleteStmt) buildSQL(sql *internal.SQL) error {
 		}
 	}
 	return nil
+}
+
+// RawClause calls the raw string clause.
+func (s *DeleteStmt) RawClause(rs string, v ...interface{}) idelete.RawClause {
+	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+	return s
 }
 
 // From calls FROM clause.

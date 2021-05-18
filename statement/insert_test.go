@@ -8,6 +8,7 @@ import (
 	"github.com/champon1020/mgorm/statement"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestInsertStmt_BuildSQLWithClauses_Fail(t *testing.T) {
@@ -109,5 +110,42 @@ func TestInsertStmt_CompareStmts(t *testing.T) {
 			t.Errorf("  Expected: %+v", testCase.ExpectedError)
 			t.Errorf("  Actual:   %+v", err)
 		}
+	}
+}
+
+func TestInsertStmt_RawClause(t *testing.T) {
+	testCases := []struct {
+		Stmt     *statement.InsertStmt
+		Expected string
+	}{
+		{
+			mgorm.Insert(nil, "table").
+				RawClause("RAW").
+				Values("value").(*statement.InsertStmt),
+			`INSERT INTO table RAW VALUES ('value')`,
+		},
+		{
+			mgorm.Insert(nil, "table").
+				Values("value1").
+				RawClause("RAW").
+				Values("value2").(*statement.InsertStmt),
+			`INSERT INTO table VALUES ('value1') RAW, ('value2')`,
+		},
+		{
+			mgorm.Insert(nil, "table").
+				Values("value").
+				RawClause("RAW").(*statement.InsertStmt),
+			`INSERT INTO table VALUES ('value') RAW`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.String()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
 	}
 }

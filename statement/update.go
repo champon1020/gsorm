@@ -6,6 +6,7 @@ import (
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/internal/parser"
+	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
 
@@ -79,9 +80,11 @@ func (s *UpdateStmt) buildSQL(sql *internal.SQL) error {
 
 // buildSQLWithClauses builds SQL statement from called clauses.
 func (s *UpdateStmt) buildSQLWithClauses(sql *internal.SQL) error {
-	for i, e := range s.called {
+	setCalled := false
+	for _, e := range s.called {
 		switch e := e.(type) {
-		case *clause.Where,
+		case *syntax.RawClause,
+			*clause.Where,
 			*clause.And,
 			*clause.Or:
 			ss, err := e.Build()
@@ -94,14 +97,13 @@ func (s *UpdateStmt) buildSQLWithClauses(sql *internal.SQL) error {
 			if err != nil {
 				return err
 			}
-			if i == 0 {
-				sql.Write(ss.Build())
-			} else if _, ok := s.called[i-1].(*clause.Set); !ok {
-				sql.Write(ss.Build())
-			} else {
+			if setCalled {
 				sql.Write(",")
 				sql.Write(ss.BuildValue())
+				continue
 			}
+			sql.Write(ss.Build())
+			setCalled = true
 		default:
 			return failure.New(errInvalidClause,
 				failure.Context{"clause": reflect.TypeOf(e).Elem().String()},
@@ -126,6 +128,12 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 
 	sql.Write(modelSQL.String())
 	return nil
+}
+
+// RawClause calls the raw string clause.
+func (s *UpdateStmt) RawClause(rs string, v ...interface{}) iupdate.RawClause {
+	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+	return s
 }
 
 // Model sets model to UpdateStmt.
