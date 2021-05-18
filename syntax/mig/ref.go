@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -14,6 +16,10 @@ type Ref struct {
 // Keyword returns clause keyword.
 func (r *Ref) Keyword() string {
 	return "REFERENCES"
+}
+
+func (r *Ref) String() string {
+	return fmt.Sprintf("%s(%s, %v)", r.Keyword(), r.Table, r.Columns)
 }
 
 // Build makes REFERENCES clause with syntax.StmtSet.

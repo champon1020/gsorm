@@ -13,8 +13,8 @@ type RawClause struct {
 	Values []interface{}
 }
 
-// Name returns the raw string.
-func (r *RawClause) Name() string {
+// Keyword returns the raw string.
+func (r *RawClause) Keyword() string {
 	return r.RawStr
 }
 

@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type DropColumn struct {
 // Keyword returns clause keyword.
 func (d *DropColumn) Keyword() string {
 	return "DROP COLUMN"
+}
+
+func (d *DropColumn) String() string {
+	return fmt.Sprintf("%s(%s)", d.Keyword(), d.Column)
 }
 
 // Build makes DROP COLUMN clause with syntax.StmtSet.

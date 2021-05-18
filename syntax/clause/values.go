@@ -13,8 +13,8 @@ type Values struct {
 	Values []interface{}
 }
 
-// Name returns clause keyword.
-func (v *Values) Name() string {
+// Keyword returns clause keyword.
+func (v *Values) Keyword() string {
 	return "VALUES"
 }
 
@@ -26,13 +26,13 @@ func (v *Values) AddValue(val interface{}) {
 // String returns function call with string.
 func (v *Values) String() string {
 	s := internal.ToString(v.Values, nil)
-	return fmt.Sprintf("%s(%s)", v.Name(), s)
+	return fmt.Sprintf("%s(%s)", v.Keyword(), s)
 }
 
 // Build makes VALUES clause with sytnax.StmtSet.
 func (v *Values) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(v.Name())
+	ss.WriteKeyword(v.Keyword())
 	ss.WriteValue("(")
 	for i, v := range v.Values {
 		if i != 0 {

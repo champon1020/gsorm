@@ -2,14 +2,8 @@ package domain
 
 // Clause is interface for SQL clauses.
 type Clause interface {
-	Name() string
-	String() string
-	Build() (StmtSet, error)
-}
-
-// MigClause is interface for SQL clauses about database migration.
-type MigClause interface {
 	Keyword() string
+	String() string
 	Build() (StmtSet, error)
 }
 

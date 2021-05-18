@@ -12,8 +12,8 @@ type Update struct {
 	Table syntax.Table
 }
 
-// Name returns clause keyword.
-func (u *Update) Name() string {
+// Keyword returns clause keyword.
+func (u *Update) Keyword() string {
 	return "UPDATE"
 }
 
@@ -25,13 +25,13 @@ func (u *Update) AddTable(table string) {
 // String returns function call with string.
 func (u *Update) String() string {
 	s := fmt.Sprintf("%q", u.Table.Build())
-	return fmt.Sprintf("%s(%s)", u.Name(), s)
+	return fmt.Sprintf("%s(%s)", u.Keyword(), s)
 }
 
 // Build makes UPDATE clause with syntax.StmtSet.
 func (u *Update) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(u.Name())
+	ss.WriteKeyword(u.Keyword())
 	ss.WriteValue(u.Table.Build())
 	return ss, nil
 }

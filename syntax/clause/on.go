@@ -14,8 +14,8 @@ type On struct {
 	Values []interface{}
 }
 
-// Name returns clause keyword.
-func (o *On) Name() string {
+// Keyword returns clause keyword.
+func (o *On) Keyword() string {
 	return "ON"
 }
 
@@ -26,7 +26,7 @@ func (o *On) String() string {
 		s += ", "
 		s += internal.ToString(o.Values, nil)
 	}
-	return fmt.Sprintf("%s(%s)", o.Name(), s)
+	return fmt.Sprintf("%s(%s)", o.Keyword(), s)
 }
 
 // Build makes ON clause with syntax.StmtSet.
@@ -36,6 +36,6 @@ func (o *On) Build() (domain.StmtSet, error) {
 		return nil, err
 	}
 	ss := &syntax.StmtSet{Value: s}
-	ss.WriteKeyword(o.Name())
+	ss.WriteKeyword(o.Keyword())
 	return ss, nil
 }

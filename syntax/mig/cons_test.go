@@ -6,6 +6,7 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/google/go-cmp/cmp"
+	"gotest.tools/v3/assert"
 )
 
 func TestCons_Build(t *testing.T) {
@@ -28,5 +29,22 @@ func TestCons_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
+	}
+}
+
+func TestCons_String(t *testing.T) {
+	testCases := []struct {
+		Cons     *mig.Cons
+		Expected string
+	}{
+		{
+			&mig.Cons{Key: "key"},
+			`CONSTRAINT(key)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Cons.String()
+		assert.Equal(t, testCase.Expected, actual)
 	}
 }

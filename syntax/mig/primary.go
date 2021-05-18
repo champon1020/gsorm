@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type Primary struct {
 // Keyword returns clause keyword.
 func (p *Primary) Keyword() string {
 	return "PRIMARY KEY"
+}
+
+func (p *Primary) String() string {
+	return fmt.Sprintf("%s(%v)", p.Keyword(), p.Columns)
 }
 
 // Build makes PRIMARY KEY clause with syntax.StmtSet.

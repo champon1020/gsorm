@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -14,6 +16,10 @@ type On struct {
 // Keyword returns clause keyword.
 func (o *On) Keyword() string {
 	return "ON"
+}
+
+func (o *On) String() string {
+	return fmt.Sprintf("%s(%s, %v)", o.Keyword(), o.Table, o.Columns)
 }
 
 // Build makes ON clause with syntax.StmtSet.
