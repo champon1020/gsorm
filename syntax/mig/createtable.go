@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type CreateTable struct {
 // Keyword returns clause keyword.
 func (c *CreateTable) Keyword() string {
 	return "CREATE TABLE"
+}
+
+func (c *CreateTable) String() string {
+	return fmt.Sprintf("%s(%s)", c.Keyword(), c.Table)
 }
 
 // Build makes CREATE TABLE clause with syntax.StmtSet.

@@ -6,6 +6,7 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/google/go-cmp/cmp"
+	"gotest.tools/v3/assert"
 )
 
 func TestPrimary_Build(t *testing.T) {
@@ -32,5 +33,26 @@ func TestPrimary_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
+	}
+}
+
+func TestPrimary_String(t *testing.T) {
+	testCases := []struct {
+		Primary  *mig.Primary
+		Expected string
+	}{
+		{
+			&mig.Primary{Columns: []string{"column"}},
+			`PRIMARY KEY([column])`,
+		},
+		{
+			&mig.Primary{Columns: []string{"column1", "column2"}},
+			`PRIMARY KEY([column1 column2])`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Primary.String()
+		assert.Equal(t, testCase.Expected, actual)
 	}
 }

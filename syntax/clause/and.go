@@ -14,8 +14,8 @@ type And struct {
 	Values []interface{}
 }
 
-// Name returns clause keyword.
-func (a *And) Name() string {
+// Keyword returns clause keyword.
+func (a *And) Keyword() string {
 	return "AND"
 }
 
@@ -26,7 +26,7 @@ func (a *And) String() string {
 		s += ", "
 		s += internal.ToString(a.Values, nil)
 	}
-	return fmt.Sprintf("%s(%s)", a.Name(), s)
+	return fmt.Sprintf("%s(%s)", a.Keyword(), s)
 }
 
 // Build makes AND clause with syntax.StmtSet.
@@ -36,7 +36,7 @@ func (a *And) Build() (domain.StmtSet, error) {
 		return nil, err
 	}
 	ss := &syntax.StmtSet{Value: s}
-	ss.WriteKeyword(a.Name())
+	ss.WriteKeyword(a.Keyword())
 	ss.Parens = true
 	return ss, nil
 }

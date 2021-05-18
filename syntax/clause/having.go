@@ -14,8 +14,8 @@ type Having struct {
 	Values []interface{}
 }
 
-// Name returns clause keyword.
-func (h *Having) Name() string {
+// Keyword returns clause keyword.
+func (h *Having) Keyword() string {
 	return "HAVING"
 }
 
@@ -26,7 +26,7 @@ func (h *Having) String() string {
 		s += ", "
 		s += internal.ToString(h.Values, nil)
 	}
-	return fmt.Sprintf("%s(%s)", h.Name(), s)
+	return fmt.Sprintf("%s(%s)", h.Keyword(), s)
 }
 
 // Build makes HAVING clause with syntax.StmtSet.
@@ -36,6 +36,6 @@ func (h *Having) Build() (domain.StmtSet, error) {
 		return nil, err
 	}
 	ss := &syntax.StmtSet{Value: s}
-	ss.WriteKeyword(h.Name())
+	ss.WriteKeyword(h.Keyword())
 	return ss, nil
 }

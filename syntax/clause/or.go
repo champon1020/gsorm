@@ -14,8 +14,8 @@ type Or struct {
 	Values []interface{}
 }
 
-// Name returns clause keyword.
-func (o *Or) Name() string {
+// Keyword returns clause keyword.
+func (o *Or) Keyword() string {
 	return "OR"
 }
 
@@ -26,7 +26,7 @@ func (o *Or) String() string {
 		s += ", "
 		s += internal.ToString(o.Values, nil)
 	}
-	return fmt.Sprintf("%s(%s)", o.Name(), s)
+	return fmt.Sprintf("%s(%s)", o.Keyword(), s)
 }
 
 // Build makes OR clause with syntax.StmtSet.
@@ -36,7 +36,7 @@ func (o *Or) Build() (domain.StmtSet, error) {
 		return nil, err
 	}
 	ss := &syntax.StmtSet{Value: s}
-	ss.WriteKeyword(o.Name())
+	ss.WriteKeyword(o.Keyword())
 	ss.Parens = true
 	return ss, nil
 }

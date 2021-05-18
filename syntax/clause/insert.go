@@ -13,8 +13,8 @@ type Insert struct {
 	Columns []syntax.Column
 }
 
-// Name returns clause keyword.
-func (i *Insert) Name() string {
+// Keyword returns clause keyword.
+func (i *Insert) Keyword() string {
 	return "INSERT INTO"
 }
 
@@ -37,13 +37,13 @@ func (i *Insert) String() string {
 	for _, c := range i.Columns {
 		s += fmt.Sprintf(", %q", c.Build())
 	}
-	return fmt.Sprintf("%s(%s)", i.Name(), s)
+	return fmt.Sprintf("%s(%s)", i.Keyword(), s)
 }
 
 // Build makes INSERT clause with sytnax.StmtSet.
 func (i *Insert) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(i.Name())
+	ss.WriteKeyword(i.Keyword())
 	ss.WriteValue(i.Table.Build())
 	if len(i.Columns) > 0 {
 		ss.WriteValue("(")

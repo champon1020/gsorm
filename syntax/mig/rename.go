@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type Rename struct {
 // Keyword returns clause keyword.
 func (r *Rename) Keyword() string {
 	return "RENAME TO"
+}
+
+func (r *Rename) String() string {
+	return fmt.Sprintf("%s(%s)", r.Keyword(), r.Table)
 }
 
 // Build makes RENAME TO clause with syntax.StmtSet.

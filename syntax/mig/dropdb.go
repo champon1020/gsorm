@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type DropDB struct {
 // Keyword returns clause keyword.
 func (d *DropDB) Keyword() string {
 	return "DROP DATABASE"
+}
+
+func (d *DropDB) String() string {
+	return fmt.Sprintf("%s(%s)", d.Keyword(), d.DBName)
 }
 
 // Build makes DROP DATABASE clause with syntax.StmtSet.

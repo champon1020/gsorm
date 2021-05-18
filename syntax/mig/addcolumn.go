@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -14,6 +16,10 @@ type AddColumn struct {
 // Keyword returns clause keyword.
 func (a *AddColumn) Keyword() string {
 	return "ADD COLUMN"
+}
+
+func (a *AddColumn) String() string {
+	return fmt.Sprintf("%s(%s, %s)", a.Keyword(), a.Column, a.Type)
 }
 
 // Build makes ADD COLUMN clause with syntax.StmtSet.

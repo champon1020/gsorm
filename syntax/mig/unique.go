@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type Unique struct {
 // Keyword returns clause keyword.
 func (u *Unique) Keyword() string {
 	return "UNIQUE"
+}
+
+func (u *Unique) String() string {
+	return fmt.Sprintf("%s(%v)", u.Keyword(), u.Columns)
 }
 
 // Build makes UNIQUE clause with syntax.StmtSet.
