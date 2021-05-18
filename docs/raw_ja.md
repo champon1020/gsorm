@@ -14,7 +14,7 @@
 - 以上の条件に該当しない値はそのまま展開される．
 
 使用者は好きなタイミングで`RawClause`を呼び出すことができます．
-ただし，`InsertStmt`，`UpdateStmt`，`CreateTable`のメソッドリストに含まれる`Model`と併用することはできません．
+ただし，`InsertStmt`，`UpdateStmt`，`CreateTable`のメソッドリストに含まれる`Model`や`InsertStmt`のメソッドリストに含まれる`Select`と併用することはできません．
 
 `RawClause`は全てのStmt構造体においてサポートされています．
 
