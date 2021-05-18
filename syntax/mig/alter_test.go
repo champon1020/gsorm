@@ -6,6 +6,7 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/google/go-cmp/cmp"
+	"gotest.tools/v3/assert"
 )
 
 func TestAlterTable_Build(t *testing.T) {
@@ -28,5 +29,22 @@ func TestAlterTable_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
+	}
+}
+
+func TestAlterTable_String(t *testing.T) {
+	testCases := []struct {
+		AlterTable *mig.AlterTable
+		Expected   string
+	}{
+		{
+			&mig.AlterTable{Table: "table"},
+			`ALTER TABLE(table)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.AlterTable.String()
+		assert.Equal(t, testCase.Expected, actual)
 	}
 }

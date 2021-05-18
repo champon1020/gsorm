@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type AlterTable struct {
 // Keyword returns clause keyword.
 func (a *AlterTable) Keyword() string {
 	return "ALTER TABLE"
+}
+
+func (a *AlterTable) String() string {
+	return fmt.Sprintf("%s(%s)", a.Keyword(), a.Table)
 }
 
 // Build makes ALTER TABLE clause with syntax.StmtSet.

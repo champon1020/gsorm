@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type Cons struct {
 // Keyword returns clause keyword.
 func (c *Cons) Keyword() string {
 	return "CONSTRAINT"
+}
+
+func (c *Cons) String() string {
+	return fmt.Sprintf("%s(%s)", c.Keyword(), c.Key)
 }
 
 // Build makes CONSTRAINT clasue with syntax.StmtSet.

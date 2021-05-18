@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type Foreign struct {
 // Keyword returns clause keyword.
 func (f *Foreign) Keyword() string {
 	return "FOREIGN KEY"
+}
+
+func (f *Foreign) String() string {
+	return fmt.Sprintf("%s(%v)", f.Keyword(), f.Columns)
 }
 
 // Build makes FOREIGN KEY clasue with syntax.StmtSet.

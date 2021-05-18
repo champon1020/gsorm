@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -14,6 +16,10 @@ type RenameColumn struct {
 // Keyword returns clause keyword.
 func (r *RenameColumn) Keyword() string {
 	return "RENAME COLUMN"
+}
+
+func (r *RenameColumn) String() string {
+	return fmt.Sprintf("%s(%s, %s)", r.Keyword(), r.Column, r.Dest)
 }
 
 // Build makes RENAME COLUMN clause with syntax.StmtSet.

@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -11,6 +13,10 @@ type NotNull struct{}
 // Keyword returns clause keyword.
 func (n *NotNull) Keyword() string {
 	return "NOT NULL"
+}
+
+func (n *NotNull) String() string {
+	return fmt.Sprintf("%s()", n.Keyword())
 }
 
 // Build makes NOT NULL clause with syntax.StmtSet.

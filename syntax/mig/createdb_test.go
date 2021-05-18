@@ -6,6 +6,7 @@ import (
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/google/go-cmp/cmp"
+	"gotest.tools/v3/assert"
 )
 
 func TestCreateDB_Build(t *testing.T) {
@@ -28,5 +29,22 @@ func TestCreateDB_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
+	}
+}
+
+func TestCreateDB_String(t *testing.T) {
+	testCases := []struct {
+		CreateDB *mig.CreateDB
+		Expected string
+	}{
+		{
+			&mig.CreateDB{DBName: "database"},
+			`CREATE DATABASE(database)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.CreateDB.String()
+		assert.Equal(t, testCase.Expected, actual)
 	}
 }

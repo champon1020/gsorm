@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type CreateDB struct {
 // Keyword returns clause keyword.
 func (c *CreateDB) Keyword() string {
 	return "CREATE DATABASE"
+}
+
+func (c *CreateDB) String() string {
+	return fmt.Sprintf("%s(%s)", c.Keyword(), c.DBName)
 }
 
 // Build makes CREATE DATABASE clause with syntax.StmtSet.

@@ -10,6 +10,7 @@ type Clause interface {
 // MigClause is interface for SQL clauses about database migration.
 type MigClause interface {
 	Keyword() string
+	String() string
 	Build() (StmtSet, error)
 }
 

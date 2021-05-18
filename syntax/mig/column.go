@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -14,6 +16,10 @@ type Column struct {
 // Keyword returns column name.
 func (c *Column) Keyword() string {
 	return c.Col
+}
+
+func (c *Column) String() string {
+	return fmt.Sprintf("COLUMN(%s, %s)", c.Col, c.Type)
 }
 
 // Build makes database column definition with syntax.StmtSet.

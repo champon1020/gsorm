@@ -1,6 +1,8 @@
 package mig
 
 import (
+	"fmt"
+
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -13,6 +15,10 @@ type CreateIndex struct {
 // Keyword returns clause keyword.
 func (c *CreateIndex) Keyword() string {
 	return "CREATE INDEX"
+}
+
+func (c *CreateIndex) String() string {
+	return fmt.Sprintf("%s(%s)", c.Keyword(), c.IdxName)
 }
 
 // Build makes CREATE INDEX clause with syntax.StmtSet.
