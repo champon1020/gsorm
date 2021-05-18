@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -23,7 +24,7 @@ func (l *Limit) String() string {
 }
 
 // Build makes LIMIT clause with syntax.StmtSet.
-func (l *Limit) Build() (*syntax.StmtSet, error) {
+func (l *Limit) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(l.Name())
 	ss.WriteValue(strconv.Itoa(l.Num))

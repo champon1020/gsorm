@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -20,7 +21,7 @@ func (d *Delete) String() string {
 }
 
 // Build makes DELETE clause with syntax.StmtSet.
-func (d *Delete) Build() (*syntax.StmtSet, error) {
+func (d *Delete) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Name())
 	return ss, nil

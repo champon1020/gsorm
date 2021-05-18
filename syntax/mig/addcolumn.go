@@ -1,6 +1,7 @@
 package mig
 
 import (
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -16,7 +17,7 @@ func (a *AddColumn) Keyword() string {
 }
 
 // Build makes ADD COLUMN clause with syntax.StmtSet.
-func (a *AddColumn) Build() (*syntax.StmtSet, error) {
+func (a *AddColumn) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(a.Keyword())
 	ss.WriteValue(a.Column)

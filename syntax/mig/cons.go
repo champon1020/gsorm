@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // Cons is CONSTRAINT clause.
 type Cons struct {
@@ -13,7 +16,7 @@ func (c *Cons) Keyword() string {
 }
 
 // Build makes CONSTRAINT clasue with syntax.StmtSet.
-func (c *Cons) Build() (*syntax.StmtSet, error) {
+func (c *Cons) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(c.Keyword())
 	ss.WriteValue(c.Key)

@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // RenameColumn is RENAME COLUMN clause.
 type RenameColumn struct {
@@ -14,7 +17,7 @@ func (r *RenameColumn) Keyword() string {
 }
 
 // Build makes RENAME COLUMN clause with syntax.StmtSet.
-func (r *RenameColumn) Build() (*syntax.StmtSet, error) {
+func (r *RenameColumn) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(r.Keyword())
 	ss.WriteValue(r.Column)

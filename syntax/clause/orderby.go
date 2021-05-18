@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -22,7 +23,7 @@ func (o *OrderBy) String() string {
 }
 
 // Build makes ORDER BY clause with sytnax.StmtSet.
-func (o *OrderBy) Build() (*syntax.StmtSet, error) {
+func (o *OrderBy) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(o.Name())
 	for i, c := range o.Columns {

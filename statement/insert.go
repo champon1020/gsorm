@@ -7,7 +7,6 @@ import (
 	"github.com/champon1020/mgorm/interfaces"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/internal/parser"
-	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
 
@@ -42,7 +41,7 @@ func (s *InsertStmt) FuncString() string {
 }
 
 // Cmd returns cmd clause.
-func (s *InsertStmt) Cmd() syntax.Clause {
+func (s *InsertStmt) Cmd() domain.Clause {
 	return s.cmd
 }
 

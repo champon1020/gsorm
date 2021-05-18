@@ -7,7 +7,6 @@ import (
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/internal/parser"
-	"github.com/champon1020/mgorm/syntax"
 	"github.com/google/go-cmp/cmp"
 	"github.com/morikuni/failure"
 )
@@ -15,12 +14,12 @@ import (
 // stmt stores information about query.
 type stmt struct {
 	conn   domain.Conn
-	called []syntax.Clause
+	called []domain.Clause
 	errors []error
 }
 
 // call appends called clause.
-func (s *stmt) call(e syntax.Clause) {
+func (s *stmt) call(e domain.Clause) {
 	s.called = append(s.called, e)
 }
 
@@ -30,7 +29,7 @@ func (s *stmt) throw(err error) {
 }
 
 // Called returns called clauses.
-func (s *stmt) Called() []syntax.Clause {
+func (s *stmt) Called() []domain.Clause {
 	return s.called
 }
 
@@ -43,7 +42,7 @@ func (s *stmt) string(buildSQL func(*internal.SQL) error) string {
 	return sql.String()
 }
 
-func (s *stmt) funcString(cmd syntax.Clause) string {
+func (s *stmt) funcString(cmd domain.Clause) string {
 	str := cmd.String()
 	for _, e := range s.called {
 		str += fmt.Sprintf(".%s", e.String())
@@ -51,7 +50,7 @@ func (s *stmt) funcString(cmd syntax.Clause) string {
 	return str
 }
 
-func (s *stmt) compareWith(cmd syntax.Clause, targetStmt domain.Stmt) error {
+func (s *stmt) compareWith(cmd domain.Clause, targetStmt domain.Stmt) error {
 	expected := s.Called()
 	actual := targetStmt.Called()
 	if len(expected) != len(actual) {

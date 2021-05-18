@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -37,7 +38,7 @@ func (s *Select) String() string {
 }
 
 // Build makes SELECT clause with syntax.StmtSet.
-func (s *Select) Build() (*syntax.StmtSet, error) {
+func (s *Select) Build() (domain.StmtSet, error) {
 	ss := &syntax.StmtSet{}
 	ss.WriteKeyword(s.Name())
 	for i, c := range s.Columns {

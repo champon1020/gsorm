@@ -1,6 +1,7 @@
 package mig
 
 import (
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -15,7 +16,7 @@ func (d *DropDB) Keyword() string {
 }
 
 // Build makes DROP DATABASE clause with syntax.StmtSet.
-func (d *DropDB) Build() (*syntax.StmtSet, error) {
+func (d *DropDB) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())
 	ss.WriteValue(d.DBName)

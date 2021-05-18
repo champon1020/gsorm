@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // DropColumn is DROP COLUMN clause.
 type DropColumn struct {
@@ -13,7 +16,7 @@ func (d *DropColumn) Keyword() string {
 }
 
 // Build makes DROP COLUMN clause with syntax.StmtSet.
-func (d *DropColumn) Build() (*syntax.StmtSet, error) {
+func (d *DropColumn) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())
 	ss.WriteValue(d.Column)

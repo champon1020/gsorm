@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // Unique is UNIQUE clause.
 type Unique struct {
@@ -13,7 +16,7 @@ func (u *Unique) Keyword() string {
 }
 
 // Build makes UNIQUE clause with syntax.StmtSet.
-func (u *Unique) Build() (*syntax.StmtSet, error) {
+func (u *Unique) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(u.Keyword())
 	ss.WriteValue("(")

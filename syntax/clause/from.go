@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -35,7 +36,7 @@ func (f *From) String() string {
 }
 
 // Build makes FROM clause with syntax.StmtSet.
-func (f *From) Build() (*syntax.StmtSet, error) {
+func (f *From) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(f.Name())
 	for i, t := range f.Tables {

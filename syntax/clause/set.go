@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -24,7 +25,7 @@ func (s *Set) String() string {
 }
 
 // Build makes SET clause with syntax.StmtSet.
-func (s *Set) Build() (*syntax.StmtSet, error) {
+func (s *Set) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(s.Name())
 

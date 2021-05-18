@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -29,7 +30,7 @@ func (o *Or) String() string {
 }
 
 // Build makes OR clause with syntax.StmtSet.
-func (o *Or) Build() (*syntax.StmtSet, error) {
+func (o *Or) Build() (domain.StmtSet, error) {
 	s, err := syntax.BuildExpr(o.Expr, o.Values...)
 	if err != nil {
 		return nil, err

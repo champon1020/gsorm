@@ -6,7 +6,6 @@ import (
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/internal/parser"
-	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
 
@@ -40,7 +39,7 @@ func (s *UpdateStmt) FuncString() string {
 }
 
 // Cmd returns cmd clause.
-func (s *UpdateStmt) Cmd() syntax.Clause {
+func (s *UpdateStmt) Cmd() domain.Clause {
 	return s.cmd
 }
 
@@ -101,7 +100,7 @@ func (s *UpdateStmt) buildSQLWithClauses(sql *internal.SQL) error {
 				sql.Write(ss.Build())
 			} else {
 				sql.Write(",")
-				sql.Write(ss.Value)
+				sql.Write(ss.BuildValue())
 			}
 		default:
 			return failure.New(errInvalidClause,

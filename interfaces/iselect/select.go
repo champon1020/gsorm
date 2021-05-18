@@ -1,8 +1,8 @@
 package iselect
 
 import (
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/interfaces"
-	"github.com/champon1020/mgorm/syntax"
 )
 
 // Stmt is interface which is returned by mgorm.Select.
@@ -20,8 +20,8 @@ type From interface {
 	Having(expr string, vals ...interface{}) Having
 	OrderBy(cols ...string) OrderBy
 	Limit(limit int) Limit
-	Union(selectStmt syntax.Stmt) Union
-	UnionAll(selectStmt syntax.Stmt) Union
+	Union(selectStmt domain.Stmt) Union
+	UnionAll(selectStmt domain.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -40,8 +40,8 @@ type On interface {
 	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
 	Limit(int) Limit
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
+	Union(domain.Stmt) Union
+	UnionAll(domain.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -53,8 +53,8 @@ type Where interface {
 	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
 	Limit(int) Limit
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
+	Union(domain.Stmt) Union
+	UnionAll(domain.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -66,8 +66,8 @@ type And interface {
 	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
 	Limit(int) Limit
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
+	Union(domain.Stmt) Union
+	UnionAll(domain.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -79,8 +79,8 @@ type Or interface {
 	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
 	Limit(int) Limit
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
+	Union(domain.Stmt) Union
+	UnionAll(domain.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -89,8 +89,8 @@ type GroupBy interface {
 	Having(string, ...interface{}) Having
 	OrderBy(...string) OrderBy
 	Limit(int) Limit
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
+	Union(domain.Stmt) Union
+	UnionAll(domain.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -98,8 +98,8 @@ type GroupBy interface {
 type Having interface {
 	OrderBy(...string) OrderBy
 	Limit(int) Limit
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
+	Union(domain.Stmt) Union
+	UnionAll(domain.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -125,7 +125,7 @@ type Offset interface {
 type Union interface {
 	OrderBy(...string) OrderBy
 	Limit(int) Limit
-	Union(syntax.Stmt) Union
-	UnionAll(syntax.Stmt) Union
+	Union(domain.Stmt) Union
+	UnionAll(domain.Stmt) Union
 	interfaces.QueryCallable
 }

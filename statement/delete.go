@@ -6,7 +6,6 @@ import (
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/interfaces/idelete"
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
 )
@@ -34,7 +33,7 @@ func (s *DeleteStmt) FuncString() string {
 }
 
 // Cmd returns cmd clause.
-func (s *DeleteStmt) Cmd() syntax.Clause {
+func (s *DeleteStmt) Cmd() domain.Clause {
 	return s.cmd
 }
 

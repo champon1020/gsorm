@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // CreateDB is CREATE DATABASE clause.
 type CreateDB struct {
@@ -13,7 +16,7 @@ func (c *CreateDB) Keyword() string {
 }
 
 // Build makes CREATE DATABASE clause with syntax.StmtSet.
-func (c *CreateDB) Build() (*syntax.StmtSet, error) {
+func (c *CreateDB) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(c.Keyword())
 	ss.WriteValue(c.DBName)

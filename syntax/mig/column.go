@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // Column is definition of table column.
 type Column struct {
@@ -14,7 +17,7 @@ func (c *Column) Keyword() string {
 }
 
 // Build makes database column definition with syntax.StmtSet.
-func (c *Column) Build() (*syntax.StmtSet, error) {
+func (c *Column) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(c.Keyword())
 	ss.WriteValue(c.Type)

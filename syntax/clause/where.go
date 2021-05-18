@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -29,7 +30,7 @@ func (w *Where) String() string {
 }
 
 // Build makes WHERE clause with syntax.StmtSet.
-func (w *Where) Build() (*syntax.StmtSet, error) {
+func (w *Where) Build() (domain.StmtSet, error) {
 	s, err := syntax.BuildExpr(w.Expr, w.Values...)
 	if err != nil {
 		return nil, err

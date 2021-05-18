@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -39,7 +40,7 @@ func (j *Join) String() string {
 }
 
 // Build makes JOIN clause with syntax.StmtSet.
-func (j *Join) Build() (*syntax.StmtSet, error) {
+func (j *Join) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(j.Name())
 	ss.WriteValue(j.Table.Build())

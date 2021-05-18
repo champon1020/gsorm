@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -23,7 +24,7 @@ func (o *Offset) String() string {
 }
 
 // Build makes OFFSET clause with sytnax.StmtSet.
-func (o *Offset) Build() (*syntax.StmtSet, error) {
+func (o *Offset) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(o.Name())
 	ss.WriteValue(strconv.Itoa(o.Num))

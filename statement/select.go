@@ -6,7 +6,6 @@ import (
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/interfaces/iselect"
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
 )
@@ -40,7 +39,7 @@ func (s *SelectStmt) FuncString() string {
 }
 
 // Cmd returns cmd clause.
-func (s *SelectStmt) Cmd() syntax.Clause {
+func (s *SelectStmt) Cmd() domain.Clause {
 	return s.cmd
 }
 
@@ -171,13 +170,13 @@ func (s *SelectStmt) On(expr string, vals ...interface{}) iselect.On {
 }
 
 // Union calls UNION clause.
-func (s *SelectStmt) Union(stmt syntax.Stmt) iselect.Union {
+func (s *SelectStmt) Union(stmt domain.Stmt) iselect.Union {
 	s.call(&clause.Union{Stmt: stmt, All: false})
 	return s
 }
 
 // UnionAll calls UNION ALL clause.
-func (s *SelectStmt) UnionAll(stmt syntax.Stmt) iselect.Union {
+func (s *SelectStmt) UnionAll(stmt domain.Stmt) iselect.Union {
 	s.call(&clause.Union{Stmt: stmt, All: true})
 	return s
 }
