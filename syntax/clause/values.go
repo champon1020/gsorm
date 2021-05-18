@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -29,7 +30,7 @@ func (v *Values) String() string {
 }
 
 // Build makes VALUES clause with sytnax.StmtSet.
-func (v *Values) Build() (*syntax.StmtSet, error) {
+func (v *Values) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(v.Name())
 	ss.WriteValue("(")

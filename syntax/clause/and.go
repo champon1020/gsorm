@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -29,7 +30,7 @@ func (a *And) String() string {
 }
 
 // Build makes AND clause with syntax.StmtSet.
-func (a *And) Build() (*syntax.StmtSet, error) {
+func (a *And) Build() (domain.StmtSet, error) {
 	s, err := syntax.BuildExpr(a.Expr, a.Values...)
 	if err != nil {
 		return nil, err

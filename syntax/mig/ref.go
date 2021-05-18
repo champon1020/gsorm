@@ -1,6 +1,7 @@
 package mig
 
 import (
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -16,7 +17,7 @@ func (r *Ref) Keyword() string {
 }
 
 // Build makes REFERENCES clause with syntax.StmtSet.
-func (r *Ref) Build() (*syntax.StmtSet, error) {
+func (r *Ref) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(r.Keyword())
 	ss.WriteValue(r.Table)

@@ -25,6 +25,7 @@ mgorm.Update(db).Set(10, "employees").
 # Methods
 `mgorm.Update`で使用できるメソッドは以下です．
 
+- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
 - [Set](https://github.com/champon1020/mgorm/tree/main/docs/update_ja.md#set)
 - [Where](https://github.com/champon1020/mgorm/tree/main/docs/update_ja.md#where)
 - [And](https://github.com/champon1020/mgorm/tree/main/docs/update_ja.md#and)
@@ -32,6 +33,7 @@ mgorm.Update(db).Set(10, "employees").
 - [Model](https://github.com/champon1020/mgorm/tree/main/docs/update_ja.md#model)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
+但し，例外として`RawClause`は任意で呼び出すことができます．
 
 ```
 | alternation

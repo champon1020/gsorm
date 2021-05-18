@@ -73,34 +73,3 @@ func TestNewColumn(t *testing.T) {
 		}
 	}
 }
-
-func TestEq_Build(t *testing.T) {
-	testCases := []struct {
-		Eq     *syntax.Eq
-		Result string
-	}{
-		{&syntax.Eq{LHS: "lhs", RHS: "rhs"}, `lhs = 'rhs'`},
-	}
-
-	for _, testCase := range testCases {
-		res := testCase.Eq.Build()
-		assert.Equal(t, testCase.Result, res)
-	}
-}
-
-func TestNewEq(t *testing.T) {
-	testCases := []struct {
-		LHS    string
-		RHS    interface{}
-		Result *syntax.Eq
-	}{
-		{"lhs", "rhs", &syntax.Eq{LHS: "lhs", RHS: "rhs"}},
-	}
-
-	for _, testCase := range testCases {
-		res := syntax.NewEq(testCase.LHS, testCase.RHS)
-		if diff := cmp.Diff(testCase.Result, res); diff != "" {
-			t.Errorf("Differs: (-want +got)\n%s", diff)
-		}
-	}
-}

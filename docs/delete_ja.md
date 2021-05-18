@@ -13,12 +13,14 @@ err := mgorm.Delete(db).From("employees").Exec()
 # Methods
 `mgorm.Delete`に使用できるメソッドは以下です．
 
+- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
 - [From](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#from)
 - [Where](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#where)
 - [And](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#and)
 - [Or](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#or)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
+但し，例外として`RawClause`は任意で呼び出すことができます．
 
 ```
 | alternation

@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -29,7 +30,7 @@ func (o *On) String() string {
 }
 
 // Build makes ON clause with syntax.StmtSet.
-func (o *On) Build() (*syntax.StmtSet, error) {
+func (o *On) Build() (domain.StmtSet, error) {
 	s, err := syntax.BuildExprWithoutQuotes(o.Expr, o.Values...)
 	if err != nil {
 		return nil, err

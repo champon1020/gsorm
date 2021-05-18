@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/morikuni/failure"
 )
@@ -33,7 +34,7 @@ func buildExprWithOpt(option *buildExprOpt, expr string, vals ...interface{}) (s
 
 	values := []interface{}{}
 	for _, v := range vals {
-		if stmt, ok := v.(Stmt); ok {
+		if stmt, ok := v.(domain.Stmt); ok {
 			values = append(values, stmt.String())
 			continue
 		}

@@ -2,7 +2,8 @@ package syntax
 
 import "strings"
 
-// StmtSet is the pair of clause keyword and its values. If Parens is true, StmtSet would be enclosed by parentheses.
+// StmtSet is the pair of clause keyword and its values.
+// If Parens is true, StmtSet would be enclosed by parentheses.
 type StmtSet struct {
 	Keyword string
 	Value   string

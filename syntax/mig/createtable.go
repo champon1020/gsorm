@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // CreateTable is CREATE TABLE clause.
 type CreateTable struct {
@@ -13,7 +16,7 @@ func (c *CreateTable) Keyword() string {
 }
 
 // Build makes CREATE TABLE clause with syntax.StmtSet.
-func (c *CreateTable) Build() (*syntax.StmtSet, error) {
+func (c *CreateTable) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(c.Keyword())
 	ss.WriteValue(c.Table)

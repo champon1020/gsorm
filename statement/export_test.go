@@ -1,6 +1,6 @@
 package statement
 
-import "github.com/champon1020/mgorm/syntax"
+import "github.com/champon1020/mgorm/domain"
 
 const (
 	ErrInvalidValue  = errInvalidValue
@@ -22,18 +22,18 @@ func (s *stmt) ExportedGetErrors() []error {
 	return s.errors
 }
 
-func (s *DeleteStmt) ExportedSetCalled(c ...syntax.Clause) {
+func (s *DeleteStmt) ExportedSetCalled(c ...domain.Clause) {
 	s.called = append(s.called, c...)
 }
 
-func (s *InsertStmt) ExportedSetCalled(c ...syntax.Clause) {
+func (s *InsertStmt) ExportedSetCalled(c ...domain.Clause) {
 	s.called = append(s.called, c...)
 }
 
-func (s *SelectStmt) ExportedSetCalled(c ...syntax.Clause) {
+func (s *SelectStmt) ExportedSetCalled(c ...domain.Clause) {
 	s.called = append(s.called, c...)
 }
 
-func (s *UpdateStmt) ExportedSetCalled(c ...syntax.Clause) {
+func (s *UpdateStmt) ExportedSetCalled(c ...domain.Clause) {
 	s.called = append(s.called, c...)
 }

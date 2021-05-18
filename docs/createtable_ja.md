@@ -40,6 +40,7 @@ err := mgorm.CreateTable(db, "employees").
 
 # Methods
 `mgorm.CreateTable`で使用できるメソッドを以下に示します．
+- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
 - [Column](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#column)
   - [NotNull](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#notnull)
   - [Default](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#default)
@@ -51,6 +52,7 @@ err := mgorm.CreateTable(db, "employees").
 - [Model](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#model)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
+但し，例外として`RawClause`は任意で呼び出すことができます．
 
 ```
 | alternation

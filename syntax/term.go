@@ -2,8 +2,6 @@ package syntax
 
 import (
 	"strings"
-
-	"github.com/champon1020/mgorm/internal"
 )
 
 // Table is table term.
@@ -66,23 +64,4 @@ func NewColumn(column string) *Column {
 		c.Alias = strs[1]
 	}
 	return c
-}
-
-// Eq is equal expression.
-type Eq struct {
-	LHS string
-	RHS interface{}
-}
-
-// Build makes equal expression with string.
-func (e *Eq) Build() string {
-	s := e.LHS
-	s += " = "
-	s += internal.ToString(e.RHS, nil)
-	return s
-}
-
-// NewEq creates new Eq instance.
-func NewEq(lhs string, rhs interface{}) *Eq {
-	return &Eq{LHS: lhs, RHS: rhs}
 }

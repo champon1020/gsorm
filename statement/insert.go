@@ -42,7 +42,7 @@ func (s *InsertStmt) FuncString() string {
 }
 
 // Cmd returns cmd clause.
-func (s *InsertStmt) Cmd() syntax.Clause {
+func (s *InsertStmt) Cmd() domain.Clause {
 	return s.cmd
 }
 
@@ -94,19 +94,27 @@ func (s *InsertStmt) buildSQL(sql *internal.SQL) error {
 
 // buildSQLWithClauses builds SQL statement from called clauses.
 func (s *InsertStmt) buildSQLWithClauses(sql *internal.SQL) error {
-	for i, e := range s.called {
+	valuesCalled := false
+	for _, e := range s.called {
 		switch e := e.(type) {
 		case *clause.Values:
 			s, err := e.Build()
 			if err != nil {
 				return err
 			}
-			if i > 0 {
+			if valuesCalled {
 				sql.Write(",")
 				sql.Write(s.BuildValue())
 				continue
 			}
 			sql.Write(s.Build())
+			valuesCalled = true
+		case *syntax.RawClause:
+			ss, err := e.Build()
+			if err != nil {
+				return err
+			}
+			sql.Write(ss.Build())
 		default:
 			return failure.New(errInvalidClause,
 				failure.Context{"clause": reflect.TypeOf(e).Elem().String()},
@@ -131,6 +139,12 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 
 	sql.Write(modelSQL.String())
 	return nil
+}
+
+// RawClause calls the raw string clause.
+func (s *InsertStmt) RawClause(rs string, v ...interface{}) iinsert.RawClause {
+	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+	return s
 }
 
 // Model sets model to InsertStmt.

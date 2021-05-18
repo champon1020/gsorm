@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // Primary is PRIMARY KEY clause.
 type Primary struct {
@@ -13,7 +16,7 @@ func (p *Primary) Keyword() string {
 }
 
 // Build makes PRIMARY KEY clause with syntax.StmtSet.
-func (p *Primary) Build() (*syntax.StmtSet, error) {
+func (p *Primary) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(p.Keyword())
 	ss.WriteValue("(")

@@ -20,6 +20,7 @@ err := mgorm.AlterTable(db, "employees").
 # Methods
 `mgorm.AlterTable`に使用できるメソッドは以下です．
 
+- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
 - [Rename](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#rename)
 - [AddColumn](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcolumn)
     - [NotNull](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcolumn.notnull)
@@ -33,6 +34,7 @@ err := mgorm.AlterTable(db, "employees").
         - [Ref](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons.foreign.ref)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
+但し，例外として`RawClause`は任意で呼び出すことができます．
 
 ```
 | alternation

@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // Rename is RENAME TO clause.
 type Rename struct {
@@ -13,7 +16,7 @@ func (r *Rename) Keyword() string {
 }
 
 // Build makes RENAME TO clause with syntax.StmtSet.
-func (r *Rename) Build() (*syntax.StmtSet, error) {
+func (r *Rename) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(r.Keyword())
 	ss.WriteValue(r.Table)

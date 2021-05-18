@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -34,7 +35,7 @@ func (g *GroupBy) String() string {
 }
 
 // Build makes GROUP BY clause with syntax.StmtSet.
-func (g *GroupBy) Build() (*syntax.StmtSet, error) {
+func (g *GroupBy) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(g.Name())
 	for i, c := range g.Columns {

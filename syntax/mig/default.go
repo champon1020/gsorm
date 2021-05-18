@@ -1,6 +1,7 @@
 package mig
 
 import (
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -16,7 +17,7 @@ func (d *Default) Keyword() string {
 }
 
 // Build makes DEFAULT clause with syntax.StmtSet.
-func (d *Default) Build() (*syntax.StmtSet, error) {
+func (d *Default) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(d.Keyword())
 	ss.WriteValue(internal.ToString(d.Value, nil))

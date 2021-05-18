@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // AddCons is ADD CONSTRAINT clause.
 type AddCons struct {
@@ -13,7 +16,7 @@ func (a *AddCons) Keyword() string {
 }
 
 // Build makes ADD CONSTRAINT clause with syntax.StmtSet.
-func (a *AddCons) Build() (*syntax.StmtSet, error) {
+func (a *AddCons) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(a.Keyword())
 	ss.WriteValue(a.Key)

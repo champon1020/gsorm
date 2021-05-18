@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // Foreign is FOREIGN KEY clasue.
 type Foreign struct {
@@ -13,7 +16,7 @@ func (f *Foreign) Keyword() string {
 }
 
 // Build makes FOREIGN KEY clasue with syntax.StmtSet.
-func (f *Foreign) Build() (*syntax.StmtSet, error) {
+func (f *Foreign) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(f.Keyword())
 	ss.WriteValue("(")

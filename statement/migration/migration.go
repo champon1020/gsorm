@@ -5,7 +5,6 @@ import (
 
 	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/mig"
 	"github.com/morikuni/failure"
 )
@@ -13,12 +12,12 @@ import (
 // migStmt stores information about database migration query.
 type migStmt struct {
 	conn   domain.Conn
-	called []syntax.MigClause
+	called []domain.MigClause
 	errors []error
 }
 
 // call appends called clause.
-func (s *migStmt) call(e syntax.MigClause) {
+func (s *migStmt) call(e domain.MigClause) {
 	s.called = append(s.called, e)
 }
 
@@ -28,7 +27,7 @@ func (s *migStmt) throw(e error) {
 }
 
 // headClause returns first element of called.
-func (s *migStmt) headClause() syntax.MigClause {
+func (s *migStmt) headClause() domain.MigClause {
 	if len(s.called) == 0 {
 		return nil
 	}

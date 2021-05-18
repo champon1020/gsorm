@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // AlterTable is ALTER TABLE clause.
 type AlterTable struct {
@@ -13,7 +16,7 @@ func (a *AlterTable) Keyword() string {
 }
 
 // Build makes ALTER TABLE clause with syntax.StmtSet.
-func (a *AlterTable) Build() (*syntax.StmtSet, error) {
+func (a *AlterTable) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(a.Keyword())
 	ss.WriteValue(a.Table)

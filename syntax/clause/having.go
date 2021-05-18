@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
 )
@@ -29,7 +30,7 @@ func (h *Having) String() string {
 }
 
 // Build makes HAVING clause with syntax.StmtSet.
-func (h *Having) Build() (*syntax.StmtSet, error) {
+func (h *Having) Build() (domain.StmtSet, error) {
 	s, err := syntax.BuildExpr(h.Expr, h.Values...)
 	if err != nil {
 		return nil, err

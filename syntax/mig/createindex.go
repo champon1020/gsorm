@@ -1,6 +1,9 @@
 package mig
 
-import "github.com/champon1020/mgorm/syntax"
+import (
+	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/syntax"
+)
 
 // CreateIndex is CREATE INDEX clause.
 type CreateIndex struct {
@@ -13,7 +16,7 @@ func (c *CreateIndex) Keyword() string {
 }
 
 // Build makes CREATE INDEX clause with syntax.StmtSet.
-func (c *CreateIndex) Build() (*syntax.StmtSet, error) {
+func (c *CreateIndex) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(c.Keyword())
 	ss.WriteValue(c.IdxName)

@@ -3,6 +3,7 @@ package clause
 import (
 	"fmt"
 
+	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 
@@ -40,7 +41,7 @@ func (i *Insert) String() string {
 }
 
 // Build makes INSERT clause with sytnax.StmtSet.
-func (i *Insert) Build() (*syntax.StmtSet, error) {
+func (i *Insert) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
 	ss.WriteKeyword(i.Name())
 	ss.WriteValue(i.Table.Build())
