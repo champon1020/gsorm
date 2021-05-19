@@ -1,25 +1,28 @@
 package internal
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
-	"regexp"
 	"strings"
 	"time"
 )
 
-var (
-	matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")
-	matchAllCap   = regexp.MustCompile("([a-z0-9])([A-Z])")
-)
-
-// SnakeCase returns str as snake case.
-func SnakeCase(str string) (snake string) {
-	str = strings.Split(str, "#")[0]
-	snake = matchFirstCap.ReplaceAllString(str, "${1}_${2}")
-	snake = matchAllCap.ReplaceAllString(snake, "${1}_${2}")
-	snake = strings.ToLower(snake)
-	return
+// SnakeCase converts the string to snake case.
+func SnakeCase(s string) string {
+	var buf bytes.Buffer
+	for _, c := range s {
+		if 'A' <= c && c <= 'Z' {
+			// just convert [A-Z] to _[a-z]
+			if buf.Len() > 0 {
+				buf.WriteRune('_')
+			}
+			buf.WriteRune(c - 'A' + 'a')
+		} else {
+			buf.WriteRune(c)
+		}
+	}
+	return buf.String()
 }
 
 // ToStringOpt is the option of ToString.
