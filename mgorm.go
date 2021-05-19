@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/champon1020/mgorm/database"
-	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/domain"
 	"github.com/champon1020/mgorm/interfaces/ialtertable"
 	"github.com/champon1020/mgorm/interfaces/icreatedb"
 	"github.com/champon1020/mgorm/interfaces/icreateindex"

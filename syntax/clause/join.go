@@ -3,7 +3,7 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/domain"
 	"github.com/champon1020/mgorm/syntax"
 )
 

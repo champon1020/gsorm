@@ -3,14 +3,13 @@ package statement
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/domain"
+	"github.com/champon1020/mgorm/interfaces/iupdate"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/internal/parser"
 	"github.com/champon1020/mgorm/syntax"
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
-
-	"github.com/champon1020/mgorm/interfaces/iupdate"
 )
 
 // UpdateStmt is UPDATE statement..

@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/domain"
+
 	"github.com/go-sql-driver/mysql"
 	"github.com/ory/dockertest/v3"
 )

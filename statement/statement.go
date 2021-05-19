@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/internal/parser"
 	"github.com/google/go-cmp/cmp"

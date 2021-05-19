@@ -1,8 +1,8 @@
 package iselect
 
 import (
-	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/interfaces"
+	"github.com/champon1020/mgorm/interfaces/domain"
 )
 
 // Stmt is interface which is returned by mgorm.Select.
