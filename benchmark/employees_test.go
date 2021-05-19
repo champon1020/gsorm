@@ -103,7 +103,7 @@ func BenchmarkSelect_gorp(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{"InnoDB", "UTF8"}}
+	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{Engine: "InnoDB", Encoding: "UTF8"}}
 
 	b.ResetTimer()
 
