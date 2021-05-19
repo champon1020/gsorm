@@ -1,2 +1,5 @@
 coverage.out
 **/*.html
+
+benchmark/benchmark.test
+benchmark/*.prof
