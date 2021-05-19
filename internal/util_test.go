@@ -17,6 +17,10 @@ func TestSnakeCase(t *testing.T) {
 	}{
 		{"thisIsString", "this_is_string"},
 		{"this", "this"},
+		{"ID", "id"},
+		{"UUID", "uuid"},
+		{"EmpID", "emp_id"},
+		{"HTTPRequest", "httprequest"},
 	}
 
 	for _, testCase := range testCases {

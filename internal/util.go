@@ -11,15 +11,15 @@ import (
 // SnakeCase converts the string to snake case.
 func SnakeCase(s string) string {
 	var buf bytes.Buffer
-	for _, c := range s {
-		if 'A' <= c && c <= 'Z' {
+	for i := 0; i < len(s); i++ {
+		if 'A' <= rune(s[i]) && rune(s[i]) <= 'Z' {
 			// just convert [A-Z] to _[a-z]
-			if buf.Len() > 0 {
+			if i > 0 && 'a' <= rune(s[i-1]) && rune(s[i-1]) <= 'z' {
 				buf.WriteRune('_')
 			}
-			buf.WriteRune(c - 'A' + 'a')
+			buf.WriteRune(rune(s[i]) - 'A' + 'a')
 		} else {
-			buf.WriteRune(c)
+			buf.WriteRune(rune(s[i]))
 		}
 	}
 	return buf.String()

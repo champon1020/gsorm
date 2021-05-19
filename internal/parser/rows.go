@@ -98,6 +98,7 @@ func (p *RowsParser) Parse() (*reflect.Value, error) {
 		}
 		return p.ParseSlice(p.Model)
 	case reflect.Struct:
+		p.ColumnField = p.columnsAndFields(p.Model)
 		p.Next()
 		return p.ParseStruct(p.Model)
 	case reflect.Map:
@@ -205,10 +206,6 @@ func (p *RowsParser) ParseMap(target reflect.Type) (*reflect.Value, error) {
 
 // ParseStruct converts struct to reflect.Value.
 func (p *RowsParser) ParseStruct(target reflect.Type) (*reflect.Value, error) {
-	if p.ColumnField == nil {
-		p.ColumnField = p.columnsAndFields(target)
-	}
-
 	item := reflect.New(target).Elem()
 	for i := 0; i < len(p.Vals); i++ {
 		fIdx := p.ColumnField[i]
