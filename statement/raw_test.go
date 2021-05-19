@@ -27,7 +27,8 @@ func TestRawStmt_String(t *testing.T) {
 			`SELECT * FROM employees WHERE first_name = 'Taro'`,
 		},
 		{
-			mgorm.RawStmt(nil, "SELECT * FROM employees WHERE birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*statement.RawStmt),
+			mgorm.RawStmt(nil, "SELECT * FROM employees WHERE birth_date = ?",
+				time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*statement.RawStmt),
 			`SELECT * FROM employees WHERE birth_date = '2006-01-02 00:00:00'`,
 		},
 		{
@@ -35,7 +36,8 @@ func TestRawStmt_String(t *testing.T) {
 			`SELECT * FROM employees WHERE emp_no IN (1001, 1002)`,
 		},
 		{
-			mgorm.RawStmt(nil, "SELECT * FROM employees WHERE emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).(*statement.RawStmt),
+			mgorm.RawStmt(nil, "SELECT * FROM employees WHERE emp_no IN (?)",
+				mgorm.Select(nil, "emp_no").From("dept_manager")).(*statement.RawStmt),
 			`SELECT * FROM employees WHERE emp_no IN (SELECT emp_no FROM dept_manager)`,
 		},
 		{
