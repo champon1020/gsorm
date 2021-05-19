@@ -36,7 +36,13 @@ err := mgorm.CreateTable(db, "dept_emp").
 ## RawStmt
 `RawStmt`は文字列で指定したSQLを呼び出します．
 
-引数には文字列を指定します．
+第1引数に文字列，第2引数以降に複数値を指定できます．
+この際，文字列における`?`に値が代入されいます．
+また，代入規則は以下に従います．
+- 値が`string`もしくは`time.Time`の場合，値はシングルクオートで囲まれます．
+- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
+- 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
+- 以上の条件に該当しない値はそのまま展開される．
 
 `RawStmt`は`Query`，`Exec`，`Migrate`の全てをサポートしています．
 
@@ -44,6 +50,21 @@ err := mgorm.CreateTable(db, "dept_emp").
 ```go
 err := mgorm.RawStmt("SELECT * FROM employees").Query(&model)
 // SELECT * FROM employees;
+
+err := mgorm.RawStmt("SELECT * FROM employees WHERE emp_no = ?", 1001).Query(&model)
+// SELECT * FROM employees WHERE emp_no = 1001;
+
+err := mgorm.RawStmt("SELECT * FROM employees WHERE first_name = ?", "Taro").Query(&model)
+// SELECT * FROM employees WHERE first_name = 'Taro';
+
+err := mgorm.RawStmt("SELECT * FROM employees WHERE birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
+// SELECT * FROM employees WHERE birth_date = '2006-01-02 00:00:00';
+
+err := mgorm.RawStmt("SELECT * FROM employees WHERE emp_no IN (?)", []int{1001, 1002}).Query(&model)
+// SELECT * FROM employees WHERE emp_no IN (1001, 1002);
+
+err := mgorm.RawStmt("SELECT * FROM employees WHERE emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
+// SELECT * FROM employees WHERE emp_no IN (SELECT emp_no FROM dept_manager);
 
 err := mgorm.RawStmt("DELETE FROM employees").Exec()
 // DELETE FROM employees;

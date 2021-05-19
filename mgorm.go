@@ -13,6 +13,7 @@ import (
 	"github.com/champon1020/mgorm/interfaces/idropdb"
 	"github.com/champon1020/mgorm/interfaces/idroptable"
 	"github.com/champon1020/mgorm/interfaces/iinsert"
+	"github.com/champon1020/mgorm/interfaces/iraw"
 	"github.com/champon1020/mgorm/interfaces/iselect"
 	"github.com/champon1020/mgorm/interfaces/iupdate"
 	"github.com/champon1020/mgorm/statement"
@@ -27,6 +28,11 @@ func Open(driver, dsn string) (domain.DB, error) {
 // OpenMock opens the mock database connection.
 func OpenMock(driver string) domain.MockDB {
 	return database.NewMockDB(driver)
+}
+
+// RawStmt calls raw string statement.
+func RawStmt(conn domain.Conn, rs string, v ...interface{}) iraw.Stmt {
+	return statement.NewRawStmt(conn, rs, v...)
 }
 
 // Select calls SELECT command.
