@@ -90,3 +90,22 @@ func TestBuildExpr_Fail(t *testing.T) {
 		}
 	}
 }
+
+func TestBuildExprWithoutQuotes(t *testing.T) {
+	testCases := []struct {
+		Expr     string
+		Values   []interface{}
+		Expected string
+	}{
+		{
+			"lhs = ?",
+			[]interface{}{"rhs"},
+			`lhs = rhs`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual, _ := syntax.BuildExprWithoutQuotes(testCase.Expr, testCase.Values...)
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}

@@ -8,6 +8,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestRawClause_Keyword(t *testing.T) {
+	key := "key"
+	r := &syntax.RawClause{RawStr: key}
+	assert.Equal(t, key, r.Keyword())
+}
+
 func TestRawClause_String(t *testing.T) {
 	testCases := []struct {
 		RawClause *syntax.RawClause
@@ -49,5 +55,13 @@ func TestRawClause_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, res); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
+	}
+}
+
+func TestRawClause_Build_Fail(t *testing.T) {
+	a := &syntax.RawClause{RawStr: "column = ?"}
+	_, err := a.Build()
+	if err == nil {
+		t.Errorf("Error was not occurred")
 	}
 }
