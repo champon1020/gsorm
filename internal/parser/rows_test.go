@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"database/sql"
 	"testing"
 	"time"
 
@@ -16,6 +17,9 @@ type Rows struct {
 
 func (r *Rows) Columns() ([]string, error) {
 	return r.Cols, nil
+}
+
+func (r *Rows) ColumnTypes() ([]*sql.ColumnType, error) {
 }
 
 func (r *Rows) Next() bool {
