@@ -73,13 +73,13 @@ func TestCountSum(t *testing.T) {
 	}
 
 	for i, testCase := range testCases {
-		model := new(int)
-		if err := testCase.Stmt.Query(model); err != nil {
+		var model int
+		if err := testCase.Stmt.Query(&model); err != nil {
 			t.Errorf("Error was occurred: %v", err)
 			t.Errorf("Executed SQL: %s", testCase.Stmt.String())
 			continue
 		}
-		if diff := cmp.Diff(testCase.Result, model); diff != "" {
+		if diff := cmp.Diff(*testCase.Result, model); diff != "" {
 			t.Errorf("Got difference with sample %d", i)
 			t.Errorf("Executed SQL: %s", testCase.Stmt.String())
 			t.Errorf("Differs: (-want +got)\n%s", diff)
