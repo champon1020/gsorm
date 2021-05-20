@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 
-	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/domain"
 	"github.com/morikuni/failure"
 )
 

@@ -3,7 +3,6 @@ package statement
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/domain"
 	"github.com/champon1020/mgorm/interfaces"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/internal/parser"
@@ -11,6 +10,7 @@ import (
 	"github.com/champon1020/mgorm/syntax/clause"
 	"github.com/morikuni/failure"
 
+	"github.com/champon1020/mgorm/interfaces/domain"
 	"github.com/champon1020/mgorm/interfaces/iinsert"
 )
 

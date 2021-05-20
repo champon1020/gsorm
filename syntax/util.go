@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/domain"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/morikuni/failure"
 )

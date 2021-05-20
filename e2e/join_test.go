@@ -1,6 +1,7 @@
 package e2e_test
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/champon1020/mgorm"
@@ -10,7 +11,7 @@ import (
 
 type EmployeeWithTitle struct {
 	EmpNo int
-	Title string
+	Title sql.NullString
 }
 
 func TestJoin(t *testing.T) {
@@ -28,14 +29,20 @@ func TestJoin(t *testing.T) {
 				On("e.emp_no = t.emp_no").
 				Limit(5).(*statement.SelectStmt),
 			&[]EmployeeWithTitle{
-				{EmpNo: 10001, Title: "Senior Engineer"},
-				{EmpNo: 10002, Title: "Staff"},
-				{EmpNo: 10003, Title: "Senior Engineer"},
-				{EmpNo: 10004, Title: "Engineer"},
-				{EmpNo: 10004, Title: "Senior Engineer"},
+				/*
+					{EmpNo: 10001, Title: "Senior Engineer"},
+					{EmpNo: 10002, Title: "Staff"},
+					{EmpNo: 10003, Title: "Senior Engineer"},
+					{EmpNo: 10004, Title: "Engineer"},
+					{EmpNo: 10004, Title: "Senior Engineer"},
+				*/
+				{EmpNo: 10001, Title: sql.NullString{String: "Senior Engineer", Valid: true}},
+				{EmpNo: 10002, Title: sql.NullString{String: "Staff", Valid: true}},
+				{EmpNo: 10003, Title: sql.NullString{String: "Senior Engineer", Valid: true}},
+				{EmpNo: 10004, Title: sql.NullString{String: "Engineer", Valid: true}},
+				{EmpNo: 10004, Title: sql.NullString{String: "Senior Engineer", Valid: true}},
 			},
 		},
-
 		// SELECT e.emp_no, t.title FROM employees AS e
 		// LEFT JOIN titles AS t ON e.emp_no = t.emp_no
 		// ORDER BY e.emp_no DESC LIMIT 5;
@@ -50,8 +57,8 @@ func TestJoin(t *testing.T) {
 				{EmpNo: 10010},
 				{EmpNo: 10009},
 				{EmpNo: 10008},
-				{EmpNo: 10007, Title: "Senior Staff"},
-				{EmpNo: 10007, Title: "Staff"},
+				{EmpNo: 10007, Title: sql.NullString{String: "Senior Staff", Valid: true}},
+				{EmpNo: 10007, Title: sql.NullString{String: "Staff", Valid: true}},
 			},
 		},
 
@@ -69,8 +76,8 @@ func TestJoin(t *testing.T) {
 				{EmpNo: 10010},
 				{EmpNo: 10009},
 				{EmpNo: 10008},
-				{EmpNo: 10007, Title: "Senior Staff"},
-				{EmpNo: 10007, Title: "Staff"},
+				{EmpNo: 10007, Title: sql.NullString{String: "Senior Staff", Valid: true}},
+				{EmpNo: 10007, Title: sql.NullString{String: "Staff", Valid: true}},
 			},
 		},
 	}

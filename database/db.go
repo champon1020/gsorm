@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/domain"
 	"github.com/morikuni/failure"
 )
 
@@ -31,6 +31,9 @@ type db struct {
 func NewDB(dn, dsn string) (domain.DB, error) {
 	d, err := sql.Open(dn, dsn)
 	if err != nil {
+		return nil, err
+	}
+	if err := d.Ping(); err != nil {
 		return nil, err
 	}
 	if dn == "psql" {

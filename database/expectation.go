@@ -1,6 +1,6 @@
 package database
 
-import "github.com/champon1020/mgorm/domain"
+import "github.com/champon1020/mgorm/interfaces/domain"
 
 // expectation can be implemented by expected operation.
 type expectation interface {

@@ -9,7 +9,8 @@ import (
 	"time"
 
 	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/domain"
+
 	"github.com/go-sql-driver/mysql"
 	"github.com/ory/dockertest/v3"
 )
@@ -28,7 +29,7 @@ func TestMain(m *testing.M) {
 
 func RunTest(m *testing.M) {
 	var err error
-	db, err = mgorm.Open("mysql", "root:toor@tcp(localhost:3306)/employees")
+	db, err = mgorm.Open("mysql", "root:toor@tcp(localhost:3306)/employees?parseTime=true")
 	if err != nil {
 		log.Fatalf("Could not connect to docker: %v", err)
 	}
@@ -71,7 +72,7 @@ func RunTestWithBuild(m *testing.M) {
 	if err = pool.Retry(func() error {
 		db, err = mgorm.Open(
 			"mysql",
-			fmt.Sprintf("root:toor@tcp(localhost:%s)/employees", resource.GetPort("3306/tcp")),
+			fmt.Sprintf("root:toor@tcp(localhost:%s)/employees?parseTime=true", resource.GetPort("3306/tcp")),
 		)
 		return err
 	}); err != nil {

@@ -3,7 +3,7 @@ package migration
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/domain"
+	"github.com/champon1020/mgorm/interfaces/domain"
 	"github.com/champon1020/mgorm/interfaces/idroptable"
 	"github.com/champon1020/mgorm/internal"
 	"github.com/champon1020/mgorm/syntax"
