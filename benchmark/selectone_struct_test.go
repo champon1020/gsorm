@@ -12,7 +12,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func BenchmarkSelectOne_standard(b *testing.B) {
+func BenchmarkSelectOne_Struct_standard(b *testing.B) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		b.Fatal(err)
@@ -39,7 +39,7 @@ func BenchmarkSelectOne_standard(b *testing.B) {
 	}
 }
 
-func BenchmarkSelectOne_mgorm(b *testing.B) {
+func BenchmarkSelectOne_Struct_mgorm(b *testing.B) {
 	db, err := mgorm.Open("mysql", dsn)
 	if err != nil {
 		b.Fatal(err)
@@ -54,7 +54,7 @@ func BenchmarkSelectOne_mgorm(b *testing.B) {
 	}
 }
 
-func BenchmarkSelectOne_gorm(b *testing.B) {
+func BenchmarkSelectOne_Struct_gorm(b *testing.B) {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		b.Fatal(err)
@@ -69,7 +69,7 @@ func BenchmarkSelectOne_gorm(b *testing.B) {
 	}
 }
 
-func BenchmarkSelectOne_sqlx(b *testing.B) {
+func BenchmarkSelectOne_Struct_sqlx(b *testing.B) {
 	db, err := sqlx.Connect("mysql", dsn)
 	if err != nil {
 		b.Fatal(err)
@@ -84,7 +84,7 @@ func BenchmarkSelectOne_sqlx(b *testing.B) {
 	}
 }
 
-func BenchmarkSelectOne_gorp(b *testing.B) {
+func BenchmarkSelectOne_Struct_gorp(b *testing.B) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		b.Fatal(err)

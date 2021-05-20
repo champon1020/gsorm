@@ -11,20 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-//_ "github.com/go-sql-driver/mysql"
-
-type Employee struct {
-	EmpNo     int    `db:"emp_no"`
-	BirthDate string `db:"birth_date"`
-	FirstName string `db:"first_name"`
-	LastName  string `db:"last_name"`
-	Gender    string `db:"gender"`
-	HireDate  string `db:"hire_date"`
-}
-
-var dsn = "root:toor@tcp(localhost:33306)/employees"
-
-func BenchmarkSelectAll_standard(b *testing.B) {
+func BenchmarkSelectAll_Struct_standard(b *testing.B) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		b.Fatal(err)
@@ -53,7 +40,7 @@ func BenchmarkSelectAll_standard(b *testing.B) {
 	}
 }
 
-func BenchmarkSelectAll_mgorm(b *testing.B) {
+func BenchmarkSelectAll_Struct_mgorm(b *testing.B) {
 	db, err := mgorm.Open("mysql", dsn)
 	if err != nil {
 		b.Fatal(err)
@@ -68,7 +55,7 @@ func BenchmarkSelectAll_mgorm(b *testing.B) {
 	}
 }
 
-func BenchmarkSelectAll_gorm(b *testing.B) {
+func BenchmarkSelectAll_Struct_gorm(b *testing.B) {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		b.Fatal(err)
@@ -83,7 +70,7 @@ func BenchmarkSelectAll_gorm(b *testing.B) {
 	}
 }
 
-func BenchmarkSelectAll_sqlx(b *testing.B) {
+func BenchmarkSelectAll_Struct_sqlx(b *testing.B) {
 	db, err := sqlx.Connect("mysql", dsn)
 	if err != nil {
 		b.Fatal(err)
@@ -98,7 +85,7 @@ func BenchmarkSelectAll_sqlx(b *testing.B) {
 	}
 }
 
-func BenchmarkSelectAll_gorp(b *testing.B) {
+func BenchmarkSelectAll_Struct_gorp(b *testing.B) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		b.Fatal(err)
