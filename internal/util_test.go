@@ -75,6 +75,10 @@ func TestToStringWithQuotes(t *testing.T) {
 			nil,
 			`nil`,
 		},
+		{
+			time.Date(2006, time.January, 2, 15, 4, 5, 0, time.UTC),
+			`'2006-01-02 15:04:05'`,
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -89,10 +93,15 @@ func TestToStringWituhoutQuotes(t *testing.T) {
 		Result string
 	}{
 		{"rhs", "rhs"},
+		{
+			time.Date(2006, time.January, 2, 15, 4, 5, 0, time.UTC),
+			`2006-01-02 15:04:05`,
+		},
 	}
 
+	opt := &internal.ToStringOpt{Quotes: false, TimeFormat: "2006-01-02 15:04:05"}
 	for _, testCase := range testCases {
-		res := internal.ToString(testCase.Value, &internal.ToStringOpt{Quotes: false})
+		res := internal.ToString(testCase.Value, opt)
 		assert.Equal(t, testCase.Result, res)
 	}
 }
