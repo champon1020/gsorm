@@ -24,3 +24,11 @@ func (d *db) ExportedSetDriver(driver domain.SQLDriver) {
 func (t *tx) ExportedSetConn(conn sqlTx) {
 	t.conn = conn
 }
+
+func (t *tx) ExportedSetDB(db *db) {
+	t.db = db
+}
+
+func (d *mockDB) ExportedSetDriver(driver domain.SQLDriver) {
+	d.driver = driver
+}

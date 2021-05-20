@@ -1,13 +1,47 @@
 package database_test
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/database"
 	"github.com/google/go-cmp/cmp"
 	"github.com/morikuni/failure"
+	"gotest.tools/v3/assert"
 )
+
+func TestMockTx_GetDriver(t *testing.T) {
+	mock := database.NewMockDB("mysql")
+	mock.ExpectBegin()
+	mocktx, err := mock.Begin()
+	if err != nil {
+		t.Errorf("error was occurred: %v", err)
+	}
+
+	assert.Equal(t, database.MysqlDriver, mocktx.GetDriver())
+}
+
+func TestMockTx_DummyFunctions(t *testing.T) {
+	mock := database.NewMockDB("")
+	mock.ExpectBegin()
+
+	mocktx, err := mock.Begin()
+	if err != nil {
+		t.Errorf("error was occurred: %v", err)
+	}
+
+	assert.Equal(t, nil, mocktx.Ping())
+
+	r, e := mocktx.Exec("")
+	assert.Equal(t, nil, r)
+	assert.Equal(t, nil, e)
+
+	r2, e2 := mocktx.Query("")
+	var rexpected *sql.Rows
+	assert.Equal(t, rexpected, r2)
+	assert.Equal(t, nil, e2)
+}
 
 func TestMock_TransactionExpectation(t *testing.T) {
 	expectedReturn1 := []int{10, 20, 30}
@@ -219,6 +253,77 @@ func TestMockTx_CompareWith(t *testing.T) {
 			return
 		}
 		err = mgorm.Select(tx, "column1").From("table").Query(model)
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB("")
+		mocktx := mock.ExpectBegin()
+		mocktx.ExpectRollback()
+
+		// Actual process.
+		model := new([]int)
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occurred: %+v", err)
+			return
+		}
+		err = mgorm.Select(tx, "column1").From("table").Query(model)
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+}
+
+func TestMockTx_CompareWith_Fail(t *testing.T) {
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB("")
+		mock.ExpectBegin()
+		mocktx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("error was occurred: %v", err)
+		}
+		mocktx.Expect(mgorm.Insert(nil, "table1", "column1").Values(10))
+
+		// Actual process.
+		err = mgorm.Insert(mocktx, "table2", "column2").Values(10).Exec()
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB("")
+		mock.ExpectBegin()
+		mocktx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("error was occurred: %v", err)
+		}
+		mocktx.Expect(mgorm.Insert(nil, "table1", "column1").Values(10))
+
+		// Actual process.
+		err = mgorm.Insert(mocktx, "table2", "column2").Values(10).Values(100).Exec()
 
 		// Validate if the expected error was occurred.
 		if !failure.Is(err, expectedErr) {

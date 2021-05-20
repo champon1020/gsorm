@@ -1,13 +1,30 @@
 package database_test
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/champon1020/mgorm"
 	"github.com/champon1020/mgorm/database"
 	"github.com/google/go-cmp/cmp"
 	"github.com/morikuni/failure"
+	"gotest.tools/v3/assert"
 )
+
+func TestNewMockDB(t *testing.T) {
+	{
+		var expected database.ExportedMockDB
+		expected.ExportedSetDriver(database.MysqlDriver)
+		mock := database.NewMockDB("mysql")
+		assert.Equal(t, expected.GetDriver(), mock.GetDriver())
+	}
+	{
+		var expected database.ExportedMockDB
+		expected.ExportedSetDriver(database.PsqlDriver)
+		mock := database.NewMockDB("psql")
+		assert.Equal(t, expected.GetDriver(), mock.GetDriver())
+	}
+}
 
 func TestMock_Expectation(t *testing.T) {
 	expectedReturn := []int{10, 20, 30}
@@ -39,6 +56,25 @@ func TestMock_Expectation(t *testing.T) {
 		t.Errorf("Differs: (-want +got)\n%s", diff)
 	}
 }
+
+func TestMockDB_DummyFunctions(t *testing.T) {
+	mock := database.NewMockDB("")
+	assert.Equal(t, nil, mock.Ping())
+	assert.Equal(t, nil, mock.SetConnMaxLifetime(0))
+	assert.Equal(t, nil, mock.SetMaxIdleConns(0))
+	assert.Equal(t, nil, mock.SetMaxOpenConns(0))
+	assert.Equal(t, nil, mock.Close())
+
+	r, e := mock.Exec("")
+	assert.Equal(t, nil, r)
+	assert.Equal(t, nil, e)
+
+	r2, e2 := mock.Query("")
+	var rexpected *sql.Rows
+	assert.Equal(t, rexpected, r2)
+	assert.Equal(t, nil, e2)
+}
+
 func TestMockDB_Begin_Fail(t *testing.T) {
 	{
 		expectedErr := database.ErrInvalidMockExpectation
@@ -160,6 +196,43 @@ func TestMockDB_CompareWith(t *testing.T) {
 		// Actual process.
 		model := new([]int)
 		err := mgorm.Select(mock, "column1").From("table").Query(model)
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+}
+
+func TestMockDB_CompareWith_Fail(t *testing.T) {
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB("")
+		mock.Expect(mgorm.Insert(nil, "table1", "column1").Values(10))
+
+		// Actual process.
+		err := mgorm.Insert(mock, "table2", "column2").Values(10).Exec()
+
+		// Validate if the expected error was occurred.
+		if !failure.Is(err, expectedErr) {
+			t.Errorf("Different error was occurred")
+			t.Errorf("  Expected: %+v", expectedErr)
+			t.Errorf("  Actual:   %+v", err)
+		}
+	}
+	{
+		expectedErr := database.ErrInvalidMockExpectation
+
+		// Test phase.
+		mock := database.NewMockDB("")
+		mock.Expect(mgorm.Insert(nil, "table1", "column1").Values(10))
+
+		// Actual process.
+		err := mgorm.Insert(mock, "table2", "column2").Values(10).Values(100).Exec()
 
 		// Validate if the expected error was occurred.
 		if !failure.Is(err, expectedErr) {
