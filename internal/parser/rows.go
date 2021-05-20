@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"reflect"
 	"strconv"
-	"time"
 
 	"github.com/champon1020/mgorm/internal"
 	"github.com/morikuni/failure"
@@ -12,9 +11,15 @@ import (
 
 // Rows is interface for *sql.Rows.
 type Rows interface {
-	ColumnTypes() ([]*sql.ColumnType, error)
+	//	ColumnTypes() ([]*sql.ColumnType, error)
 	Next() bool
 	Scan(...interface{}) error
+}
+
+// ColumnType is interface for *sql.ColumnType.
+type ColumnType interface {
+	Name() string
+	ScanType() reflect.Type
 }
 
 // RowsParser is parser for sql.Rows.
@@ -26,7 +31,7 @@ type RowsParser struct {
 	NumOfColumns int
 
 	// Column types
-	ColumnTypes []*sql.ColumnType
+	ColumnTypes []ColumnType
 
 	// Pointers of the scanning values.
 	ItemPtr []interface{}
@@ -39,12 +44,7 @@ type RowsParser struct {
 }
 
 // NewRowsParser creates RowsParser instance.
-func NewRowsParser(r Rows, m interface{}) (*RowsParser, error) {
-	ct, err := r.ColumnTypes()
-	if err != nil {
-		return nil, failure.Wrap(err)
-	}
-
+func NewRowsParser(r Rows, ct []ColumnType, m interface{}) (*RowsParser, error) {
 	mt := reflect.TypeOf(m)
 	if mt.Kind() != reflect.Ptr {
 		err := failure.New(errInvalidValue, failure.Message("model must be a pointer"))
@@ -254,14 +254,20 @@ func (p *RowsParser) columnsAndFields(dest reflect.Type) map[int]int {
 // Types.
 var (
 	Int         = reflect.TypeOf(int(0))
+	Int8        = reflect.TypeOf(int8(0))
+	Int16       = reflect.TypeOf(int16(0))
 	Int32       = reflect.TypeOf(int32(0))
 	Int64       = reflect.TypeOf(int64(0))
+	Uint8       = reflect.TypeOf(uint8(0))
+	Uint16      = reflect.TypeOf(uint16(0))
+	Uint32      = reflect.TypeOf(uint32(0))
+	Uint64      = reflect.TypeOf(uint64(0))
+	Float32     = reflect.TypeOf(float32(0))
 	Float64     = reflect.TypeOf(float64(0))
 	Bool        = reflect.TypeOf(false)
 	String      = reflect.TypeOf("")
-	Time        = reflect.TypeOf(time.Time{})
 	NullInt32   = reflect.TypeOf(sql.NullInt32{})
-	NullInt64   = reflect.TypeOf(sql.NullInt32{})
+	NullInt64   = reflect.TypeOf(sql.NullInt64{})
 	NullFloat64 = reflect.TypeOf(sql.NullFloat64{})
 	NullBool    = reflect.TypeOf(sql.NullBool{})
 	NullString  = reflect.TypeOf(sql.NullString{})
@@ -271,21 +277,13 @@ var (
 
 func generateValue(t reflect.Type) reflect.Value {
 	switch t {
-	case Int32, Int64:
+	case Int8, Int16, Int32, Int64, Uint8, Uint16, Uint32, Uint64:
 		return reflect.New(Int).Elem()
 	case RawBytes:
 		return reflect.New(String).Elem()
-	case Bool,
-		String,
-		Float64,
-		NullInt32,
-		NullInt64,
-		NullBool,
-		NullFloat64,
-		NullString,
-		NullTime:
-		return reflect.New(t).Elem()
 	}
 
-	return reflect.New(String).Elem()
+	// Bool, String, Float32, Float64
+	// NullInt32, NullInt64, NullBool, NullFloat64, NullString, NullTime
+	return reflect.New(t).Elem()
 }
