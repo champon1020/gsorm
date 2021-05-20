@@ -97,3 +97,27 @@ func TestInsert_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestInsert_AddTable(t *testing.T) {
+	{
+		j := &clause.Insert{}
+		table := "table"
+		j.AddTable(table)
+
+		assert.Equal(t, j.Table, syntax.Table{Name: "table"})
+	}
+	{
+		j := &clause.Insert{}
+		table := "table as t"
+		j.AddTable(table)
+
+		assert.Equal(t, j.Table, syntax.Table{Name: "table", Alias: "t"})
+	}
+}
+
+func TestInsert_AddColumn(t *testing.T) {
+	g := &clause.Insert{}
+	c := []string{"column1", "column2 as c"}
+	g.AddColumns(c...)
+	assert.Equal(t, []syntax.Column{{Name: "column1"}, {Name: "column2", Alias: "c"}}, g.Columns)
+}

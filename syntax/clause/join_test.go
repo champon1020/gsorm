@@ -64,3 +64,20 @@ func TestJoin_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestJoin_AddTable(t *testing.T) {
+	{
+		j := &clause.Join{}
+		table := "table"
+		j.AddTable(table)
+
+		assert.Equal(t, j.Table, syntax.Table{Name: "table"})
+	}
+	{
+		j := &clause.Join{}
+		table := "table as t"
+		j.AddTable(table)
+
+		assert.Equal(t, j.Table, syntax.Table{Name: "table", Alias: "t"})
+	}
+}

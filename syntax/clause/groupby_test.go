@@ -70,3 +70,10 @@ func TestGroupBy_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestGroupBy_AddColumn(t *testing.T) {
+	g := &clause.GroupBy{}
+	c := "column as c"
+	g.AddColumn(c)
+	assert.Equal(t, []syntax.Column{{Name: "column", Alias: "c"}}, g.Columns)
+}
