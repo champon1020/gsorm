@@ -81,14 +81,12 @@ func TestUpdateModelParser_ParseStruct(t *testing.T) {
 			"float32 = 3.1415927, float64 = 3.141592653589793",
 		},
 		{
-			[]string{"bool", "time", "time_ansic", "time_format"},
+			[]string{"bool", "time"},
 			&OtherTypesModel{
-				B:          true,
-				Time:       time.Date(2021, time.January, 2, 3, 4, 5, 0, time.UTC),
-				TimeANSIC:  time.Date(2021, time.March, 25, 22, 13, 30, 0, time.UTC),
-				TimeFormat: time.Date(2021, time.April, 1, 0, 0, 0, 0, time.UTC),
+				B:    true,
+				Time: time.Date(2021, time.January, 2, 3, 4, 5, 0, time.UTC),
 			},
-			"bool = 1, time = '2021-01-02 03:04:05', time_ansic = 'Thu Mar 25 22:13:30 2021', time_format = '2021-04-01'",
+			"bool = 1, time = '2021-01-02 03:04:05'",
 		},
 	}
 

@@ -11,6 +11,7 @@ func BenchmarkSelectAll_Map_mgorm(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	defer db.Close()
 
 	b.ResetTimer()
 

@@ -38,7 +38,7 @@ func buildExprWithOpt(option *buildExprOpt, expr string, vals ...interface{}) (s
 			values = append(values, stmt.String())
 			continue
 		}
-		opt := &internal.ToStringOpt{Quotes: option.quotes, TimeFormat: "2006-01-02 15:04:05"}
+		opt := &internal.ToStringOpt{Quotes: option.quotes}
 		values = append(values, internal.ToString(v, opt))
 	}
 

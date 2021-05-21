@@ -40,11 +40,11 @@ err := mgorm.Insert(db, "employees", "emp_no", "first_name").
 ```go
 type Employees struct {
     ID        int       `mgorm:"emp_no,typ=INT,notnull=t"`
-    BirthDate time.Time `mgorm:"typ=DATE,notnull=t,layout=time.RFC3339"`
+    BirthDate time.Time `mgorm:"typ=DATE,notnull=t"`
     FirstName string    `mgorm:"typ=VARCHAR(14),notnull=t"`
     LastName  string    `mgorm:"typ=VARCHAR(16),notnull=t"`
     Gender    string    `mgorm:"typ=CHAR(3),notnull=t"`
-    HireDate  time.Time `mgorm:"typ=DATE,notnull=t,layout=2006-01-02"`
+    HireDate  time.Time `mgorm:"typ=DATE,notnull=t"`
 }
 ```
 
@@ -152,17 +152,5 @@ type DeptEmp struct {
     // CONSTRAINT UC_emp_no UNIQUE (emp_no, dept_no)
     EmpNo  int `mgorm:"uc=UC_emp_no"`
     DeptNo int `mgorm:"uc=UC_emp_no"`
-}
-```
-
-
-### layout
-カラムの型が`time.Time`の場合のみ，そのフォーマットを指定します．
-
-#### 例
-```go
-type Employees struct {
-    BirthDate   time.Time `mgorm:"layout=time.RFC3339"`
-    HireDate    time.Time `mgorm:"layout=2006-01-02 15:05:06"`
 }
 ```

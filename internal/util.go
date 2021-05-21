@@ -27,8 +27,7 @@ func SnakeCase(s string) string {
 
 // ToStringOpt is the option of ToString.
 type ToStringOpt struct {
-	Quotes     bool
-	TimeFormat string
+	Quotes bool
 }
 
 // ToString converts the type of value to string.
@@ -39,7 +38,6 @@ type ToStringOpt struct {
 //  0 (uint, uintN)                         -> "0"
 //  1.0 (floatN)                            -> "1.00000"
 //  true (bool)                             -> "1" (If false, "0")
-//  2006-01-02T15:04:05Z00:00 (time.Time)   -> "2006-01-02 15:04:05"
 //  nil                                     -> "nil"
 func ToString(v interface{}, opt *ToStringOpt) string {
 	if v == nil {
@@ -47,7 +45,7 @@ func ToString(v interface{}, opt *ToStringOpt) string {
 	}
 
 	if opt == nil {
-		opt = &ToStringOpt{Quotes: true, TimeFormat: "2006-01-02 15:04:05"}
+		opt = &ToStringOpt{Quotes: true}
 	}
 
 	switch v := v.(type) {
@@ -75,7 +73,7 @@ func ToString(v interface{}, opt *ToStringOpt) string {
 		}
 		return "0"
 	case time.Time:
-		t := v.Format(opt.TimeFormat)
+		t := v.Format("2006-01-02 15:04:05")
 		if opt.Quotes {
 			return fmt.Sprintf("'%s'", t)
 		}
