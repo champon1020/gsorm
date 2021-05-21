@@ -4,14 +4,14 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/gsorm/internal"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
 type TagModel struct {
-	A string `mgorm:"col,typ=VARCHAR(64),notnull=t,default='test',pk=PK_a,fk=FK_a:reftbl(refcol),uc=UC_a"`
-	B string `mgorm:"col" json:"col2"`
+	A string `gsorm:"col,typ=VARCHAR(64),notnull=t,default='test',pk=PK_a,fk=FK_a:reftbl(refcol),uc=UC_a"`
+	B string `gsorm:"col" json:"col2"`
 }
 
 func TestTag_Lookup(t *testing.T) {

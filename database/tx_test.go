@@ -3,7 +3,7 @@ package database_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/gsorm/database"
 	"github.com/morikuni/failure"
 	"gotest.tools/v3/assert"
 )

@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -19,9 +19,9 @@ func UnionTest(t *testing.T) {
 		// SELECT from_date AS date FROM salaries
 		// LIMIT 5;
 		{
-			mgorm.Select(db, "hire_date AS date").
+			gsorm.Select(db, "hire_date AS date").
 				From("employees").
-				Union(mgorm.Select(nil, "from_date AS date").
+				Union(gsorm.Select(nil, "from_date AS date").
 					From("salaries"),
 				).
 				Limit(5).(*statement.SelectStmt),
@@ -39,9 +39,9 @@ func UnionTest(t *testing.T) {
 		// SELECT from_date AS date FROM titles
 		// LIMIT 5;
 		{
-			mgorm.Select(db, "from_date AS date").
+			gsorm.Select(db, "from_date AS date").
 				From("salaries").
-				UnionAll(mgorm.Select(nil, "from_date AS date").
+				UnionAll(gsorm.Select(nil, "from_date AS date").
 					From("titles"),
 				).
 				Limit(5).(*statement.SelectStmt),

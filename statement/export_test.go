@@ -1,6 +1,6 @@
 package statement
 
-import "github.com/champon1020/mgorm/interfaces/domain"
+import "github.com/champon1020/gsorm/interfaces/domain"
 
 const (
 	ErrInvalidValue  = errInvalidValue

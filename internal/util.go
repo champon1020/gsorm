@@ -112,8 +112,8 @@ func ColumnsAndFields(cols []string, modelTyp reflect.Type) map[int]int {
 
 // ColumnName returns column name with field tag.
 func ColumnName(sf reflect.StructField) string {
-	if sf.Tag.Get("mgorm") == "" {
+	if sf.Tag.Get("gsorm") == "" {
 		return SnakeCase(sf.Name)
 	}
-	return sf.Tag.Get("mgorm")
+	return sf.Tag.Get("gsorm")
 }

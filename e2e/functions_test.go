@@ -3,8 +3,8 @@ package e2e_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -15,7 +15,7 @@ func TestMaxMin(t *testing.T) {
 	}{
 		// SELECT MIN(emp_no) FROM employees;
 		{
-			mgorm.Min(db, "emp_no", "emp_no").
+			gsorm.Min(db, "emp_no", "emp_no").
 				From("employees").(*statement.SelectStmt),
 			&Employee{
 				EmpNo: 10001,
@@ -24,7 +24,7 @@ func TestMaxMin(t *testing.T) {
 
 		// SELECT MAX(emp_no) FROM employees;
 		{
-			mgorm.Max(db, "emp_no", "emp_no").
+			gsorm.Max(db, "emp_no", "emp_no").
 				From("employees").(*statement.SelectStmt),
 			&Employee{
 				EmpNo: 10010,
@@ -59,14 +59,14 @@ func TestCountSum(t *testing.T) {
 	}{
 		// SELECT COUNT(emp_no) FROM salaries;
 		{
-			mgorm.Count(db, "emp_no", "emp_no").
+			gsorm.Count(db, "emp_no", "emp_no").
 				From("salaries").(*statement.SelectStmt),
 			&cnt,
 		},
 
 		// SELECT SUM(salary) FROM salaries;
 		{
-			mgorm.Sum(db, "salary", "salary").
+			gsorm.Sum(db, "salary", "salary").
 				From("salaries").(*statement.SelectStmt),
 			&sum,
 		},
@@ -96,7 +96,7 @@ func TestAvg(t *testing.T) {
 	}{
 		// SELECT AVG(salary) FROM salaries;
 		{
-			mgorm.Avg(db, "salary", "salary").
+			gsorm.Avg(db, "salary", "salary").
 				From("salaries").(*statement.SelectStmt),
 			&avg,
 		},

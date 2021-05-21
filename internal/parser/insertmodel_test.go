@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm/internal/parser"
+	"github.com/champon1020/gsorm/internal/parser"
 	"github.com/stretchr/testify/assert"
 )
 

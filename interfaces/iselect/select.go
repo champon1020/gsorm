@@ -1,11 +1,11 @@
 package iselect
 
 import (
-	"github.com/champon1020/mgorm/interfaces"
-	"github.com/champon1020/mgorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
+	"github.com/champon1020/gsorm/interfaces/domain"
 )
 
-// Stmt is interface which is returned by mgorm.Select.
+// Stmt is interface which is returned by gsorm.Select.
 type Stmt interface {
 	RawClause(rs string, v ...interface{}) RawClause
 	From(tables ...string) From

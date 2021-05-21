@@ -3,8 +3,8 @@ package clause_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm/syntax"
-	"github.com/champon1020/mgorm/syntax/clause"
+	"github.com/champon1020/gsorm/syntax"
+	"github.com/champon1020/gsorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )

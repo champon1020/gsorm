@@ -3,12 +3,12 @@ package statement
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/interfaces/domain"
-	"github.com/champon1020/mgorm/interfaces/iupdate"
-	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/internal/parser"
-	"github.com/champon1020/mgorm/syntax"
-	"github.com/champon1020/mgorm/syntax/clause"
+	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces/iupdate"
+	"github.com/champon1020/gsorm/internal"
+	"github.com/champon1020/gsorm/internal/parser"
+	"github.com/champon1020/gsorm/syntax"
+	"github.com/champon1020/gsorm/syntax/clause"
 	"github.com/morikuni/failure"
 )
 
@@ -50,7 +50,7 @@ func (s *UpdateStmt) CompareWith(targetStmt domain.Stmt) error {
 }
 
 // Exec executes SQL statement without mapping to model.
-// If type of conn is mgorm.MockDB, compare statements between called and expected.
+// If type of conn is gsorm.MockDB, compare statements between called and expected.
 func (s *UpdateStmt) Exec() error {
 	return s.exec(s.buildSQL, s)
 }

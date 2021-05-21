@@ -3,8 +3,8 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/mgorm/interfaces/domain"
-	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/syntax"
 )
 
 // Unique is UNIQUE clause.

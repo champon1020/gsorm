@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/interfaces/domain"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/interfaces/domain"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/ory/dockertest/v3"
@@ -20,7 +20,7 @@ const TIMEOUT = 20 * time.Second
 var db domain.DB
 
 func TestMain(m *testing.M) {
-	if os.Getenv("MGORM_CI") == "true" {
+	if os.Getenv("GSORM_CI") == "true" {
 		RunTest(m)
 		return
 	}
@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 
 func RunTest(m *testing.M) {
 	var err error
-	db, err = mgorm.Open("mysql", "root:toor@tcp(localhost:3306)/employees?parseTime=true")
+	db, err = gsorm.Open("mysql", "root:toor@tcp(localhost:3306)/employees?parseTime=true")
 	if err != nil {
 		log.Fatalf("Could not connect to docker: %v", err)
 	}
@@ -70,7 +70,7 @@ func RunTestWithBuild(m *testing.M) {
 
 	// Connect to database.
 	if err = pool.Retry(func() error {
-		db, err = mgorm.Open(
+		db, err = gsorm.Open(
 			"mysql",
 			fmt.Sprintf("root:toor@tcp(localhost:%s)/employees?parseTime=true", resource.GetPort("3306/tcp")),
 		)
@@ -106,23 +106,23 @@ func RunTestWithBuild(m *testing.M) {
 
 type Employee struct {
 	EmpNo     int
-	BirthDate time.Time `mgorm:"layout=2006-01-02"`
+	BirthDate time.Time `gsorm:"layout=2006-01-02"`
 	FirstName string
 	LastName  string
 	Gender    string
-	HireDate  time.Time `mgorm:"layout=2006-01-02"`
+	HireDate  time.Time `gsorm:"layout=2006-01-02"`
 }
 
 type Salary struct {
 	EmpNo    int
 	Salary   int
-	FromDate time.Time `mgorm:"layout=2006-01-02"`
-	ToDate   time.Time `mgorm:"layout=2006-01-02"`
+	FromDate time.Time `gsorm:"layout=2006-01-02"`
+	ToDate   time.Time `gsorm:"layout=2006-01-02"`
 }
 
 type Title struct {
 	EmpNo    int
 	Title    string
-	FromDate time.Time `mgorm:"layout=2006-01-02"`
-	ToDate   time.Time `mgorm:"layout=2006-01-02"`
+	FromDate time.Time `gsorm:"layout=2006-01-02"`
+	ToDate   time.Time `gsorm:"layout=2006-01-02"`
 }

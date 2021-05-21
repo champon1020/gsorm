@@ -3,8 +3,8 @@ package e2e_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -15,7 +15,7 @@ func TestSelectWhere(t *testing.T) {
 	}{
 		// SELECT emp_no FROM employees WHERE emp_no = 10001;
 		{
-			mgorm.Select(db, "emp_no").
+			gsorm.Select(db, "emp_no").
 				From("employees").
 				Where("emp_no = ?", 10001).(*statement.SelectStmt),
 			&[]Employee{
@@ -26,7 +26,7 @@ func TestSelectWhere(t *testing.T) {
 		// SELECT emp_no, first_name, last_name FROM employees
 		// WHERE emp_no <= 10005 AND (first_name = "Georgi" OR last_name = "Bamford");
 		{
-			mgorm.Select(db, "emp_no", "first_name", "last_name").
+			gsorm.Select(db, "emp_no", "first_name", "last_name").
 				From("employees").
 				Where("emp_no <= ?", 10005).
 				And("first_name = ? OR last_name = ?", "Georgi", "Bamford").(*statement.SelectStmt),
@@ -47,7 +47,7 @@ func TestSelectWhere(t *testing.T) {
 		// SELECT emp_no, first_name, last_name FROM employees
 		// WHERE emp_no <= 10002 OR (first_name = "Saniya" AND last_name = "Kalloufi");
 		{
-			mgorm.Select(db, "emp_no", "first_name", "last_name").
+			gsorm.Select(db, "emp_no", "first_name", "last_name").
 				From("employees").
 				Where("emp_no <= ?", 10002).
 				Or("first_name = ? AND last_name = ?", "Saniya", "Kalloufi").(*statement.SelectStmt),
@@ -73,10 +73,10 @@ func TestSelectWhere(t *testing.T) {
 		// SELECT emp_no FROM employees
 		// WHERE emp_no IN (SELECT DISTINCT emp_no FROM salaries WHERE salary < 60000);
 		{
-			mgorm.Select(db, "emp_no").
+			gsorm.Select(db, "emp_no").
 				From("employees").
 				Where("emp_no IN (?)",
-					mgorm.Select(nil, "DISTINCT emp_no").
+					gsorm.Select(nil, "DISTINCT emp_no").
 						From("salaries").
 						Where("salary < ?", 60000),
 				).(*statement.SelectStmt),
@@ -88,7 +88,7 @@ func TestSelectWhere(t *testing.T) {
 
 		// SELECT emp_no FROM employees WHERE emp_no BETWEEN 10002 AND 10004;
 		{
-			mgorm.Select(db, "emp_no").
+			gsorm.Select(db, "emp_no").
 				From("employees").
 				Where("emp_no BETWEEN ? AND ?", 10002, 10004).(*statement.SelectStmt),
 			&[]Employee{
@@ -100,7 +100,7 @@ func TestSelectWhere(t *testing.T) {
 
 		// SELECT first_name FROM employees WHERE first_name LIKE "S%";
 		{
-			mgorm.Select(db, "first_name").
+			gsorm.Select(db, "first_name").
 				From("employees").
 				Where("first_name LIKE ?", "S%").(*statement.SelectStmt),
 			&[]Employee{
@@ -111,7 +111,7 @@ func TestSelectWhere(t *testing.T) {
 
 		// SELECT emp_no FROM employees WHERE emp_no IN (10002, 10004);
 		{
-			mgorm.Select(db, "emp_no").
+			gsorm.Select(db, "emp_no").
 				From("employees").
 				Where("emp_no IN (?, ?)", 10002, 10004).(*statement.SelectStmt),
 			&[]Employee{

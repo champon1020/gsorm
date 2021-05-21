@@ -3,11 +3,11 @@ package migration
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/interfaces/domain"
-	"github.com/champon1020/mgorm/interfaces/ialtertable"
-	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
-	"github.com/champon1020/mgorm/syntax/mig"
+	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces/ialtertable"
+	"github.com/champon1020/gsorm/internal"
+	"github.com/champon1020/gsorm/syntax"
+	"github.com/champon1020/gsorm/syntax/mig"
 	"github.com/morikuni/failure"
 )
 

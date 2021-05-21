@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/champon1020/mgorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/morikuni/failure"
 )
 
@@ -50,7 +50,7 @@ func (d *db) GetDriver() domain.SQLDriver {
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.
 func (d *db) Ping() error {
 	if d.conn == nil {
-		return failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
+		return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 	}
 	return d.conn.Ping()
 }
@@ -58,7 +58,7 @@ func (d *db) Ping() error {
 // Exec executes a query that doesn't return rows. For example: an INSERT and UPDATE.
 func (d *db) Exec(query string, args ...interface{}) (sql.Result, error) {
 	if d.conn == nil {
-		return nil, failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
+		return nil, failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 	}
 	return d.conn.Exec(query, args...)
 }
@@ -66,7 +66,7 @@ func (d *db) Exec(query string, args ...interface{}) (sql.Result, error) {
 // Query executes a query that returns rows, typically a SELECT.
 func (d *db) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	if d.conn == nil {
-		return nil, failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
+		return nil, failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 	}
 	return d.conn.Query(query, args...)
 }
@@ -74,7 +74,7 @@ func (d *db) Query(query string, args ...interface{}) (*sql.Rows, error) {
 // SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
 func (d *db) SetConnMaxLifetime(n time.Duration) error {
 	if d.conn == nil {
-		return failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
+		return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 	}
 	d.conn.SetConnMaxLifetime(n)
 	return nil
@@ -83,7 +83,7 @@ func (d *db) SetConnMaxLifetime(n time.Duration) error {
 // SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
 func (d *db) SetMaxIdleConns(n int) error {
 	if d.conn == nil {
-		return failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
+		return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 	}
 	d.conn.SetMaxIdleConns(n)
 	return nil
@@ -92,7 +92,7 @@ func (d *db) SetMaxIdleConns(n int) error {
 // SetMaxOpenConns sets the maximum number of open connections to the database.
 func (d *db) SetMaxOpenConns(n int) error {
 	if d.conn == nil {
-		return failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
+		return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 	}
 	d.conn.SetMaxOpenConns(n)
 	return nil
@@ -102,7 +102,7 @@ func (d *db) SetMaxOpenConns(n int) error {
 // Close then waits for all queries that have started processing on the server to finish.
 func (d *db) Close() error {
 	if d.conn == nil {
-		return failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
+		return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 	}
 	return d.conn.Close()
 }
@@ -110,7 +110,7 @@ func (d *db) Close() error {
 // Begin starts a transaction. The default isolation level is dependent on the driver.
 func (d *db) Begin() (domain.Tx, error) {
 	if d.conn == nil {
-		return nil, failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
+		return nil, failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 	}
 	t, err := d.conn.Begin()
 	if err != nil {

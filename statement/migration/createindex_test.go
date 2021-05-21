@@ -3,8 +3,8 @@ package migration_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement/migration"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement/migration"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,12 +14,12 @@ func TestCreateIndex_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateIndex(nil, "IDX_emp").
+			gsorm.CreateIndex(nil, "IDX_emp").
 				On("employees", "emp_no").(*migration.CreateIndexStmt),
 			`CREATE INDEX IDX_emp ON employees (emp_no)`,
 		},
 		{
-			mgorm.CreateIndex(nil, "IDX_emp").
+			gsorm.CreateIndex(nil, "IDX_emp").
 				On("employees", "emp_no", "first_name").(*migration.CreateIndexStmt),
 			`CREATE INDEX IDX_emp ON employees (emp_no, first_name)`,
 		},
@@ -42,15 +42,15 @@ func TestCreateIndex_RawClause(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateIndex(nil, "idx").RawClause("RAW").(*migration.CreateIndexStmt),
+			gsorm.CreateIndex(nil, "idx").RawClause("RAW").(*migration.CreateIndexStmt),
 			`CREATE INDEX idx RAW`,
 		},
 		{
-			mgorm.CreateIndex(nil, "idx").RawClause("RAW").On("table", "column").(*migration.CreateIndexStmt),
+			gsorm.CreateIndex(nil, "idx").RawClause("RAW").On("table", "column").(*migration.CreateIndexStmt),
 			`CREATE INDEX idx RAW ON table (column)`,
 		},
 		{
-			mgorm.CreateIndex(nil, "idx").On("table", "column").RawClause("RAW").(*migration.CreateIndexStmt),
+			gsorm.CreateIndex(nil, "idx").On("table", "column").RawClause("RAW").(*migration.CreateIndexStmt),
 			`CREATE INDEX idx ON table (column) RAW`,
 		},
 	}

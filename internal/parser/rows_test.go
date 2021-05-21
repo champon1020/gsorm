@@ -37,31 +37,29 @@ func (c *ColumnType) ScanType() reflect.Type {
 }
 
 type IntModel struct {
-	I8  int8  `mgorm:"int8"`
-	I16 int16 `mgorm:"int16"`
-	I32 int32 `mgorm:"int32"`
-	I64 int64 `mgorm:"int64"`
-	I   int   `mgorm:"int"`
+	I8  int8  `gsorm:"int8"`
+	I16 int16 `gsorm:"int16"`
+	I32 int32 `gsorm:"int32"`
+	I64 int64 `gsorm:"int64"`
+	I   int   `gsorm:"int"`
 }
 
 type UintModel struct {
-	U8  uint8  `mgorm:"uint8"`
-	U16 uint16 `mgorm:"uint16"`
-	U32 uint32 `mgorm:"uint32"`
-	U64 uint64 `mgorm:"uint64"`
-	U   uint   `mgorm:"uint"`
+	U8  uint8  `gsorm:"uint8"`
+	U16 uint16 `gsorm:"uint16"`
+	U32 uint32 `gsorm:"uint32"`
+	U64 uint64 `gsorm:"uint64"`
+	U   uint   `gsorm:"uint"`
 }
 
 type FloatModel struct {
-	F32 float32 `mgorm:"float32"`
-	F64 float64 `mgorm:"float64"`
+	F32 float32 `gsorm:"float32"`
+	F64 float64 `gsorm:"float64"`
 }
 
 type OtherTypesModel struct {
-	B          bool      `mgorm:"bool"`
-	Time       time.Time `mgorm:"time"`
-	TimeANSIC  time.Time `mgorm:"time_ansic,layout=time.ANSIC"`
-	TimeFormat time.Time `mgorm:"time_format,layout=2006-01-02"`
+	B    bool      `gsorm:"bool"`
+	Time time.Time `gsorm:"time"`
 }
 
 /*

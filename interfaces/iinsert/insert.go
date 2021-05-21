@@ -1,10 +1,10 @@
 package iinsert
 
 import (
-	"github.com/champon1020/mgorm/interfaces"
+	"github.com/champon1020/gsorm/interfaces"
 )
 
-// Stmt is interface which is returned by mgorm.Insert.
+// Stmt is interface which is returned by gsorm.Insert.
 type Stmt interface {
 	RawClause(rs string, v ...interface{}) RawClause
 	Model(model interface{}) Model

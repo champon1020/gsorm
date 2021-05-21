@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/champon1020/mgorm/interfaces/domain"
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/internal"
 	"github.com/morikuni/failure"
 )
 

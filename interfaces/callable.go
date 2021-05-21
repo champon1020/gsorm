@@ -1,6 +1,6 @@
 package interfaces
 
-import "github.com/champon1020/mgorm/interfaces/domain"
+import "github.com/champon1020/gsorm/interfaces/domain"
 
 // QueryCallable is embedded into clause interfaces which can call (*Stmt).Query.
 type QueryCallable interface {

@@ -1,47 +1,47 @@
 # Select
-`mgorm.Select`はSELECT句を呼び出します．
+`gsorm.Select`はSELECT句を呼び出します．
 
-引数にはデータベースのコネクション(`mgorm.Conn`)，カラム名を指定します．
+引数にはデータベースのコネクション(`gsorm.Conn`)，カラム名を指定します．
 
 カラム名は複数指定することができます．カラム名はからでも問題ありません．
 
 #### 例
 ```go
-err := mgorm.Select(db, "emp_no").From("employees").Query(&model)
+err := gsorm.Select(db, "emp_no").From("employees").Query(&model)
 // SELECT emp_no FROM people;
 
-err := mgorm.Select(db).From("employees").Query(&model)
+err := gsorm.Select(db).From("employees").Query(&model)
 // SELECT * FROM people;
 
-err := mgorm.Select(db, "emp_no", "first_name").From("employees").Query(&model)
+err := gsorm.Select(db, "emp_no", "first_name").From("employees").Query(&model)
 // SELECT emp_no, first_name FROM people;
 
-err := mgorm.Select(db, "emp_no, first_name").From("employees").Query(&model)
+err := gsorm.Select(db, "emp_no, first_name").From("employees").Query(&model)
 // SELECT emp_no, first_name FROM people;
 
-err := mgorm.Select(db, "emp_no, first_name", "last_name").From("employees").Query(&model)
+err := gsorm.Select(db, "emp_no, first_name", "last_name").From("employees").Query(&model)
 // SELECT emp_no, first_name, last_name FROM people;
 ```
 
 
 # Methods
-`mgorm.Select`に使用できるメソッドは以下です．
+`gsorm.Select`に使用できるメソッドは以下です．
 
-- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
-- [From](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#from)
-- [Join](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#join)
-- [LeftJoin](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#leftjoin)
-- [RightJoin](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#rightjoin)
-- [Where](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#where)
-- [And](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#and)
-- [Or](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#or)
-- [GroupBy](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#groupby)
-- [Having](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#having)
-- [Union](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#union)
-- [UnionAll](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#unionall)
-- [OrderBy](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#orderby)
-- [Limit](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#limit)
-- [Offset](https://github.com/champon1020/mgorm/tree/main/docs/select_ja.md#offset)
+- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
+- [From](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#from)
+- [Join](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#join)
+- [LeftJoin](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#leftjoin)
+- [RightJoin](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#rightjoin)
+- [Where](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#where)
+- [And](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#and)
+- [Or](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#or)
+- [GroupBy](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#groupby)
+- [Having](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#having)
+- [Union](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#union)
+- [UnionAll](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#unionall)
+- [OrderBy](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#orderby)
+- [Limit](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#limit)
+- [Offset](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#offset)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 但し，例外として`RawClause`は任意で呼び出すことができます．
@@ -52,7 +52,7 @@ err := mgorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 [] option (0 to 1 times)
 {} repetition (0 to n times)
 
-mgorm.Select
+gsorm.Select
     .From
     [(.Join | .LeftJoin | .RightJoin) .On {(.Join | .LeftJoin | .RightJoin) .On}]
     [.Where [{.And} | {.Or}]]
@@ -68,12 +68,12 @@ mgorm.Select
 
 ```go
 // NG
-err := mgorm.Select(db).
+err := gsorm.Select(db).
     Where("emp_no = ?", 10000).
     From("employees").Query(&model)
 
 // NG
-err := mgorm.Select(db).
+err := gsorm.Select(db).
     Join("dept_manager AS d").Query(&model)
 ```
 
@@ -86,16 +86,16 @@ err := mgorm.Select(db).
 
 #### 例
 ```go
-err := mgorm.Select(db, "emp_no").From("employees").Query(&model)
+err := gsorm.Select(db, "emp_no").From("employees").Query(&model)
 // SELECT emp_no FROM employees;
 
-err := mgorm.Select(db, "e.emp_no").From("employees AS e").Query(&model)
+err := gsorm.Select(db, "e.emp_no").From("employees AS e").Query(&model)
 // SELECT e.emp_no FROM employees AS e;
 
-err := mgorm.Select(db, "e.emp_no").From("employees as e").Query(&model)
+err := gsorm.Select(db, "e.emp_no").From("employees as e").Query(&model)
 // SELECT e.emp_no FROM employees AS e;
 
-err := mgorm.Select(db, "emp_no", "dept_no").From("employees", "departments").Query(&model)
+err := gsorm.Select(db, "emp_no", "dept_no").From("employees", "departments").Query(&model)
 // SELECT emp_no, dept_no FROM employees, departments;
 ```
 
@@ -110,7 +110,7 @@ err := mgorm.Select(db, "emp_no", "dept_no").From("employees", "departments").Qu
 
 #### 例
 ```go
-err := mgorm.Select(db, "e.emp_no", "d.dept_no").
+err := gsorm.Select(db, "e.emp_no", "d.dept_no").
     From("employees AS e").
     Join("dept_manager AS d").
     On("e.emp_no = d.emp_no").Query(&model)
@@ -118,7 +118,7 @@ err := mgorm.Select(db, "e.emp_no", "d.dept_no").
 //      INNER JOIN dept_manager AS d
 //      ON e.emp_no = d.emp_no;
 
-err := mgorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
+err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
     From("employees AS e").
     Join("dept_manager AS d").On("e.emp_no = d.emp_no").
     LeftJoin("salaries AS s").On("e.emp_no = s.emp_no").Query(&model)
@@ -138,7 +138,7 @@ err := mgorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 
 #### 例
 ```go
-err := mgorm.Select(db, "e.emp_no", "d.dept_no").
+err := gsorm.Select(db, "e.emp_no", "d.dept_no").
     From("employees AS e").
     LeftJoin("dept_manager AS d").
     On("e.emp_no = d.emp_no").Query(&model)
@@ -146,7 +146,7 @@ err := mgorm.Select(db, "e.emp_no", "d.dept_no").
 //      LEFT JOIN dept_manager AS d
 //      ON e.emp_no = d.emp_no;
 
-err := mgorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
+err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
     From("employees AS e").
     LeftJoin("dept_manager AS d").On("e.emp_no = d.emp_no").
     RightJoin("salaries AS s").On("e.emp_no = s.emp_no").Query(&model)
@@ -166,7 +166,7 @@ err := mgorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 
 #### 例
 ```go
-err := mgorm.Select(db, "e.emp_no", "d.dept_no").
+err := gsorm.Select(db, "e.emp_no", "d.dept_no").
     From("employees AS e").
     RightJoin("dept_manager AS d").
     On("e.emp_no = d.emp_no").Query(&model)
@@ -174,7 +174,7 @@ err := mgorm.Select(db, "e.emp_no", "d.dept_no").
 //      RIGHT JOIN dept_manager AS d
 //      ON e.emp_no = d.emp_no;
 
-err := mgorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
+err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
     From("employees AS e").
     RightJoin("dept_manager AS d").On("e.emp_no = d.emp_no").
     Join("salaries AS s").On("e.emp_no = s.emp_no").Query(&model)
@@ -193,53 +193,53 @@ err := mgorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
 - 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
+- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない値はそのまま展開される．
 
 #### 例
 ```go
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = 1001").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001;
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001;
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("first_name = ?", "Taro").Query(&model)
 // SELECT * FROM employees
 //      WHERE first_name = 'Taro';
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
 // SELECT * FROM employees
 //      WHERE birth_date = '2006-01-02 00:00:00';
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("first_name LIKE ?", "%Taro").Query(&model)
 // SELECT * FROM employees
 //      WHERE first_name LIKE '%Taro';
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no BETWEEN ? AND ?", 1001, 1003).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no BETWEEN 1001 AND 1003;
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no IN (?)", []int{1001, 1002}).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no IN (1001, 1002);
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no IN (?)", [2]int{1001, 1002}).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no IN (1001, 1002);
 
-err := mgorm.Select(db).From("employees").
-    Where("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
+err := gsorm.Select(db).From("employees").
+    Where("emp_no IN (?)", gsorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no IN (SELECT emp_no FROM dept_manager);
 ```
@@ -255,35 +255,35 @@ err := mgorm.Select(db).From("employees").
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
 - 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
+- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない場合，値はそのまま展開される．
 
 `And`は複数回呼び出すことができます．
 
 #### 例
 ```go
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no = 1002").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no = 1002);
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no = ?", 1002).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no = 1002);
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     And("first_name = ? OR first_name = ?", "Taro", "Jiro").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      AND (first_name = 'Taro' OR first_name = 'Jiro');
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no = ?", 1002).
     And("emp_no = ?", 1003).Exec()
@@ -292,44 +292,44 @@ err := mgorm.Select(db).From("employees").
 //      AND (emp_no = 1002);
 //      AND (emp_no = 1003);
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      AND (birth_date = '2006-01-02 00:00:00');
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     And("first_name LIKE ?", "%Taro").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      AND (first_name LIKE '%Taro');
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no BETWEEN ? AND ?", 1001, 1003).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no BETWEEN 1001 AND 1003);
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no IN (?)", []int{1001, 1002}).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no IN (1001, 1002));
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no IN (?)", [2]int{1001, 1002}).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no IN (1001, 1002));
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
-    And("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
+    And("emp_no IN (?)", gsorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no IN (SELECT emp_no FROM dept_manager));
@@ -346,35 +346,35 @@ err := mgorm.Select(db).From("employees").
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
 - 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
+- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない場合，値はそのまま展開される．
 
 `Or`は複数回呼び出すことができます．
 
 #### 例
 ```go
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no = 1002").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002);
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no = ?", 1002).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002);
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no = ? AND first_name = ?", 1002, "Taro").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002 AND first_name = 'Taro');
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no = ?", 1002).
     Or("emp_no = ?", 1003).Exec()
@@ -383,44 +383,44 @@ err := mgorm.Select(db).From("employees").
 //      OR (emp_no = 1002)
 //      OR (emp_no = 1003);
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      OR (birth_date = '2006-01-02 00:00:00');
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("first_name LIKE ?", "%Taro").Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      OR (first_name LIKE '%Taro');
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no BETWEEN ? AND ?", 1001, 1003).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no BETWEEN 1001 AND 1003);
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no IN (?)", []int{1001, 1002}).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no IN (1001, 1002));
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no IN (?)", [2]int{1001, 1002}).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no IN (1001, 1002));
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
-    Or("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
+    Or("emp_no IN (?)", gsorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
 // SELECT * FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no IN (SELECT emp_no FROM dept_manager));
@@ -434,7 +434,7 @@ err := mgorm.Select(db).From("employees").
 
 #### 例
 ```go
-err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
+err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
     GroupBy("emp_no").Query(&model)
 // SELECT emp_no, AVG(salary) FROM salaries
 //      GROUP BY emp_no;
@@ -450,63 +450,63 @@ err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
 - 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
+- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない場合，値はそのまま展開される．
 
 #### 例
 ```go
-err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
+err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
     GroupBy("emp_no").
     Having("AVG(salary) > 130000").Query(&model)
 // SELECT emp_no, AVG(salary) FROM salaries
 //      GROUP BY emp_no
 //      HAVING AVG(salary) > 130000;
 
-err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
+err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
     GroupBy("emp_no").
     Having("AVG(salary) > ?", 130000).Query(&model)
 // SELECT emp_no, AVG(salary) FROM salaries
 //      GROUP BY emp_no
 //      HAVING AVG(salary) > 130000;
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Having("first_name = ?", "Taro").Query(&model)
 // SELECT * FROM employees
 //      HAVING first_name = 'Taro';
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Having("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Query(&model)
 // SELECT * FROM employees
 //      HAVING birth_date = '2006-01-02 00:00:00';
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Having("first_name LIKE ?", "%Taro").Query(&model)
 // SELECT * FROM employees
 //      HAVING first_name LIKE '%Taro';
 
-err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
+err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
     GroupBy("emp_no").
     Having("AVG(salary) BETWEEN ? AND ?", 100000, 130000).Query(&model)
 // SELECT emp_no, AVG(salary) FROM salaries
 //      GROUP BY emp_no
 //      HAVING AVG(salary) BETWEEN 100000 AND 130000;
 
-err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
+err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
     GroupBy("emp_no").
     Having("AVG(salary) IN (?)", []int{100000, 130000}).Query(&model)
 // SELECT emp_no, AVG(salary) FROM salaries
 //      GROUP BY emp_no
 //      HAVING AVG(salary) IN (100000, 130000);
 
-err := mgorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
+err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
     GroupBy("emp_no").
     Having("AVG(salary) IN (?)", [2]int{100000, 130000}).Query(&model)
 // SELECT emp_no, AVG(salary) FROM salaries
 //      GROUP BY emp_no
 //      HAVING AVG(salary) IN (100000, 130000);
 
-err := mgorm.Select(db).From("employees").
-    Having("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
+err := gsorm.Select(db).From("employees").
+    Having("emp_no IN (?)", gsorm.Select(nil, "emp_no").From("dept_manager")).Query(&model)
 // SELECT * FROM employees
 //      HAVING emp_no IN (SELECT emp_no FROM dept_manager);
 ```
@@ -515,12 +515,12 @@ err := mgorm.Select(db).From("employees").
 ## Union
 `Union`はUNION句を呼び出します．
 
-引数に`*mgorm.SelectStmt`を指定します．
+引数に`*gsorm.SelectStmt`を指定します．
 
 #### 例
 ```go
-mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
-    Union(mgorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
+gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
+    Union(gsorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
 // SELECT emp_no, dept_no FROM dept_manager
 //      UNION (SELECT emp_no, dept_no FROM dept_emp);
 ```
@@ -529,12 +529,12 @@ mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 ## UnionAll
 `UnionAll`はUNION ALL句を呼び出します．
 
-引数に`*mgorm.SelectStmt`を指定します．
+引数に`*gsorm.SelectStmt`を指定します．
 
 #### 例
 ```go
-mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
-    UnionAll(mgorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
+gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
+    UnionAll(gsorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
 // SELECT emp_no, dept_no FROM dept_manager
 //  UNION ALL (SELECT emp_no, dept_no FROM dept_emp);
 ```
@@ -549,22 +549,22 @@ mgorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 
 #### 例
 ```go
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     OrderBy("birth_date").Query(&model)
 // SELECT * FROM employees
 //      ORDER BY birth_date;
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     OrderBy("birth_date DESC").Query(&model)
 // SELECT * FROM employees
 //      ORDER BY birth_date DESC;
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     OrderBy("birth_date desc").Query(&model)
 // SELECT * FROM employees
 //      ORDER BY birth_date desc;
 
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     OrderBy("birth_date").
     OrderBy("hire_date DESC").Query(&model)
 // SELECT id FROM people
@@ -580,7 +580,7 @@ err := mgorm.Select(db).From("employees").
 
 #### 例
 ```go
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Limit(10).Query(&model)
 // SELECT * FROM employees
 //      LIMIT 10;
@@ -596,7 +596,7 @@ err := mgorm.Select(db).From("employees").
 
 #### 例
 ```go
-err := mgorm.Select(db).From("employees").
+err := gsorm.Select(db).From("employees").
     Limit(10).
     Offset(5).Query(&model)
 // SELECT * FROM employees

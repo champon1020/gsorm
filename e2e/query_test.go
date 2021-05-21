@@ -3,15 +3,15 @@ package e2e_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement"
 	"github.com/google/go-cmp/cmp"
 	"gotest.tools/v3/assert"
 )
 
 func TestQueryWithSlice(t *testing.T) {
 	// SELECT emp_no FROM employees;
-	stmt := mgorm.Select(db, "emp_no").From("employees")
+	stmt := gsorm.Select(db, "emp_no").From("employees")
 	result := &[]int{10001, 10002, 10003, 10004, 10005, 10006, 10007, 10008, 10009, 10010}
 
 	model := new([]int)
@@ -27,7 +27,7 @@ func TestQueryWithSlice(t *testing.T) {
 
 func TestQueryWithVar(t *testing.T) {
 	// SELECT COUNT(emp_no) FROM employees;
-	stmt := mgorm.Count(db, "emp_no").From("employees")
+	stmt := gsorm.Count(db, "emp_no").From("employees")
 	result := 10
 
 	model := new(int)
@@ -45,7 +45,7 @@ func TestQueryWithStruct(t *testing.T) {
 	}{
 		// SELECT emp_no FROM employees LIMIT 1;
 		{
-			mgorm.Select(db, "emp_no").
+			gsorm.Select(db, "emp_no").
 				From("employees").
 				Limit(1).(*statement.SelectStmt),
 			&Employee{EmpNo: 10001},
@@ -53,7 +53,7 @@ func TestQueryWithStruct(t *testing.T) {
 
 		// SELECT emp_no FROM employees;
 		{
-			mgorm.Select(db, "emp_no").From("employees").(*statement.SelectStmt),
+			gsorm.Select(db, "emp_no").From("employees").(*statement.SelectStmt),
 			&Employee{EmpNo: 10001},
 		},
 	}
@@ -74,7 +74,7 @@ func TestQueryWithStruct(t *testing.T) {
 }
 
 func TestQueryWithMap(t *testing.T) {
-	stmt := mgorm.Select(db, "emp_no", "first_name").From("employees")
+	stmt := gsorm.Select(db, "emp_no", "first_name").From("employees")
 	result := []map[string]interface{}{
 		{
 			"emp_no":     10001,

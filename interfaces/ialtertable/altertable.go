@@ -1,8 +1,8 @@
 package ialtertable
 
-import "github.com/champon1020/mgorm/interfaces"
+import "github.com/champon1020/gsorm/interfaces"
 
-// Table is interface which is returned by mgorm.AlterTable.
+// Table is interface which is returned by gsorm.AlterTable.
 type Table interface {
 	RawClause(rs string, v ...interface{}) RawClause
 	Rename(string) Rename

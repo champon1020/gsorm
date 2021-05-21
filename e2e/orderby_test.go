@@ -3,8 +3,8 @@ package e2e_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -15,7 +15,7 @@ func TestOrderBy(t *testing.T) {
 	}{
 		// SELECT * FROM first_name ORDER BY first_name;
 		{
-			mgorm.Select(db, "first_name").
+			gsorm.Select(db, "first_name").
 				From("employees").
 				OrderBy("first_name").(*statement.SelectStmt),
 			&[]Employee{
@@ -34,7 +34,7 @@ func TestOrderBy(t *testing.T) {
 
 		// SELECT * FROM first_name ORDER BY first_name DESC;
 		{
-			mgorm.Select(db, "first_name").
+			gsorm.Select(db, "first_name").
 				From("employees").
 				OrderBy("first_name DESC").(*statement.SelectStmt),
 			&[]Employee{

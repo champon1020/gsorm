@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/champon1020/mgorm"
+	"github.com/champon1020/gsorm"
 	"github.com/go-gorp/gorp"
 	"github.com/jmoiron/sqlx"
 	"gorm.io/driver/mysql"
@@ -41,8 +41,8 @@ func BenchmarkSelectAll_Struct_standard(b *testing.B) {
 	}
 }
 
-func BenchmarkSelectAll_Struct_mgorm(b *testing.B) {
-	db, err := mgorm.Open("mysql", dsn)
+func BenchmarkSelectAll_Struct_gsorm(b *testing.B) {
+	db, err := gsorm.Open("mysql", dsn)
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func BenchmarkSelectAll_Struct_mgorm(b *testing.B) {
 	b.ResetTimer()
 
 	var emp []Employee
-	err = mgorm.Select(db).From("employees").Query(&emp)
+	err = gsorm.Select(db).From("employees").Query(&emp)
 	if err != nil {
 		b.Fatal(err)
 	}

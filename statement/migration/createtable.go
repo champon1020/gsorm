@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/champon1020/mgorm/interfaces/domain"
-	"github.com/champon1020/mgorm/interfaces/icreatetable"
-	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
-	"github.com/champon1020/mgorm/syntax/mig"
+	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces/icreatetable"
+	"github.com/champon1020/gsorm/internal"
+	"github.com/champon1020/gsorm/syntax"
+	"github.com/champon1020/gsorm/syntax/mig"
 	"github.com/morikuni/failure"
 )
 
@@ -142,7 +142,7 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 			sql.Write(tag.Type)
 		} else {
 			if s.conn == nil {
-				return failure.New(errFailedDBConnection, failure.Message("mgorm.db.conn is nil"))
+				return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 			}
 			dbtyp := s.conn.GetDriver().LookupDefaultType(f.Type)
 			if dbtyp == "" {

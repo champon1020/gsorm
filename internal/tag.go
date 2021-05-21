@@ -55,7 +55,7 @@ func ExtractTag(f reflect.StructField) *Tag {
 		t.Column = jsonTag
 	}
 
-	tags := strings.Split(f.Tag.Get("mgorm"), ",")
+	tags := strings.Split(f.Tag.Get("gsorm"), ",")
 	for _, v := range tags {
 		if !strings.Contains(v, "=") {
 			t.Column = v
@@ -86,42 +86,3 @@ func ExtractTag(f reflect.StructField) *Tag {
 	}
 	return t
 }
-
-/*
-// timeFormat returns layout of date.
-func timeFormat(layout string) string {
-	switch layout {
-	case "time.ANSIC":
-		return time.ANSIC
-	case "time.UnixDate":
-		return time.UnixDate
-	case "time.RubyDate":
-		return time.RubyDate
-	case "time.RFC822":
-		return time.RFC822
-	case "time.RFC822Z":
-		return time.RFC822Z
-	case "time.RFC850":
-		return time.RFC850
-	case "time.RFC1123":
-		return time.RFC1123
-	case "time.RFC1123Z":
-		return time.RFC1123Z
-	case "time.RFC3339":
-		return time.RFC3339
-	case "time.RFC3339Nano":
-		return time.RFC3339Nano
-	case "time.Kitchen":
-		return time.Kitchen
-	case "time.Stamp":
-		return time.Stamp
-	case "time.StampMilli":
-		return time.StampMilli
-	case "time.StampMicro":
-		return time.StampMicro
-	case "time.StampNano":
-		return time.StampNano
-	}
-	return layout
-}
-*/

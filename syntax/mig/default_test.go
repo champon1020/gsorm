@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm/syntax"
-	"github.com/champon1020/mgorm/syntax/mig"
+	"github.com/champon1020/gsorm/syntax"
+	"github.com/champon1020/gsorm/syntax/mig"
 	"github.com/google/go-cmp/cmp"
 	"gotest.tools/v3/assert"
 )

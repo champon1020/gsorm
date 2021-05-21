@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,37 +15,37 @@ func TestRawStmt_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.RawStmt(nil, "SELECT * FROM employees").(*statement.RawStmt),
+			gsorm.RawStmt(nil, "SELECT * FROM employees").(*statement.RawStmt),
 			`SELECT * FROM employees`,
 		},
 		{
-			mgorm.RawStmt(nil, "SELECT * FROM employees WHERE emp_no = ?", 1001).(*statement.RawStmt),
+			gsorm.RawStmt(nil, "SELECT * FROM employees WHERE emp_no = ?", 1001).(*statement.RawStmt),
 			`SELECT * FROM employees WHERE emp_no = 1001`,
 		},
 		{
-			mgorm.RawStmt(nil, "SELECT * FROM employees WHERE first_name = ?", "Taro").(*statement.RawStmt),
+			gsorm.RawStmt(nil, "SELECT * FROM employees WHERE first_name = ?", "Taro").(*statement.RawStmt),
 			`SELECT * FROM employees WHERE first_name = 'Taro'`,
 		},
 		{
-			mgorm.RawStmt(nil, "SELECT * FROM employees WHERE birth_date = ?",
+			gsorm.RawStmt(nil, "SELECT * FROM employees WHERE birth_date = ?",
 				time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*statement.RawStmt),
 			`SELECT * FROM employees WHERE birth_date = '2006-01-02 00:00:00'`,
 		},
 		{
-			mgorm.RawStmt(nil, "SELECT * FROM employees WHERE emp_no IN (?)", []int{1001, 1002}).(*statement.RawStmt),
+			gsorm.RawStmt(nil, "SELECT * FROM employees WHERE emp_no IN (?)", []int{1001, 1002}).(*statement.RawStmt),
 			`SELECT * FROM employees WHERE emp_no IN (1001, 1002)`,
 		},
 		{
-			mgorm.RawStmt(nil, "SELECT * FROM employees WHERE emp_no IN (?)",
-				mgorm.Select(nil, "emp_no").From("dept_manager")).(*statement.RawStmt),
+			gsorm.RawStmt(nil, "SELECT * FROM employees WHERE emp_no IN (?)",
+				gsorm.Select(nil, "emp_no").From("dept_manager")).(*statement.RawStmt),
 			`SELECT * FROM employees WHERE emp_no IN (SELECT emp_no FROM dept_manager)`,
 		},
 		{
-			mgorm.RawStmt(nil, "DELETE FROM employees").(*statement.RawStmt),
+			gsorm.RawStmt(nil, "DELETE FROM employees").(*statement.RawStmt),
 			`DELETE FROM employees`,
 		},
 		{
-			mgorm.RawStmt(nil, "ALTER TABLE employees DROP PRIMARY KEY PK_emp_no").(*statement.RawStmt),
+			gsorm.RawStmt(nil, "ALTER TABLE employees DROP PRIMARY KEY PK_emp_no").(*statement.RawStmt),
 			`ALTER TABLE employees DROP PRIMARY KEY PK_emp_no`,
 		},
 	}
