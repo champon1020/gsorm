@@ -6,14 +6,58 @@ import (
 
 	"github.com/champon1020/mgorm/internal"
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
 )
 
-func Test_ExtractTag(t *testing.T) {
-	type Model struct {
-		A string `mgorm:"col,typ=VARCHAR(64),notnull=t,default='test',pk=PK_a,fk=FK_a:reftbl(refcol),uc=UC_a,layout=time.RFC3339"`
-		B string `mgorm:"col" json:"col2"`
+type TagModel struct {
+	A string `mgorm:"col,typ=VARCHAR(64),notnull=t,default='test',pk=PK_a,fk=FK_a:reftbl(refcol),uc=UC_a,layout=time.RFC3339"`
+	B string `mgorm:"col" json:"col2"`
+}
+
+func TestTag_Lookup(t *testing.T) {
+	tag := &internal.Tag{
+		Column:  "col",
+		Type:    "VARCHAR(64)",
+		NotNull: true,
+		Default: "'test'",
+		PK:      "PK_a",
+		FK:      "FK_a",
+		Ref:     "reftbl(refcol)",
+		UC:      "UC_a",
+		Layout:  "2006-01-02T15:04:05Z07:00",
+	}
+	assert.Equal(t, true, tag.Lookup("col"))
+	assert.Equal(t, true, tag.Lookup("typ"))
+	assert.Equal(t, true, tag.Lookup("notnull"))
+	assert.Equal(t, true, tag.Lookup("default"))
+	assert.Equal(t, true, tag.Lookup("pk"))
+	assert.Equal(t, true, tag.Lookup("fk"))
+	assert.Equal(t, true, tag.Lookup("uc"))
+	assert.Equal(t, true, tag.Lookup("layout"))
+	assert.Equal(t, false, tag.Lookup("hoge"))
+}
+
+func Test_ExtractTags(t *testing.T) {
+	expected := []*internal.Tag{
+		{
+			Column:  "col",
+			Type:    "VARCHAR(64)",
+			NotNull: true,
+			Default: "'test'",
+			PK:      "PK_a",
+			FK:      "FK_a",
+			Ref:     "reftbl(refcol)",
+			UC:      "UC_a",
+			Layout:  "2006-01-02T15:04:05Z07:00",
+		},
+		{Column: "col"},
 	}
 
+	tags := internal.ExtractTags(reflect.TypeOf(TagModel{}))
+	assert.Equal(t, expected, tags)
+}
+
+func Test_ExtractTag(t *testing.T) {
 	testCases := []struct {
 		FieldNum int
 		Expected *internal.Tag
@@ -41,7 +85,7 @@ func Test_ExtractTag(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		typ := reflect.TypeOf(Model{})
+		typ := reflect.TypeOf(TagModel{})
 		actual := internal.ExtractTag(typ.Field(testCase.FieldNum))
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)

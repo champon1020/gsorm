@@ -56,3 +56,10 @@ func TestValues_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestValues_AddValue(t *testing.T) {
+	v := &clause.Values{}
+	val := 100
+	v.AddValue(val)
+	assert.Equal(t, v.Values, []interface{}{val})
+}

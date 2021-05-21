@@ -60,3 +60,11 @@ func TestOn_Build(t *testing.T) {
 		}
 	}
 }
+
+func TestOn_Build_Fail(t *testing.T) {
+	a := &clause.On{Expr: "column = ?"}
+	_, err := a.Build()
+	if err == nil {
+		t.Errorf("Error was not occurred")
+	}
+}

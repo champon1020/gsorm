@@ -51,6 +51,13 @@ func (s *stmt) funcString(cmd domain.Clause) string {
 }
 
 func (s *stmt) compareWith(cmd domain.Clause, targetStmt domain.Stmt) error {
+	if diff := cmp.Diff(cmd, targetStmt.Cmd()); diff != "" {
+		err := failure.New(errInvalidValue,
+			failure.Context{"expected": s.funcString(cmd), "actual": targetStmt.FuncString()},
+			failure.Message("statements comparison is failed"))
+		return err
+	}
+
 	expected := s.Called()
 	actual := targetStmt.Called()
 	if len(expected) != len(actual) {
