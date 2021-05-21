@@ -3,7 +3,6 @@ package internal
 import (
 	"reflect"
 	"strings"
-	"time"
 )
 
 // Tag stores the field tag contents.
@@ -16,7 +15,6 @@ type Tag struct {
 	FK      string
 	Ref     string
 	UC      string
-	Layout  string
 }
 
 // Lookup returns tag exists or not.
@@ -36,8 +34,6 @@ func (t *Tag) Lookup(tag string) bool {
 		return t.FK != "" && t.Ref != ""
 	case "uc":
 		return t.UC != ""
-	case "layout":
-		return t.Layout != ""
 	}
 	return false
 }
@@ -86,13 +82,12 @@ func ExtractTag(f reflect.StructField) *Tag {
 			}
 		case "uc":
 			t.UC = eq[1]
-		case "layout":
-			t.Layout = timeFormat(eq[1])
 		}
 	}
 	return t
 }
 
+/*
 // timeFormat returns layout of date.
 func timeFormat(layout string) string {
 	switch layout {
@@ -129,3 +124,4 @@ func timeFormat(layout string) string {
 	}
 	return layout
 }
+*/

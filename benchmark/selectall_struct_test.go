@@ -16,6 +16,7 @@ func BenchmarkSelectAll_Struct_standard(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	defer db.Close()
 
 	b.ResetTimer()
 
@@ -45,6 +46,7 @@ func BenchmarkSelectAll_Struct_mgorm(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	defer db.Close()
 
 	b.ResetTimer()
 
@@ -75,6 +77,7 @@ func BenchmarkSelectAll_Struct_sqlx(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	defer db.Close()
 
 	b.ResetTimer()
 
@@ -90,6 +93,7 @@ func BenchmarkSelectAll_Struct_gorp(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
+	defer db.Close()
 	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.MySQLDialect{Engine: "InnoDB", Encoding: "UTF8"}}
 
 	b.ResetTimer()

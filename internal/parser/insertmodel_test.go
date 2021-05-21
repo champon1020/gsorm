@@ -143,14 +143,12 @@ func TestInsertModelParser_ParseStruct(t *testing.T) {
 			"(3.1415927, 3.141592653589793)",
 		},
 		{
-			[]string{"bool", "time", "time_ansic", "time_format"},
+			[]string{"bool", "time"},
 			&OtherTypesModel{
-				B:          true,
-				Time:       time.Date(2021, time.January, 2, 3, 4, 5, 0, time.UTC),
-				TimeANSIC:  time.Date(2021, time.March, 25, 22, 13, 30, 0, time.UTC),
-				TimeFormat: time.Date(2021, time.April, 1, 0, 0, 0, 0, time.UTC),
+				B:    true,
+				Time: time.Date(2021, time.January, 2, 3, 4, 5, 0, time.UTC),
 			},
-			"(1, '2021-01-02 03:04:05', 'Thu Mar 25 22:13:30 2021', '2021-04-01')",
+			"(1, '2021-01-02 03:04:05')",
 		},
 	}
 

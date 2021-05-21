@@ -150,18 +150,11 @@ func (p *InsertModelParser) ParseStruct(sql *internal.SQL, model reflect.Value) 
 		p.ColumnField = p.columnsAndFields(model.Type())
 	}
 	sql.Write("(")
-	tags := internal.ExtractTags(reflect.TypeOf(model.Interface()))
 	for i := 0; i < len(p.Cols); i++ {
 		if i > 0 {
 			sql.Write(",")
 		}
-
-		var opt *internal.ToStringOpt
-		if tags[p.ColumnField[i]].Layout != "" {
-			opt = &internal.ToStringOpt{Quotes: true, TimeFormat: tags[p.ColumnField[i]].Layout}
-		} else {
-			opt = nil
-		}
+		opt := &internal.ToStringOpt{Quotes: true}
 		s := internal.ToString(model.Field(p.ColumnField[i]).Interface(), opt)
 		sql.Write(s)
 	}

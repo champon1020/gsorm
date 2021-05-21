@@ -10,7 +10,7 @@ import (
 )
 
 type TagModel struct {
-	A string `mgorm:"col,typ=VARCHAR(64),notnull=t,default='test',pk=PK_a,fk=FK_a:reftbl(refcol),uc=UC_a,layout=time.RFC3339"`
+	A string `mgorm:"col,typ=VARCHAR(64),notnull=t,default='test',pk=PK_a,fk=FK_a:reftbl(refcol),uc=UC_a"`
 	B string `mgorm:"col" json:"col2"`
 }
 
@@ -24,7 +24,6 @@ func TestTag_Lookup(t *testing.T) {
 		FK:      "FK_a",
 		Ref:     "reftbl(refcol)",
 		UC:      "UC_a",
-		Layout:  "2006-01-02T15:04:05Z07:00",
 	}
 	assert.Equal(t, true, tag.Lookup("col"))
 	assert.Equal(t, true, tag.Lookup("typ"))
@@ -33,7 +32,6 @@ func TestTag_Lookup(t *testing.T) {
 	assert.Equal(t, true, tag.Lookup("pk"))
 	assert.Equal(t, true, tag.Lookup("fk"))
 	assert.Equal(t, true, tag.Lookup("uc"))
-	assert.Equal(t, true, tag.Lookup("layout"))
 	assert.Equal(t, false, tag.Lookup("hoge"))
 }
 
@@ -48,7 +46,6 @@ func Test_ExtractTags(t *testing.T) {
 			FK:      "FK_a",
 			Ref:     "reftbl(refcol)",
 			UC:      "UC_a",
-			Layout:  "2006-01-02T15:04:05Z07:00",
 		},
 		{Column: "col"},
 	}
@@ -73,7 +70,6 @@ func Test_ExtractTag(t *testing.T) {
 				FK:      "FK_a",
 				Ref:     "reftbl(refcol)",
 				UC:      "UC_a",
-				Layout:  "2006-01-02T15:04:05Z07:00",
 			},
 		},
 		{
