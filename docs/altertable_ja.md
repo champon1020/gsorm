@@ -1,16 +1,16 @@
 # Alter Table
-`mgorm.AlterTable`はALTER TABLE句を呼び出します．
+`gsorm.AlterTable`はALTER TABLE句を呼び出します．
 
-引数にはデータベースのコネクション(`mgorm.Conn`)，テーブル名を指定します．
+引数にはデータベースのコネクション(`gsorm.Conn`)，テーブル名を指定します．
 
 #### 例
 ```go
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddColumn("nickname", "VARCHAR(64)").NotNull().Migrate()
 // ALTER TABLE employees
 //      ADD COLUMN nickname VARCHAR(64) NOT NULL;
 
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddCons("UC_nickname").Primary("nickname").Migrate()
 // ALTER TABLE employees
 //      ADD CONSTRAINT UC_nickname UNIQUE (nickname);
@@ -18,20 +18,20 @@ err := mgorm.AlterTable(db, "employees").
 
 
 # Methods
-`mgorm.AlterTable`に使用できるメソッドは以下です．
+`gsorm.AlterTable`に使用できるメソッドは以下です．
 
-- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
-- [Rename](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#rename)
-- [AddColumn](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcolumn)
-    - [NotNull](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcolumn.notnull)
-    - [Default](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcolumn.default)
-- [DropColumn](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#dropcolumn)
-- [RenameColumn](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#renamecolumn)
-- [AddCons](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons)
-    - [Unique](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons.unique)
-    - [Primary](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons.primary)
-    - [Foreign](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons.foreign)
-        - [Ref](https://github.com/champon1020/mgorm/tree/main/docs/altertable_ja.md#addcons.foreign.ref)
+- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
+- [Rename](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#rename)
+- [AddColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumn)
+    - [NotNull](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumn.notnull)
+    - [Default](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumn.default)
+- [DropColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#dropcolumn)
+- [RenameColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#renamecolumn)
+- [AddCons](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons)
+    - [Unique](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.unique)
+    - [Primary](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.primary)
+    - [Foreign](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.foreign)
+        - [Ref](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.foreign.ref)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 但し，例外として`RawClause`は任意で呼び出すことができます．
@@ -42,7 +42,7 @@ err := mgorm.AlterTable(db, "employees").
 [] option (0 to 1 times)
 {} repetition (0 to n times)
 
-mgorm.AlterTable
+gsorm.AlterTable
     (
         .Rename
         | (.AddColumn {.NotNull} {.Default})
@@ -57,12 +57,12 @@ mgorm.AlterTable
 
 ```go
 // NG
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     Rename("people").
     DropColumn("id").Migrate()
 
 // NG
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddCons("UC_id").Migrate()
 ```
 
@@ -74,7 +74,7 @@ err := mgorm.AlterTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     Rename("people").Migrate()
 // ALTER TABLE employees
 //      RENAME TO people;
@@ -88,7 +88,7 @@ err := mgorm.AlterTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddColumn("nickname", "VARCHAR(64)").Migrate()
 // ALTER TABLE employees
 //      ADD COLUMN nickname VARCHAR(64);
@@ -102,13 +102,13 @@ err := mgorm.AlterTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddColumn("nickname", "VARCHAR(64)").
     NotNull().Migrate()
 // ALTER TABLE employees
 //      ADD COLUMN nickanme VARCHAR(64) NOT NULL;
 
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddColumn("nickname", "VARCHAR(64)").
     NotNull().
     Default("none").Migrate()
@@ -123,13 +123,13 @@ err := mgorm.AlterTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddColumn("nickname", "VARCHAR(64)").
     Default("none").Migrate()
 // ALTER TABLE employees
 //      ADD COLUMN nickanme VARCHAR(64) DEFAULT 'none';
 
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddColumn("nickname", "VARCHAR(64)").
     Default("none").
     NotNull().Migrate()
@@ -145,7 +145,7 @@ err := mgorm.AlterTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     DropColumn("nickname").Migrate()
 // ALTER TABLE employees
 //      DROP COLUMN nickname;
@@ -159,7 +159,7 @@ err := mgorm.AlterTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     RenameColumn("emp_no", "id").Migrate()
 // ALTER TABLE employees
 //      RENAME COLUMN emp_no TO id;
@@ -180,12 +180,12 @@ err := mgorm.AlterTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddCons("UC_nickname").Unique("nickname").Migrate()
 // ALTER TABLE employees
 //      ADD CONSTRAINT UC_nickname UNIQUE (nickname);
 
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddCons("UC_nickname").Unique("nickname", "first_name").Migrate()
 // ALTER TABLE employees
 //      ADD CONSTRAINT UC_nickname UNIQUE (nickname, first_name);
@@ -198,12 +198,12 @@ err := mgorm.AlterTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddCons("PK_emp_no").Primary("emp_no").Migrate()
 // ALTER TABLE employees
 //      ADD CONSTRAINT PK_emp_no PRIMARY KEY (emp_no);
 
-err := mgorm.AlterTable(db, "employees").
+err := gsorm.AlterTable(db, "employees").
     AddCons("PK_emp_no").Primary("emp_no", "first_name").Migrate()
 // ALTER TABLE employees
 //      ADD CONSTRAINT PK_emp_no PRIMARY KEY (emp_no, first_name);
@@ -223,12 +223,12 @@ err := mgorm.AlterTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.AlterTable(db, "dept_emp").
+err := gsorm.AlterTable(db, "dept_emp").
     AddCons("FK_emp_no").Foreign("emp_no").Ref("employees", "emp_no").Migrate()
 // ALTER TABLE dept_emp
 //      ADD CONSTRAINT FK_emp_no FOREIGN KEY (emp_no) REFERENCES employees (emp_no);
 
-err := mgorm.AlterTable(db, "dept_emp").
+err := gsorm.AlterTable(db, "dept_emp").
     AddCons("FK_emp_no").Foreign("emp_no", "from_date").Ref("employees", "emp_no", "hire_date").Migrate()
 // ALTER TABLE dept_emp
 //      ADD CONSTRAINT FK_emp_no FOREIGN KEY (emp_no, from_date) REFERENCES employees (emp_no, hire_date);

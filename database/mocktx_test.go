@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/database"
 	"github.com/google/go-cmp/cmp"
 	"github.com/morikuni/failure"
 	"gotest.tools/v3/assert"
@@ -52,11 +52,11 @@ func TestMock_TransactionExpectation(t *testing.T) {
 	mocktx1 := mock.ExpectBegin()
 	mocktx2 := mock.ExpectBegin()
 
-	mocktx1.Expect(mgorm.Insert(nil, "table1", "column1", "column2").Values(10, "str"))
-	mocktx1.ExpectWithReturn(mgorm.Select(nil, "column1").From("table1"), expectedReturn1)
+	mocktx1.Expect(gsorm.Insert(nil, "table1", "column1", "column2").Values(10, "str"))
+	mocktx1.ExpectWithReturn(gsorm.Select(nil, "column1").From("table1"), expectedReturn1)
 	mocktx1.ExpectCommit()
-	mocktx2.Expect(mgorm.Insert(nil, "table2", "column1", "column2").Values(10, "str"))
-	mocktx2.ExpectWithReturn(mgorm.Select(nil, "column2").From("table2"), expectedReturn2)
+	mocktx2.Expect(gsorm.Insert(nil, "table2", "column1", "column2").Values(10, "str"))
+	mocktx2.ExpectWithReturn(gsorm.Select(nil, "column2").From("table2"), expectedReturn2)
 	mocktx2.ExpectRollback()
 
 	// Actual process.
@@ -71,12 +71,12 @@ func TestMock_TransactionExpectation(t *testing.T) {
 		return
 	}
 
-	if err := mgorm.Insert(tx1, "table1", "column1", "column2").Values(10, "str").Exec(); err != nil {
+	if err := gsorm.Insert(tx1, "table1", "column1", "column2").Values(10, "str").Exec(); err != nil {
 		t.Errorf("Error was occurred: %+v", err)
 		return
 	}
 	model1 := new([]int)
-	if err := mgorm.Select(tx1, "column1").From("table1").Query(model1); err != nil {
+	if err := gsorm.Select(tx1, "column1").From("table1").Query(model1); err != nil {
 		t.Errorf("Error was occurred: %+v", err)
 		return
 	}
@@ -86,13 +86,13 @@ func TestMock_TransactionExpectation(t *testing.T) {
 		return
 	}
 
-	if err := mgorm.Insert(tx2, "table2", "column1", "column2").Values(10, "str").Exec(); err != nil {
+	if err := gsorm.Insert(tx2, "table2", "column1", "column2").Values(10, "str").Exec(); err != nil {
 		t.Errorf("Error was occurred: %+v", err)
 		return
 	}
 
 	model2 := new([]string)
-	if err := mgorm.Select(tx2, "column2").From("table2").Query(model2); err != nil {
+	if err := gsorm.Select(tx2, "column2").From("table2").Query(model2); err != nil {
 		t.Errorf("Error was occurred: %+v", err)
 		return
 	}
@@ -228,7 +228,7 @@ func TestMockTx_CompareWith(t *testing.T) {
 			t.Errorf("Error was occurred: %+v", err)
 			return
 		}
-		err = mgorm.Select(tx, "column1").From("table").Query(model)
+		err = gsorm.Select(tx, "column1").From("table").Query(model)
 
 		// Validate if the expected error was occurred.
 		if !failure.Is(err, expectedErr) {
@@ -252,7 +252,7 @@ func TestMockTx_CompareWith(t *testing.T) {
 			t.Errorf("Error was occurred: %+v", err)
 			return
 		}
-		err = mgorm.Select(tx, "column1").From("table").Query(model)
+		err = gsorm.Select(tx, "column1").From("table").Query(model)
 
 		// Validate if the expected error was occurred.
 		if !failure.Is(err, expectedErr) {
@@ -276,7 +276,7 @@ func TestMockTx_CompareWith(t *testing.T) {
 			t.Errorf("Error was occurred: %+v", err)
 			return
 		}
-		err = mgorm.Select(tx, "column1").From("table").Query(model)
+		err = gsorm.Select(tx, "column1").From("table").Query(model)
 
 		// Validate if the expected error was occurred.
 		if !failure.Is(err, expectedErr) {
@@ -298,10 +298,10 @@ func TestMockTx_CompareWith_Fail(t *testing.T) {
 		if err != nil {
 			t.Errorf("error was occurred: %v", err)
 		}
-		mocktx.Expect(mgorm.Insert(nil, "table1", "column1").Values(10))
+		mocktx.Expect(gsorm.Insert(nil, "table1", "column1").Values(10))
 
 		// Actual process.
-		err = mgorm.Insert(mocktx, "table2", "column2").Values(10).Exec()
+		err = gsorm.Insert(mocktx, "table2", "column2").Values(10).Exec()
 
 		// Validate if the expected error was occurred.
 		if !failure.Is(err, expectedErr) {
@@ -320,10 +320,10 @@ func TestMockTx_CompareWith_Fail(t *testing.T) {
 		if err != nil {
 			t.Errorf("error was occurred: %v", err)
 		}
-		mocktx.Expect(mgorm.Insert(nil, "table1", "column1").Values(10))
+		mocktx.Expect(gsorm.Insert(nil, "table1", "column1").Values(10))
 
 		// Actual process.
-		err = mgorm.Insert(mocktx, "table2", "column2").Values(10).Values(100).Exec()
+		err = gsorm.Insert(mocktx, "table2", "column2").Values(10).Values(100).Exec()
 
 		// Validate if the expected error was occurred.
 		if !failure.Is(err, expectedErr) {

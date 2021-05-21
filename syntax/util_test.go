@@ -3,8 +3,8 @@ package syntax_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/syntax"
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
@@ -52,7 +52,7 @@ func TestBuildExpr(t *testing.T) {
 		},
 		{
 			"IN (?)",
-			[]interface{}{mgorm.Select(nil, "*").
+			[]interface{}{gsorm.Select(nil, "*").
 				From("table").
 				Where("lhs = ?", "rhs")},
 			`IN (SELECT * FROM table WHERE lhs = 'rhs')`,

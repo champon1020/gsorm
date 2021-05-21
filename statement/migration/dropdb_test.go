@@ -3,8 +3,8 @@ package migration_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement/migration"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement/migration"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,7 +14,7 @@ func TestDropDB_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.DropDB(nil, "employees").(*migration.DropDBStmt),
+			gsorm.DropDB(nil, "employees").(*migration.DropDBStmt),
 			`DROP DATABASE employees`,
 		},
 	}
@@ -36,7 +36,7 @@ func TestDropDB_RawClause(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.DropDB(nil, "database").RawClause("RAW").(*migration.DropDBStmt),
+			gsorm.DropDB(nil, "database").RawClause("RAW").(*migration.DropDBStmt),
 			`DROP DATABASE database RAW`,
 		},
 	}

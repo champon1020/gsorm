@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/gsorm/internal"
 	"github.com/morikuni/failure"
 )
 

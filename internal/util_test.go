@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/gsorm/internal"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -111,7 +111,7 @@ func TestColumnsAndFields(t *testing.T) {
 
 	type Model2 struct {
 		ID   int
-		Name string `mgorm:"first_name"`
+		Name string `gsorm:"first_name"`
 	}
 
 	testCases := []struct {
@@ -154,7 +154,7 @@ func TestColumnsAndFields(t *testing.T) {
 
 func TestColumnName(t *testing.T) {
 	type Model1 struct {
-		UID int `mgorm:"id"`
+		UID int `gsorm:"id"`
 	}
 	m1 := new(Model1)
 

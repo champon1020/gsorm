@@ -1,8 +1,8 @@
 package idroptable
 
-import "github.com/champon1020/mgorm/interfaces"
+import "github.com/champon1020/gsorm/interfaces"
 
-// Table is interface which is returned by mgorm.DropTable.
+// Table is interface which is returned by gsorm.DropTable.
 type Table interface {
 	RawClause(rs string, v ...interface{}) RawClause
 	interfaces.MigrateCallable

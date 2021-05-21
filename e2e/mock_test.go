@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -15,7 +15,7 @@ func TestSelectAllEmployees(t *testing.T) {
 		Result *[]Employee
 	}{
 		{
-			mgorm.Select(db, "*").From("employees").(*statement.SelectStmt),
+			gsorm.Select(db, "*").From("employees").(*statement.SelectStmt),
 			&[]Employee{
 				{
 					EmpNo:     10001,
@@ -120,7 +120,7 @@ func TestSelectAllSalaries(t *testing.T) {
 		Result *[]Salary
 	}{
 		{
-			mgorm.Select(db, "*").From("salaries").(*statement.SelectStmt),
+			gsorm.Select(db, "*").From("salaries").(*statement.SelectStmt),
 			&[]Salary{
 				{
 					EmpNo:    10001,
@@ -205,7 +205,7 @@ func TestSelectAllTitles(t *testing.T) {
 		Result *[]Title
 	}{
 		{
-			mgorm.Select(db, "*").From("titles").(*statement.SelectStmt),
+			gsorm.Select(db, "*").From("titles").(*statement.SelectStmt),
 			&[]Title{
 				{
 					EmpNo:    10001,

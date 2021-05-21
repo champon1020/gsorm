@@ -3,8 +3,8 @@ package e2e_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -15,7 +15,7 @@ func TestGroupBy(t *testing.T) {
 	}{
 		// SELECT title, COUNT(title) FROM titles GROUP BY title;
 		{
-			mgorm.Select(db, "title", "COUNT(title)").
+			gsorm.Select(db, "title", "COUNT(title)").
 				From("titles").
 				GroupBy("title").(*statement.SelectStmt),
 			[]map[string]interface{}{
@@ -40,7 +40,7 @@ func TestGroupBy(t *testing.T) {
 
 		// SELECT title, COUNT(title) FROM titles GROUP BY title HAVING COUNT(title) != 1;
 		{
-			mgorm.Select(db, "title", "COUNT(title)").
+			gsorm.Select(db, "title", "COUNT(title)").
 				From("titles").
 				GroupBy("title").
 				Having("COUNT(title) != ?", 1).(*statement.SelectStmt),

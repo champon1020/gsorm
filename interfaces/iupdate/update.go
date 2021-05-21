@@ -1,10 +1,10 @@
 package iupdate
 
 import (
-	"github.com/champon1020/mgorm/interfaces"
+	"github.com/champon1020/gsorm/interfaces"
 )
 
-// Stmt is interface which is returned by mgorm.Update.
+// Stmt is interface which is returned by gsorm.Update.
 type Stmt interface {
 	RawClause(rs string, v ...interface{}) RawClause
 	Model(model interface{}, cols ...string) Model

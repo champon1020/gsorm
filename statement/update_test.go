@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/statement"
-	"github.com/champon1020/mgorm/syntax/clause"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/internal"
+	"github.com/champon1020/gsorm/statement"
+	"github.com/champon1020/gsorm/syntax/clause"
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +21,7 @@ func TestUpdateStmt_BuildSQLWithClauses_Fail(t *testing.T) {
 			statement.ErrInvalidClause,
 			func() error {
 				// Prepare for test.
-				s := mgorm.Update(nil, "table").(*statement.UpdateStmt)
+				s := gsorm.Update(nil, "table").(*statement.UpdateStmt)
 				s.ExportedSetCalled(&clause.Join{})
 
 				// Actual build.
@@ -55,7 +55,7 @@ func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 					"id":   1000,
 					"name": "Taro",
 				}
-				s := mgorm.Update(nil, "sample").Model(&model, "id", "first_name").(*statement.UpdateStmt)
+				s := gsorm.Update(nil, "sample").Model(&model, "id", "first_name").(*statement.UpdateStmt)
 
 				// Actual build.
 				var sql internal.SQL
@@ -68,7 +68,7 @@ func TestUpdateStmt_BuildSQLWithModel_Fail(t *testing.T) {
 			func() error {
 				// Prepare for test.
 				model := []int{1000}
-				s := mgorm.Update(nil, "sample").Model(&model, "id", "first_name").(*statement.UpdateStmt)
+				s := gsorm.Update(nil, "sample").Model(&model, "id", "first_name").(*statement.UpdateStmt)
 
 				// Actual build.
 				var sql internal.SQL
@@ -95,13 +95,13 @@ func TestUpdateStmt_CompareStmts(t *testing.T) {
 		ExpectedError failure.StringCode
 	}{
 		{
-			mgorm.Update(nil, "table").Set("col1", 10).(*statement.UpdateStmt),
-			mgorm.Update(nil, "table").Set("col1", 10).Set("col2", 100).(*statement.UpdateStmt),
+			gsorm.Update(nil, "table").Set("col1", 10).(*statement.UpdateStmt),
+			gsorm.Update(nil, "table").Set("col1", 10).Set("col2", 100).(*statement.UpdateStmt),
 			statement.ErrInvalidValue,
 		},
 		{
-			mgorm.Update(nil, "table").Set("col1", 10).(*statement.UpdateStmt),
-			mgorm.Update(nil, "table").Set("col1", 100).(*statement.UpdateStmt),
+			gsorm.Update(nil, "table").Set("col1", 10).(*statement.UpdateStmt),
+			gsorm.Update(nil, "table").Set("col1", 100).(*statement.UpdateStmt),
 			statement.ErrInvalidValue,
 		},
 	}
@@ -124,20 +124,20 @@ func TestUpdateStmt_RawClause(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Update(nil, "table").
+			gsorm.Update(nil, "table").
 				RawClause("RAW").
 				Set("column", "value").(*statement.UpdateStmt),
 			`UPDATE table RAW SET column = 'value'`,
 		},
 		{
-			mgorm.Update(nil, "table").
+			gsorm.Update(nil, "table").
 				Set("column", "value").
 				RawClause("RAW").
 				Set("column2", "value2").(*statement.UpdateStmt),
 			`UPDATE table SET column = 'value' RAW, column2 = 'value2'`,
 		},
 		{
-			mgorm.Update(nil, "table").
+			gsorm.Update(nil, "table").
 				Set("column", "value").
 				RawClause("RAW").
 				Where("column = ?", 10).(*statement.UpdateStmt),
@@ -145,7 +145,7 @@ func TestUpdateStmt_RawClause(t *testing.T) {
 				`RAW WHERE column = 10`,
 		},
 		{
-			mgorm.Update(nil, "table").
+			gsorm.Update(nil, "table").
 				Set("column", "value").
 				Where("column = ?", 10).
 				RawClause("RAW").
@@ -155,7 +155,7 @@ func TestUpdateStmt_RawClause(t *testing.T) {
 				`RAW AND (column = 100)`,
 		},
 		{
-			mgorm.Update(nil, "table").
+			gsorm.Update(nil, "table").
 				Set("column", "value").
 				Where("column = ?", 10).
 				RawClause("RAW").
@@ -165,7 +165,7 @@ func TestUpdateStmt_RawClause(t *testing.T) {
 				`RAW OR (column = 100)`,
 		},
 		{
-			mgorm.Update(nil, "table").
+			gsorm.Update(nil, "table").
 				Set("column", "value").
 				Where("column = ?", 10).
 				And("column = ?", 100).
@@ -175,7 +175,7 @@ func TestUpdateStmt_RawClause(t *testing.T) {
 				`AND (column = 100) RAW`,
 		},
 		{
-			mgorm.Update(nil, "table").
+			gsorm.Update(nil, "table").
 				Set("column", "value").
 				Where("column = ?", 10).
 				Or("column = ?", 100).
@@ -203,12 +203,12 @@ func TestUpdateStmt_Set(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako'`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Set("last_name", "Suzuki").(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako', last_name = 'Suzuki'`,
@@ -232,65 +232,65 @@ func TestUpdateStmt_Where(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = 1001").(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE emp_no = 1001`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE emp_no = 1001`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("first_name = ?", "Taro").(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE first_name = 'Taro'`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE birth_date = '2006-01-02 00:00:00'`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("first_name LIKE ?", "%Taro").(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE first_name LIKE '%Taro'`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no BETWEEN ? AND ?", 1001, 1003).(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE emp_no BETWEEN 1001 AND 1003`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no IN (?)", []int{1001, 1002}).(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE emp_no IN (1001, 1002)`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no IN (?)", [2]int{1001, 1002}).(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE emp_no IN (1001, 1002)`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
-				Where("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).(*statement.UpdateStmt),
+				Where("emp_no IN (?)", gsorm.Select(nil, "emp_no").From("dept_manager")).(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE emp_no IN (SELECT emp_no FROM dept_manager)`,
 		},
@@ -313,7 +313,7 @@ func TestUpdateStmt_And(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				And("emp_no = 1002").(*statement.UpdateStmt),
@@ -322,7 +322,7 @@ func TestUpdateStmt_And(t *testing.T) {
 				`AND (emp_no = 1002)`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				And("emp_no = ?", 1002).(*statement.UpdateStmt),
@@ -331,7 +331,7 @@ func TestUpdateStmt_And(t *testing.T) {
 				`AND (emp_no = 1002)`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				And("first_name = ? OR first_name = ?", "Taro", "Jiro").(*statement.UpdateStmt),
@@ -340,7 +340,7 @@ func TestUpdateStmt_And(t *testing.T) {
 				`AND (first_name = 'Taro' OR first_name = 'Jiro')`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				And("emp_no = ?", 1002).
@@ -351,7 +351,7 @@ func TestUpdateStmt_And(t *testing.T) {
 				`AND (emp_no = 1003)`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*statement.UpdateStmt),
@@ -360,7 +360,7 @@ func TestUpdateStmt_And(t *testing.T) {
 				`AND (birth_date = '2006-01-02 00:00:00')`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				And("first_name LIKE ?", "%Taro").(*statement.UpdateStmt),
@@ -369,7 +369,7 @@ func TestUpdateStmt_And(t *testing.T) {
 				`AND (first_name LIKE '%Taro')`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				And("emp_no BETWEEN ? AND ?", 1001, 1003).(*statement.UpdateStmt),
@@ -378,7 +378,7 @@ func TestUpdateStmt_And(t *testing.T) {
 				`AND (emp_no BETWEEN 1001 AND 1003)`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				And("emp_no IN (?)", []int{1001, 1002}).(*statement.UpdateStmt),
@@ -387,7 +387,7 @@ func TestUpdateStmt_And(t *testing.T) {
 				`AND (emp_no IN (1001, 1002))`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				And("emp_no IN (?)", [2]int{1001, 1002}).(*statement.UpdateStmt),
@@ -396,10 +396,10 @@ func TestUpdateStmt_And(t *testing.T) {
 				`AND (emp_no IN (1001, 1002))`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
-				And("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).(*statement.UpdateStmt),
+				And("emp_no IN (?)", gsorm.Select(nil, "emp_no").From("dept_manager")).(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE emp_no = 1001 ` +
 				`AND (emp_no IN (SELECT emp_no FROM dept_manager))`,
@@ -423,7 +423,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				Or("emp_no = 1002").(*statement.UpdateStmt),
@@ -432,7 +432,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 				`OR (emp_no = 1002)`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				Or("emp_no = ?", 1002).(*statement.UpdateStmt),
@@ -441,7 +441,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 				`OR (emp_no = 1002)`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				Or("first_name = ? OR first_name = ?", "Taro", "Jiro").(*statement.UpdateStmt),
@@ -450,7 +450,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 				`OR (first_name = 'Taro' OR first_name = 'Jiro')`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				Or("emp_no = ?", 1002).
@@ -461,7 +461,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 				`OR (emp_no = 1003)`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				Or("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).(*statement.UpdateStmt),
@@ -470,7 +470,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 				`OR (birth_date = '2006-01-02 00:00:00')`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				Or("first_name LIKE ?", "%Taro").(*statement.UpdateStmt),
@@ -479,7 +479,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 				`OR (first_name LIKE '%Taro')`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				Or("emp_no BETWEEN ? AND ?", 1001, 1003).(*statement.UpdateStmt),
@@ -488,7 +488,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 				`OR (emp_no BETWEEN 1001 AND 1003)`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				Or("emp_no IN (?)", []int{1001, 1002}).(*statement.UpdateStmt),
@@ -497,7 +497,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 				`OR (emp_no IN (1001, 1002))`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
 				Or("emp_no IN (?)", [2]int{1001, 1002}).(*statement.UpdateStmt),
@@ -506,10 +506,10 @@ func TestUpdateStmt_Or(t *testing.T) {
 				`OR (emp_no IN (1001, 1002))`,
 		},
 		{
-			mgorm.Update(nil, "employees").
+			gsorm.Update(nil, "employees").
 				Set("first_name", "Hanako").
 				Where("emp_no = ?", 1001).
-				Or("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).(*statement.UpdateStmt),
+				Or("emp_no IN (?)", gsorm.Select(nil, "emp_no").From("dept_manager")).(*statement.UpdateStmt),
 			`UPDATE employees SET first_name = 'Hanako' ` +
 				`WHERE emp_no = 1001 ` +
 				`OR (emp_no IN (SELECT emp_no FROM dept_manager))`,
@@ -529,7 +529,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 
 func TestUpdateStmt_Model(t *testing.T) {
 	type Employee struct {
-		ID        int `mgorm:"emp_no"`
+		ID        int `gsorm:"emp_no"`
 		FirstName string
 	}
 	structModel := Employee{ID: 1001, FirstName: "Taro"}
@@ -540,11 +540,11 @@ func TestUpdateStmt_Model(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Update(nil, "employees").Model(&structModel, "emp_no", "first_name").(*statement.UpdateStmt),
+			gsorm.Update(nil, "employees").Model(&structModel, "emp_no", "first_name").(*statement.UpdateStmt),
 			`UPDATE employees SET emp_no = 1001, first_name = 'Taro'`,
 		},
 		{
-			mgorm.Update(nil, "employees").Model(&mapModel, "emp_no", "first_name").(*statement.UpdateStmt),
+			gsorm.Update(nil, "employees").Model(&mapModel, "emp_no", "first_name").(*statement.UpdateStmt),
 			`UPDATE employees SET emp_no = 1001, first_name = 'Taro'`,
 		},
 	}

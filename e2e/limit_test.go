@@ -3,8 +3,8 @@ package e2e_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -15,7 +15,7 @@ func TestSelectLimit(t *testing.T) {
 	}{
 		// SELECT emp_no FROM employees LIMIT 5;
 		{
-			mgorm.Select(db, "emp_no").
+			gsorm.Select(db, "emp_no").
 				From("employees").
 				Limit(5).(*statement.SelectStmt),
 			&[]Employee{
@@ -29,7 +29,7 @@ func TestSelectLimit(t *testing.T) {
 
 		// SELECT emp_no FROM employees LIMIT 5 OFFSET 3;
 		{
-			mgorm.Select(db, "emp_no").
+			gsorm.Select(db, "emp_no").
 				From("employees").
 				Limit(5).
 				Offset(3).(*statement.SelectStmt),

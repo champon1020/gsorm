@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/champon1020/mgorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/morikuni/failure"
 )
 
@@ -81,14 +81,14 @@ func (m *mockDB) Begin() (domain.MockTx, error) {
 	if tx == nil || expected == nil {
 		err := failure.New(errInvalidMockExpectation,
 			failure.Context{"expected": "none"},
-			failure.Message("mgorm.mockDB.Begin is not expected"))
+			failure.Message("gsorm.mockDB.Begin is not expected"))
 		return nil, err
 	}
 	_, ok := expected.(*expectedBegin)
 	if !ok {
 		err := failure.New(errInvalidMockExpectation,
 			failure.Context{"expected": expected.String()},
-			failure.Message("mgorm.mockDB.Begin is not expected"))
+			failure.Message("gsorm.mockDB.Begin is not expected"))
 		return nil, err
 	}
 	return tx, nil

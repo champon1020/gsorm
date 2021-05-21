@@ -3,8 +3,8 @@ package migration_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement/migration"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement/migration"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,7 +14,7 @@ func TestDropTable_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.DropTable(nil, "employees").(*migration.DropTableStmt),
+			gsorm.DropTable(nil, "employees").(*migration.DropTableStmt),
 			`DROP TABLE employees`,
 		},
 	}
@@ -36,7 +36,7 @@ func TestDropTable_RawClause(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.DropTable(nil, "table").RawClause("RAW").(*migration.DropTableStmt),
+			gsorm.DropTable(nil, "table").RawClause("RAW").(*migration.DropTableStmt),
 			`DROP TABLE table RAW`,
 		},
 	}

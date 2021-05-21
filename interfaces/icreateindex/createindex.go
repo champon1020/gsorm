@@ -1,8 +1,8 @@
 package icreateindex
 
-import "github.com/champon1020/mgorm/interfaces"
+import "github.com/champon1020/gsorm/interfaces"
 
-// Index is interface which is returned by mgorm.CreateIndex.
+// Index is interface which is returned by gsorm.CreateIndex.
 type Index interface {
 	RawClause(rs string, v ...interface{}) RawClause
 	On(string, ...string) On

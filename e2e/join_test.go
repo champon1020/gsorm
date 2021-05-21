@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -23,7 +23,7 @@ func TestJoin(t *testing.T) {
 		// INNER JOIN titles AS t ON e.emp_no = t.emp_no
 		// LIMIT 5;
 		{
-			mgorm.Select(db, "e.emp_no", "t.title").
+			gsorm.Select(db, "e.emp_no", "t.title").
 				From("employees AS e").
 				Join("titles AS t").
 				On("e.emp_no = t.emp_no").
@@ -47,7 +47,7 @@ func TestJoin(t *testing.T) {
 		// LEFT JOIN titles AS t ON e.emp_no = t.emp_no
 		// ORDER BY e.emp_no DESC LIMIT 5;
 		{
-			mgorm.Select(db, "e.emp_no", "t.title").
+			gsorm.Select(db, "e.emp_no", "t.title").
 				From("employees AS e").
 				LeftJoin("titles AS t").
 				On("e.emp_no = t.emp_no").
@@ -66,7 +66,7 @@ func TestJoin(t *testing.T) {
 		// RIGHT JOIN titles AS t ON e.emp_no = t.emp_no
 		// ORDER BY e.emp_no DESC LIMIT 5;
 		{
-			mgorm.Select(db, "t.title", "e.emp_no").
+			gsorm.Select(db, "t.title", "e.emp_no").
 				From("titles AS t").
 				RightJoin("employees AS e").
 				On("t.emp_no = e.emp_no").

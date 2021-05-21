@@ -3,8 +3,8 @@ package migration_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/statement/migration"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/statement/migration"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,7 +14,7 @@ func TestCreateDB_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateDB(nil, "employees").(*migration.CreateDBStmt),
+			gsorm.CreateDB(nil, "employees").(*migration.CreateDBStmt),
 			`CREATE DATABASE employees`,
 		},
 	}
@@ -36,7 +36,7 @@ func TestCreateDB_RawClause(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateDB(nil, "database").RawClause("RAW").(*migration.CreateDBStmt),
+			gsorm.CreateDB(nil, "database").RawClause("RAW").(*migration.CreateDBStmt),
 			`CREATE DATABASE database RAW`,
 		},
 	}

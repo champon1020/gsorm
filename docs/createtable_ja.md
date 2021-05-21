@@ -1,11 +1,11 @@
 # CreateTable
-`mgorm.CreateTable`はCREATE TABLE句を呼び出します．
+`gsorm.CreateTable`はCREATE TABLE句を呼び出します．
 
-引数にはデータベースのコネクション(`mgorm.Conn`)，テーブル名を指定します．
+引数にはデータベースのコネクション(`gsorm.Conn`)，テーブル名を指定します．
 
 #### 例
 ```go
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
     Column("birth_date", "DATE").NotNull().
     Column("first_name", "VARCHAR(14)").NotNull().
@@ -24,32 +24,32 @@ err := mgorm.CreateTable(db, "employees").
 // );
 
 type Employee struct {
-    ID          int         `mgorm:"emp_no typ=INT notnull=t"`
-    BirthDate   time.Time   `mgorm:"typ=DATE notnull=t"`
-    FirstName   string      `mgorm:"typ=VARCHAR(16) notnull=t"`
-    LastName    string      `mgorm:"typ=VARCHAR(14) notnull=t"`
-    Gender      string      `mgorm:"typ=ENUM('M', 'F') notnull=t"`
-    HireDate    string      `mgorm:"typ=DATE notnull=t"`
+    ID          int         `gsorm:"emp_no typ=INT notnull=t"`
+    BirthDate   time.Time   `gsorm:"typ=DATE notnull=t"`
+    FirstName   string      `gsorm:"typ=VARCHAR(16) notnull=t"`
+    LastName    string      `gsorm:"typ=VARCHAR(14) notnull=t"`
+    Gender      string      `gsorm:"typ=ENUM('M', 'F') notnull=t"`
+    HireDate    string      `gsorm:"typ=DATE notnull=t"`
 }
 
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Model(&Employee{}).Migrate()
 // Same as the previous example.
 ```
 
 
 # Methods
-`mgorm.CreateTable`で使用できるメソッドを以下に示します．
-- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
-- [Column](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#column)
-  - [NotNull](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#notnull)
-  - [Default](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#default)
-- [Cons](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#cons)
-  - [Unique](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#unique)
-  - [Primary](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#primary)
-  - [Foreign](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#foreign)
-    - [Ref](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#ref)
-- [Model](https://github.com/champon1020/mgorm/tree/main/docs/createtable_ja.md#model)
+`gsorm.CreateTable`で使用できるメソッドを以下に示します．
+- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
+- [Column](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#column)
+  - [NotNull](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#notnull)
+  - [Default](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#default)
+- [Cons](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#cons)
+  - [Unique](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#unique)
+  - [Primary](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#primary)
+  - [Foreign](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#foreign)
+    - [Ref](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#ref)
+- [Model](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#model)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 但し，例外として`RawClause`は任意で呼び出すことができます．
@@ -60,7 +60,7 @@ err := mgorm.CreateTable(db, "employees").
 [] option (0 to 1 times)
 {} repetition (0 to n times)
 
-Error = mgorm.CreateTable ColumnStmt { ColumnStmt } { ConstraintStmt } Migrate
+Error = gsorm.CreateTable ColumnStmt { ColumnStmt } { ConstraintStmt } Migrate
 
 ColumnStmt = Column [ NotNull ] [ Default ]
 ConstraintStmt = Cons ( Unique | Primary | Foreign Ref )
@@ -70,20 +70,20 @@ ConstraintStmt = Cons ( Unique | Primary | Foreign Ref )
 
 ```go
 // NG
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Cons("PK_employees").Primary("emp_no").
     Column("emp_no", "INT").NotNull().Migrate()
 
 // NG
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     NotNull().Column("emp_no", "INT").Migrate()
 
 // NG
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().Primary("PK_employees").Migrate()
 
 // NG
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
     Cons("PK_employees").Primary("emp_no").
     Column("birth_date", "DATE").NotNull().Migrate()
@@ -99,13 +99,13 @@ err := mgorm.CreateTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").Migrate()
 // CREATE TABLE employees (
 //      emp_no INT
 // );
 
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").
     Column("birth_date", "DATE").Migrate()
 // CREATE TABLE employees (
@@ -121,13 +121,13 @@ err := mgorm.CreateTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().Migrate()
 // CREATE TABLE employees (
 //      emp_no INT NOT NULL
 // );
 
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
     Column("birth_date", "DATE").Migrate()
 // CREATE TABLE employees (
@@ -150,25 +150,25 @@ err := mgorm.CreateTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").Default(1).Migrate()
 // CREATE TABLE employees (
 //      emp_no INT DEFAULT 1
 // );
 
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().Default(1).Migrate()
 // CREATE TABLE employees (
 //      emp_no INT NOT NULL DEFAULT 1
 // );
 
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").Default(1).NotNull().Migrate()
 // CREATE TABLE employees (
 //      emp_no INT DEFAULT 1 NOT NULL
 // );
 
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().Default(1).
     Column("birth_date", "DATE").NotNull().Migrate()
 // CREATE TABLE employees (
@@ -189,7 +189,7 @@ err := mgorm.CreateTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
     Cons("UC_emp_no").Unique("emp_no").Migrate()
 // CREATE TABLE employees (
@@ -197,7 +197,7 @@ err := mgorm.CreateTable(db, "employees").
 //      CONSTRAINT UC_emp_no UNIQUE (emp_no)
 // );
 
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
     Cons("PK_employees").Primary("emp_no").Migrate()
 // CREATE TABLE employees (
@@ -205,7 +205,7 @@ err := mgorm.CreateTable(db, "employees").
 //      CONSTRAINT PK_employees PRIMARY KEY (emp_no)
 // );
 
-err := mgorm.CreateTable(db, "dept_emp").
+err := gsorm.CreateTable(db, "dept_emp").
     Column("emp_no", "INT").NotNull().
     Cons("FK_dept_emp_emp_no").Foreign("emp_no").Ref("employees", "emp_no").Migrate()
 // CREATE TABLE employees (
@@ -224,7 +224,7 @@ err := mgorm.CreateTable(db, "dept_emp").
 
 #### 例
 ```go
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
     Cons("UC_emp_no").Unique("emp_no").Migrate()
 // CREATE TABLE employees (
@@ -232,7 +232,7 @@ err := mgorm.CreateTable(db, "employees").
 //      CONSTRAINT UC_emp_no UNIQUE (emp_no)
 // );
 
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
     Column("first_name", "VARCHAR(14)").NotNull().
     Cons("UC_emp_no_first_name").Unique("emp_no", "first_name").Migrate()
@@ -252,7 +252,7 @@ err := mgorm.CreateTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
     Cons("PK_employees").Primary("emp_no").Migrate()
 // CREATE TABLE employees (
@@ -260,7 +260,7 @@ err := mgorm.CreateTable(db, "employees").
 //      CONSTRAINT PK_employees PRIMARY KEY (emp_no)
 // );
 
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
     Column("first_name", "VARCHAR(14)").NotNull().
     Cons("PK_employees").Primary("emp_no", "first_name").Migrate()
@@ -282,7 +282,7 @@ err := mgorm.CreateTable(db, "employees").
 
 #### 例
 ```go
-err := mgorm.CreateTable(db, "dept_emp").
+err := gsorm.CreateTable(db, "dept_emp").
     Column("emp_no", "INT").NotNull().
     Cons("FK_dept_emp").Foreign("emp_no").Ref("employees(emp_no)").Migrate()
 // CREATE TABLE employees (
@@ -290,7 +290,7 @@ err := mgorm.CreateTable(db, "dept_emp").
 //      CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no) REFERENCES employees(emp_no)
 // );
 
-err := mgorm.CreateTable(db, "dept_emp").
+err := gsorm.CreateTable(db, "dept_emp").
     Column("emp_no", "INT").NotNull().
     Column("first_name", "VARCHAR(14)").NotNull().
     Cons("FK_dept_emp").Foreign("emp_no", "first_name").Ref("employees", "emp_no", "first_name").Migrate()
@@ -310,7 +310,7 @@ err := mgorm.CreateTable(db, "dept_emp").
 
 #### 例
 ```go
-err := mgorm.CreateTable(db, "dept_emp").
+err := gsorm.CreateTable(db, "dept_emp").
     Column("emp_no", "INT").NotNull().
     Cons("FK_dept_emp").Foreign("emp_no").Ref("employees(emp_no)").Migrate()
 // CREATE TABLE employees (
@@ -318,7 +318,7 @@ err := mgorm.CreateTable(db, "dept_emp").
 //      CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no) REFERENCES employees (emp_no)
 // );
 
-err := mgorm.CreateTable(db, "dept_emp").
+err := gsorm.CreateTable(db, "dept_emp").
     Column("emp_no", "INT").NotNull().
     Column("first_name", "VARCHAR(14)").NotNull().
     Cons("FK_dept_emp").Foreign("emp_no", "first_name").Ref("employees", "emp_no", "first_name").Migrate()
@@ -337,20 +337,20 @@ err := mgorm.CreateTable(db, "dept_emp").
 構造体もしくは構造体のスライスをマッピングする際，対象のカラム名はフィールド名もしくはフィールドタグから推定されます．
 また，型やNULL，デフォルト値，制約などはフィールドタグから推定されます．
 
-Modelについての詳細は[Model](https://github.com/champon1020/mgorm/tree/main/docs/model_ja.md)に記載されています．
+Modelについての詳細は[Model](https://github.com/champon1020/gsorm/tree/main/docs/model_ja.md)に記載されています．
 
 #### 例
 ```go
 type Employee struct {
-    ID          int         `mgorm:"emp_no typ=INT notnull=t"`
-    BirthDate   time.Time   `mgorm:"typ=DATE notnull=t"`
-    FirstName   string      `mgorm:"typ=VARCHAR(16) notnull=t"`
-    LastName    string      `mgorm:"typ=VARCHAR(14) notnull=t"`
-    Gender      string      `mgorm:"typ=ENUM('M', 'F') notnull=t"`
-    HireDate    string      `mgorm:"typ=DATE notnull=t"`
+    ID          int         `gsorm:"emp_no typ=INT notnull=t"`
+    BirthDate   time.Time   `gsorm:"typ=DATE notnull=t"`
+    FirstName   string      `gsorm:"typ=VARCHAR(16) notnull=t"`
+    LastName    string      `gsorm:"typ=VARCHAR(14) notnull=t"`
+    Gender      string      `gsorm:"typ=ENUM('M', 'F') notnull=t"`
+    HireDate    string      `gsorm:"typ=DATE notnull=t"`
 }
 
-err := mgorm.CreateTable(db, "employees").
+err := gsorm.CreateTable(db, "employees").
     Model(&Employee{}).Migrate()
 // CREATE TABLE employees (
 //      emp_no      INT             NOT NULL,

@@ -1,23 +1,23 @@
 # Delete
-`mgorm.Delete`はDELETE句を呼び出します．
+`gsorm.Delete`はDELETE句を呼び出します．
 
-引数にはデータベースのコネクション(`mgorm.Conn`)を指定します．
+引数にはデータベースのコネクション(`gsorm.Conn`)を指定します．
 
 #### 例
 ```go
-err := mgorm.Delete(db).From("employees").Exec()
+err := gsorm.Delete(db).From("employees").Exec()
 // DELETE FROM employees;
 ```
 
 
 # Methods
-`mgorm.Delete`に使用できるメソッドは以下です．
+`gsorm.Delete`に使用できるメソッドは以下です．
 
-- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
-- [From](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#from)
-- [Where](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#where)
-- [And](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#and)
-- [Or](https://github.com/champon1020/mgorm/tree/main/docs/delete_ja.md#or)
+- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
+- [From](https://github.com/champon1020/gsorm/tree/main/docs/delete_ja.md#from)
+- [Where](https://github.com/champon1020/gsorm/tree/main/docs/delete_ja.md#where)
+- [And](https://github.com/champon1020/gsorm/tree/main/docs/delete_ja.md#and)
+- [Or](https://github.com/champon1020/gsorm/tree/main/docs/delete_ja.md#or)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 但し，例外として`RawClause`は任意で呼び出すことができます．
@@ -28,7 +28,7 @@ err := mgorm.Delete(db).From("employees").Exec()
 [] option (0 to 1 times)
 {} repetition (0 to n times)
 
-mgorm.Delete
+gsorm.Delete
     .From
     [.Where [{.And} | {.Or}]]
     .Exec
@@ -38,12 +38,12 @@ mgorm.Delete
 
 ```go
 // NG
-err := mgorm.Delete(db).
+err := gsorm.Delete(db).
     Where("emp_no = ?", 1001).
     From("employees").Exec()
 
 // NG
-err := mgorm.Delete(db).
+err := gsorm.Delete(db).
     From("employees").
     Where("emp_no = ?", 1001).
     Where("emp_no = ?", 1002).Exec()
@@ -58,13 +58,13 @@ err := mgorm.Delete(db).
 
 #### 例
 ```go
-err := mgorm.Delete(db).From("employees").Exec()
+err := gsorm.Delete(db).From("employees").Exec()
 // DELETE FROM employees;
 
-err := mgorm.Delete(db).From("employees", "dept_emp").Exec()
+err := gsorm.Delete(db).From("employees", "dept_emp").Exec()
 // DELETE FROM employees, dept_emp;
 
-err := mgorm.Delete(db).From("employees AS e").Exec()
+err := gsorm.Delete(db).From("employees AS e").Exec()
 // DELETE FROM employees AS e;
 ```
 
@@ -76,53 +76,53 @@ err := mgorm.Delete(db).From("employees AS e").Exec()
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
 - 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
+- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない値はそのまま展開される．
 
 #### 例
 ```go
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = 1001").Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001;
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001;
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("first_name = ?", "Taro").Exec()
 // DELETE FROM employees
 //      WHERE first_name = 'Taro';
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Exec()
 // DELETE FROM employees
 //      WHERE birth_date = '2006-01-02 00:00:00';
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("first_name LIKE ?", "%Taro").Exec()
 // DELETE FROM employees
 //      WHERE first_name LIKE '%Taro';
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no BETWEEN ? AND ?", 1001, 1003).Exec()
 // DELETE FROM employees
 //      WHERE emp_no BETWEEN 1001 AND 1003;
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no IN (?)", []int{1001, 1002}).Exec()
 // DELETE FROM employees
 //      WHERE emp_no IN (1001, 1002);
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no IN (?)", [2]int{1001, 1002}).Exec()
 // DELETE FROM employees
 //      WHERE emp_no IN (1001, 1002);
 
-err := mgorm.Delete(db).From("employees").
-    Where("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Exec()
+err := gsorm.Delete(db).From("employees").
+    Where("emp_no IN (?)", gsorm.Select(nil, "emp_no").From("dept_manager")).Exec()
 // DELETE FROM employees
 //      WHERE emp_no IN (SELECT emp_no FROM dept_manager);
 ```
@@ -136,35 +136,35 @@ err := mgorm.Delete(db).From("employees").
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
 - 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
+- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない値はそのまま展開される．
 
 `And`は複数回呼び出すことができます．
 
 #### 例
 ```go
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no = 1002").Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no = 1002);
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no = ?", 1002).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no = 1002);
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     And("first_name = ? OR first_name = ?", "Taro", "Jiro").Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      AND (first_name = 'Taro' OR first_name = 'Jiro');
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no = ?", 1002).
     And("emp_no = ?", 1003).Exec()
@@ -173,44 +173,44 @@ err := mgorm.Delete(db).From("employees").
 //      AND (emp_no = 1002);
 //      AND (emp_no = 1003);
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     And("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      AND (birth_date = '2006-01-02 00:00:00');
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     And("first_name LIKE ?", "%Taro").Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      AND (first_name LIKE '%Taro');
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no BETWEEN ? AND ?", 1001, 1003).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no BETWEEN 1001 AND 1003);
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no IN (?)", []int{1001, 1002}).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no IN (1001, 1002));
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     And("emp_no IN (?)", [2]int{1001, 1002}).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no IN (1001, 1002));
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
-    And("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Exec()
+    And("emp_no IN (?)", gsorm.Select(nil, "emp_no").From("dept_manager")).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      AND (emp_no IN (SELECT emp_no FROM dept_manager));
@@ -225,35 +225,35 @@ err := mgorm.Delete(db).From("employees").
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
 - 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*mgorm.SelectStmt`型の場合，SELECT文が展開されます．
+- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
 - 以上の条件に該当しない値はそのまま展開される．
 
 `Or`は複数回呼び出すことができます．
 
 #### 例
 ```go
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no = 1002").Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002);
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no = ?", 1002).Exec()
 // DELETE FROM employees
 //  WHERE emp_no = 1001
 //  OR (emp_no = 1002);
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no = ? AND first_name = ?", 1002, "Taro").Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no = 1002 AND first_name = 'Taro');
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no = ?", 1002).
     Or("emp_no = ?", 1003).Exec()
@@ -262,44 +262,44 @@ err := mgorm.Delete(db).From("employees").
 //      OR (emp_no = 1002)
 //      OR (emp_no = 1003);
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("birth_date = ?", time.Date(2006, time.January, 2, 0, 0, 0, 0, time.UTC)).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      OR (birth_date = '2006-01-02 00:00:00');
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("first_name LIKE ?", "%Taro").Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      OR (first_name LIKE '%Taro');
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no BETWEEN ? AND ?", 1001, 1003).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no BETWEEN 1001 AND 1003);
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no IN (?)", []int{1001, 1002}).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no IN (1001, 1002));
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
     Or("emp_no IN (?)", [2]int{1001, 1002}).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no IN (1001, 1002));
 
-err := mgorm.Delete(db).From("employees").
+err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
-    Or("emp_no IN (?)", mgorm.Select(nil, "emp_no").From("dept_manager")).Exec()
+    Or("emp_no IN (?)", gsorm.Select(nil, "emp_no").From("dept_manager")).Exec()
 // DELETE FROM employees
 //      WHERE emp_no = 1001
 //      OR (emp_no IN (SELECT emp_no FROM dept_manager));

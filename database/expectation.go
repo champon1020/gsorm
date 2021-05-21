@@ -1,6 +1,6 @@
 package database
 
-import "github.com/champon1020/mgorm/interfaces/domain"
+import "github.com/champon1020/gsorm/interfaces/domain"
 
 // expectation can be implemented by expected operation.
 type expectation interface {
@@ -21,19 +21,19 @@ func (e *expectedQuery) String() string {
 type expectedBegin struct{}
 
 func (e *expectedBegin) String() string {
-	return "mgorm.MockDB.Begin"
+	return "gsorm.MockDB.Begin"
 }
 
 // expectedCommit is expectation of transaction commit.
 type expectedCommit struct{}
 
 func (e *expectedCommit) String() string {
-	return "mgorm.MockTx.Commit"
+	return "gsorm.MockTx.Commit"
 }
 
 // expectedRollback is expectation of transaction rollback.
 type expectedRollback struct{}
 
 func (e *expectedRollback) String() string {
-	return "mgorm.MockTx.Rollback"
+	return "gsorm.MockTx.Rollback"
 }

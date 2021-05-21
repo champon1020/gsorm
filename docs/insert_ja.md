@@ -1,19 +1,19 @@
 # Insert
-`mgorm.Insert`はINSERT句を呼び出します．
+`gsorm.Insert`はINSERT句を呼び出します．
 
-引数にはデータベースのコネクション(`mgorm.Conn`)，テーブル名，カラム名を指定します．
+引数にはデータベースのコネクション(`gsorm.Conn`)，テーブル名，カラム名を指定します．
 
 カラム名は複数指定することができます．
 カラム名は空でも問題ありません．
 
 #### 例
 ```go
-err := mgorm.Insert(db, "employees").
+err := gsorm.Insert(db, "employees").
     Values(1001, "1996-03-09", "Taro", "Sato", "M", "2020-04-01").Exec()
 // INSERT INTO employees
 //      VALUES (1001, '1996-03-09', 'Taro', 'Sato', 'M', '2020-04-01');
 
-err := mgorm.Insert(db, "employees", "emp_no", "first_name").
+err := gsorm.Insert(db, "employees", "emp_no", "first_name").
     Values(1001, "Taro").Exec()
 // INSERT INTO employees (emp_no, first_name)
 //      VALUES (1001, 'Taro');
@@ -21,12 +21,12 @@ err := mgorm.Insert(db, "employees", "emp_no", "first_name").
 
 
 # Methods
-`mgorm.Insert`に使用できるメソッドは以下です．
+`gsorm.Insert`に使用できるメソッドは以下です．
 
-- [RawClause](https://github.com/champon1020/mgorm/tree/main/docs/raw_ja.md#rawclause)
-- [Values](https://github.com/champon1020/mgorm/tree/main/docs/insert_ja.md#values)
-- [Select](https://github.com/champon1020/mgorm/tree/main/docs/insert_ja.md#select)
-- [Model](https://github.com/champon1020/mgorm/tree/main/docs/insert_ja.md#model)
+- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
+- [Values](https://github.com/champon1020/gsorm/tree/main/docs/insert_ja.md#values)
+- [Select](https://github.com/champon1020/gsorm/tree/main/docs/insert_ja.md#select)
+- [Model](https://github.com/champon1020/gsorm/tree/main/docs/insert_ja.md#model)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 但し，例外として`RawClause`は任意で呼び出すことができます．
@@ -37,7 +37,7 @@ err := mgorm.Insert(db, "employees", "emp_no", "first_name").
 [] option (0 to 1 times)
 {} repetition (0 to n times)
 
-mgorm.Insert
+gsorm.Insert
     (.Values {.Values}) | .Select | .Model
     .Exec
 ```
@@ -46,10 +46,10 @@ mgorm.Insert
 
 ```go
 // NG
-err := mgorm.Insert(db).Exec()
+err := gsorm.Insert(db).Exec()
 
 // NG
-err := mgorm.Insert(db).
+err := gsorm.Insert(db).
     Model(model1).
     Model(model2).Exec()
 ```
@@ -64,12 +64,12 @@ err := mgorm.Insert(db).
 
 #### 例
 ```go
-err := mgorm.Insert(db, "employees", "emp_no", "first_name").
+err := gsorm.Insert(db, "employees", "emp_no", "first_name").
     Values(1001, "Taro").Exec()
 // INSERT INTO employees (emp_no, first_name)
 //      VALUES (1001, 'Taro');
 
-err := mgorm.Insert(db, "employees", "emp_no", "first_name").
+err := gsorm.Insert(db, "employees", "emp_no", "first_name").
     Values(1001, "Taro").
     Values(1002, "Jiro").Exec()
 // INSERT INTO employees (emp_no, first_name)
@@ -80,12 +80,12 @@ err := mgorm.Insert(db, "employees", "emp_no", "first_name").
 ## Select
 `Select`はINSERT INTO ... SELECT構文を呼び出します．
 
-引数には`mgorm.SelectStmt`を指定します．
+引数には`gsorm.SelectStmt`を指定します．
 
 #### 例
 ```go
-err := mgorm.Insert(db, "dept_manager").
-    Select(mgorm.Select(nil).From("dept_emp")).Exec()
+err := gsorm.Insert(db, "dept_manager").
+    Select(gsorm.Select(nil).From("dept_emp")).Exec()
 // INSERT INTO dept_manager
 //      SELECT * FROM dept_emp;
 ```
@@ -98,18 +98,18 @@ err := mgorm.Insert(db, "dept_manager").
 
 構造体もしくは構造体のスライスをマッピングする際，対象のカラム名はフィールド名もしくはフィールドタグから推定されます．
 
-Modelについての詳細は[Model](https://github.com/champon1020/mgorm/blob/main/docs/model_ja.md)に記載されています．
+Modelについての詳細は[Model](https://github.com/champon1020/gsorm/blob/main/docs/model_ja.md)に記載されています．
 
 #### 例
 ```go
 type Employee struct {
-    ID        int    `mgorm:"emp_no"`
+    ID        int    `gsorm:"emp_no"`
     FirstName string
 }
 
 employees := []Employee{{ID: 1001, FirstName: "Taro"}, {ID: 1002, FirstName: "Jiro"}}
 
-err := mgorm.Insert(db, "employees", "emp_no", "first_name").
+err := gsorm.Insert(db, "employees", "emp_no", "first_name").
     Model(&employees).Exec()
 // INSERT INTO employees (emp_no, first_name)
 //  VALUES (1001, 'Taro'), (1002, 'Jiro');

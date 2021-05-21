@@ -3,9 +3,9 @@ package statement
 import (
 	"reflect"
 
-	"github.com/champon1020/mgorm/interfaces/domain"
-	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/internal"
+	"github.com/champon1020/gsorm/syntax"
 	"github.com/morikuni/failure"
 )
 
@@ -43,14 +43,14 @@ func (r *RawStmt) CompareWith(s domain.Stmt) error {
 }
 
 // Query executes SQL statement with mapping to model.
-// If type of (*SelectStmt).conn is mgorm.MockDB, compare statements between called and expected.
+// If type of (*SelectStmt).conn is gsorm.MockDB, compare statements between called and expected.
 // Then, it maps expected values to model.
 func (r *RawStmt) Query(model interface{}) error {
 	return r.query(r.buildSQL, r, model)
 }
 
 // Exec executed SQL statement without mapping to model.
-// If type of conn is mgorm.MockDB, compare statements between called and expected.
+// If type of conn is gsorm.MockDB, compare statements between called and expected.
 func (r *RawStmt) Exec() error {
 	return r.exec(r.buildSQL, r)
 }

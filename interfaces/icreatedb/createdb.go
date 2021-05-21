@@ -1,8 +1,8 @@
 package icreatedb
 
-import "github.com/champon1020/mgorm/interfaces"
+import "github.com/champon1020/gsorm/interfaces"
 
-// DB is interface which is returned by mgorm.CreateDB.
+// DB is interface which is returned by gsorm.CreateDB.
 type DB interface {
 	RawClause(rs string, v ...interface{}) RawClause
 	interfaces.MigrateCallable

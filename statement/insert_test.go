@@ -3,10 +3,10 @@ package statement_test
 import (
 	"testing"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/statement"
-	"github.com/champon1020/mgorm/syntax/clause"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/internal"
+	"github.com/champon1020/gsorm/statement"
+	"github.com/champon1020/gsorm/syntax/clause"
 	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
@@ -20,7 +20,7 @@ func TestInsertStmt_BuildSQLWithClauses_Fail(t *testing.T) {
 			statement.ErrInvalidClause,
 			func() error {
 				// Prepare for test.
-				s := mgorm.Insert(nil, "", "").(*statement.InsertStmt)
+				s := gsorm.Insert(nil, "", "").(*statement.InsertStmt)
 				s.ExportedSetCalled(&clause.Set{})
 
 				// Actual build.
@@ -50,7 +50,7 @@ func TestInsertStmt_BuildSQLWithModel_Fail(t *testing.T) {
 			statement.ErrFailedParse,
 			func() error {
 				// Prepare for test.
-				s := mgorm.Insert(nil, "", "").Model(1000).(*statement.InsertStmt)
+				s := gsorm.Insert(nil, "", "").Model(1000).(*statement.InsertStmt)
 
 				// Actual build.
 				var sql internal.SQL
@@ -63,7 +63,7 @@ func TestInsertStmt_BuildSQLWithModel_Fail(t *testing.T) {
 			func() error {
 				// Prepare for test.
 				model := make(map[string]interface{})
-				s := mgorm.Insert(nil, "table", "column").Model(&model).(*statement.InsertStmt)
+				s := gsorm.Insert(nil, "table", "column").Model(&model).(*statement.InsertStmt)
 
 				// Actual build.
 				var sql internal.SQL
@@ -90,13 +90,13 @@ func TestInsertStmt_CompareStmts(t *testing.T) {
 		ExpectedError failure.StringCode
 	}{
 		{
-			mgorm.Insert(nil, "table").Values(10).(*statement.InsertStmt),
-			mgorm.Insert(nil, "table").Values(10).Values(100).(*statement.InsertStmt),
+			gsorm.Insert(nil, "table").Values(10).(*statement.InsertStmt),
+			gsorm.Insert(nil, "table").Values(10).Values(100).(*statement.InsertStmt),
 			statement.ErrInvalidValue,
 		},
 		{
-			mgorm.Insert(nil, "table").Values(10).(*statement.InsertStmt),
-			mgorm.Insert(nil, "table").Values(10, 100).(*statement.InsertStmt),
+			gsorm.Insert(nil, "table").Values(10).(*statement.InsertStmt),
+			gsorm.Insert(nil, "table").Values(10, 100).(*statement.InsertStmt),
 			statement.ErrInvalidValue,
 		},
 	}
@@ -119,20 +119,20 @@ func TestInsertStmt_RawClause(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Insert(nil, "table").
+			gsorm.Insert(nil, "table").
 				RawClause("RAW").
 				Values("value").(*statement.InsertStmt),
 			`INSERT INTO table RAW VALUES ('value')`,
 		},
 		{
-			mgorm.Insert(nil, "table").
+			gsorm.Insert(nil, "table").
 				Values("value1").
 				RawClause("RAW").
 				Values("value2").(*statement.InsertStmt),
 			`INSERT INTO table VALUES ('value1') RAW, ('value2')`,
 		},
 		{
-			mgorm.Insert(nil, "table").
+			gsorm.Insert(nil, "table").
 				Values("value").
 				RawClause("RAW").(*statement.InsertStmt),
 			`INSERT INTO table VALUES ('value') RAW`,
@@ -156,17 +156,17 @@ func TestInsertStmt_Values(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Insert(nil, "employees").
+			gsorm.Insert(nil, "employees").
 				Values(1001, "1996-03-09", "Taro", "Sato", "M", "2020-04-01").(*statement.InsertStmt),
 			`INSERT INTO employees VALUES (1001, '1996-03-09', 'Taro', 'Sato', 'M', '2020-04-01')`,
 		},
 		{
-			mgorm.Insert(nil, "employees", "emp_no", "first_name").
+			gsorm.Insert(nil, "employees", "emp_no", "first_name").
 				Values(1001, "Taro").(*statement.InsertStmt),
 			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`,
 		},
 		{
-			mgorm.Insert(nil, "employees", "emp_no", "first_name").
+			gsorm.Insert(nil, "employees", "emp_no", "first_name").
 				Values(1001, "Taro").
 				Values(1002, "Jiro").(*statement.InsertStmt),
 			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro'), (1002, 'Jiro')`,
@@ -190,7 +190,7 @@ func TestInsertStmt_Select(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Insert(nil, "dept_manager").Select(mgorm.Select(nil).From("dept_emp")).(*statement.InsertStmt),
+			gsorm.Insert(nil, "dept_manager").Select(gsorm.Select(nil).From("dept_emp")).(*statement.InsertStmt),
 			`INSERT INTO dept_manager SELECT * FROM dept_emp`,
 		},
 	}
@@ -208,7 +208,7 @@ func TestInsertStmt_Select(t *testing.T) {
 
 func TestInsertStmt_Model(t *testing.T) {
 	type Employee struct {
-		ID        int `mgorm:"emp_no"`
+		ID        int `gsorm:"emp_no"`
 		FirstName string
 	}
 	structModel := Employee{ID: 1001, FirstName: "Taro"}
@@ -225,23 +225,23 @@ func TestInsertStmt_Model(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.Insert(nil, "employees", "emp_no", "first_name").Model(&structModel).(*statement.InsertStmt),
+			gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&structModel).(*statement.InsertStmt),
 			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`,
 		},
 		{
-			mgorm.Insert(nil, "employees", "emp_no", "first_name").Model(&structSlice).(*statement.InsertStmt),
+			gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&structSlice).(*statement.InsertStmt),
 			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro'), (1002, 'Jiro')`,
 		},
 		{
-			mgorm.Insert(nil, "employees", "emp_no", "first_name").Model(&mapModel).(*statement.InsertStmt),
+			gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&mapModel).(*statement.InsertStmt),
 			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`,
 		},
 		{
-			mgorm.Insert(nil, "employees", "emp_no", "first_name").Model(&mapSlice).(*statement.InsertStmt),
+			gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&mapSlice).(*statement.InsertStmt),
 			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro'), (1002, 'Jiro')`,
 		},
 		{
-			mgorm.Insert(nil, "employees", "first_name").Model(&varSlice).(*statement.InsertStmt),
+			gsorm.Insert(nil, "employees", "first_name").Model(&varSlice).(*statement.InsertStmt),
 			`INSERT INTO employees (first_name) VALUES ('Taro'), ('Jiro')`,
 		},
 	}

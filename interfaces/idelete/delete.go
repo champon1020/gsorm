@@ -1,8 +1,8 @@
 package idelete
 
-import "github.com/champon1020/mgorm/interfaces"
+import "github.com/champon1020/gsorm/interfaces"
 
-// Stmt is interface which is returned by mgorm.Delete.
+// Stmt is interface which is returned by gsorm.Delete.
 type Stmt interface {
 	From(...string) From
 	RawClause(rs string, v ...interface{}) RawClause

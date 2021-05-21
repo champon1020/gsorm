@@ -1,23 +1,23 @@
-package mgorm
+package gsorm
 
 import (
 	"fmt"
 
-	"github.com/champon1020/mgorm/database"
-	"github.com/champon1020/mgorm/interfaces/domain"
-	"github.com/champon1020/mgorm/interfaces/ialtertable"
-	"github.com/champon1020/mgorm/interfaces/icreatedb"
-	"github.com/champon1020/mgorm/interfaces/icreateindex"
-	"github.com/champon1020/mgorm/interfaces/icreatetable"
-	"github.com/champon1020/mgorm/interfaces/idelete"
-	"github.com/champon1020/mgorm/interfaces/idropdb"
-	"github.com/champon1020/mgorm/interfaces/idroptable"
-	"github.com/champon1020/mgorm/interfaces/iinsert"
-	"github.com/champon1020/mgorm/interfaces/iraw"
-	"github.com/champon1020/mgorm/interfaces/iselect"
-	"github.com/champon1020/mgorm/interfaces/iupdate"
-	"github.com/champon1020/mgorm/statement"
-	"github.com/champon1020/mgorm/statement/migration"
+	"github.com/champon1020/gsorm/database"
+	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces/ialtertable"
+	"github.com/champon1020/gsorm/interfaces/icreatedb"
+	"github.com/champon1020/gsorm/interfaces/icreateindex"
+	"github.com/champon1020/gsorm/interfaces/icreatetable"
+	"github.com/champon1020/gsorm/interfaces/idelete"
+	"github.com/champon1020/gsorm/interfaces/idropdb"
+	"github.com/champon1020/gsorm/interfaces/idroptable"
+	"github.com/champon1020/gsorm/interfaces/iinsert"
+	"github.com/champon1020/gsorm/interfaces/iraw"
+	"github.com/champon1020/gsorm/interfaces/iselect"
+	"github.com/champon1020/gsorm/interfaces/iupdate"
+	"github.com/champon1020/gsorm/statement"
+	"github.com/champon1020/gsorm/statement/migration"
 )
 
 // Open opens the database connection.

@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/champon1020/mgorm/internal"
+	"github.com/champon1020/gsorm/internal"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm/database"
+	"github.com/champon1020/gsorm/database"
 	"gotest.tools/v3/assert"
 )
 

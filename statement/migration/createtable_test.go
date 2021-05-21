@@ -4,19 +4,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/champon1020/mgorm"
-	"github.com/champon1020/mgorm/database"
-	"github.com/champon1020/mgorm/statement/migration"
+	"github.com/champon1020/gsorm"
+	"github.com/champon1020/gsorm/database"
+	"github.com/champon1020/gsorm/statement/migration"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateTable_String(t *testing.T) {
 	type Model struct {
-		ID          int       `mgorm:"notnull=t,pk=PK_id"`
-		CountryCode string    `mgorm:"typ=CHAR(3),notnull=t,default='0',fk=FK_country_code:country (code)"`
-		Name        string    `mgorm:"typ=VARCHAR(16),notnull=t,default='anonymous',uc=UC_name"`
-		Nickname    string    `mgorm:"typ=VARCHAR(32),uc=UC_name"`
-		BirthDate   time.Time `mgorm:"notnull=t"`
+		ID          int       `gsorm:"notnull=t,pk=PK_id"`
+		CountryCode string    `gsorm:"typ=CHAR(3),notnull=t,default='0',fk=FK_country_code:country (code)"`
+		Name        string    `gsorm:"typ=VARCHAR(16),notnull=t,default='anonymous',uc=UC_name"`
+		Nickname    string    `gsorm:"typ=VARCHAR(32),uc=UC_name"`
+		BirthDate   time.Time `gsorm:"notnull=t"`
 	}
 	model := new(Model)
 	db := database.NewMockDB("mysql")
@@ -26,7 +26,7 @@ func TestCreateTable_String(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateTable(db, "person").
+			gsorm.CreateTable(db, "person").
 				Column("id", "INT").NotNull().
 				Column("country_code", "CHAR(3)").NotNull().Default("0").
 				Column("name", "VARCHAR(16)").NotNull().Default("anonymous").
@@ -47,7 +47,7 @@ func TestCreateTable_String(t *testing.T) {
 				`)`,
 		},
 		{
-			mgorm.CreateTable(db, "person").
+			gsorm.CreateTable(db, "person").
 				Model(model).(*migration.CreateTableStmt),
 			`CREATE TABLE person (` +
 				`id INT NOT NULL, ` +
@@ -79,25 +79,25 @@ func TestCreateTable_RawClause(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				RawClause("RAW").
 				Column("column", "type").(*migration.CreateTableStmt),
 			`CREATE TABLE table (RAW, column type)`,
 		},
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				Column("column", "type").
 				RawClause("RAW").NotNull().(*migration.CreateTableStmt),
 			`CREATE TABLE table (column type RAW NOT NULL)`,
 		},
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				Column("column", "type").
 				NotNull().RawClause("RAW").Default("value").(*migration.CreateTableStmt),
 			`CREATE TABLE table (column type NOT NULL RAW DEFAULT 'value')`,
 		},
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				Column("column", "type").
 				NotNull().Default("value").
 				RawClause("RAW").
@@ -106,7 +106,7 @@ func TestCreateTable_RawClause(t *testing.T) {
 				`CONSTRAINT key UNIQUE (column))`,
 		},
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				Column("column", "type").
 				NotNull().Default("value").
 				Cons("key").RawClause("RAW").Unique("column").(*migration.CreateTableStmt),
@@ -114,7 +114,7 @@ func TestCreateTable_RawClause(t *testing.T) {
 				`CONSTRAINT key RAW UNIQUE (column))`,
 		},
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				Column("column", "type").
 				NotNull().Default("value").
 				Cons("key").Unique("column").RawClause("RAW").(*migration.CreateTableStmt),
@@ -122,7 +122,7 @@ func TestCreateTable_RawClause(t *testing.T) {
 				`CONSTRAINT key UNIQUE (column) RAW)`,
 		},
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				Column("column", "type").
 				NotNull().Default("value").
 				Cons("key").RawClause("RAW").Primary("column").(*migration.CreateTableStmt),
@@ -130,7 +130,7 @@ func TestCreateTable_RawClause(t *testing.T) {
 				`CONSTRAINT key RAW PRIMARY KEY (column))`,
 		},
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				Column("column", "type").
 				NotNull().Default("value").
 				Cons("key").Primary("column").RawClause("RAW").(*migration.CreateTableStmt),
@@ -138,7 +138,7 @@ func TestCreateTable_RawClause(t *testing.T) {
 				`CONSTRAINT key PRIMARY KEY (column) RAW)`,
 		},
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				Column("column", "type").
 				NotNull().Default("value").
 				Cons("key").RawClause("RAW").
@@ -147,7 +147,7 @@ func TestCreateTable_RawClause(t *testing.T) {
 				`CONSTRAINT key RAW FOREIGN KEY (column) REFERENCES table2 (column2))`,
 		},
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				Column("column", "type").
 				NotNull().Default("value").
 				Cons("key").Foreign("column").
@@ -156,7 +156,7 @@ func TestCreateTable_RawClause(t *testing.T) {
 				`CONSTRAINT key FOREIGN KEY (column) RAW REFERENCES table2 (column2))`,
 		},
 		{
-			mgorm.CreateTable(nil, "table").
+			gsorm.CreateTable(nil, "table").
 				Column("column", "type").
 				NotNull().Default("value").
 				Cons("key").Foreign("column").Ref("table2", "column2").
@@ -183,12 +183,12 @@ func TestCreateTable_Column(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").(*migration.CreateTableStmt),
 			`CREATE TABLE employees (emp_no INT)`,
 		},
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").
 				Column("birth_date", "DATE").(*migration.CreateTableStmt),
 			`CREATE TABLE employees (emp_no INT, birth_date DATE)`,
@@ -212,12 +212,12 @@ func TestCreateTable_NotNull(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").NotNull().(*migration.CreateTableStmt),
 			`CREATE TABLE employees (emp_no INT NOT NULL)`,
 		},
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").NotNull().
 				Column("birth_date", "DATE").(*migration.CreateTableStmt),
 			`CREATE TABLE employees (emp_no INT NOT NULL, birth_date DATE)`,
@@ -241,22 +241,22 @@ func TestCreateTable_Default(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").Default(1).(*migration.CreateTableStmt),
 			`CREATE TABLE employees (emp_no INT DEFAULT 1)`,
 		},
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").NotNull().Default(1).(*migration.CreateTableStmt),
 			`CREATE TABLE employees (emp_no INT NOT NULL DEFAULT 1)`,
 		},
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").Default(1).NotNull().(*migration.CreateTableStmt),
 			`CREATE TABLE employees (emp_no INT DEFAULT 1 NOT NULL)`,
 		},
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").NotNull().Default(1).
 				Column("birth_date", "DATE").(*migration.CreateTableStmt),
 			`CREATE TABLE employees (emp_no INT NOT NULL DEFAULT 1, birth_date DATE)`,
@@ -280,7 +280,7 @@ func TestCreateTable_Cons(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").NotNull().
 				Cons("UC_emp_no").Unique("emp_no").(*migration.CreateTableStmt),
 			`CREATE TABLE employees (` +
@@ -288,7 +288,7 @@ func TestCreateTable_Cons(t *testing.T) {
 				`CONSTRAINT UC_emp_no UNIQUE (emp_no))`,
 		},
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").NotNull().
 				Cons("PK_emp_no").Primary("emp_no").(*migration.CreateTableStmt),
 			`CREATE TABLE employees (` +
@@ -296,7 +296,7 @@ func TestCreateTable_Cons(t *testing.T) {
 				`CONSTRAINT PK_emp_no PRIMARY KEY (emp_no))`,
 		},
 		{
-			mgorm.CreateTable(nil, "dept_emp").
+			gsorm.CreateTable(nil, "dept_emp").
 				Column("emp_no", "INT").NotNull().
 				Cons("FK_dept_emp").Foreign("emp_no").
 				Ref("employees", "emp_no").(*migration.CreateTableStmt),
@@ -323,7 +323,7 @@ func TestCreateTable_Unique(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").NotNull().
 				Cons("UC_emp_no").Unique("emp_no").(*migration.CreateTableStmt),
 			`CREATE TABLE employees (` +
@@ -331,7 +331,7 @@ func TestCreateTable_Unique(t *testing.T) {
 				`CONSTRAINT UC_emp_no UNIQUE (emp_no))`,
 		},
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").NotNull().
 				Column("first_name", "VARCHAR(14)").NotNull().
 				Cons("UC_emp_no_first_name").Unique("emp_no", "first_name").(*migration.CreateTableStmt),
@@ -359,7 +359,7 @@ func TestCreateTable_Primary(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").NotNull().
 				Cons("PK_emp_no").Primary("emp_no").(*migration.CreateTableStmt),
 			`CREATE TABLE employees (` +
@@ -367,7 +367,7 @@ func TestCreateTable_Primary(t *testing.T) {
 				`CONSTRAINT PK_emp_no PRIMARY KEY (emp_no))`,
 		},
 		{
-			mgorm.CreateTable(nil, "employees").
+			gsorm.CreateTable(nil, "employees").
 				Column("emp_no", "INT").NotNull().
 				Column("first_name", "VARCHAR(14)").NotNull().
 				Cons("PK_emp_no_first_name").Primary("emp_no", "first_name").(*migration.CreateTableStmt),
@@ -395,7 +395,7 @@ func TestCreateTable_Foreign(t *testing.T) {
 		Expected string
 	}{
 		{
-			mgorm.CreateTable(nil, "dept_emp").
+			gsorm.CreateTable(nil, "dept_emp").
 				Column("emp_no", "INT").NotNull().
 				Cons("FK_dept_emp").Foreign("emp_no").
 				Ref("employees", "emp_no").(*migration.CreateTableStmt),
@@ -404,7 +404,7 @@ func TestCreateTable_Foreign(t *testing.T) {
 				`CONSTRAINT FK_dept_emp FOREIGN KEY (emp_no) REFERENCES employees (emp_no))`,
 		},
 		{
-			mgorm.CreateTable(nil, "dept_emp").
+			gsorm.CreateTable(nil, "dept_emp").
 				Column("emp_no", "INT").NotNull().
 				Column("first_name", "VARCHAR(14)").NotNull().
 				Cons("FK_dept_emp").Foreign("emp_no", "first_name").

@@ -3,9 +3,9 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/mgorm/interfaces/domain"
-	"github.com/champon1020/mgorm/internal"
-	"github.com/champon1020/mgorm/syntax"
+	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/internal"
+	"github.com/champon1020/gsorm/syntax"
 )
 
 // Values is VALUES clause.

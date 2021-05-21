@@ -1,10 +1,10 @@
 # DropDB
-`mgorm.DropDB`はDROP DATABASE句を呼び出します．
+`gsorm.DropDB`はDROP DATABASE句を呼び出します．
 
-引数にはデータベースのコネクション(`mgorm.Conn`)，データベース名を指定します．
+引数にはデータベースのコネクション(`gsorm.Conn`)，データベース名を指定します．
 
 #### 例
 ```go
-err := mgorm.DropDB(db, "employees").Migrate()
+err := gsorm.DropDB(db, "employees").Migrate()
 // DROP DATABASE employees;
 ```

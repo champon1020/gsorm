@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 
-	"github.com/champon1020/mgorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/morikuni/failure"
 )
 
@@ -40,10 +40,10 @@ func (m *mockTx) Query(string, ...interface{}) (*sql.Rows, error) {
 func (m *mockTx) Commit() error {
 	expected := m.popExpected()
 	if expected == nil {
-		return failure.New(errInvalidMockExpectation, failure.Message("mgorm.mockTx.Commit is not expected"))
+		return failure.New(errInvalidMockExpectation, failure.Message("gsorm.mockTx.Commit is not expected"))
 	}
 	if _, ok := expected.(*expectedCommit); !ok {
-		return failure.New(errInvalidMockExpectation, failure.Message("mgorm.mockTx.Commit is not expected"))
+		return failure.New(errInvalidMockExpectation, failure.Message("gsorm.mockTx.Commit is not expected"))
 	}
 	return nil
 }
@@ -52,10 +52,10 @@ func (m *mockTx) Commit() error {
 func (m *mockTx) Rollback() error {
 	expected := m.popExpected()
 	if expected == nil {
-		return failure.New(errInvalidMockExpectation, failure.Message("mgorm.mockTx.Rollback is not expected"))
+		return failure.New(errInvalidMockExpectation, failure.Message("gsorm.mockTx.Rollback is not expected"))
 	}
 	if _, ok := expected.(*expectedRollback); !ok {
-		return failure.New(errInvalidMockExpectation, failure.Message("mgorm.mockTx.Rollback is not expected"))
+		return failure.New(errInvalidMockExpectation, failure.Message("gsorm.mockTx.Rollback is not expected"))
 	}
 	return nil
 }
