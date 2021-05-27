@@ -1,5 +1,5 @@
 # Docs
-This is documents for mgorm.
+This is the gsorm document.
 
 [Japanese](https://github.com/champon1020/mgorm/blob/docs/docs/README_jp.md)
 
