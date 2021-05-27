@@ -42,27 +42,22 @@ err := gsorm.Select(db, "id", "name").From("people").
 
 
 ## Query
-SELECT文などのQueryを実行する際は，`Query`というメソッドを実行することで実際にSQLが実行されます．
+SELECT文を実行するとき，`Query`メソッドを実行することで実際にSQLが実行されます．
 
-```go
-// SELECT id FROM people;
-err := gsorm.Select(db, "id").From("people").Query(&person)
-```
+`Query`メソッドの引数にはmodelを渡すことができます．
 
-詳細は[Select](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md)に記載されています．
-
-また，このときQueryの引数にはmodelを渡すことができます．
-
-modelには構造体，map，変数，およびそれらのスライスを使用することができます．
-
-ここでは例として，以下のような構造体を用いて説明いたします．
-
+#### 例
 ```go
 type Person struct {
     ID        int
-	FirstName string    `gsorm:"name typ=VARCHAR(64)"`
-	BirthDate time.Time `gsorm:"layout=time.RFC3339"`
+	FirstName string    `gsorm:"name"`
+	BirthDate time.Time
 }
+
+person := Person{}
+
+// SELECT id FROM people;
+err := gsorm.Select(db, "id").From("people").Query(&person)
 ```
 
 注目していただきたいのがフィールドタグです．
@@ -70,21 +65,21 @@ type Person struct {
 `FirstName`において`name`が指定されていますが，これはDBのテーブルにおけるカラム名を表しています．
 つまり，`FirstName`は`name`というカラムにマッピングされます．
 
-また，`BirthDate`には`layout=time.RFC3339`が指定されていますが，このように日付のフォーマットを指定することができます．
-
-Modelの詳細は[Model](https://github.com/champon1020/gsorm/tree/main/docs/model_ja.md)に記載されています．
+詳細は[Select](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md)に記載されています．
 
 
 ## Exec
-ExecはINSERT文，UPDATE文，DELETE文などのSQLを実行する際に使用されるメソッドです．
+`Exec`メソッドは，INSERT文，UPDATE文，DELETE文などのSQLを実行するときに使用されるメソッドです．
 
+#### 例
 ```go
 // INSERT INTO id, name VALUES (1, 'Taro');
 err := gsorm.Insert(db, "people", "id", "name").Values(1, "Taro").Exec()
 ```
 
-特にINSERT文とUPDATE文ではModelをそのままマッピングすることができます．
+特にINSERT文とUPDATE文では`Model`メソッドを使用することでマッピングをすることができます．
 
+#### 例
 ```go
 person := Person{ID: 1, FirstName: "Taro"}
 
@@ -96,8 +91,9 @@ err := gsorm.Insert(db, "people", "id", "name").Model(&person).Exec()
 
 
 ## Migrate
-MigrateはCREATE TABLE文やALTER TABLE文など，データベーススキーマを変更するようなSQLを実行する際に使用されるメソッドです．
+`Migrate`メソッドは，CREATE TABLE文やALTER TABLE文など，データベーススキーマを変更するようなSQLを実行するときに使用されるメソッドです．
 
+#### 例
 ```go
 // CREATE TABLE teams (id INT NOT NULL, name VARCHAR(64) NOT NULL);
 err := gsorm.CreateTable(db, "teams").
@@ -105,8 +101,9 @@ err := gsorm.CreateTable(db, "teams").
     Column("name", "VARCHAR(64)").NotNull().Migrate()
 ```
 
-また，CREATE TABLE文では`Model`メソッドを使用することで，構造体をマッピングしてテーブルを作成することができます．
+CREATE TABLE文では`Model`メソッドを使用することで，構造体をマッピングしてテーブルを作成することができます．
 
+#### 例
 ```go
 type Person struct {
     ID        int    `gsorm:"notnull=t"`
@@ -125,6 +122,7 @@ Modelについての詳細は[Model](https://github.com/champon1020/gsorm/tree/m
 ## Mock
 gsormの特徴の1つとして，独自のmockを提供しているというところがあります．
 
+#### 例
 ```go
 mock := gsorm.NewMock()
 

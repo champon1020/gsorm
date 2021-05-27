@@ -2,9 +2,6 @@
 `Model`を使用することで構造体を用いたマッピングを行うことができます．
 このメソッドは[Insert](https://github.com/champon1020/gsorm/tree/main/docs/insert_ja.md)，[Update](https://github.com/champon1020/gsorm/tree/main/docs/update_ja.md)，[CreateTable](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md)において使用することができます．
 
-`Model`の引数には，スライス，構造体，マップ，`int`や`string`などの事前定義型を渡すことができます．
-この際，必ず参照を渡すようにしてください．
-
 #### 例
 ```go
 type Employee struct {
@@ -20,21 +17,39 @@ err := gsorm.Insert(db, "employees", "emp_no", "first_name").
 
 
 ## Type
-`Model`の引数に渡せる値は以下の型の参照になります．
+`Model`の引数に渡せる値は以下の型の**参照**になります．
+
+Insert，Update，CreateTableでそれぞれ使用できる型が異なるので注意してください．
+
+### Insert
+- map[string]interface{}
+- struct{}
+- []map[string]interface{}
+- []struct{}
+
+### Update
+- map[string]interface{}
+- struct{}
+
+### CreateTable
+- struct{}
+
+構造体のフィールド，マップの要素に使用できる型は以下です．
 
 - int, int8, int16, in32, in64
 - uint, uint8, uint16, uint32, uint64
+- float32, float64
+- bool
 - string
 - time.Time
-- map{}
-- struct{} (エクスポートされたフィールドのみ適用)
-- 上記の型によるスライス
+
+構造体はエクスポートされている型のみ適用されます．
 
 
 ## Tag
 構造体のフィールドに`gsorm`タグを付与することでデータベースのスキーマを定義することができます．
 
-複数のタグを使用したい場合は「,」で区切ることで指定できます．
+複数のタグを使用したい場合はカンマで区切ることで指定できます．
 
 #### 例
 ```go
