@@ -131,7 +131,7 @@ mock.Expect(gsorm.Select(db, "id", "name").From("people")).
     Return(&[]Person{{ID: 1, Name: "Taro"}, {ID: 2, Name: "Jiro"}})
 
 // 実際に実行される．
-err := func(db gsorm.Conn) {
+err := func(db gsorm.Conn) error {
     person := []Person{}
 
     err := db.Select(db, "id", "name").From("people").Query(&person)

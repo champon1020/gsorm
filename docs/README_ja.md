@@ -72,7 +72,7 @@ gsormのドキュメントです．
   - [RawStmt](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawstmt)
 - [Model](https://github.com/champon1020/gsorm/tree/main/docs/model_ja.md)
 - [Transaction](https://github.com/champon1020/gsorm/tree/main/docs/transaction_ja.md)
-- [Mock](https://github.com/champon1020/gsorm/tree/main/docs/droptable_ja.md)
+- [Mock](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md)
   - [Expect](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#expect)
   - [Return](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#return)
   - [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#complete)

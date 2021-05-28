@@ -1,4 +1,3 @@
-
 # Select
 `gsorm.Select`はSELECT句を呼び出します．
 
