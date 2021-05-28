@@ -42,13 +42,13 @@ if err := mock.Complete(); err != nil {
 
 また，`gsorm.MockDB`は`gsorm.DB`が実装するメソッドも使用することができます．
 
-- [Expect](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#expect)
-- [ExpectWithReturn](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#expectwithreturn)
-- [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#complete)
-- [ExpectBegin](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#expectbegin)
+- [Expect](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mockdbexpect)
+- [ExpectWithReturn](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mockdbexpectwithreturn)
+- [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mockdbcomplete)
+- [ExpectBegin](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mockdbexpectbegin)
 
 
-## Expect
+## (MockDB).Expect
 `Expect`は返り値がない文が実行されることを予期します．
 
 #### 例
@@ -57,7 +57,7 @@ mock.Expect(gsorm.Insert(nil, "employees", "emp_no", "first_name").Values(1001, 
 ```
 
 
-## ExpectWithReturn
+## (MockDB).ExpectWithReturn
 `ExpectWithReturn`は返り値がある文が実行されることを予期します．
 
 #### 例
@@ -68,7 +68,7 @@ mock.ExpectWithReturn(
 ```
 
 
-## Complete
+## (MockDB).Complete
 `Complete`は予期した文が全て実行されたかどうがを確認するメソッドです．
 
 もし実行されていない文が存在する場合，エラーを返します．
@@ -83,7 +83,7 @@ if err := gsorm.Complete(); err != nil {
 ```
 
 
-## ExpectBegin
+## (MockDB).ExpectBegin
 `ExpectBegin`はトランザクションが作成されることを予期します．
 
 このとき，`gsorm.MockTx`を実装するインスタンスが返されます．
@@ -104,11 +104,11 @@ mocktx := mock.ExpectBegin()
 
 基本的には`gsorm.MockDB`と同一ですが，`ExpectCommit`や`ExpectRollback`を使用することができます．
 
-- [Expect](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#(mocktx).expect)
-- [ExpectWithReturn](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#(mocktx).expectwithreturn)
-- [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#(mocktx).complete)
-- [ExpectCommit](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#(mocktx).expectcommit)
-- [ExpectRollback](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#(mocktx).expectrollback)
+- [Expect](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxexpect)
+- [ExpectWithReturn](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxexpectwithreturn)
+- [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxcomplete)
+- [ExpectCommit](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxexpectcommit)
+- [ExpectRollback](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxexpectrollback)
 
 ## (MockTx).Expect
 `Expect`は返り値がない文が実行されることを予期します．
