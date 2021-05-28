@@ -75,7 +75,7 @@ func (m *mockDB) Close() error {
 }
 
 // Begin starts the mock transaction.
-func (m *mockDB) Begin() (domain.MockTx, error) {
+func (m *mockDB) Begin() (domain.Tx, error) {
 	expected := m.popExpected()
 	tx := m.nextTx()
 	if tx == nil || expected == nil {
@@ -95,7 +95,7 @@ func (m *mockDB) Begin() (domain.MockTx, error) {
 }
 
 // nextTx pops begun transaction.
-func (m *mockDB) nextTx() domain.MockTx {
+func (m *mockDB) nextTx() domain.Tx {
 	if len(m.tx) <= m.txItr {
 		return nil
 	}

@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// SQLDriver is database driver.
 type SQLDriver interface {
 	LookupDefaultType(typ reflect.Type) string
 }
@@ -44,20 +45,17 @@ type Mock interface {
 	ExpectWithReturn(s Stmt, v interface{})
 }
 
+// MockDB is interface of mock database.
 type MockDB interface {
 	Mock
-	SetConnMaxLifetime(n time.Duration) error
-	SetMaxIdleConns(n int) error
-	SetMaxOpenConns(n int) error
-	Close() error
-	Begin() (MockTx, error)
+	DB
 	ExpectBegin() MockTx
 }
 
+// MockTx is interface of mock transaction.
 type MockTx interface {
 	Mock
-	Commit() error
-	Rollback() error
+	Tx
 	ExpectCommit()
 	ExpectRollback()
 }

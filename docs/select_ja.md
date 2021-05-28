@@ -42,6 +42,7 @@ err := gsorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 - [OrderBy](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#orderby)
 - [Limit](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#limit)
 - [Offset](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#offset)
+- [Query](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#query)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
 但し，例外として`RawClause`は任意で呼び出すことができます．
@@ -602,4 +603,35 @@ err := gsorm.Select(db).From("employees").
 // SELECT * FROM employees
 //      LIMIT 10
 //      OFFSET 5;
+```
+
+
+## Query
+`Query`はSQLを実行して，結果をmodelにマッピングします．
+
+引数にはmodelを指定します．
+
+modelには[sql.Rows.Scan](https://golang.org/pkg/database/sql/#Rows.Scan)に使用できる型を利用できます．
+
+また，`struct{}`，`[]struct{}`，`map[string]interface{}`，`[]map[string]interface{}`を使用することもできます．
+このとき，マップの要素，構造体のフィールドの型は`sql.Rows.Scan`に使用できる型である必要があります．
+構造体を使用する場合は，フィールドがエクスポートされている必要があります．
+
+構造体を使用するとき，カラムとフィールドとの対応はフィールド名で指定されます．
+具体的には，フィールド名のスネークケースと一致するカラム名にマッピングされます．
+フィールド名とカラム名の対応を強制したい場合は，フィールドタグとして`gsorm`タグもしくは`json`タグを使用することができます．
+`gsorm`タグと`json`タグの両方が指定されている場合は`gsorm`タグが優先されます．
+
+#### 例
+```go
+type Employee struct {
+	EmpNo     int       `gsorm:"id"`
+	FirstName string
+	BirthDate time.Time
+}
+
+model := &[]Employee{}
+
+err := gsorm.Select(db, "emp_no AS id", "first_name", "birth_date").From("employees").Query(&model)
+// SELECT emp_no AS id, first_name, birth_date FROM employees;
 ```

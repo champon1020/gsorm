@@ -20,13 +20,20 @@ import (
 	"github.com/champon1020/gsorm/statement/migration"
 )
 
+type (
+	DB     = domain.DB
+	Tx     = domain.Tx
+	MockDB = domain.MockDB
+	MockTx = domain.MockTx
+)
+
 // Open opens the database connection.
-func Open(driver, dsn string) (domain.DB, error) {
+func Open(driver, dsn string) (DB, error) {
 	return database.NewDB(driver, dsn)
 }
 
 // OpenMock opens the mock database connection.
-func OpenMock(driver string) domain.MockDB {
+func OpenMock(driver string) MockDB {
 	return database.NewMockDB(driver)
 }
 

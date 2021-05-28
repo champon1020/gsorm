@@ -1,19 +1,19 @@
 # Function Query
 COUNTやAVGなどのfunction queryを簡単に実装するために，以下のような関数が設けられています．
 
-扱い方は`gsorm.Select`と同様です．
-
 - [Count](https://github.com/champon1020/gsorm/tree/main/docs/fnquery_ja.md#count)
 - [Sum](https://github.com/champon1020/gsorm/tree/main/docs/fnquery_ja.md#sum)
 - [Avg](https://github.com/champon1020/gsorm/tree/main/docs/fnquery_ja.md#avg)
 - [Max](https://github.com/champon1020/gsorm/tree/main/docs/fnquery_ja.md#max)
 - [Min](https://github.com/champon1020/gsorm/tree/main/docs/fnquery_ja.md#min)
 
+実態は`gsorm.Select`と同様です．
+
 
 ## Count
-`gsorm.Count`を使用することでSELECT COUNT(column)...を実行できます．
+`gsorm.Count`はSELECT COUNT(column)...を実行します．
 
-`gsorm.Count`には複数のカラム名をstring型で受け取ります．
+引数には複数カラム名を指定します．
 
 #### 例
 ```go
@@ -30,9 +30,9 @@ err := gsorm.Count(db, "emp_no", "CASE WHEN birth_date < '1960-01-01' THEN 1 END
 
 
 ## Sum
-`gsorm.Sum`を使用することでSELECT SUM(column)...を実行できます．
+`gsorm.Sum`はSELECT SUM(column)...を実行します．
 
-`gsorm.Sum`には複数のカラム名をstring型で受け取ります．
+引数には複数カラム名を指定します．
 
 #### 例
 ```go
@@ -49,9 +49,9 @@ err := gsorm.Sum(db, "salary", "CASE WHEN from_date < '1990-01-01' THEN salary E
 
 
 ## Avg
-`gsorm.Avg`を使用することでSELECT AVG(column)...を実行できます．
+`gsorm.Avg`はSELECT AVG(column)...を実行します．
 
-`gsorm.Avg`には複数のカラム名をstring型で受け取ります．
+引数には複数カラム名を指定します．
 
 #### 例
 ```go
@@ -68,9 +68,9 @@ err := gsorm.Avg(db, "salary", "CASE WHEN from_date < '1990-01-01' THEN salary E
 
 
 ## Max
-`gsorm.Max`を使用することでSELECT MAX(column)...を実行できます．
+`gsorm.Max`はSELECT MAX(column)...を実行します．
 
-`gsorm.Max`には複数のカラム名をstring型で受け取ります．
+引数には複数カラム名を指定します．
 
 #### 例
 ```go
@@ -87,9 +87,9 @@ err := gsorm.Max(db, "salary", "CASE WHEN from_date < '1990-01-01' THEN salary E
 
 
 ## Min
-`gsorm.Min`を使用することでSELECT MIN(column)...を実行できます．
+`gsorm.Min`はSELECT MIN(column)...を実行します．
 
-`gsorm.Min`には複数のカラム名をstring型で受け取ります．
+引数には複数カラム名を指定します．
 
 #### 例
 ```go

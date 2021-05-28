@@ -389,12 +389,6 @@ err := gsorm.Update(db).From("employees").
 ## Model
 `Model`は構造体をマッピングします．
 
-引数にはモデルのポインタ，複数カラム名をしてします．
-
-モデルには構造体のポインタ，マップのポインタのいずれかを指定します．
-
-構造体もしくは構造体のスライスをマッピングする際，対象のカラム名はフィールド名もしくはフィールドタグから推定されます．
-
 Modelについての詳細は[Model](https://github.com/champon1020/gsorm/blob/main/docs/model_ja.md)に記載されています．
 
 #### 例

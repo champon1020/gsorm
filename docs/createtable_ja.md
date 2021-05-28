@@ -332,11 +332,6 @@ err := gsorm.CreateTable(db, "dept_emp").
 ## Model
 `Model`は構造体をマッピングします．
 
-引数には構造体のポインタを指定します．
-
-構造体もしくは構造体のスライスをマッピングする際，対象のカラム名はフィールド名もしくはフィールドタグから推定されます．
-また，型やNULL，デフォルト値，制約などはフィールドタグから推定されます．
-
 Modelについての詳細は[Model](https://github.com/champon1020/gsorm/tree/main/docs/model_ja.md)に記載されています．
 
 #### 例
