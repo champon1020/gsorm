@@ -218,7 +218,6 @@ func TestInsertStmt_Model(t *testing.T) {
 		{"emp_no": 1001, "first_name": "Taro"},
 		{"emp_no": 1002, "first_name": "Jiro"},
 	}
-	varSlice := []string{"Taro", "Jiro"}
 
 	testCases := []struct {
 		Stmt     *statement.InsertStmt
@@ -239,10 +238,6 @@ func TestInsertStmt_Model(t *testing.T) {
 		{
 			gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&mapSlice).(*statement.InsertStmt),
 			`INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro'), (1002, 'Jiro')`,
-		},
-		{
-			gsorm.Insert(nil, "employees", "first_name").Model(&varSlice).(*statement.InsertStmt),
-			`INSERT INTO employees (first_name) VALUES ('Taro'), ('Jiro')`,
 		},
 	}
 
