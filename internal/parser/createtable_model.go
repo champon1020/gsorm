@@ -69,7 +69,11 @@ func (p *CreateTableModelParser) Parse() (*internal.SQL, error) {
 		p.tag = internal.ExtractTag(p.f)
 
 		column := p.ParseColumn(&sql)
-		p.ParseType(&sql)
+
+		if err := p.ParseType(&sql); err != nil {
+			return nil, err
+		}
+
 		p.ParseNotNull(&sql)
 		p.ParseDefault(&sql)
 		p.ParseUnique(&sql, column)
