@@ -65,7 +65,7 @@ func (s *CreateDBStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // RawClause calls the raw string clause.
-func (s *CreateDBStmt) RawClause(rs string, v ...interface{}) icreatedb.RawClause {
-	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+func (s *CreateDBStmt) RawClause(raw string, values ...interface{}) icreatedb.RawClause {
+	s.call(&syntax.RawClause{RawStr: raw, Values: values})
 	return s
 }

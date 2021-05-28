@@ -3,7 +3,6 @@ package statement
 import (
 	"reflect"
 
-	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/internal"
 	"github.com/champon1020/gsorm/internal/parser"
 	"github.com/champon1020/gsorm/syntax"
@@ -22,6 +21,7 @@ type InsertStmt struct {
 	sel   domain.Stmt
 }
 
+// NewInsertStmt creates InsertStmt instance.
 func NewInsertStmt(conn domain.Conn, table string, cols ...string) *InsertStmt {
 	i := new(clause.Insert)
 	i.AddTable(table)
@@ -142,8 +142,8 @@ func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // RawClause calls the raw string clause.
-func (s *InsertStmt) RawClause(rs string, v ...interface{}) iinsert.RawClause {
-	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+func (s *InsertStmt) RawClause(raw string, values ...interface{}) iinsert.RawClause {
+	s.call(&syntax.RawClause{RawStr: raw, Values: values})
 	return s
 }
 
@@ -154,15 +154,15 @@ func (s *InsertStmt) Model(model interface{}) iinsert.Model {
 }
 
 // Select calls SELECT statement.
-func (s *InsertStmt) Select(sel interfaces.QueryCallable) iinsert.Select {
-	s.sel = sel
+func (s *InsertStmt) Select(stmt domain.Stmt) iinsert.Select {
+	s.sel = stmt
 	return s
 }
 
 // Values calls VALUES clause.
-func (s *InsertStmt) Values(vals ...interface{}) iinsert.Values {
+func (s *InsertStmt) Values(values ...interface{}) iinsert.Values {
 	v := new(clause.Values)
-	for _, val := range vals {
+	for _, val := range values {
 		v.AddValue(val)
 	}
 	s.call(v)

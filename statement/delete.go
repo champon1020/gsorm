@@ -17,6 +17,7 @@ type DeleteStmt struct {
 	cmd *clause.Delete
 }
 
+// NewDeleteStmt creates DeleteStmt instance.
 func NewDeleteStmt(conn domain.Conn) *DeleteStmt {
 	stmt := &DeleteStmt{cmd: &clause.Delete{}}
 	stmt.conn = conn
@@ -80,8 +81,8 @@ func (s *DeleteStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // RawClause calls the raw string clause.
-func (s *DeleteStmt) RawClause(rs string, v ...interface{}) idelete.RawClause {
-	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+func (s *DeleteStmt) RawClause(raw string, values ...interface{}) idelete.RawClause {
+	s.call(&syntax.RawClause{RawStr: raw, Values: values})
 	return s
 }
 
@@ -96,19 +97,19 @@ func (s *DeleteStmt) From(tables ...string) idelete.From {
 }
 
 // Where calls WHERE clause.
-func (s *DeleteStmt) Where(expr string, vals ...interface{}) idelete.Where {
-	s.call(&clause.Where{Expr: expr, Values: vals})
+func (s *DeleteStmt) Where(expr string, values ...interface{}) idelete.Where {
+	s.call(&clause.Where{Expr: expr, Values: values})
 	return s
 }
 
 // And calls AND clause.
-func (s *DeleteStmt) And(expr string, vals ...interface{}) idelete.And {
-	s.call(&clause.And{Expr: expr, Values: vals})
+func (s *DeleteStmt) And(expr string, values ...interface{}) idelete.And {
+	s.call(&clause.And{Expr: expr, Values: values})
 	return s
 }
 
 // Or calls OR clause.
-func (s *DeleteStmt) Or(expr string, vals ...interface{}) idelete.Or {
-	s.call(&clause.Or{Expr: expr, Values: vals})
+func (s *DeleteStmt) Or(expr string, values ...interface{}) idelete.Or {
+	s.call(&clause.Or{Expr: expr, Values: values})
 	return s
 }

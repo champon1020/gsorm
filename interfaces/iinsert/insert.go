@@ -2,19 +2,20 @@ package iinsert
 
 import (
 	"github.com/champon1020/gsorm/interfaces"
+	"github.com/champon1020/gsorm/interfaces/domain"
 )
 
 // Stmt is interface which is returned by gsorm.Insert.
 type Stmt interface {
-	RawClause(rs string, v ...interface{}) RawClause
+	RawClause(raw string, values ...interface{}) RawClause
 	Model(model interface{}) Model
-	Select(selectStmt interfaces.QueryCallable) Select
-	Values(vals ...interface{}) Values
+	Select(stmt domain.Stmt) Select
+	Values(values ...interface{}) Values
 }
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
-	Values(v ...interface{}) Values
+	Values(values ...interface{}) Values
 	interfaces.ExecCallable
 }
 
@@ -30,7 +31,7 @@ type Select interface {
 
 // Values is interface which is returned by (*InsertStmt).Values.
 type Values interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Values(vals ...interface{}) Values
+	RawClause(raw string, values ...interface{}) RawClause
+	Values(values ...interface{}) Values
 	interfaces.ExecCallable
 }

@@ -89,8 +89,8 @@ func (s *AlterTableStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // RawClause calls the raw string clause.
-func (s *AlterTableStmt) RawClause(rs string, v ...interface{}) ialtertable.RawClause {
-	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+func (s *AlterTableStmt) RawClause(raw string, values ...interface{}) ialtertable.RawClause {
+	s.call(&syntax.RawClause{RawStr: raw, Values: values})
 	return s
 }
 
@@ -101,20 +101,20 @@ func (s *AlterTableStmt) Rename(table string) ialtertable.Rename {
 }
 
 // AddColumn calls ADD COLUMN clause.
-func (s *AlterTableStmt) AddColumn(col, typ string) ialtertable.AddColumn {
-	s.call(&mig.AddColumn{Column: col, Type: typ})
+func (s *AlterTableStmt) AddColumn(column, typ string) ialtertable.AddColumn {
+	s.call(&mig.AddColumn{Column: column, Type: typ})
 	return s
 }
 
 // DropColumn calls DROP COLUMN clause.
-func (s *AlterTableStmt) DropColumn(col string) ialtertable.DropColumn {
-	s.call(&mig.DropColumn{Column: col})
+func (s *AlterTableStmt) DropColumn(column string) ialtertable.DropColumn {
+	s.call(&mig.DropColumn{Column: column})
 	return s
 }
 
 // RenameColumn calls RENAME COLUMN clause.
-func (s *AlterTableStmt) RenameColumn(col, dest string) ialtertable.RenameColumn {
-	s.call(&mig.RenameColumn{Column: col, Dest: dest})
+func (s *AlterTableStmt) RenameColumn(column, dest string) ialtertable.RenameColumn {
+	s.call(&mig.RenameColumn{Column: column, Dest: dest})
 	return s
 }
 
@@ -125,8 +125,8 @@ func (s *AlterTableStmt) NotNull() ialtertable.NotNull {
 }
 
 // Default calls DEFAULT option.
-func (s *AlterTableStmt) Default(val interface{}) ialtertable.Default {
-	s.call(&mig.Default{Value: val})
+func (s *AlterTableStmt) Default(value interface{}) ialtertable.Default {
+	s.call(&mig.Default{Value: value})
 	return s
 }
 
@@ -137,25 +137,25 @@ func (s *AlterTableStmt) AddCons(key string) ialtertable.AddCons {
 }
 
 // Unique calls UNIQUE keyword.
-func (s *AlterTableStmt) Unique(cols ...string) ialtertable.Unique {
-	s.call(&mig.Unique{Columns: cols})
+func (s *AlterTableStmt) Unique(columns ...string) ialtertable.Unique {
+	s.call(&mig.Unique{Columns: columns})
 	return s
 }
 
 // Primary calls PRIMARY KEY keyword.
-func (s *AlterTableStmt) Primary(cols ...string) ialtertable.Primary {
-	s.call(&mig.Primary{Columns: cols})
+func (s *AlterTableStmt) Primary(columns ...string) ialtertable.Primary {
+	s.call(&mig.Primary{Columns: columns})
 	return s
 }
 
 // Foreign calls FOREIGN KEY keyword.
-func (s *AlterTableStmt) Foreign(cols ...string) ialtertable.Foreign {
-	s.call(&mig.Foreign{Columns: cols})
+func (s *AlterTableStmt) Foreign(columns ...string) ialtertable.Foreign {
+	s.call(&mig.Foreign{Columns: columns})
 	return s
 }
 
 // Ref calls REFERENCES keyword.
-func (s *AlterTableStmt) Ref(table string, cols ...string) ialtertable.Ref {
-	s.call(&mig.Ref{Table: table, Columns: cols})
+func (s *AlterTableStmt) Ref(table string, columns ...string) ialtertable.Ref {
+	s.call(&mig.Ref{Table: table, Columns: columns})
 	return s
 }

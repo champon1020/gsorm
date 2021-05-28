@@ -17,6 +17,7 @@ type SelectStmt struct {
 	cmd *clause.Select
 }
 
+// NewSelectStmt creates SelectStmt instance.
 func NewSelectStmt(conn domain.Conn, cols ...string) *SelectStmt {
 	sel := new(clause.Select)
 	if len(cols) == 0 {
@@ -96,8 +97,8 @@ func (s *SelectStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // RawClause calls the raw string clause.
-func (s *SelectStmt) RawClause(rs string, v ...interface{}) iselect.RawClause {
-	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+func (s *SelectStmt) RawClause(raw string, values ...interface{}) iselect.RawClause {
+	s.call(&syntax.RawClause{RawStr: raw, Values: values})
 	return s
 }
 
@@ -112,38 +113,38 @@ func (s *SelectStmt) From(tables ...string) iselect.From {
 }
 
 // Where calls WHERE clause.
-func (s *SelectStmt) Where(expr string, vals ...interface{}) iselect.Where {
-	s.call(&clause.Where{Expr: expr, Values: vals})
+func (s *SelectStmt) Where(expr string, values ...interface{}) iselect.Where {
+	s.call(&clause.Where{Expr: expr, Values: values})
 	return s
 }
 
 // And calls AND clause.
-func (s *SelectStmt) And(expr string, vals ...interface{}) iselect.And {
-	s.call(&clause.And{Expr: expr, Values: vals})
+func (s *SelectStmt) And(expr string, values ...interface{}) iselect.And {
+	s.call(&clause.And{Expr: expr, Values: values})
 	return s
 }
 
 // Or calls OR clause.
-func (s *SelectStmt) Or(expr string, vals ...interface{}) iselect.Or {
-	s.call(&clause.Or{Expr: expr, Values: vals})
+func (s *SelectStmt) Or(expr string, values ...interface{}) iselect.Or {
+	s.call(&clause.Or{Expr: expr, Values: values})
 	return s
 }
 
 // Limit calls LIMIT clause.
-func (s *SelectStmt) Limit(num int) iselect.Limit {
-	s.call(&clause.Limit{Num: num})
+func (s *SelectStmt) Limit(limit int) iselect.Limit {
+	s.call(&clause.Limit{Num: limit})
 	return s
 }
 
 // Offset calls OFFSET clause.
-func (s *SelectStmt) Offset(num int) iselect.Offset {
-	s.call(&clause.Offset{Num: num})
+func (s *SelectStmt) Offset(offset int) iselect.Offset {
+	s.call(&clause.Offset{Num: offset})
 	return s
 }
 
 // OrderBy calls ORDER BY clause.
-func (s *SelectStmt) OrderBy(cols ...string) iselect.OrderBy {
-	s.call(&clause.OrderBy{Columns: cols})
+func (s *SelectStmt) OrderBy(columns ...string) iselect.OrderBy {
+	s.call(&clause.OrderBy{Columns: columns})
 	return s
 }
 
@@ -172,8 +173,8 @@ func (s *SelectStmt) RightJoin(table string) iselect.Join {
 }
 
 // On calls ON clause.
-func (s *SelectStmt) On(expr string, vals ...interface{}) iselect.On {
-	s.call(&clause.On{Expr: expr, Values: vals})
+func (s *SelectStmt) On(expr string, values ...interface{}) iselect.On {
+	s.call(&clause.On{Expr: expr, Values: values})
 	return s
 }
 
@@ -190,9 +191,9 @@ func (s *SelectStmt) UnionAll(stmt domain.Stmt) iselect.Union {
 }
 
 // GroupBy calls GROUP BY clause.
-func (s *SelectStmt) GroupBy(cols ...string) iselect.GroupBy {
+func (s *SelectStmt) GroupBy(columns ...string) iselect.GroupBy {
 	g := new(clause.GroupBy)
-	for _, c := range cols {
+	for _, c := range columns {
 		g.AddColumn(c)
 	}
 	s.call(g)
@@ -200,7 +201,7 @@ func (s *SelectStmt) GroupBy(cols ...string) iselect.GroupBy {
 }
 
 // Having calls HAVING clause.
-func (s *SelectStmt) Having(expr string, vals ...interface{}) iselect.Having {
-	s.call(&clause.Having{Expr: expr, Values: vals})
+func (s *SelectStmt) Having(expr string, values ...interface{}) iselect.Having {
+	s.call(&clause.Having{Expr: expr, Values: values})
 	return s
 }
