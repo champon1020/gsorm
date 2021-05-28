@@ -45,18 +45,18 @@ func OpenMock(driver string) MockDB {
 }
 
 // RawStmt calls raw string statement.
-func RawStmt(conn domain.Conn, rs string, v ...interface{}) iraw.Stmt {
-	return statement.NewRawStmt(conn, rs, v...)
+func RawStmt(conn domain.Conn, raw string, values ...interface{}) iraw.Stmt {
+	return statement.NewRawStmt(conn, raw, values...)
 }
 
 // Select calls SELECT command.
-func Select(conn domain.Conn, cols ...string) iselect.Stmt {
-	return statement.NewSelectStmt(conn, cols...)
+func Select(conn domain.Conn, columns ...string) iselect.Stmt {
+	return statement.NewSelectStmt(conn, columns...)
 }
 
 // Insert calls INSERT command.
-func Insert(conn domain.Conn, table string, cols ...string) iinsert.Stmt {
-	return statement.NewInsertStmt(conn, table, cols...)
+func Insert(conn domain.Conn, table string, columns ...string) iinsert.Stmt {
+	return statement.NewInsertStmt(conn, table, columns...)
 }
 
 // Update calls UPDATE command.
@@ -70,8 +70,8 @@ func Delete(conn domain.Conn) idelete.Stmt {
 }
 
 // Count calls COUNT function.
-func Count(conn domain.Conn, col string, alias ...string) iselect.Stmt {
-	c := fmt.Sprintf("COUNT(%s)", col)
+func Count(conn domain.Conn, column string, alias ...string) iselect.Stmt {
+	c := fmt.Sprintf("COUNT(%s)", column)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
@@ -79,8 +79,8 @@ func Count(conn domain.Conn, col string, alias ...string) iselect.Stmt {
 }
 
 // Avg calls AVG function.
-func Avg(conn domain.Conn, col string, alias ...string) iselect.Stmt {
-	c := fmt.Sprintf("AVG(%s)", col)
+func Avg(conn domain.Conn, column string, alias ...string) iselect.Stmt {
+	c := fmt.Sprintf("AVG(%s)", column)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
@@ -88,8 +88,8 @@ func Avg(conn domain.Conn, col string, alias ...string) iselect.Stmt {
 }
 
 // Sum calls SUM function.
-func Sum(conn domain.Conn, col string, alias ...string) iselect.Stmt {
-	c := fmt.Sprintf("SUM(%s)", col)
+func Sum(conn domain.Conn, column string, alias ...string) iselect.Stmt {
+	c := fmt.Sprintf("SUM(%s)", column)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
@@ -97,8 +97,8 @@ func Sum(conn domain.Conn, col string, alias ...string) iselect.Stmt {
 }
 
 // Min calls MIN function.
-func Min(conn domain.Conn, col string, alias ...string) iselect.Stmt {
-	c := fmt.Sprintf("MIN(%s)", col)
+func Min(conn domain.Conn, column string, alias ...string) iselect.Stmt {
+	c := fmt.Sprintf("MIN(%s)", column)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
@@ -106,8 +106,8 @@ func Min(conn domain.Conn, col string, alias ...string) iselect.Stmt {
 }
 
 // Max calls MAX function.
-func Max(conn domain.Conn, col string, alias ...string) iselect.Stmt {
-	c := fmt.Sprintf("MAX(%s)", col)
+func Max(conn domain.Conn, column string, alias ...string) iselect.Stmt {
+	c := fmt.Sprintf("MAX(%s)", column)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
 	}
@@ -115,31 +115,31 @@ func Max(conn domain.Conn, col string, alias ...string) iselect.Stmt {
 }
 
 // CreateDB calls CREATE DATABASE command.
-func CreateDB(conn domain.Conn, dbName string) icreatedb.DB {
+func CreateDB(conn domain.Conn, dbName string) icreatedb.Stmt {
 	return migration.NewCreateDBStmt(conn, dbName)
 }
 
 // CreateIndex calls CREATE INDEX command.
-func CreateIndex(conn domain.Conn, idx string) icreateindex.Index {
+func CreateIndex(conn domain.Conn, idx string) icreateindex.Stmt {
 	return migration.NewCreateIndexStmt(conn, idx)
 }
 
 // CreateTable calls CREATE TABLE command.
-func CreateTable(conn domain.Conn, table string) icreatetable.Table {
+func CreateTable(conn domain.Conn, table string) icreatetable.Stmt {
 	return migration.NewCreateTableStmt(conn, table)
 }
 
 // DropDB calls DROP DATABASE command.
-func DropDB(conn domain.Conn, dbName string) idropdb.DB {
+func DropDB(conn domain.Conn, dbName string) idropdb.Stmt {
 	return migration.NewDropDBStmt(conn, dbName)
 }
 
 // DropTable calls DROP TABLE command.
-func DropTable(conn domain.Conn, table string) idroptable.Table {
+func DropTable(conn domain.Conn, table string) idroptable.Stmt {
 	return migration.NewDropTableStmt(conn, table)
 }
 
 // AlterTable calls ALTER TABLE command.
-func AlterTable(conn domain.Conn, table string) ialtertable.Table {
+func AlterTable(conn domain.Conn, table string) ialtertable.Stmt {
 	return migration.NewAlterTableStmt(conn, table)
 }

@@ -2,8 +2,8 @@ package ialtertable
 
 import "github.com/champon1020/gsorm/interfaces"
 
-// Table is interface which is returned by gsorm.AlterTable.
-type Table interface {
+// Stmt is interface which is returned by gsorm.AlterTable.
+type Stmt interface {
 	RawClause(raw string, values ...interface{}) RawClause
 	Rename(table string) Rename
 	AddColumn(column, typ string) AddColumn
@@ -29,38 +29,38 @@ type RawClause interface {
 
 // Rename is interface which is returned by (*AlterTableStmt).Rename.
 type Rename interface {
-	Table
+	Stmt
 	interfaces.MigrateCallable
 }
 
 // AddColumn is interface which is returned by (*AlterTableStmt).AddColumn.
 type AddColumn interface {
-	Table
+	Stmt
 	NotNull() NotNull
 	Default(value interface{}) Default
 }
 
 // DropColumn is interface which is returned by (*AlterTableStmt).DropColumn.
 type DropColumn interface {
-	Table
+	Stmt
 	interfaces.MigrateCallable
 }
 
-// RenameColumn is interface which is returned by (*AlterTableStmt).RenameColumn.
+// RenameColumn is interface which is returned by (*AlterStmtStmt).RenameColumn.
 type RenameColumn interface {
-	Table
+	Stmt
 	interfaces.MigrateCallable
 }
 
 // NotNull is interface which is returned by (*AlterTableStmt).NotNull.
 type NotNull interface {
-	Table
+	Stmt
 	Default(value interface{}) Default
 }
 
 // Default is interface which is returned by (*AlterTableStmt).Default.
 type Default interface {
-	Table
+	Stmt
 	NotNull() NotNull
 }
 
@@ -74,13 +74,13 @@ type AddCons interface {
 
 // Unique is interface which is returned by (*AlterTableStmt).Unique.
 type Unique interface {
-	Table
+	Stmt
 	interfaces.MigrateCallable
 }
 
 // Primary is interface which is returned by (*AlterTableStmt).Primary.
 type Primary interface {
-	Table
+	Stmt
 	interfaces.MigrateCallable
 }
 
@@ -92,6 +92,6 @@ type Foreign interface {
 
 // Ref is interface which is returned by (*AlterTableStmt).Ref.
 type Ref interface {
-	Table
+	Stmt
 	interfaces.MigrateCallable
 }

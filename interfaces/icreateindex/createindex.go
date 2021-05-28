@@ -2,8 +2,8 @@ package icreateindex
 
 import "github.com/champon1020/gsorm/interfaces"
 
-// Index is interface which is returned by gsorm.CreateIndex.
-type Index interface {
+// Stmt is interface which is returned by gsorm.CreateIndex.
+type Stmt interface {
 	RawClause(raw string, values ...interface{}) RawClause
 	On(table string, columns ...string) On
 }

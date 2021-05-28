@@ -2,8 +2,8 @@ package icreatetable
 
 import "github.com/champon1020/gsorm/interfaces"
 
-// Table is interface which is returned by gsorm.CreateTable.
-type Table interface {
+// Stmt is interface which is returned by gsorm.CreateTable.
+type Stmt interface {
 	RawClause(raw string, values ...interface{}) RawClause
 	Model(interface{}) Model
 	Column(column, typ string) Column
