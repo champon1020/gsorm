@@ -1,13 +1,13 @@
 package migration
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 
 	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/champon1020/gsorm/interfaces/icreatetable"
 	"github.com/champon1020/gsorm/internal"
+	"github.com/champon1020/gsorm/internal/parser"
 	"github.com/champon1020/gsorm/syntax"
 	"github.com/champon1020/gsorm/syntax/mig"
 	"github.com/morikuni/failure"
@@ -104,94 +104,17 @@ func (s *CreateTableStmt) buildSQLWithClauses(sql *internal.SQL) error {
 }
 
 func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
-	typ := reflect.TypeOf(s.model)
-	if typ.Kind() != reflect.Ptr {
-		return failure.New(errInvalidValue, failure.Message("model must be pointer"))
+	p, err := parser.NewCreateTableModelParser(s.model, s.conn.GetDriver())
+	if err != nil {
+		return failure.Translate(err, errFailedParse)
 	}
 
-	typ = typ.Elem()
-	if typ.Kind() != reflect.Struct {
-		return failure.New(errInvalidValue, failure.Message("model must be pointer of struct"))
+	modelSQL, err := p.Parse()
+	if err != nil {
+		return failure.Translate(err, errFailedParse)
 	}
 
-	var (
-		uc  = make(map[string][]string)
-		pk  = make(map[string][]string)
-		fk  = make(map[string][]string)
-		ref = make(map[string]string)
-	)
-	sql.Write("(")
-	for i := 0; i < typ.NumField(); i++ {
-		if i > 0 {
-			sql.Write(",")
-		}
-		f := typ.Field(i)
-		tag := internal.ExtractTag(f)
-
-		// Write column name.
-		var name string
-		if tag.Lookup("col") {
-			name = tag.Column
-		} else {
-			name = internal.SnakeCase(f.Name)
-		}
-		sql.Write(name)
-
-		// Write column type.
-		if tag.Lookup("typ") {
-			sql.Write(tag.Type)
-		} else {
-			if s.conn == nil {
-				return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
-			}
-			dbtyp := s.conn.GetDriver().LookupDefaultType(f.Type)
-			if dbtyp == "" {
-				return failure.New(errInvalidType,
-					failure.Context{"type": f.Type.String()},
-					failure.Message("invalid type for database column"))
-			}
-			sql.Write(dbtyp)
-		}
-
-		// Write NOT NULL option if exist.
-		if tag.Lookup("notnull") {
-			sql.Write("NOT NULL")
-		}
-		// Write DEFAULT option if exist.
-		if tag.Lookup("default") {
-			sql.Write(fmt.Sprintf("DEFAULT %s", tag.Default))
-		}
-		// Store unique key if exist.
-		if tag.Lookup("uc") {
-			uc[tag.UC] = append(uc[tag.UC], name)
-		}
-		// Store primary key if exist.
-		if tag.Lookup("pk") {
-			pk[tag.PK] = append(pk[tag.PK], name)
-		}
-		// Store foreign key if exist.
-		if tag.Lookup("fk") {
-			fk[tag.FK] = append(fk[tag.FK], name)
-			ref[tag.FK] = tag.Ref
-		}
-	}
-
-	// Write unique key if exist.
-	for k, v := range uc {
-		sql.Write(",")
-		sql.Write(fmt.Sprintf("CONSTRAINT %s UNIQUE (%s)", k, strings.Join(v, ", ")))
-	}
-	// Write primary key if exist.
-	for k, v := range pk {
-		sql.Write(",")
-		sql.Write(fmt.Sprintf("CONSTRAINT %s PRIMARY KEY (%s)", k, strings.Join(v, ", ")))
-	}
-	// Write foreign key if exist.
-	for k, v := range fk {
-		sql.Write(",")
-		sql.Write(fmt.Sprintf("CONSTRAINT %s FOREIGN KEY (%s) REFERENCES %s", k, strings.Join(v, ", "), ref[k]))
-	}
-	sql.Write(")")
+	sql.Write(modelSQL.String())
 	return nil
 }
 

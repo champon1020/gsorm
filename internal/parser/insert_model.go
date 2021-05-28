@@ -1,9 +1,7 @@
 package parser
 
 import (
-	"fmt"
 	"reflect"
-	"strconv"
 
 	"github.com/champon1020/gsorm/internal"
 	"github.com/morikuni/failure"
@@ -49,33 +47,11 @@ func (p *InsertModelParser) Parse() (*internal.SQL, error) {
 			}
 			return &sql, nil
 		}
-		if err := p.ParseVarSlice(&sql, p.Model); err != nil {
-			return nil, err
-		}
-		return &sql, nil
 	case reflect.Struct:
 		p.ParseStruct(&sql, p.Model)
 		return &sql, nil
 	case reflect.Map:
 		if err := p.ParseMap(&sql, p.Model); err != nil {
-			return nil, err
-		}
-		return &sql, nil
-	case reflect.Int,
-		reflect.Int8,
-		reflect.Int16,
-		reflect.Int32,
-		reflect.Int64,
-		reflect.Uint,
-		reflect.Uint8,
-		reflect.Uint16,
-		reflect.Uint32,
-		reflect.Uint64,
-		reflect.Float32,
-		reflect.Float64,
-		reflect.Bool,
-		reflect.String:
-		if err := p.ParseVar(&sql, p.Model); err != nil {
 			return nil, err
 		}
 		return &sql, nil
@@ -109,20 +85,6 @@ func (p *InsertModelParser) ParseStructSlice(sql *internal.SQL, model reflect.Va
 		}
 		p.ParseStruct(sql, model.Index(i))
 	}
-}
-
-// ParseVarSlice parses slice or array of variable to SQL.
-func (p *InsertModelParser) ParseVarSlice(sql *internal.SQL, model reflect.Value) error {
-	for i := 0; i < model.Len(); i++ {
-		if i > 0 {
-			sql.Write(",")
-		}
-		err := p.ParseVar(sql, model.Index(i))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 // ParseMap parses map to SQL.
@@ -159,19 +121,6 @@ func (p *InsertModelParser) ParseStruct(sql *internal.SQL, model reflect.Value) 
 		sql.Write(s)
 	}
 	sql.Write(")")
-}
-
-// ParseVar parses variable to SQL.
-func (p *InsertModelParser) ParseVar(sql *internal.SQL, model reflect.Value) error {
-	if len(p.Cols) != 1 {
-		return failure.New(errInvalidSyntax,
-			failure.Context{"n_columns": strconv.Itoa(len(p.Cols))},
-			failure.Message("invalid number of columns"))
-	}
-
-	s := internal.ToString(model.Interface(), nil)
-	sql.Write(fmt.Sprintf("(%s)", s))
-	return nil
 }
 
 func (p *InsertModelParser) columnsAndFields(target reflect.Type) map[int]int {
