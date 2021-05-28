@@ -293,15 +293,11 @@ func TestMockTx_CompareWith_Fail(t *testing.T) {
 
 		// Test phase.
 		mock := database.NewMockDB("")
-		mock.ExpectBegin()
-		mocktx, err := mock.Begin()
-		if err != nil {
-			t.Errorf("error was occurred: %v", err)
-		}
+		mocktx := mock.ExpectBegin()
 		mocktx.Expect(gsorm.Insert(nil, "table1", "column1").Values(10))
 
 		// Actual process.
-		err = gsorm.Insert(mocktx, "table2", "column2").Values(10).Exec()
+		err := gsorm.Insert(mocktx, "table2", "column2").Values(10).Exec()
 
 		// Validate if the expected error was occurred.
 		if !failure.Is(err, expectedErr) {
@@ -315,15 +311,11 @@ func TestMockTx_CompareWith_Fail(t *testing.T) {
 
 		// Test phase.
 		mock := database.NewMockDB("")
-		mock.ExpectBegin()
-		mocktx, err := mock.Begin()
-		if err != nil {
-			t.Errorf("error was occurred: %v", err)
-		}
+		mocktx := mock.ExpectBegin()
 		mocktx.Expect(gsorm.Insert(nil, "table1", "column1").Values(10))
 
 		// Actual process.
-		err = gsorm.Insert(mocktx, "table2", "column2").Values(10).Values(100).Exec()
+		err := gsorm.Insert(mocktx, "table2", "column2").Values(10).Values(100).Exec()
 
 		// Validate if the expected error was occurred.
 		if !failure.Is(err, expectedErr) {
