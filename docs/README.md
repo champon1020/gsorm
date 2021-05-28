@@ -1,7 +1,7 @@
 # Docs
 This is the gsorm document.
 
-[Japanese](https://github.com/champon1020/mgorm/blob/docs/docs/README_jp.md)
+[Japanese](https://github.com/champon1020/gsorm/tree/main/docs/README_ja.md)
 
 ## Overview
 - [Introduction](https://github.com/champon1020/gsorm/tree/main/docs/introduction.md)
@@ -71,8 +71,20 @@ This is the gsorm document.
   - [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw.md#rawclause)
   - [RawStmt](https://github.com/champon1020/gsorm/tree/main/docs/raw.md#rawstmt)
 - [Model](https://github.com/champon1020/gsorm/tree/main/docs/model.md)
-- [Transaction](https://github.com/champon1020/gsorm/tree/main/docs/transaction.md)
-- [Mock](https://github.com/champon1020/gsorm/tree/main/docs/droptable.md)
-  - [Expect](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#expect)
-  - [Return](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#return)
-  - [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#complete)
+  - [Type](https://github.com/champon1020/gsorm/tree/main/docs/model.md#type)
+  - [Tag](https://github.com/champon1020/gsorm/tree/main/docs/model.md#tag)
+- [Connection](https://github.com/champon1020/gsorm/tree/main/docs/connection.md)
+  - [DB](https://github.com/champon1020/gsorm/tree/main/docs/connection.md#db)
+  - [Tx](https://github.com/champon1020/gsorm/tree/main/docs/connection.md#tx)
+- [Mock](https://github.com/champon1020/gsorm/tree/main/docs/mock.md)
+  - [MockDB](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mockdb)
+    - [Expect](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mockdbexpect)
+    - [ExpectWithReturn](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mockdbexpectreturn)
+    - [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mockdbcomplete)
+    - [ExpectBegin](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mockdbexpectbegin)
+  - [MockTx](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mocktx)
+    - [Expect](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mocktxexpect)
+    - [ExpectWithReturn](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mocktxexpectreturn)
+    - [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mocktxcomplete)
+    - [ExpectCommit](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mocktxcommit)
+    - [ExpectRollback](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mocktxrollback)

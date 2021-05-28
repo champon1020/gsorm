@@ -8,7 +8,7 @@
 - [gsorm.MockTx](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktx)
 
 
-# DB
+## DB
 `gsorm.DB`を実装する構造体は`gsorm.Open`関数で生成されます．
 
 第一引数にはデータベースドライバー名，第二引数にはDSNをを指定します．
