@@ -8,4 +8,5 @@ const (
 	errInvalidSyntax      failure.StringCode = "InvalidSyntax"
 	errInvalidType        failure.StringCode = "InvalidType"
 	errFailedDBConnection failure.StringCode = "FailedDBConnection"
+	errFailedParse        failure.StringCode = "FailedParse"
 )
