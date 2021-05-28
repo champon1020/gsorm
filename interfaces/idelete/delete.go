@@ -4,44 +4,44 @@ import "github.com/champon1020/gsorm/interfaces"
 
 // Stmt is interface which is returned by gsorm.Delete.
 type Stmt interface {
-	From(...string) From
-	RawClause(rs string, v ...interface{}) RawClause
+	From(tables ...string) From
+	RawClause(raw string, values ...interface{}) RawClause
 }
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
-	From(t ...string) From
-	Where(e string, v ...interface{}) Where
-	And(e string, v ...interface{}) And
-	Or(e string, v ...interface{}) Or
+	From(tables ...string) From
+	Where(expr string, values ...interface{}) Where
+	And(expr string, values ...interface{}) And
+	Or(expr string, values ...interface{}) Or
 	interfaces.ExecCallable
 }
 
 // From is interface which is returned by (*Stmt).From.
 type From interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Where(string, ...interface{}) Where
+	RawClause(raw string, values ...interface{}) RawClause
+	Where(expr string, values ...interface{}) Where
 	interfaces.ExecCallable
 }
 
 // Where is interface which is returned by (*Stmt).Where.
 type Where interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	And(string, ...interface{}) And
-	Or(string, ...interface{}) Or
+	RawClause(raw string, values ...interface{}) RawClause
+	And(expr string, values ...interface{}) And
+	Or(expr string, values ...interface{}) Or
 	interfaces.ExecCallable
 }
 
 // And is interface which is returned by (*Stmt).And.
 type And interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	And(string, ...interface{}) And
+	RawClause(raw string, values ...interface{}) RawClause
+	And(expr string, values ...interface{}) And
 	interfaces.ExecCallable
 }
 
 // Or is interface which is returned by (*Or).Or.
 type Or interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Or(string, ...interface{}) Or
+	RawClause(raw string, values ...interface{}) RawClause
+	Or(expr string, values ...interface{}) Or
 	interfaces.ExecCallable
 }

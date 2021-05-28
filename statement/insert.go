@@ -3,7 +3,6 @@ package statement
 import (
 	"reflect"
 
-	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/internal"
 	"github.com/champon1020/gsorm/internal/parser"
 	"github.com/champon1020/gsorm/syntax"
@@ -154,7 +153,7 @@ func (s *InsertStmt) Model(model interface{}) iinsert.Model {
 }
 
 // Select calls SELECT statement.
-func (s *InsertStmt) Select(sel interfaces.QueryCallable) iinsert.Select {
+func (s *InsertStmt) Select(sel domain.Stmt) iinsert.Select {
 	s.sel = sel
 	return s
 }

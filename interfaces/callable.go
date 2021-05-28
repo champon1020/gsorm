@@ -4,22 +4,14 @@ import "github.com/champon1020/gsorm/interfaces/domain"
 
 // QueryCallable is embedded into clause interfaces which can call (*Stmt).Query.
 type QueryCallable interface {
-	Query(interface{}) error
-	String() string
-	FuncString() string
-	Called() []domain.Clause
-	Cmd() domain.Clause
-	CompareWith(targetStmt domain.Stmt) error
+	Query(model interface{}) error
+	domain.Stmt
 }
 
 // ExecCallable is embedded into clause interfaces which can call (*Stmt).Exec.
 type ExecCallable interface {
 	Exec() error
-	String() string
-	FuncString() string
-	Called() []domain.Clause
-	Cmd() domain.Clause
-	CompareWith(targetStmt domain.Stmt) error
+	domain.Stmt
 }
 
 // MigrateCallable is embedded into clause interfaces which can call (*MigStmt).Migration.

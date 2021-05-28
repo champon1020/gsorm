@@ -4,7 +4,7 @@ import "github.com/champon1020/gsorm/interfaces"
 
 // Table is interface which is returned by gsorm.DropTable.
 type Table interface {
-	RawClause(rs string, v ...interface{}) RawClause
+	RawClause(raw string, values ...interface{}) RawClause
 	interfaces.MigrateCallable
 }
 

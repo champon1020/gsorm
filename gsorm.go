@@ -21,9 +21,16 @@ import (
 )
 
 type (
-	DB     = domain.DB
-	Tx     = domain.Tx
+	// DB interface.
+	DB = domain.DB
+
+	// Tx interface.
+	Tx = domain.Tx
+
+	// MockDB interface.
 	MockDB = domain.MockDB
+
+	// MockTx interface.
 	MockTx = domain.MockTx
 )
 

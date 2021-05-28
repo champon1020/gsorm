@@ -6,53 +6,53 @@ import (
 
 // Stmt is interface which is returned by gsorm.Update.
 type Stmt interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Model(model interface{}, cols ...string) Model
-	Set(col string, val interface{}) Set
+	RawClause(raw string, values ...interface{}) RawClause
+	Model(model interface{}, columns ...string) Model
+	Set(column string, value interface{}) Set
 }
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
-	Set(c string, v interface{}) Set
-	Where(e string, v ...interface{}) Where
-	And(e string, v ...interface{}) And
-	Or(e string, v ...interface{}) Or
+	Set(column string, value interface{}) Set
+	Where(expr string, values ...interface{}) Where
+	And(expr string, values ...interface{}) And
+	Or(expr string, values ...interface{}) Or
 }
 
 // Model is interface which is returned by (*UpdateStmt).Model.
 type Model interface {
-	Where(string, ...interface{}) Where
+	Where(expr string, values ...interface{}) Where
 	interfaces.ExecCallable
 }
 
 // Set is interface which is returned by (*UpdateStmt).Set.
 type Set interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Set(col string, val interface{}) Set
-	Where(string, ...interface{}) Where
+	RawClause(raw string, values ...interface{}) RawClause
+	Set(column string, value interface{}) Set
+	Where(epxr string, values ...interface{}) Where
 	interfaces.ExecCallable
 }
 
 // Where is interface which is returned by (*UpdateStmt).Where.
 type Where interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	And(string, ...interface{}) And
-	Or(string, ...interface{}) Or
+	RawClause(raw string, values ...interface{}) RawClause
+	And(expr string, values ...interface{}) And
+	Or(expr string, values ...interface{}) Or
 	interfaces.ExecCallable
 }
 
 // And is interface which is returned by (*UpdateStmt).And.
 type And interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	And(string, ...interface{}) And
-	Or(string, ...interface{}) Or
+	RawClause(raw string, values ...interface{}) RawClause
+	And(expr string, values ...interface{}) And
+	Or(expr string, values ...interface{}) Or
 	interfaces.ExecCallable
 }
 
 // Or is interface which is returned by (*UpdateStmt).Or.
 type Or interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	And(string, ...interface{}) And
-	Or(string, ...interface{}) Or
+	RawClause(raw string, values ...interface{}) RawClause
+	And(expr string, values ...interface{}) And
+	Or(expr string, values ...interface{}) Or
 	interfaces.ExecCallable
 }

@@ -4,27 +4,27 @@ import "github.com/champon1020/gsorm/interfaces"
 
 // Table is interface which is returned by gsorm.AlterTable.
 type Table interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Rename(string) Rename
-	AddColumn(string, string) AddColumn
-	DropColumn(string) DropColumn
-	RenameColumn(string, string) RenameColumn
-	AddCons(string) AddCons
+	RawClause(raw string, values ...interface{}) RawClause
+	Rename(table string) Rename
+	AddColumn(column, typ string) AddColumn
+	DropColumn(column string) DropColumn
+	RenameColumn(column, dest string) RenameColumn
+	AddCons(key string) AddCons
 }
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
-	Rename(t string) Rename
-	AddColumn(c string, t string) AddColumn
+	Rename(table string) Rename
+	AddColumn(column string, typ string) AddColumn
 	NotNull() NotNull
-	Default(v interface{}) Default
-	DropColumn(c string) DropColumn
-	RenameColumn(from string, to string) RenameColumn
-	AddCons(k string) AddCons
-	Unique(c ...string) Unique
-	Primary(c ...string) Primary
-	Foreign(c ...string) Foreign
-	Ref(t string, c ...string) Ref
+	Default(value interface{}) Default
+	DropColumn(column string) DropColumn
+	RenameColumn(column, dest string) RenameColumn
+	AddCons(key string) AddCons
+	Unique(columns ...string) Unique
+	Primary(columns ...string) Primary
+	Foreign(columns ...string) Foreign
+	Ref(table string, columns ...string) Ref
 }
 
 // Rename is interface which is returned by (*AlterTableStmt).Rename.
@@ -37,7 +37,7 @@ type Rename interface {
 type AddColumn interface {
 	Table
 	NotNull() NotNull
-	Default(interface{}) Default
+	Default(value interface{}) Default
 }
 
 // DropColumn is interface which is returned by (*AlterTableStmt).DropColumn.
@@ -55,7 +55,7 @@ type RenameColumn interface {
 // NotNull is interface which is returned by (*AlterTableStmt).NotNull.
 type NotNull interface {
 	Table
-	Default(interface{}) Default
+	Default(value interface{}) Default
 }
 
 // Default is interface which is returned by (*AlterTableStmt).Default.
@@ -66,10 +66,10 @@ type Default interface {
 
 // AddCons is interface which is returned by (*AlterTableStmt).AddCons.
 type AddCons interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Unique(...string) Unique
-	Primary(...string) Primary
-	Foreign(...string) Foreign
+	RawClause(raw string, values ...interface{}) RawClause
+	Unique(columns ...string) Unique
+	Primary(columns ...string) Primary
+	Foreign(columns ...string) Foreign
 }
 
 // Unique is interface which is returned by (*AlterTableStmt).Unique.
@@ -86,8 +86,8 @@ type Primary interface {
 
 // Foreign is interface which is returned by (*AlterTableStmt).Foreign.
 type Foreign interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Ref(string, ...string) Ref
+	RawClause(raw string, values ...interface{}) RawClause
+	Ref(table string, columns ...string) Ref
 }
 
 // Ref is interface which is returned by (*AlterTableStmt).Ref.

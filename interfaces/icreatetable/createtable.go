@@ -4,21 +4,21 @@ import "github.com/champon1020/gsorm/interfaces"
 
 // Table is interface which is returned by gsorm.CreateTable.
 type Table interface {
-	RawClause(rs string, v ...interface{}) RawClause
+	RawClause(raw string, values ...interface{}) RawClause
 	Model(interface{}) Model
-	Column(string, string) Column
+	Column(column, typ string) Column
 }
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
-	Column(c string, t string) Column
+	Column(column, typ string) Column
 	NotNull() NotNull
-	Default(v interface{}) Default
-	Cons(k string) Cons
-	Unique(c ...string) Unique
-	Primary(c ...string) Primary
-	Foreign(c ...string) Foreign
-	Ref(t string, c ...string) Ref
+	Default(value interface{}) Default
+	Cons(key string) Cons
+	Unique(columns ...string) Unique
+	Primary(columns ...string) Primary
+	Foreign(columns ...string) Foreign
+	Ref(table string, columns ...string) Ref
 	interfaces.MigrateCallable
 }
 
@@ -29,63 +29,63 @@ type Model interface {
 
 // Column is interface which is returned by (*CreateTableStmt).Column.
 type Column interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Column(string, string) Column
+	RawClause(raw string, value ...interface{}) RawClause
+	Column(column, typ string) Column
 	NotNull() NotNull
-	Default(interface{}) Default
-	Cons(string) Cons
+	Default(value interface{}) Default
+	Cons(key string) Cons
 	interfaces.MigrateCallable
 }
 
 // NotNull is interface which is returned by (*CreateTableStmt).NotNull.
 type NotNull interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Column(string, string) Column
-	Default(interface{}) Default
-	Cons(string) Cons
+	RawClause(raw string, value ...interface{}) RawClause
+	Column(column, typ string) Column
+	Default(value interface{}) Default
+	Cons(key string) Cons
 	interfaces.MigrateCallable
 }
 
 // Default is interface which is returned by (*CreateTableStmt).Default.
 type Default interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Column(string, string) Column
+	RawClause(raw string, value ...interface{}) RawClause
+	Column(column, typ string) Column
 	NotNull() NotNull
-	Cons(string) Cons
+	Cons(key string) Cons
 	interfaces.MigrateCallable
 }
 
 // Cons is interface which is returned by (*CreateTableStmt).Cons.
 type Cons interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Unique(...string) Unique
-	Primary(...string) Primary
-	Foreign(...string) Foreign
+	RawClause(raw string, value ...interface{}) RawClause
+	Unique(columns ...string) Unique
+	Primary(columns ...string) Primary
+	Foreign(columns ...string) Foreign
 }
 
 // Unique is interface which is returned by (*CreateTableStmt).Unique.
 type Unique interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Cons(string) Cons
+	RawClause(raw string, value ...interface{}) RawClause
+	Cons(key string) Cons
 	interfaces.MigrateCallable
 }
 
 // Primary is interface which is returned by (*CreateTableStmt).Primary.
 type Primary interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Cons(string) Cons
+	RawClause(raw string, value ...interface{}) RawClause
+	Cons(key string) Cons
 	interfaces.MigrateCallable
 }
 
 // Foreign is interface which is returned by (*CreateTableStmt).Foreign.
 type Foreign interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Ref(string, ...string) Ref
+	RawClause(raw string, value ...interface{}) RawClause
+	Ref(table string, columns ...string) Ref
 }
 
 // Ref is interface which is returned by (*CreateTableStmt).Ref.
 type Ref interface {
-	RawClause(rs string, v ...interface{}) RawClause
-	Cons(string) Cons
+	RawClause(raw string, value ...interface{}) RawClause
+	Cons(key string) Cons
 	interfaces.MigrateCallable
 }
