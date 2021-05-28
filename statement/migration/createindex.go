@@ -66,13 +66,13 @@ func (s *CreateIndexStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // On calls ON clause.
-func (s *CreateIndexStmt) On(table string, cols ...string) icreateindex.On {
-	s.call(&mig.On{Table: table, Columns: cols})
+func (s *CreateIndexStmt) On(table string, columns ...string) icreateindex.On {
+	s.call(&mig.On{Table: table, Columns: columns})
 	return s
 }
 
 // RawClause calls the raw string clause.
-func (s *CreateIndexStmt) RawClause(rs string, v ...interface{}) icreateindex.RawClause {
-	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+func (s *CreateIndexStmt) RawClause(raw string, values ...interface{}) icreateindex.RawClause {
+	s.call(&syntax.RawClause{RawStr: raw, Values: values})
 	return s
 }

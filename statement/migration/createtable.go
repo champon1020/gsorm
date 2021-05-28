@@ -119,8 +119,8 @@ func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
 }
 
 // RawClause calls the raw string clause.
-func (s *CreateTableStmt) RawClause(rs string, v ...interface{}) icreatetable.RawClause {
-	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+func (s *CreateTableStmt) RawClause(raw string, values ...interface{}) icreatetable.RawClause {
+	s.call(&syntax.RawClause{RawStr: raw, Values: values})
 	return s
 }
 
@@ -131,8 +131,8 @@ func (s *CreateTableStmt) Model(model interface{}) icreatetable.Model {
 }
 
 // Column calls table column definition.
-func (s *CreateTableStmt) Column(col, typ string) icreatetable.Column {
-	s.call(&mig.Column{Col: col, Type: typ})
+func (s *CreateTableStmt) Column(column, typ string) icreatetable.Column {
+	s.call(&mig.Column{Col: column, Type: typ})
 	return s
 }
 
@@ -143,8 +143,8 @@ func (s *CreateTableStmt) NotNull() icreatetable.NotNull {
 }
 
 // Default calls DEFAULT option.
-func (s *CreateTableStmt) Default(val interface{}) icreatetable.Default {
-	s.call(&mig.Default{Value: val})
+func (s *CreateTableStmt) Default(value interface{}) icreatetable.Default {
+	s.call(&mig.Default{Value: value})
 	return s
 }
 
@@ -155,25 +155,25 @@ func (s *CreateTableStmt) Cons(key string) icreatetable.Cons {
 }
 
 // Unique calls UNIQUE keyword.
-func (s *CreateTableStmt) Unique(cols ...string) icreatetable.Unique {
-	s.call(&mig.Unique{Columns: cols})
+func (s *CreateTableStmt) Unique(columns ...string) icreatetable.Unique {
+	s.call(&mig.Unique{Columns: columns})
 	return s
 }
 
 // Primary calls PRIMARY KEY keyword.
-func (s *CreateTableStmt) Primary(cols ...string) icreatetable.Primary {
-	s.call(&mig.Primary{Columns: cols})
+func (s *CreateTableStmt) Primary(columns ...string) icreatetable.Primary {
+	s.call(&mig.Primary{Columns: columns})
 	return s
 }
 
 // Foreign calls FOREIGN KEY keyword.
-func (s *CreateTableStmt) Foreign(cols ...string) icreatetable.Foreign {
-	s.call(&mig.Foreign{Columns: cols})
+func (s *CreateTableStmt) Foreign(columns ...string) icreatetable.Foreign {
+	s.call(&mig.Foreign{Columns: columns})
 	return s
 }
 
 // Ref calls REFERENCES keyword.
-func (s *CreateTableStmt) Ref(table string, cols ...string) icreatetable.Ref {
-	s.call(&mig.Ref{Table: table, Columns: cols})
+func (s *CreateTableStmt) Ref(table string, columns ...string) icreatetable.Ref {
+	s.call(&mig.Ref{Table: table, Columns: columns})
 	return s
 }

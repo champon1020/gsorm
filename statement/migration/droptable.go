@@ -65,7 +65,7 @@ func (s *DropTableStmt) buildSQL(sql *internal.SQL) error {
 }
 
 // RawClause calls the raw string clause.
-func (s *DropTableStmt) RawClause(rs string, v ...interface{}) idroptable.RawClause {
-	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+func (s *DropTableStmt) RawClause(raw string, value ...interface{}) idroptable.RawClause {
+	s.call(&syntax.RawClause{RawStr: raw, Values: value})
 	return s
 }

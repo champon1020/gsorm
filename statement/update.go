@@ -20,6 +20,7 @@ type UpdateStmt struct {
 	cmd       *clause.Update
 }
 
+// NewUpdateStmt creates UpdateStmt instance.
 func NewUpdateStmt(conn domain.Conn, table string) *UpdateStmt {
 	u := new(clause.Update)
 	u.AddTable(table)
@@ -130,38 +131,38 @@ func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *in
 }
 
 // RawClause calls the raw string clause.
-func (s *UpdateStmt) RawClause(rs string, v ...interface{}) iupdate.RawClause {
-	s.call(&syntax.RawClause{RawStr: rs, Values: v})
+func (s *UpdateStmt) RawClause(raw string, values ...interface{}) iupdate.RawClause {
+	s.call(&syntax.RawClause{RawStr: raw, Values: values})
 	return s
 }
 
 // Model sets model to UpdateStmt.
-func (s *UpdateStmt) Model(model interface{}, cols ...string) iupdate.Model {
+func (s *UpdateStmt) Model(model interface{}, columns ...string) iupdate.Model {
 	s.model = model
-	s.modelCols = cols
+	s.modelCols = columns
 	return s
 }
 
 // Set calls SET clause.
-func (s *UpdateStmt) Set(col string, val interface{}) iupdate.Set {
-	s.call(&clause.Set{Column: col, Value: val})
+func (s *UpdateStmt) Set(column string, value interface{}) iupdate.Set {
+	s.call(&clause.Set{Column: column, Value: value})
 	return s
 }
 
 // Where calls WHERE clause.
-func (s *UpdateStmt) Where(expr string, vals ...interface{}) iupdate.Where {
-	s.call(&clause.Where{Expr: expr, Values: vals})
+func (s *UpdateStmt) Where(expr string, values ...interface{}) iupdate.Where {
+	s.call(&clause.Where{Expr: expr, Values: values})
 	return s
 }
 
 // And calls AND clause.
-func (s *UpdateStmt) And(expr string, vals ...interface{}) iupdate.And {
-	s.call(&clause.And{Expr: expr, Values: vals})
+func (s *UpdateStmt) And(expr string, values ...interface{}) iupdate.And {
+	s.call(&clause.And{Expr: expr, Values: values})
 	return s
 }
 
 // Or calls OR clause.
-func (s *UpdateStmt) Or(expr string, vals ...interface{}) iupdate.Or {
-	s.call(&clause.Or{Expr: expr, Values: vals})
+func (s *UpdateStmt) Or(expr string, values ...interface{}) iupdate.Or {
+	s.call(&clause.Or{Expr: expr, Values: values})
 	return s
 }
