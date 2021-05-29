@@ -1,11 +1,9 @@
 # Select
-`gsorm.Select`はSELECT句を呼び出します．
+`gsorm.Select` calls SELECT statement.
 
-引数にはデータベースのコネクション(`gsorm.Conn`)，カラム名を指定します．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Select)
 
-カラム名は複数指定することができます．カラム名はからでも問題ありません．
-
-#### 例
+#### Example
 ```go
 err := gsorm.Select(db, "emp_no").From("employees").Query(&model)
 // SELECT emp_no FROM people;
@@ -25,27 +23,26 @@ err := gsorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 
 
 ## Methods
-`gsorm.Select`に使用できるメソッドは以下です．
+- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw.md#rawclause)
+- [From](https://github.com/champon1020/gsorm/tree/main/docs/select.md#from)
+- [Join](https://github.com/champon1020/gsorm/tree/main/docs/select.md#join)
+- [LeftJoin](https://github.com/champon1020/gsorm/tree/main/docs/select.md#leftjoin)
+- [RightJoin](https://github.com/champon1020/gsorm/tree/main/docs/select.md#rightjoin)
+- [Where](https://github.com/champon1020/gsorm/tree/main/docs/select.md#where)
+- [And](https://github.com/champon1020/gsorm/tree/main/docs/select.md#and)
+- [Or](https://github.com/champon1020/gsorm/tree/main/docs/select.md#or)
+- [GroupBy](https://github.com/champon1020/gsorm/tree/main/docs/select.md#groupby)
+- [Having](https://github.com/champon1020/gsorm/tree/main/docs/select.md#having)
+- [Union](https://github.com/champon1020/gsorm/tree/main/docs/select.md#union)
+- [UnionAll](https://github.com/champon1020/gsorm/tree/main/docs/select.md#unionall)
+- [OrderBy](https://github.com/champon1020/gsorm/tree/main/docs/select.md#orderby)
+- [Limit](https://github.com/champon1020/gsorm/tree/main/docs/select.md#limit)
+- [Offset](https://github.com/champon1020/gsorm/tree/main/docs/select.md#offset)
+- [Query](https://github.com/champon1020/gsorm/tree/main/docs/select.md#query)
 
-- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
-- [From](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#from)
-- [Join](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#join)
-- [LeftJoin](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#leftjoin)
-- [RightJoin](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#rightjoin)
-- [Where](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#where)
-- [And](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#and)
-- [Or](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#or)
-- [GroupBy](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#groupby)
-- [Having](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#having)
-- [Union](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#union)
-- [UnionAll](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#unionall)
-- [OrderBy](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#orderby)
-- [Limit](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#limit)
-- [Offset](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#offset)
-- [Query](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#query)
+These methods is executed according to the following EBNF.
 
-これらのメソッドは以下のEBNFに従って実行することができます．
-但し，例外として`RawClause`は任意で呼び出すことができます．
+Exceptionally, `RawClause` can be executed at any time.
 
 ```
 | alternation
@@ -65,7 +62,7 @@ gsorm.Select
     .Query
 ```
 
-例えば以下の実装はコンパイルエラーを吐き出します．
+For example, these implementations will output the compile error.
 
 ```go
 // NG
@@ -80,12 +77,11 @@ err := gsorm.Select(db).
 
 
 ## From
-`From`はFROM句を呼び出します．
+`From` calls FROM clause.
 
-引数には複数のテーブル名を指定します．
-これらのテーブル名にはエイリアスを含めることができます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.From)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Select(db, "emp_no").From("employees").Query(&model)
 // SELECT emp_no FROM employees;
@@ -102,14 +98,13 @@ err := gsorm.Select(db, "emp_no", "dept_no").From("employees", "departments").Qu
 
 
 ## Join
-`Join`はINNERT JOIN句を呼び出します．
+`Join` calls INNER JOIN clause.
 
-引数にはテーブル名を指定します．
-このテーブル名にはエイリアスを含めることができます．
+`Join`, `LeftJoin` and `RightJoin` can be called multiple times.
 
-`Join`，`LeftJoin`，`RightJoin`は複数回呼び出すことができます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Join)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Select(db, "e.emp_no", "d.dept_no").
     From("employees AS e").
@@ -130,14 +125,13 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 
 
 ## LeftJoin
-`LeftJoin`はLEFT JOIN句を呼び出します．
+`LeftJoin` calls LEFT JOIN clause.
 
-引数にはテーブル名を指定します．
-このテーブル名にはエイリアスを含めることができます．
+`Join`, `LeftJoin` and `RightJoin` can be called multiple times.
 
-`Join`，`LeftJoin`，`RightJoin`は複数回呼び出すことができます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.LeftJoin)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Select(db, "e.emp_no", "d.dept_no").
     From("employees AS e").
@@ -158,14 +152,13 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 
 
 ## RightJoin
-`RightJoin`はRIGHT JOIN句を呼び出します．
+`RightJoin` calls RIGHT JOIN clause.
 
-引数にはテーブル名を指定します．
-このテーブル名にはエイリアスを含めることができます．
+`Join`, `LeftJoin` and `RightJoin` can be called multiple times.
 
-`Join`，`LeftJoin`，`RightJoin`は複数回呼び出すことができます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.RightJoin)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Select(db, "e.emp_no", "d.dept_no").
     From("employees AS e").
@@ -186,18 +179,19 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 
 
 ## Where
-`Where`はWHERE句を呼び出します．
+`Where` calls WHERE clause.
 
-第1引数に条件式，第2引数以降に複数値を指定できます．
-この際，条件式における`?`に値が代入されます．
-また，代入規則は以下に従います．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
-- 以上の条件に該当しない値はそのまま展開される．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
-#### 例
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Where)
+
+#### Example
 ```go
 err := gsorm.Select(db).From("employees").
     Where("emp_no = 1001").Query(&model)
@@ -247,21 +241,21 @@ err := gsorm.Select(db).From("employees").
 
 
 ## And
-`And`はAND句を呼び出します．
-この時実行されるSQLは，条件式が`()`で括られた形となります．
+`And` calls AND clause.
 
-第1引数に条件式，第2引数以降に複数値を指定できます．
-この際，条件式における`?`に値が代入されます．
-また，代入規則は以下に従います．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
-- 以上の条件に該当しない場合，値はそのまま展開される．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
-`And`は複数回呼び出すことができます．
+`And` can be called mutliple times.
 
-#### 例
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.And)
+
+#### Example
 ```go
 err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
@@ -338,21 +332,21 @@ err := gsorm.Select(db).From("employees").
 
 
 ## Or
-`Or`はOR句を呼び出します．
-この時実行されるSQLは，条件式が`()`で括られた形となります．
+`Or` calls OR clause.
 
-第1引数に条件式，第2引数以降に複数値を指定できます．
-この際，条件式における`?`に値が代入されます．
-また，代入規則は以下に従います．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
-- 以上の条件に該当しない場合，値はそのまま展開される．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
-`Or`は複数回呼び出すことができます．
+`Or` can be called mutliple times.
 
-#### 例
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Or)
+
+#### Example
 ```go
 err := gsorm.Select(db).From("employees").
     Where("emp_no = ?", 1001).
@@ -429,11 +423,11 @@ err := gsorm.Select(db).From("employees").
 
 
 ## GroupBy
-`GroupBy`はGROUP BY句を呼び出します．
+`GroupBy` calls GROUP BY clause.
 
-引数には複数カラムを指定できます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.GroupBy)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
     GroupBy("emp_no").Query(&model)
@@ -443,18 +437,19 @@ err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
 
 
 ## Having
-`Having`はHAVING句を呼び出します．
+`Having` calls HAVING clause.
 
-第1引数に条件式，第2引数以降に複数値を指定できます．
-この際，条件式における`?`に値が代入されます．
-また，代入規則は以下に従います．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
-- 以上の条件に該当しない場合，値はそのまま展開される．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
-#### 例
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Having)
+
+#### Example
 ```go
 err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
     GroupBy("emp_no").
@@ -514,11 +509,11 @@ err := gsorm.Select(db).From("employees").
 
 
 ## Union
-`Union`はUNION句を呼び出します．
+`Union` calls UNION clause.
 
-引数に`*gsorm.SelectStmt`を指定します．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Union)
 
-#### 例
+#### Example
 ```go
 gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
     Union(gsorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
@@ -528,11 +523,11 @@ gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 
 
 ## UnionAll
-`UnionAll`はUNION ALL句を呼び出します．
+`UnionAll` calls UNION ALL clause.
 
-引数に`*gsorm.SelectStmt`を指定します．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.UnionAll)
 
-#### 例
+#### Example
 ```go
 gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
     UnionAll(gsorm.Select(db, "emp_no", "dept_no").From("dept_emp")).Query(&model)
@@ -542,13 +537,11 @@ gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 
 
 ## OrderBy
-`OrderBy`はORDER BY句を呼び出します．
+`OrderBy` calls ORDER BY clause.
 
-引数に複数カラム名を指定できます．
-このとき，カラム名に`DESC`や`ASC`を含めることができます．
-`DESC`や`ASC`は`desc`や`asc`でも問題ありません．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.OrderBy)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Select(db).From("employees").
     OrderBy("birth_date").Query(&model)
@@ -575,11 +568,11 @@ err := gsorm.Select(db).From("employees").
 
 
 ## Limit
-`Limit`はLIMIT句を呼び出します．
+`Limit` calls LIMIT clause.
 
-引数にlimitを指定します．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Limit)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Select(db).From("employees").
     Limit(10).Query(&model)
@@ -589,13 +582,13 @@ err := gsorm.Select(db).From("employees").
 
 
 ## Offset
-`Offset`はOFFSET句を呼び出します．
+`Offset` calls OFFSET clause.
 
-引数にoffsetを指定します．
+`Offset` is called after `Limit`.
 
-`Offset`は`Limit`の直後のみ呼び出すことができます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Offset)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Select(db).From("employees").
     Limit(10).
@@ -607,22 +600,24 @@ err := gsorm.Select(db).From("employees").
 
 
 ## Query
-`Query`はSQLを実行して，結果をmodelにマッピングします．
+`Query` executes the SQL and maps the results into the model.
 
-引数にはmodelを指定します．
+The types available for [sql.Rows.Scan](https://golang.org/pkg/database/sql/#Rows.Scan) can be used as the model.
 
-modelには[sql.Rows.Scan](https://golang.org/pkg/database/sql/#Rows.Scan)に使用できる型を利用できます．
+Also `struct`, `[]struct`, `map[string]interface{}`, and `[]map[string]interface{}` can be used as the model.
+In this case, the type of slice element or array element must be the types available for `sql.Rows.Scan`.
 
-また，`struct{}`，`[]struct{}`，`map[string]interface{}`，`[]map[string]interface{}`を使用することもできます．
-このとき，マップの要素，構造体のフィールドの型は`sql.Rows.Scan`に使用できる型である必要があります．
-構造体を使用する場合は，フィールドがエクスポートされている必要があります．
+Using struct as the model, the fileds must be exported.
+The correspondance of the field names and the database column names are determined by the following rules.
 
-構造体を使用するとき，カラムとフィールドとの対応はフィールド名で指定されます．
-具体的には，フィールド名のスネークケースと一致するカラム名にマッピングされます．
-フィールド名とカラム名の対応を強制したい場合は，フィールドタグとして`gsorm`タグもしくは`json`タグを使用することができます．
-`gsorm`タグと`json`タグの両方が指定されている場合は`gsorm`タグが優先されます．
+- If the field has `gsorm` tag and column name is specified, the name is used
+- If the field has `json` tag, the name is used
+- If the field has both `gsorm` and `json` tags, `gsorm` rule is applied
+- If the field doesn't have `gsorm` or `json` tags, snake case of the field name is used
 
-#### 例
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Query)
+
+#### Example
 ```go
 type Employee struct {
 	EmpNo     int       `gsorm:"id"`
