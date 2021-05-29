@@ -1,7 +1,7 @@
 # AlterTable
 `gsorm.AlterTable` calls ALTER TALBE statement.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm#AlterTable)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#AlterTable)
 
 #### Example
 ```go
@@ -53,13 +53,24 @@ gsorm.AlterTable
     .Migrate
 ```
 
-For example, this implementation outputs the compile error.
+For example, these implementations output the compile error.
+
+```go
+// NG
+err := gsorm.AlterTable(db, "employees").
+    Rename("people").
+    DropColumn("id").Migrate()
+
+// NG
+err := gsorm.AlterTable(db, "employees").
+    AddCons("UC_id").Migrate()
+```
 
 
 ## Rename
 `Rename` calls RENAME TO caluse.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Rename)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Rename)
 
 #### Example
 ```go
@@ -73,7 +84,7 @@ err := gsorm.AlterTable(db, "employees").
 ## AddColumn
 `AddColumn` calls ADD COLUMN clause.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.AddColumn)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.AddColumn)
 
 #### 例
 ```go
@@ -87,11 +98,11 @@ err := gsorm.AlterTable(db, "employees").
 ### AddColumn.NotNull
 `NotNull` calls NOT NULL clause.
 
-`NotNull` is called after `AddColumn`.
+`NotNull` can be called after `AddColumn`.
 
 `NotNull` and `Default` can be used together.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.NotNull)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.NotNull)
 
 #### Example
 ```go
@@ -113,11 +124,11 @@ err := gsorm.AlterTable(db, "employees").
 ### AddColumn.Default
 `Default` calls DEFAULT clause.
 
-`Default` is called after `AddColumn`.
+`Default` can be called after `AddColumn`.
 
 `Default` and `NotNull` can be used together.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Default)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Default)
 
 #### Example
 ```go
@@ -139,7 +150,7 @@ err := gsorm.AlterTable(db, "employees").
 ## DropColumn
 `DropColumn` calls DROP COLUMN clause.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.DropColumn)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.DropColumn)
 
 #### Example
 ```go
@@ -153,7 +164,7 @@ err := gsorm.AlterTable(db, "employees").
 ## RenameColumn
 `RenameColumn` calls RENAME COLUMN clause.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.RenameColumn)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.RenameColumn)
 
 #### Example
 ```go
@@ -167,9 +178,9 @@ err := gsorm.AlterTable(db, "employees").
 ## AddCons
 `AddCons` calls ADD CONSTRAINT clause.
 
-`Unique`, `Primary`, `Foreign` can be called after `AddCons`.
+`Unique`, `Primary` or `Foreign` is called after `AddCons`.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.AddCons)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.AddCons)
 
 #### Example
 ```go
@@ -188,7 +199,7 @@ err := gsorm.AlterTable(db, "employees").
 ### AddCons.Unique
 `Unique` calls UNIQUE clause.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Unique)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Unique)
 
 #### Example
 ```go
@@ -207,7 +218,7 @@ err := gsorm.AlterTable(db, "employees").
 ### AddCons.Primary
 `Primary` calls PRIMARY KEY clause.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Primary)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Primary)
 
 #### Example
 ```go
@@ -226,14 +237,15 @@ err := gsorm.AlterTable(db, "employees").
 ### AddCons.Foregin
 `Foreign` calls FOREIGN KEY clause.
 
-`Ref` must be called after `Foreign`.
+`Ref` is called after `Foreign`.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Foregin)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Foreign)
+
 
 ### AddCons.Foreing.Ref
 `Ref` calls REFERENCES clause.
 
-[godoc](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Ref)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Ref)
 
 #### Example
 ```go
