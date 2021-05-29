@@ -12,12 +12,12 @@ You can see the usage in [Quick Start](https://github.com/champon1020/gsorm#quic
 
 
 ## Benchmark
-I measured the benchmark of the mapping with [MySQL Employees Dataset](https://dev.mysql.com/doc/employee/en/) which has about 300000 rows.
-Also I compared with some famous ORM libraries.
+I measured the benchmark of the mapping query results with [MySQL Employees Dataset](https://dev.mysql.com/doc/employee/en/) which has about 300000 rows.
+Also I compared the average of 10 trials to other ORM libraries.
 
-gsorm is faster than other libraries when mapping the multi rows.
+As a result, gsorm is faster than other libraries when mapping the multi rows.
 
-The results are as follows:
+The result are as follows:
 
 #### Select All
 | ORM | (ns/op) |
@@ -29,13 +29,29 @@ The results are as follows:
 | **gsorm** | **0.38252** |
 
 #### Select One
-| ORM | ns/op |
+| ORM | (ns/op) |
 | ---- | ---- |
 | standard | 0.00053297 |
 | gorm | 0.00024275 |
 | sqlx | 0.00015573 |
 | gorp | 0.00051207 |
 | gsorm | 0.00050992 |
+
+If you want to run the benchmark on your machine, follow the steps below.
+
+```
+git clone git@github.com:champon1020/employees_database.git
+
+cd employees_database
+
+docker-compose up -d
+
+cd /path/to/gsorm/benchmark
+
+go test -bench . -benchmem -count 10
+```
+
+Benchmark codes are written under `benchmark` directory.
 
 
 ## Installation
