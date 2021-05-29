@@ -11,6 +11,33 @@ Major features of gsorm are as follows:
 You can see the usage in [Quick Start](https://github.com/champon1020/gsorm#quick-start) or [Documents](https://github.com/champon1020/gsorm/blob/main/docs/README.md)
 
 
+## Benchmark
+I measured the benchmark of the mapping with [MySQL Employees Dataset](https://dev.mysql.com/doc/employee/en/) which has about 300000 rows.
+Also I compared with some famous ORM libraries.
+
+gsorm is faster than other libraries when mapping the multi rows.
+
+The results are as follows:
+
+#### Select All
+| ORM | (ns/op) |
+| ---- | ---- |
+| standard | 0.40952 |
+| gorm | >= 200 ms/op |
+| sqlx | 0.49695 |
+| gorp | 0.56168 |
+| **gsorm** | **0.38252** |
+
+#### Select One
+| ORM | ns/op |
+| ---- | ---- |
+| standard | 0.00053297 |
+| gorm | 0.00024275 |
+| sqlx | 0.00015573 |
+| gorp | 0.00051207 |
+| gsorm | 0.00050992 |
+
+
 ## Installation
 ```
 go get github.com/champon1020/gsorm
