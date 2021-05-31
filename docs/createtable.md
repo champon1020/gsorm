@@ -82,7 +82,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Column` can be called multiple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Column)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Column)
 
 #### Example
 ```go
@@ -110,7 +110,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `NotNull` and `Default` can be used together.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.NotNull)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.NotNull)
 
 #### Example
 ```go
@@ -137,7 +137,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Default` and `NotNull` can be used together.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Default)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Default)
 
 #### Example
 ```go
@@ -174,7 +174,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Unique`, `Primary` or `Foreign` must be called after `Cons`.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Cons)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Cons)
 
 #### Example
 ```go
@@ -209,7 +209,7 @@ err := gsorm.CreateTable(db, "dept_emp").
 
 `Unique` is called after `Cons`.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Unique)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Unique)
 
 #### Example
 ```go
@@ -237,7 +237,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Primary` is called after `Cons`.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Primary)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Primary)
 
 #### Example
 ```go
@@ -267,7 +267,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Ref` must be called after `Foreign`.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Foreign)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Foreign)
 
 
 ### Cons.Foreign.Ref
@@ -275,7 +275,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Ref` is called after `Foreign`.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Ref)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Ref)
 
 #### Example
 ```go
@@ -303,7 +303,7 @@ err := gsorm.CreateTable(db, "dept_emp").
 
 Details are given in [Model](https://github.com/champon1020/gsorm/tree/main/docs/model.md).
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Model)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Model)
 
 #### Example
 ```go
