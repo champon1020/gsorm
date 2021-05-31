@@ -1,7 +1,7 @@
 # DropTable
-`gsorm.DropTable`はDROP TABLE句を呼び出します．
+`gsorm.DropTable`はDROP TABLE文を呼び出します．
 
-引数にはデータベースのコネクション(`gsorm.Conn`)，データベース名を指定します．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#DropTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DropTable)
 
 #### 例
 ```go

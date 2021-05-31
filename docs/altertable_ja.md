@@ -1,5 +1,5 @@
 # AlterTable
-`gsorm.AlterTable`はALTER TABLE句を呼び出します．
+`gsorm.AlterTable`はALTER TABLE文を呼び出します．
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#AlterTable)
 
@@ -18,22 +18,21 @@ err := gsorm.AlterTable(db, "employees").
 
 
 ## Methods
-`gsorm.AlterTable`に使用できるメソッドは以下です．
-
 - [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
 - [Rename](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#rename)
 - [AddColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumn)
-    - [NotNull](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumn.notnull)
-    - [Default](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumn.default)
+  - [NotNull](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumnnotnull)
+  - [Default](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumndefault)
 - [DropColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#dropcolumn)
 - [RenameColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#renamecolumn)
 - [AddCons](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons)
-    - [Unique](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.unique)
-    - [Primary](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.primary)
-    - [Foreign](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.foreign)
-        - [Ref](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.foreign.ref)
+  - [Unique](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addconsunique)
+  - [Primary](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addconsprimary)
+  - [Foreign](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addconsforeign)
+    - [Ref](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addconsforeignref)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
+
 例外として，`RawClause`は任意で呼び出すことができます．
 
 ```
@@ -83,8 +82,6 @@ err := gsorm.AlterTable(db, "employees").
 
 ## AddColumn
 `AddColumn`はADD COLUMN句を呼び出します．
-
-`AddColumn`に続けて`NotNull`，`Default`を呼び出すことができます．
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.AddColumn)
 

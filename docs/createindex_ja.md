@@ -1,7 +1,7 @@
 # CreateIndex
-`gsorm.CreateIndex`はCREATE INDEX句を呼び出します．
+`gsorm.CreateIndex`はCREATE INDEX文を呼び出します．
 
-引数にはデータベースのコネクション(`gsorm.Conn`)，インデックス名を指定します．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateIndex.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateIndex)
 
 #### 例
 ```go

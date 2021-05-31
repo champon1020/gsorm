@@ -18,22 +18,21 @@ err := gsorm.AlterTable(db, "employees").
 
 
 ## Methods
-`gsorm.AlterTable` has these methods.
+- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw.md#rawclause)
+- [Rename](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#rename)
+- [AddColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addcolumn)
+  - [NotNull](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addcolumnnotnull)
+  - [Default](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addcolumndefault)
+- [DropColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#dropcolumn)
+- [RenameColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#renamecolumn)
+- [AddCons](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addcons)
+  - [Unique](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addconsunique)
+  - [Primary](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addconsprimary)
+  - [Foreign](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addconsforeign)
+    - [Ref](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addconsforeignref)
 
-- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
-- [Rename](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#rename)
-- [AddColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumn)
-    - [NotNull](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumn.notnull)
-    - [Default](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumn.default)
-- [DropColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#dropcolumn)
-- [RenameColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#renamecolumn)
-- [AddCons](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons)
-    - [Unique](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.unique)
-    - [Primary](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.primary)
-    - [Foreign](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.foreign)
-        - [Ref](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons.foreign.ref)
+These methods can be executed according to the following EBNF.
 
-These methods can be executeed according to the following EBNF.
 Exceptionally, `RawClause` can be executed at any time.
 
 ```

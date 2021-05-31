@@ -9,11 +9,13 @@
 
 
 ## DB
+`gsorm.DB`はデータベースコネクションのインタフェースです．
+
 `gsorm.DB`を実装する構造体は`gsorm.Open`関数で生成されます．
 
-第一引数にはデータベースドライバー名，第二引数にはDSNをを指定します．
+`gsorm.Open`は`sql.Open`とほとんど変わりません．
 
-使用方法は`sql.Open`とほとんど変わりません．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#DB.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DB)
 
 #### 例
 ```go
@@ -25,7 +27,11 @@ if err != nil {
 
 
 ## Tx
-`gsorm.Tx`を実装する構造体は`gsorm.DB`の`Begin`メソッドによって生成されます．
+`gsorm.Tx`はデータベーストランザクションのインタフェースです．
+
+`gsorm.Tx`を実装する構造体は`gsorm.DB.Begin`メソッドによって生成されます．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Tx.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Tx)
 
 #### 例
 ```go

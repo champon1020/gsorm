@@ -1,7 +1,7 @@
 # DropDB
-`gsorm.DropDB`はDROP DATABASE句を呼び出します．
+`gsorm.DropDB`はDROP DATABASE文を呼び出します．
 
-引数にはデータベースのコネクション(`gsorm.Conn`)，データベース名を指定します．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#DropDB.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DropDB)
 
 #### 例
 ```go

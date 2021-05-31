@@ -1,9 +1,7 @@
 # Select
-`gsorm.Select`はSELECT句を呼び出します．
+`gsorm.Select`はSELECT文を呼び出します．
 
-引数にはデータベースのコネクション(`gsorm.Conn`)，カラム名を指定します．
-
-カラム名は複数指定することができます．カラム名はからでも問題ありません．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Select)
 
 #### 例
 ```go
@@ -25,8 +23,6 @@ err := gsorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 
 
 ## Methods
-`gsorm.Select`に使用できるメソッドは以下です．
-
 - [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
 - [From](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#from)
 - [Join](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#join)
@@ -45,6 +41,7 @@ err := gsorm.Select(db, "emp_no, first_name", "last_name").From("employees").Que
 - [Query](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md#query)
 
 これらのメソッドは以下のEBNFに従って実行することができます．
+
 但し，例外として`RawClause`は任意で呼び出すことができます．
 
 ```
@@ -82,8 +79,7 @@ err := gsorm.Select(db).
 ## From
 `From`はFROM句を呼び出します．
 
-引数には複数のテーブル名を指定します．
-これらのテーブル名にはエイリアスを含めることができます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.From)
 
 #### 例
 ```go
@@ -104,10 +100,9 @@ err := gsorm.Select(db, "emp_no", "dept_no").From("employees", "departments").Qu
 ## Join
 `Join`はINNERT JOIN句を呼び出します．
 
-引数にはテーブル名を指定します．
-このテーブル名にはエイリアスを含めることができます．
-
 `Join`，`LeftJoin`，`RightJoin`は複数回呼び出すことができます．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Join)
 
 #### 例
 ```go
@@ -132,10 +127,9 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 ## LeftJoin
 `LeftJoin`はLEFT JOIN句を呼び出します．
 
-引数にはテーブル名を指定します．
-このテーブル名にはエイリアスを含めることができます．
-
 `Join`，`LeftJoin`，`RightJoin`は複数回呼び出すことができます．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.LeftJoin)
 
 #### 例
 ```go
@@ -160,10 +154,9 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 ## RightJoin
 `RightJoin`はRIGHT JOIN句を呼び出します．
 
-引数にはテーブル名を指定します．
-このテーブル名にはエイリアスを含めることができます．
-
 `Join`，`LeftJoin`，`RightJoin`は複数回呼び出すことができます．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.RightJoin)
 
 #### 例
 ```go
@@ -188,14 +181,16 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 ## Where
 `Where`はWHERE句を呼び出します．
 
-第1引数に条件式，第2引数以降に複数値を指定できます．
-この際，条件式における`?`に値が代入されます．
-また，代入規則は以下に従います．
+クエリが実行されるとき，条件式における`?`に値が代入されます．
+
+代入規則は以下に従います．
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
+- 値がスライスもしくは配列の場合，その要素が展開されます．
+- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
 - 以上の条件に該当しない値はそのまま展開される．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Where)
 
 #### 例
 ```go
@@ -248,18 +243,21 @@ err := gsorm.Select(db).From("employees").
 
 ## And
 `And`はAND句を呼び出します．
-この時実行されるSQLは，条件式が`()`で括られた形となります．
 
-第1引数に条件式，第2引数以降に複数値を指定できます．
-この際，条件式における`?`に値が代入されます．
-また，代入規則は以下に従います．
+このときAND句は条件式は`()`で括られます．
+
+クエリが実行されるとき，条件式における`?`に値が代入されます．
+
+代入規則は以下に従います．
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
-- 以上の条件に該当しない場合，値はそのまま展開される．
+- 値がスライスもしくは配列の場合，その要素が展開されます．
+- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
+- 以上の条件に該当しない値はそのまま展開される．
 
 `And`は複数回呼び出すことができます．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.And)
 
 #### 例
 ```go
@@ -339,18 +337,21 @@ err := gsorm.Select(db).From("employees").
 
 ## Or
 `Or`はOR句を呼び出します．
-この時実行されるSQLは，条件式が`()`で括られた形となります．
 
-第1引数に条件式，第2引数以降に複数値を指定できます．
-この際，条件式における`?`に値が代入されます．
-また，代入規則は以下に従います．
+このときOR句は条件式は`()`で括られます．
+
+クエリが実行されるとき，条件式における`?`に値が代入されます．
+
+代入規則は以下に従います．
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
-- 以上の条件に該当しない場合，値はそのまま展開される．
+- 値がスライスもしくは配列の場合，その要素が展開されます．
+- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
+- 以上の条件に該当しない値はそのまま展開される．
 
 `Or`は複数回呼び出すことができます．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Or)
 
 #### 例
 ```go
@@ -431,7 +432,7 @@ err := gsorm.Select(db).From("employees").
 ## GroupBy
 `GroupBy`はGROUP BY句を呼び出します．
 
-引数には複数カラムを指定できます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.GroupBy)
 
 #### 例
 ```go
@@ -445,14 +446,16 @@ err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
 ## Having
 `Having`はHAVING句を呼び出します．
 
-第1引数に条件式，第2引数以降に複数値を指定できます．
-この際，条件式における`?`に値が代入されます．
-また，代入規則は以下に従います．
+クエリが実行されるとき，条件式における`?`に値が代入されます．
+
+代入規則は以下に従います．
 
 - 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値が事前定義型のスライスもしくは配列の場合，その要素が展開されます．
-- 値が`*gsorm.SelectStmt`型の場合，SELECT文が展開されます．
-- 以上の条件に該当しない場合，値はそのまま展開される．
+- 値がスライスもしくは配列の場合，その要素が展開されます．
+- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
+- 以上の条件に該当しない値はそのまま展開される．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Having)
 
 #### 例
 ```go
@@ -516,7 +519,7 @@ err := gsorm.Select(db).From("employees").
 ## Union
 `Union`はUNION句を呼び出します．
 
-引数に`*gsorm.SelectStmt`を指定します．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Union)
 
 #### 例
 ```go
@@ -530,7 +533,7 @@ gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 ## UnionAll
 `UnionAll`はUNION ALL句を呼び出します．
 
-引数に`*gsorm.SelectStmt`を指定します．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.UnionAll)
 
 #### 例
 ```go
@@ -544,9 +547,7 @@ gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 ## OrderBy
 `OrderBy`はORDER BY句を呼び出します．
 
-引数に複数カラム名を指定できます．
-このとき，カラム名に`DESC`や`ASC`を含めることができます．
-`DESC`や`ASC`は`desc`や`asc`でも問題ありません．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.OrderBy)
 
 #### 例
 ```go
@@ -577,7 +578,7 @@ err := gsorm.Select(db).From("employees").
 ## Limit
 `Limit`はLIMIT句を呼び出します．
 
-引数にlimitを指定します．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Limit)
 
 #### 例
 ```go
@@ -591,9 +592,9 @@ err := gsorm.Select(db).From("employees").
 ## Offset
 `Offset`はOFFSET句を呼び出します．
 
-引数にoffsetを指定します．
+`Offset`は`Limit`に続けて呼び出すことができます．
 
-`Offset`は`Limit`の直後のみ呼び出すことができます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Offset)
 
 #### 例
 ```go
@@ -609,18 +610,20 @@ err := gsorm.Select(db).From("employees").
 ## Query
 `Query`はSQLを実行して，結果をmodelにマッピングします．
 
-引数にはmodelを指定します．
-
 modelには[sql.Rows.Scan](https://golang.org/pkg/database/sql/#Rows.Scan)に使用できる型を利用できます．
 
 また，`struct{}`，`[]struct{}`，`map[string]interface{}`，`[]map[string]interface{}`を使用することもできます．
 このとき，マップの要素，構造体のフィールドの型は`sql.Rows.Scan`に使用できる型である必要があります．
-構造体を使用する場合は，フィールドがエクスポートされている必要があります．
 
-構造体を使用するとき，カラムとフィールドとの対応はフィールド名で指定されます．
-具体的には，フィールド名のスネークケースと一致するカラム名にマッピングされます．
-フィールド名とカラム名の対応を強制したい場合は，フィールドタグとして`gsorm`タグもしくは`json`タグを使用することができます．
-`gsorm`タグと`json`タグの両方が指定されている場合は`gsorm`タグが優先されます．
+構造体を使用する場合は，フィールドがエクスポートされている必要があります．
+構造体フィールド名とデータベースカラムの対応は以下の規則で決定されます．
+
+- フィールドの`gsorm`タグによってカラム名を指定しているとき，そのカラム名が使用されます
+- フィールドに`json`が付いているとき，その名前が使用されます
+- `gsorm`と`json`の両方が付いているとき，`gsorm`の規則が優先されます
+- `gsorm`と`json`の両方とも付いていないとき，フィールド名のスネークケースが使用されます
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Query)
 
 #### 例
 ```go

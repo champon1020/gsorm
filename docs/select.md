@@ -243,6 +243,8 @@ err := gsorm.Select(db).From("employees").
 ## And
 `And` calls AND clause.
 
+The expression of AND clause is enclused in parenthesises.
+
 When the query is executed, the values will be assigned to `?` in the expression.
 
 Assignment rules are as follows:
@@ -610,10 +612,10 @@ In this case, the type of slice element or array element must be the types avail
 Using struct as the model, the fileds must be exported.
 The correspondance of the field names and the database column names are determined by the following rules.
 
-- If the field has `gsorm` tag and column name is specified, the name is used
-- If the field has `json` tag, the name is used
-- If the field has both `gsorm` and `json` tags, `gsorm` rule is applied
-- If the field doesn't have `gsorm` or `json` tags, snake case of the field name is used
+- If the field is tagged `gsorm` and column name is specified, the name is used
+- If the field is tagged `json`, the name is used
+- If the field is tagged both `gsorm` and `json`, `gsorm` rule is applied
+- If the field isn't tagged `gsorm` nor `json`, the snake case of the field name is used
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Query)
 
