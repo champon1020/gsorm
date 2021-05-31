@@ -1,9 +1,9 @@
 # Update
-`gsorm.Update`はUPDATE句を呼び出します．
+`gsorm.Update` calls UPDATE statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Update)
 
-#### 例
+#### Example
 ```go
 gsorm.Update(db).Set(10, "employees").
     Set("emp_no", 1001).
@@ -30,9 +30,9 @@ gsorm.Update(db).Set(10, "employees").
 - [Or](https://github.com/champon1020/gsorm/tree/main/docs/update_ja.md#or)
 - [Model](https://github.com/champon1020/gsorm/tree/main/docs/update_ja.md#model)
 
-これらのメソッドは以下のEBNFに従って実行することができます．
+These methods can be executed according to the following EBNF.
 
-但し，例外として`RawClause`は任意で呼び出すことができます．
+Exceptionally, `RawClause` can be executed at any time.
 
 ```
 | alternation
@@ -46,7 +46,7 @@ gsorm.Update(DB, table, columns...)
     .Exec
 ```
 
-例えば以下の実装はコンパイルエラーを吐き出します．
+For example, these implementations output the compile error.
 
 ```go
 // NG
@@ -62,13 +62,13 @@ err := gsorm.Update(db, "employees", "emp_no", "first_name").
 
 
 ## Set
-`Set`はSET句を呼び出します．
+`Set` calls SET clause.
 
-`Set`は複数回呼び出すことが可能です．
+`Set` can be called multiple times.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Set)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Update(db, "employees").
     Set("first_name", "Hanako").Exec()
@@ -85,20 +85,19 @@ err := gsorm.Update(db, "employees").
 
 
 ## Where
-`Where`はWHERE句を呼び出します．
+`Where` calls WHERE clause.
 
-クエリが実行されるとき，条件式における`?`に値が代入されます．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-代入規則は以下に従います．
-
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値がスライスもしくは配列の場合，その要素が展開されます．
-- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
-- 以上の条件に該当しない値はそのまま展開される．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Where)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Update(db, "employees").
     Set("first_name", "Hanako").
@@ -166,24 +165,23 @@ err := gsorm.Update(db).From("employees").
 
 
 ## And
-`And`はAND句を呼び出します．
+`And` calls AND clause.
 
-このときAND句は条件式は`()`で括られます．
+The expression of AND clause is enclused in parenthesises.
 
-クエリが実行されるとき，条件式における`?`に値が代入されます．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-代入規則は以下に従います．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値がスライスもしくは配列の場合，その要素が展開されます．
-- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
-- 以上の条件に該当しない値はそのまま展開される．
+`And` can be called mutliple times.
 
-`And`は複数回呼び出すことができます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.And)
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.And)
-
-#### 例
+#### Example
 ```go
 err := gsorm.Update(db).From("employees").
     Set("first_name", "Hanako").
@@ -278,25 +276,23 @@ err := gsorm.Update(db).From("employees").
 //      AND (emp_no IN (SELECT emp_no FROM dept_manager));
 ```
 
+
 ## Or
-`Or`はOR句を呼び出します．
+`Or` calls OR clause.
 
-このときOR句は条件式は`()`で括られます．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-クエリが実行されるとき，条件式における`?`に値が代入されます．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
-代入規則は以下に従います．
-
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値がスライスもしくは配列の場合，その要素が展開されます．
-- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
-- 以上の条件に該当しない値はそのまま展開される．
-
-`Or`は複数回呼び出すことができます．
+`Or` can be called mutliple times.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Or)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Update(db).From("employees").
     Set("first_name", "Hanako").
@@ -393,13 +389,13 @@ err := gsorm.Update(db).From("employees").
 
 
 ## Model
-`Model`は構造体をマッピングします．
+`Model` maps the model into SQL.
 
-Modelについての詳細は[Model](https://github.com/champon1020/gsorm/blob/main/docs/model_ja.md)に記載されています．
+Details are given in [Model](https://github.com/champon1020/gsorm/blob/main/docs/model.md).
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Model)
 
-#### 例
+#### Example
 ```go
 type Employee struct {
     ID        int       `gsorm:"emp_no"`
