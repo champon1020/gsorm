@@ -1,9 +1,9 @@
 # CreateTable
-`gsorm.CreateTable`はCREATE TABLE文を呼び出します．
+`gsorm.CreateTable` calls CREATE TABLE statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateTable)
 
-#### 例
+#### Example
 ```go
 err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
@@ -22,37 +22,24 @@ err := gsorm.CreateTable(db, "employees").
 //      hire_date   DATE            NOT NULL,
 //      CONSTRAINT PK_employees PRIMARY KEY (emp_no)
 // );
-
-type Employee struct {
-    ID          int         `gsorm:"emp_no typ=INT notnull=t"`
-    BirthDate   time.Time   `gsorm:"typ=DATE notnull=t"`
-    FirstName   string      `gsorm:"typ=VARCHAR(16) notnull=t"`
-    LastName    string      `gsorm:"typ=VARCHAR(14) notnull=t"`
-    Gender      string      `gsorm:"typ=ENUM('M', 'F') notnull=t"`
-    HireDate    string      `gsorm:"typ=DATE notnull=t"`
-}
-
-err := gsorm.CreateTable(db, "employees").
-    Model(&Employee{}).Migrate()
-// Same as the previous example.
 ```
 
 
-# Methods
-- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
-- [Column](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#column)
-  - [NotNull](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#columnnotnull)
-  - [Default](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#columndefault)
-- [Cons](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#cons)
-  - [Unique](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#consunique)
-  - [Primary](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#consprimary)
-  - [Foreign](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#consforeign)
-    - [Ref](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#consforeignref)
-- [Model](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md#model)
+## Methods
+- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw.md#rawclause)
+- [Column](https://github.com/champon1020/gsorm/tree/main/docs/createtable.md#column)
+  - [NotNull](https://github.com/champon1020/gsorm/tree/main/docs/createtable.md#columnnotnull)
+  - [Default](https://github.com/champon1020/gsorm/tree/main/docs/createtable.md#columndefault)
+- [Cons](https://github.com/champon1020/gsorm/tree/main/docs/createtable.md#cons)
+  - [Unique](https://github.com/champon1020/gsorm/tree/main/docs/createtable.md#consunique)
+  - [Primary](https://github.com/champon1020/gsorm/tree/main/docs/createtable.md#consprimary)
+  - [Foreign](https://github.com/champon1020/gsorm/tree/main/docs/createtable.md#consforeign)
+    - [Ref](https://github.com/champon1020/gsorm/tree/main/docs/createtable.md#consforeignref)
+- [Model](https://github.com/champon1020/gsorm/tree/main/docs/createtable.md#model)
 
-これらのメソッドは以下のEBNFに従って実行することができます．
+These methods can be executed according to the following EBNF.
 
-但し，例外として`RawClause`は任意で呼び出すことができます．
+Exceptionally, `RawClause` can be executed at any time.
 
 ```
 | alternation
@@ -66,7 +53,7 @@ ColumnStmt = Column [ NotNull ] [ Default ]
 ConstraintStmt = Cons ( Unique | Primary | Foreign Ref )
 ```
 
-例えば以下の実装はコンパイルエラーを吐き出します．
+For example, these implementations output the compile error.
 
 ```go
 // NG
@@ -91,13 +78,13 @@ err := gsorm.CreateTable(db, "employees").
 
 
 ## Column
-`Column`はカラムの定義を呼び出します．
+`Column` calls the column definition.
 
-`Column`は複数回び出すことができます．
+`Column` can be called multiple times.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Column)
 
-#### 例
+#### Example
 ```go
 err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").Migrate()
@@ -112,18 +99,20 @@ err := gsorm.CreateTable(db, "employees").
 //      emp_no      INT,
 //      birth_date  DATE
 // );
+
 ```
 
+
 ### Column.NotNull
-`NotNull`はNOTNULL句を呼び出します．
+`NotNull` calls NOT NULL clause.
 
-`NotNull`は`Column`に続けて呼び出すことができます．
+`NotNull` is called after `Column`.
 
-`NotNull`と`Default`は併用できます．
+`NotNull` and `Default` can be used together.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.NotNull)
 
-#### 例
+#### Example
 ```go
 err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().Migrate()
@@ -142,15 +131,15 @@ err := gsorm.CreateTable(db, "employees").
 
 
 ### Column.Default
-`Default`はDEFAULT句を呼び出します．
+`Default` calls DEFAULT clause.
 
-`Default`は`Column`に続けて呼び出すことができます．
+`Default` is called after `Default`
 
-`Default`と`NotNull`は併用できます．
+`Default` and `NotNull` can be used together.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Default)
 
-#### 例
+#### Example
 ```go
 err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").Default(1).Migrate()
@@ -181,13 +170,13 @@ err := gsorm.CreateTable(db, "employees").
 
 
 ## Cons
-`Cons`はCONSTRAINT句を呼び出します．
+`Cons` calls CONSTRAINT clause.
 
-`Cons`に続けて`Unique`，`Primary`，`Foreign`のいずれかを呼び出す必要があります．
+`Unique`, `Primary` or `Foreign` must be called after `Cons`.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Cons)
 
-#### 例
+#### Example
 ```go
 err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
@@ -216,13 +205,13 @@ err := gsorm.CreateTable(db, "dept_emp").
 
 
 ### Cons.Unique
-`Unique`はUNIQUE句を呼び出します．
+`Unique` calls UNIQUE clause.
 
-`Unique`は`Cons`に続けて呼び出すことができます．
+`Unique` is called after `Cons`.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Unique)
 
-#### 例
+#### Example
 ```go
 err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
@@ -244,13 +233,13 @@ err := gsorm.CreateTable(db, "employees").
 
 
 ### Cons.Primary
-`Primary`はPRIMARY KEY句を呼び出します．
+`Primary` calls PRIMARY KEY clause.
 
-`Primary`は`Cons`に続けて呼び出すことができます．
+`Primary` is called after `Cons`.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Primary)
 
-#### 例
+#### Example
 ```go
 err := gsorm.CreateTable(db, "employees").
     Column("emp_no", "INT").NotNull().
@@ -272,23 +261,23 @@ err := gsorm.CreateTable(db, "employees").
 
 
 ### Cons.Foreign
-`Foreign`はFOREIGN KEY句を呼び出します．
+`Foreign` calls FOREIGN KEY clause.
 
-`Foreign`は`Cons`に続けて呼び出すことができます．
+`Foreign` is called after `Cons`.
 
-`Foreign`に続けて`Ref`を呼び出す必要があります．
+`Ref` must be called after `Foreign`.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Foreign)
 
 
 ### Cons.Foreign.Ref
-`Ref`はREFERENCES句を呼び出します．
+`Ref` calls REFERENCES clause.
 
-第1引数に参照テーブル名，第2引数以降に複数の参照カラム名を指定します．
+`Ref` is called after `Foreign`.
 
-`Ref`は`Foreign`に続けて呼び出すことができます．
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Ref)
 
-#### 例
+#### Example
 ```go
 err := gsorm.CreateTable(db, "dept_emp").
     Column("emp_no", "INT").NotNull().
@@ -310,13 +299,13 @@ err := gsorm.CreateTable(db, "dept_emp").
 
 
 ## Model
-`Model`は構造体をマッピングします．
+`Model` maps the model into table schema.
 
-Modelについての詳細は[Model](https://github.com/champon1020/gsorm/tree/main/docs/model_ja.md)に記載されています．
+Details are given in [Model](https://github.com/champon1020/gsorm/tree/main/docs/model.md).
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTable.Model)
 
-#### 例
+#### Example
 ```go
 type Employee struct {
     ID          int         `gsorm:"emp_no typ=INT notnull=t"`
