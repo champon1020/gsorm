@@ -1,9 +1,9 @@
 # Delete
-`gsorm.Delete`はDELETE句を呼び出します．
+`gsorm.Delete` calls DELETE statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Delete)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Delete(db).From("employees").Exec()
 // DELETE FROM employees;
@@ -11,14 +11,15 @@ err := gsorm.Delete(db).From("employees").Exec()
 
 
 ## Methods
-- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
-- [From](https://github.com/champon1020/gsorm/tree/main/docs/delete_ja.md#from)
-- [Where](https://github.com/champon1020/gsorm/tree/main/docs/delete_ja.md#where)
-- [And](https://github.com/champon1020/gsorm/tree/main/docs/delete_ja.md#and)
-- [Or](https://github.com/champon1020/gsorm/tree/main/docs/delete_ja.md#or)
+- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw.md#rawclause)
+- [From](https://github.com/champon1020/gsorm/tree/main/docs/delete.md#from)
+- [Where](https://github.com/champon1020/gsorm/tree/main/docs/delete.md#where)
+- [And](https://github.com/champon1020/gsorm/tree/main/docs/delete.md#and)
+- [Or](https://github.com/champon1020/gsorm/tree/main/docs/delete.md#or)
 
-これらのメソッドは以下のEBNFに従って実行することができます．
-但し，例外として`RawClause`は任意で呼び出すことができます．
+These methods can be executed according to the following EBNF.
+
+Exceptionally, `RawClanuse` can be executed at any time.
 
 ```
 | alternation
@@ -32,7 +33,7 @@ gsorm.Delete
     .Exec
 ```
 
-例えば以下の実装はコンパイルエラーを吐き出します．
+For example, these implementations output the compile error.
 
 ```go
 // NG
@@ -49,11 +50,11 @@ err := gsorm.Delete(db).
 
 
 ## From
-`From`はFROM句を呼び出します．
+`From` calls FROM clause.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.From)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Delete(db).From("employees").Exec()
 // DELETE FROM employees;
@@ -67,20 +68,19 @@ err := gsorm.Delete(db).From("employees AS e").Exec()
 
 
 ## Where
-`Where`はWHERE句を呼び出します．
+`Where` calls WHERE clause.
 
-クエリが実行されるとき，条件式における`?`に値が代入されます．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-代入規則は以下に従います．
-
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値がスライスもしくは配列の場合，その要素が展開されます．
-- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
-- 以上の条件に該当しない値はそのまま展開される．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.Where)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Delete(db).From("employees").
     Where("emp_no = 1001").Exec()
@@ -130,24 +130,23 @@ err := gsorm.Delete(db).From("employees").
 
 
 ## And
-`And`はAND句を呼び出します．
+`And` calls AND clause.
 
-このときAND句は条件式は`()`で括られます．
+The expression of AND clause is enclused in parenthesises.
 
-クエリが実行されるとき，条件式における`?`に値が代入されます．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-代入規則は以下に従います．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値がスライスもしくは配列の場合，その要素が展開されます．
-- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
-- 以上の条件に該当しない値はそのまま展開される．
-
-`And`は複数回呼び出すことができます．
+`And` can be called mutliple times.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.And)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
@@ -224,24 +223,21 @@ err := gsorm.Delete(db).From("employees").
 
 
 ## Or
-`Or`はOR句を呼び出します．
+`Or` calls OR clause.
 
-このときOR句は条件式は`()`で括られます．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-クエリが実行されるとき，条件式における`?`に値が代入されます．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
-代入規則は以下に従います．
-
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値がスライスもしくは配列の場合，その要素が展開されます．
-- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
-- 以上の条件に該当しない値はそのまま展開される．
-
-`Or`は複数回呼び出すことができます．
+`Or` can be called mutliple times.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.Or)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Delete(db).From("employees").
     Where("emp_no = ?", 1001).
