@@ -27,11 +27,4 @@ jobs:
       - name: Test
         run: go test -v -coverprofile=coverate.out ./...
 
-      - uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.out
-          flags: unittests
-          name: codecov-gsorm
-          fail_ci_if_error: true
-          verbose: true
+      - run: bash <(curl -s https://codecov.io/bash)
