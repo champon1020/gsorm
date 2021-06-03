@@ -1,5 +1,6 @@
 # gsorm
 [![Go Report Card](https://goreportcard.com/badge/github.com/champon1020/gsorm)](https://goreportcard.com/report/github.com/champon1020/gsorm)
+[![codecov](https://codecov.io/gh/champon1020/gsorm/branch/main/graph/badge.svg?token=7FCUS2VZMV)](https://codecov.io/gh/champon1020/gsorm)
 
 This is new Simple and SQL-like ORM framework written in Go language.
 gsorm lets you implement database operation easily and intuitively.
