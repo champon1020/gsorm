@@ -1,9 +1,9 @@
 # Model
-`Model`は構造体を用いたマッピングを行います．
+`Model` maps the struct contents to the SQL.
 
-このメソッドは[Insert](https://github.com/champon1020/gsorm/tree/main/docs/insert_ja.md)，[Update](https://github.com/champon1020/gsorm/tree/main/docs/update_ja.md)，[CreateTable](https://github.com/champon1020/gsorm/tree/main/docs/createtable_ja.md)で使用することができます．
+This method is available on `Insert`, `Update` and `CreateTable`.
 
-#### 例
+#### Example
 ```go
 type Employee struct {
     EmpNo     int    `gsorm:"typ=INT"`
@@ -18,9 +18,7 @@ err := gsorm.Insert(db, "employees", "emp_no", "first_name").
 
 
 ## Type
-`Model`の引数に渡せる値は以下の型の**参照**になります．
-
-Insert，Update，CreateTableでそれぞれ使用できる型が異なるので注意してください．
+`Model` can handle the pointer of these types.
 
 ### Insert
 - map[string]interface{}
@@ -35,7 +33,7 @@ Insert，Update，CreateTableでそれぞれ使用できる型が異なるので
 ### CreateTable
 - struct{}
 
-構造体のフィールド，マップの要素に使用できる型は以下です．
+Type of struct field or map element should be below.
 
 - int, int8, int16, in32, in64
 - uint, uint8, uint16, uint32, uint64
@@ -44,15 +42,15 @@ Insert，Update，CreateTableでそれぞれ使用できる型が異なるので
 - string
 - time.Time
 
-構造体はエクスポートされている型のみ適用されます．
+In case of using struct, only exported fields are used.
 
 
 ## Tag
-構造体のフィールドに`gsorm`タグを付与することでデータベースのスキーマを定義することができます．
+Tagging the struct field with `gsorm` defines the properties of database column corresponding to the struct field.
 
-複数のタグを使用したい場合はカンマで区切ることで指定できます．
+Multiple tags should be separated by comma.
 
-#### 例
+#### Example
 ```go
 type Employees struct {
     ID        int       `gsorm:"emp_no,typ=INT,notnull=t"`
@@ -66,13 +64,13 @@ type Employees struct {
 
 
 ### column
-データベースのカラム名を指定します．
+Defines the database column name.
 
-`gsorm`タグではなく`json`をタグを用いた場合にも反映されます．
+`json` tag is also used as the database column name.
 
-両方指定してある場合は`gsorm`タグが優先されます．
+If both `gsorm` and `json` are tagged, `gsorm` will be applied.
 
-#### 例
+#### Example
 ```go
 type Employee struct {
     // emp_no
@@ -86,9 +84,9 @@ type Employee struct {
 
 
 ### typ
-データベース型を指定します．
+Defines the type of database column.
 
-#### 例
+#### Example
 ```go
 type Employee struct {
     EmpNo      int     `gsorm:"typ=INT"`
@@ -98,9 +96,9 @@ type Employee struct {
 
 
 ### notnull
-カラムに`NOT NULL`属性を付与します．
+Adds `NOT NULL` property.
 
-#### 例
+#### Example
 ```go
 type Employee struct {
     EmpNo int `gsorm:"notnull=t"`
@@ -109,9 +107,9 @@ type Employee struct {
 
 
 ### default
-カラムに`DEFAULT`属性を付与します．
+Adds `DEFAULT` property.
 
-#### 例
+#### Example
 ```go
 type Employee struct {
     EmpNo      int     `gsorm:"default=60000"`
@@ -121,9 +119,9 @@ type Employee struct {
 
 
 ### uc
-カラムに`UNIQUE`を付与します．
+Sets `UNIQUE`.
 
-#### 例
+#### Example
 ```go
 type Employee struct {
     // CONSTRAINT PK_emp_no UNIQUE (emp_no)
@@ -139,9 +137,9 @@ type DeptEmp struct {
 
 
 ### pk
-カラムに`PRIMARY KEY`を付与します．
+Sets `PRIMARY KEY`.
 
-#### 例
+#### Example
 ```go
 type Employee struct {
     // CONSTRAINT PK_emp_no PRIAMRY KEY (emp_no)
@@ -157,7 +155,7 @@ type DeptEmp struct {
 
 
 ### fk
-カラムに`FOREIGN KEY`を付与します．
+Sets `FOREIGN KEY`.
 
 #### 例
 ```go
