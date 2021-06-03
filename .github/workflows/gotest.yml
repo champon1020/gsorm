@@ -17,10 +17,12 @@ jobs:
       - uses: actions/checkout@v2
 
       - uses: codecov/codecov-action@v1
-        flags: unittests
-        name: codecov-gsorm
-        fail_ci_if_error: true
-        verbose: true
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          name: codecov-gsorm
+          fail_ci_if_error: true
+          verbose: true
 
       - name: Set up Go
         uses: actions/setup-go@v2
