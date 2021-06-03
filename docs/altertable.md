@@ -1,9 +1,9 @@
 # AlterTable
-`gsorm.AlterTable`はALTER TABLE文を呼び出します．
+`gsorm.AlterTable` calls ALTER TALBE statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#AlterTable)
 
-#### 例
+#### Example
 ```go
 err := gsorm.AlterTable(db, "employees").
     AddColumn("nickname", "VARCHAR(64)").NotNull().Migrate()
@@ -18,22 +18,22 @@ err := gsorm.AlterTable(db, "employees").
 
 
 ## Methods
-- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw_ja.md#rawclause)
-- [Rename](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#rename)
-- [AddColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumn)
-  - [NotNull](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumnnotnull)
-  - [Default](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcolumndefault)
-- [DropColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#dropcolumn)
-- [RenameColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#renamecolumn)
-- [AddCons](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addcons)
-  - [Unique](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addconsunique)
-  - [Primary](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addconsprimary)
-  - [Foreign](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addconsforeign)
-    - [Ref](https://github.com/champon1020/gsorm/tree/main/docs/altertable_ja.md#addconsforeignref)
+- [RawClause](https://github.com/champon1020/gsorm/tree/main/docs/raw.md#rawclause)
+- [Rename](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#rename)
+- [AddColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addcolumn)
+  - [NotNull](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addcolumnnotnull)
+  - [Default](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addcolumndefault)
+- [DropColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#dropcolumn)
+- [RenameColumn](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#renamecolumn)
+- [AddCons](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addcons)
+  - [Unique](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addconsunique)
+  - [Primary](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addconsprimary)
+  - [Foreign](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addconsforeign)
+    - [Ref](https://github.com/champon1020/gsorm/tree/main/docs/altertable.md#addconsforeignref)
 
-これらのメソッドは以下のEBNFに従って実行することができます．
+These methods can be executed according to the following EBNF.
 
-例外として，`RawClause`は任意で呼び出すことができます．
+Exceptionally, `RawClause` can be executed at any time.
 
 ```
 | alternation
@@ -52,7 +52,7 @@ gsorm.AlterTable
     .Migrate
 ```
 
-例えば，以下の実装はコンパイルエラーが出力されます．
+For example, these implementations output the compile error.
 
 ```go
 // NG
@@ -67,11 +67,11 @@ err := gsorm.AlterTable(db, "employees").
 
 
 ## Rename
-`Rename`はRENAME TO句を呼び出します．
+`Rename` calls RENAME TO caluse.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Rename)
 
-#### 例
+#### Example
 ```go
 err := gsorm.AlterTable(db, "employees").
     Rename("people").Migrate()
@@ -81,7 +81,7 @@ err := gsorm.AlterTable(db, "employees").
 
 
 ## AddColumn
-`AddColumn`はADD COLUMN句を呼び出します．
+`AddColumn` calls ADD COLUMN clause.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.AddColumn)
 
@@ -95,15 +95,15 @@ err := gsorm.AlterTable(db, "employees").
 
 
 ### AddColumn.NotNull
-`NotNull`はNOT NULL句を呼び出します．
+`NotNull` calls NOT NULL clause.
 
-`NotNull`は`AddColumn`に続けて呼び出すことができます．
+`NotNull` can be called after `AddColumn`.
 
-また，`NotNull`と`Default`は併用できます．
+`NotNull` and `Default` can be used together.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.NotNull)
 
-#### 例
+#### Example
 ```go
 err := gsorm.AlterTable(db, "employees").
     AddColumn("nickname", "VARCHAR(64)").
@@ -119,16 +119,17 @@ err := gsorm.AlterTable(db, "employees").
 //      ADD COLUMN nickanme VARCHAR(64) NOT NULL DEFAULT 'none';
 ```
 
+
 ### AddColumn.Default
-`Default`はDEFAULT句を呼び出します．
+`Default` calls DEFAULT clause.
 
-`Default`は`AddColumn`に続けて呼び出すことができます．
+`Default` can be called after `AddColumn`.
 
-また，`Default`と`NotNull`は併用できます．
+`Default` and `NotNull` can be used together.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Default)
 
-#### 例
+#### Example
 ```go
 err := gsorm.AlterTable(db, "employees").
     AddColumn("nickname", "VARCHAR(64)").
@@ -146,11 +147,11 @@ err := gsorm.AlterTable(db, "employees").
 
 
 ## DropColumn
-`DropColumn`はDROP COLUMN句を呼び出します．
+`DropColumn` calls DROP COLUMN clause.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.DropColumn)
 
-#### 例
+#### Example
 ```go
 err := gsorm.AlterTable(db, "employees").
     DropColumn("nickname").Migrate()
@@ -160,11 +161,11 @@ err := gsorm.AlterTable(db, "employees").
 
 
 ## RenameColumn
-`RenameColumn`はRENAME COLUMN句を呼び出します．
+`RenameColumn` calls RENAME COLUMN clause.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.RenameColumn)
 
-#### 例
+#### Example
 ```go
 err := gsorm.AlterTable(db, "employees").
     RenameColumn("emp_no", "id").Migrate()
@@ -174,19 +175,32 @@ err := gsorm.AlterTable(db, "employees").
 
 
 ## AddCons
-`AddCons`はADD CONSTRAINT句を呼び出します．
+`AddCons` calls ADD CONSTRAINT clause.
 
-`AddCons`に続けて`Unique`，`Primary`，`Foreign`のいずれかを呼び出す必要があります．
+`Unique`, `Primary` or `Foreign` is called after `AddCons`.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.AddCons)
 
+#### Example
+```go
+err := gsorm.AlterTable(db, "employees").
+    AddCons("UC_nickname").Unique("nickname").Migrate()
+// ALTER TABLE employees
+//      ADD CONSTRAINT UC_nickname UNIQUE (nickname);
+
+err := gsorm.AlterTable(db, "employees").
+    AddCons("UC_nickname").Unique("nickname", "first_name").Migrate()
+// ALTER TABLE employees
+//      ADD CONSTRAINT UC_nickname UNIQUE (nickname, first_name);
+```
+
 
 ### AddCons.Unique
-`Unique`はUNIQUE句を呼び出します．
+`Unique` calls UNIQUE clause.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Unique)
 
-#### 例
+#### Example
 ```go
 err := gsorm.AlterTable(db, "employees").
     AddCons("UC_nickname").Unique("nickname").Migrate()
@@ -201,11 +215,11 @@ err := gsorm.AlterTable(db, "employees").
 
 
 ### AddCons.Primary
-`Primary`はPRIMARY KEY句を呼び出します．
+`Primary` calls PRIMARY KEY clause.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Primary)
 
-#### 例
+#### Example
 ```go
 err := gsorm.AlterTable(db, "employees").
     AddCons("PK_emp_no").Primary("emp_no").Migrate()
@@ -218,20 +232,21 @@ err := gsorm.AlterTable(db, "employees").
 //      ADD CONSTRAINT PK_emp_no PRIMARY KEY (emp_no, first_name);
 ```
 
-### AddCons.Foreign
-`Foreign`はFOREIGN KEY句を呼び出します．
 
-`Foreign`に続けて`Ref`を呼び出す必要があります．
+### AddCons.Foregin
+`Foreign` calls FOREIGN KEY clause.
+
+`Ref` is called after `Foreign`.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Foreign)
 
 
-### AddCons.Foreign.Ref
-`Ref`はREFERENCES句を呼び出します．
+### AddCons.Foreing.Ref
+`Ref` calls REFERENCES clause.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#AlterTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#AlterTableStmt.Ref)
 
-#### 例
+#### Example
 ```go
 err := gsorm.AlterTable(db, "dept_emp").
     AddCons("FK_emp_no").Foreign("emp_no").Ref("employees", "emp_no").Migrate()

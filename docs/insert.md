@@ -1,9 +1,9 @@
 # Insert
-`gsorm.Insert`はINSERT句を呼び出します．
+`gsorm.Insert` calls INSERT statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Insert)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Insert(db, "employees").
     Values(1001, "1996-03-09", "Taro", "Sato", "M", "2020-04-01").Exec()
@@ -23,9 +23,9 @@ err := gsorm.Insert(db, "employees", "emp_no", "first_name").
 - [Select](https://github.com/champon1020/gsorm/tree/main/docs/insert_ja.md#select)
 - [Model](https://github.com/champon1020/gsorm/tree/main/docs/insert_ja.md#model)
 
-これらのメソッドは以下のEBNFに従って実行することができます．
+These methods can be executed according to the following EBNF.
 
-但し，例外として`RawClause`は任意で呼び出すことができます．
+Exceptionally, `RawClause` can be executed at any time.
 
 ```
 | alternation
@@ -38,7 +38,7 @@ gsorm.Insert
     .Exec
 ```
 
-例えば以下の実装はコンパイルエラーを吐き出します．
+For example, these implementations output the compile error.
 
 ```go
 // NG
@@ -52,13 +52,13 @@ err := gsorm.Insert(db).
 
 
 ## Values
-`Values`はVALUES句を呼び出します．
+`Values` calls VALUES clause.
 
-`Values`は複数回呼び出すことができます．
+`Values` can be called mutiple times.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#InsertStmt.Values)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Insert(db, "employees", "emp_no", "first_name").
     Values(1001, "Taro").Exec()
@@ -74,11 +74,11 @@ err := gsorm.Insert(db, "employees", "emp_no", "first_name").
 
 
 ## Select
-`Select`はINSERT INTO ... SELECT文を呼び出します．
+`Select` calls INSERT INTO ... SELECT statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#InsertStmt.Select)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Insert(db, "dept_manager").
     Select(gsorm.Select(nil).From("dept_emp")).Exec()
@@ -88,13 +88,13 @@ err := gsorm.Insert(db, "dept_manager").
 
 
 ## Model
-`Model`は構造体をマッピングします．
+`Model` maps the model into SQL.
 
-Modelについての詳細は[Model](https://github.com/champon1020/gsorm/blob/main/docs/model_ja.md)に記載されています．
+Details are given in[Model](https://github.com/champon1020/gsorm/blob/main/docs/model.md).
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#InsertStmt.Model)
 
-#### 例
+#### Example
 ```go
 type Employee struct {
     ID        int    `gsorm:"emp_no"`

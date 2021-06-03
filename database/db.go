@@ -33,9 +33,6 @@ func NewDB(dn, dsn string) (domain.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := d.Ping(); err != nil {
-		return nil, err
-	}
 	if dn == "psql" {
 		return &db{conn: d, driver: PsqlDriver}, nil
 	}

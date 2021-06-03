@@ -1,21 +1,21 @@
 # Function Query
-COUNTやAVGなどのfunction queryを簡単に実装するために，以下のような関数が設けられています．
+These functions can be used to execute function query easily.
 
-- [Count](https://github.com/champon1020/gsorm/tree/main/docs/function_ja.md#count)
-- [Sum](https://github.com/champon1020/gsorm/tree/main/docs/function_ja.md#sum)
-- [Avg](https://github.com/champon1020/gsorm/tree/main/docs/function_ja.md#avg)
-- [Max](https://github.com/champon1020/gsorm/tree/main/docs/function_ja.md#max)
-- [Min](https://github.com/champon1020/gsorm/tree/main/docs/function_ja.md#min)
+- [Count](https://github.com/champon1020/gsorm/tree/main/docs/function.md#count)
+- [Sum](https://github.com/champon1020/gsorm/tree/main/docs/function.md#sum)
+- [Avg](https://github.com/champon1020/gsorm/tree/main/docs/function.md#avg)
+- [Max](https://github.com/champon1020/gsorm/tree/main/docs/function.md#max)
+- [Min](https://github.com/champon1020/gsorm/tree/main/docs/function.md#min)
 
-実態は`gsorm.Select`と同様です．
+In fact, `gsorm.Select` is called internally.
 
 
 ## Count
-`gsorm.Count`はSELECT COUNT(...)文を実行します．
+`gsorm.Count` calls SELECT COUNT(...) statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Count.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Count)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Count(db, "emp_no").From("employees").Query(&model)
 // SELECT COUNT(emp_no) FROM employees;
@@ -30,11 +30,11 @@ err := gsorm.Count(db, "emp_no", "CASE WHEN birth_date < '1960-01-01' THEN 1 END
 
 
 ## Sum
-`gsorm.Sum`はSELECT SUM(...)文を実行します．
+`gsorm.Sum` calls SELECT SUM(...) statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Sum.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Sum)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Sum(db, "salary").From("salaries").Query(&model)
 // SELECT SUM(salary) FROM salaries;
@@ -49,11 +49,11 @@ err := gsorm.Sum(db, "salary", "CASE WHEN from_date < '1990-01-01' THEN salary E
 
 
 ## Avg
-`gsorm.Avg`はSELECT AVG(...)文を実行します．
+`gsorm.Avg` calls SELECT AVG(...) statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Avg.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Avg)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Avg(db, "salary").From("salaries").Query(&model)
 // SELECT AVG(salary) FROM salaries;
@@ -68,11 +68,11 @@ err := gsorm.Avg(db, "salary", "CASE WHEN from_date < '1990-01-01' THEN salary E
 
 
 ## Max
-`gsorm.Max`はSELECT MAX(...)文を実行します．
+`gsorm.Max` calls SELECT MAX(...) statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Max.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Max)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Max(db, "salary").From("salaries").Query(&model)
 // SELECT MAX(salary) FROM salaries;
@@ -87,11 +87,11 @@ err := gsorm.Max(db, "salary", "CASE WHEN from_date < '1990-01-01' THEN salary E
 
 
 ## Min
-`gsorm.Min`はSELECT MIN(...)文を実行します．
+`gsorm.Min` calls SELECT MIN(...) statement.
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Min.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Min)
 
-#### 例
+#### Example
 ```go
 err := gsorm.Min(db, "salary").From("salaries").Query(&model)
 // SELECT MIN(salary) FROM salaries;

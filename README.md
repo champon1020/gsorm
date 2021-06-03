@@ -1,4 +1,6 @@
 # gsorm
+[![Go Report Card](https://goreportcard.com/badge/github.com/champon1020/gsorm)](https://goreportcard.com/report/github.com/champon1020/gsorm)
+
 This is new Simple and SQL-like ORM framework written in Go language.
 gsorm lets you implement database operation easily and intuitively.
 
@@ -9,6 +11,49 @@ Major features of gsorm are as follows:
 - Mapping into struct, map, variable or their slice with high performance
 
 You can see the usage in [Quick Start](https://github.com/champon1020/gsorm#quick-start) or [Documents](https://github.com/champon1020/gsorm/blob/main/docs/README.md)
+
+
+## Benchmark
+I measured the benchmark of the mapping query results with [MySQL Employees Dataset](https://dev.mysql.com/doc/employee/en/) which has about 300000 rows.
+Also I compared the average of 10 trials to other ORM libraries.
+
+As a result, gsorm is faster than other libraries when mapping the multi rows.
+
+The result are as follows:
+
+#### Select All
+| ORM | (ns/op) |
+| ---- | ---- |
+| standard | 0.40952 |
+| gorm | >= 200 ms/op |
+| sqlx | 0.49695 |
+| gorp | 0.56168 |
+| **gsorm** | **0.38252** |
+
+#### Select One
+| ORM | (ns/op) |
+| ---- | ---- |
+| standard | 0.00053297 |
+| gorm | 0.00024275 |
+| sqlx | 0.00015573 |
+| gorp | 0.00051207 |
+| gsorm | 0.00050992 |
+
+If you want to run the benchmark on your machine, follow the steps below.
+
+```
+git clone git@github.com:champon1020/employees_database.git
+
+cd employees_database
+
+docker-compose up -d
+
+cd /path/to/gsorm/benchmark
+
+go test -bench . -benchmem -count 10
+```
+
+Benchmark codes are written under `benchmark` directory.
 
 
 ## Installation

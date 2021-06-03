@@ -1,7 +1,7 @@
 # Mock
-gsormは独自のモックを提供しています．
+gsormはモックを提供しています．
 
-gsormのモックは生文字列を指定せずに使用することができます．
+gsormのモックは生SQLを利用せずに使用することができます．
 
 #### 例
 ```go
@@ -38,10 +38,6 @@ if err := mock.Complete(); err != nil {
 
 # MockDB
 ## Methods
-`gsorm.MockDB`が実装するメソッドは以下です．
-
-また，`gsorm.MockDB`は`gsorm.DB`が実装するメソッドも使用することができます．
-
 - [Expect](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mockdbexpect)
 - [ExpectWithReturn](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mockdbexpectwithreturn)
 - [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mockdbcomplete)
@@ -84,9 +80,9 @@ if err := gsorm.Complete(); err != nil {
 
 
 ## (MockDB).ExpectBegin
-`ExpectBegin`はトランザクションが作成されることを予期します．
+`ExpectBegin`は`Begin`メソッドが実行されるのを予期します．
 
-このとき，`gsorm.MockTx`を実装するインスタンスが返されます．
+`ExpectBegin`は`gsorm.MockTx`を実装するインスタンスを返します．
 
 `gsorm.MockTx`についての詳細は[MockTx](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktx)に記載されています．
 
@@ -98,15 +94,8 @@ mocktx := mock.ExpectBegin()
 
 # MockTx
 ## Methods
-`gsorm.MockTx`が実装するメソッドは以下です．
-
-また，`gsorm.MockTx`は`gsorm.Tx`が実装するメソッドも使用することができます．
-
-基本的には`gsorm.MockDB`と同一ですが，`ExpectCommit`や`ExpectRollback`を使用することができます．
-
 - [Expect](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxexpect)
 - [ExpectWithReturn](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxexpectwithreturn)
-- [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxcomplete)
 - [ExpectCommit](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxexpectcommit)
 - [ExpectRollback](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxexpectrollback)
 
@@ -128,11 +117,6 @@ mocktx.ExpectWithReturn(
 	gsorm.Select(nil, "id", "first_name").From("employees"),
 	[]Employee{{EmpNo: 1001, FirstName: "Taro"}, {EmpNo: 1002, FirstName: "Jiro"}})
 ```
-
-
-## (MockTx).Complete
-通常は`gsorm.MockDB`において`Complete`を実行すると，作成されたトランザクションの`Complete`も反映されます．
-そのため，ユーザーはこのメソッドを意識する必要はありません．
 
 
 ## (MockTx).ExpectCommit
