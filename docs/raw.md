@@ -1,24 +1,23 @@
 # Raw
-`RawClause`，`RawStmt`は指定された文字列による句や文を呼び出します．
+`Rawclause` or `RawStmt` calls clause or statement with raw string.
 
 
 ## RawClause
-`RawClause`はSQLの汎用性を高めるために作られました．
+`RawClause` makes the implementation using gsorm generic.
 
-クエリが実行されるとき，条件式における`?`に値が代入されます．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-代入規則は以下に従います．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値がスライスもしくは配列の場合，その要素が展開されます．
-- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
-- 以上の条件に該当しない値はそのまま展開される．
+`RawsClause` is supported on all Stmt structs and can be called at any time.
 
-`RawClause`は全てのStmt構造体においてサポートされており，任意のタイミングで呼び出すことができます．
+However, `RawClause` cannot be used with `InsertStmt.Select`, `InsertStmt.Model`, `UpdateStmt.Model` or `CreateTable.Model` methods.
 
-しかし，`InsertStmt.Select`, `InsertStmt.Model`, `UpdateStmt.Model`, `CreateTable.Model`などのメソッドと併用することはできません．
-
-#### 例
+#### Example
 ```go
 err := gsorm.CreateTable(db, "dept_emp").
     Column("dept_no", "INT").NotNull().RawClause("AUTO_INCREMENT").
@@ -34,20 +33,19 @@ err := gsorm.CreateTable(db, "dept_emp").
 
 
 ## RawStmt
-`RawStmt`は文字列で指定したSQLを呼び出します．
+`RawStmt` calls the SQL with raw string.
 
-クエリが実行されるとき，条件式における`?`に値が代入されます．
+When the query is executed, the values will be assigned to `?` in the expression.
 
-代入規則は以下に従います．
+Assignment rules are as follows:
+- If the type of value is `string` or `time.Time`, the value is enclosed in single quotes
+- If the value is slice or array, its elements are expanded
+- If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
+- If the above conditions are not met, the value is assigned as is
 
-- 値が`string`型もしくは`time.Time`型の場合，値はシングルクオートで囲まれます．
-- 値がスライスもしくは配列の場合，その要素が展開されます．
-- 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
-- 以上の条件に該当しない値はそのまま展開される．
+`RawStmt` has `Query`, `Exec` and `Migrate` methods.
 
-`RawStmt`は`Query`，`Exec`，`Migrate`の全てをサポートしています．
-
-#### 例
+#### Example
 ```go
 err := gsorm.RawStmt("SELECT * FROM employees").Query(&model)
 // SELECT * FROM employees;
