@@ -45,6 +45,8 @@ Assignment rules are as follows:
 
 `RawStmt` has `Query`, `Exec` and `Migrate` methods.
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#RawStmt.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#RawStmt)
+
 #### Example
 ```go
 err := gsorm.RawStmt("SELECT * FROM employees").Query(&model)

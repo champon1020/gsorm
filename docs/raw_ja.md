@@ -47,6 +47,8 @@ err := gsorm.CreateTable(db, "dept_emp").
 
 `RawStmt`は`Query`，`Exec`，`Migrate`の全てをサポートしています．
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#RawStmt.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#RawStmt)
+
 #### 例
 ```go
 err := gsorm.RawStmt("SELECT * FROM employees").Query(&model)
