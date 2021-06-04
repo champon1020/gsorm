@@ -6,6 +6,7 @@ import (
 
 	"github.com/champon1020/gsorm"
 	"github.com/champon1020/gsorm/statement"
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -58,5 +59,42 @@ func TestRawStmt_String(t *testing.T) {
 			continue
 		}
 		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestRawStmt_QueryWithMock(t *testing.T) {
+	type Employee struct {
+		EmpNo     int
+		FirstName string
+	}
+	model := []Employee{}
+	expectedReturn := []Employee{{1001, "Taro"}, {1002, "Jiro"}}
+
+	mock := gsorm.OpenMock()
+	mock.ExpectWithReturn(gsorm.RawStmt(nil, "SELECT emp_no, first_name FROM employees"), expectedReturn)
+
+	if err := gsorm.RawStmt(mock, "SELECT emp_no, first_name FROM employees").Query(&model); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+	}
+
+	if err := mock.Complete(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+	}
+
+	if diff := cmp.Diff(expectedReturn, model); diff != "" {
+		t.Errorf("Differs: (-want +got)\n%s", diff)
+	}
+}
+
+func TestRawStmt_ExecWithMock(t *testing.T) {
+	mock := gsorm.OpenMock()
+	mock.Expect(gsorm.RawStmt(mock, `INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`))
+
+	if err := gsorm.RawStmt(mock, `INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`).Exec(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
+	}
+
+	if err := mock.Complete(); err != nil {
+		t.Errorf("Error was occurred: %v", err)
 	}
 }

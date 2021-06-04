@@ -1,29 +1,18 @@
 package database_test
 
 import (
-	"database/sql"
 	"testing"
 
 	"github.com/champon1020/gsorm"
 	"github.com/champon1020/gsorm/database"
+	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/google/go-cmp/cmp"
 	"github.com/morikuni/failure"
 	"gotest.tools/v3/assert"
 )
 
-func TestMockTx_GetDriver(t *testing.T) {
-	mock := database.NewMockDB("mysql")
-	mock.ExpectBegin()
-	mocktx, err := mock.Begin()
-	if err != nil {
-		t.Errorf("error was occurred: %v", err)
-	}
-
-	assert.Equal(t, database.MysqlDriver, mocktx.GetDriver())
-}
-
 func TestMockTx_DummyFunctions(t *testing.T) {
-	mock := database.NewMockDB("")
+	mock := gsorm.OpenMock()
 	mock.ExpectBegin()
 
 	mocktx, err := mock.Begin()
@@ -38,7 +27,7 @@ func TestMockTx_DummyFunctions(t *testing.T) {
 	assert.Equal(t, nil, e)
 
 	r2, e2 := mocktx.Query("")
-	var rexpected *sql.Rows
+	var rexpected domain.Rows
 	assert.Equal(t, rexpected, r2)
 	assert.Equal(t, nil, e2)
 }
@@ -48,7 +37,7 @@ func TestMock_TransactionExpectation(t *testing.T) {
 	expectedReturn2 := []string{"hello", "world", "!"}
 
 	// Test phase.
-	mock := database.NewMockDB("")
+	mock := gsorm.OpenMock()
 	mocktx1 := mock.ExpectBegin()
 	mocktx2 := mock.ExpectBegin()
 
@@ -122,7 +111,7 @@ func TestMockTx_Commit_Fail(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB("")
+		mock := gsorm.OpenMock()
 		_ = mock.ExpectBegin()
 
 		// Actual process.
@@ -144,7 +133,7 @@ func TestMockTx_Commit_Fail(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB("")
+		mock := gsorm.OpenMock()
 		mocktx := mock.ExpectBegin()
 		mocktx.ExpectRollback()
 
@@ -170,7 +159,7 @@ func TestMockTx_Rollback_Fail(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB("")
+		mock := gsorm.OpenMock()
 		_ = mock.ExpectBegin()
 
 		// Actual process.
@@ -192,7 +181,7 @@ func TestMockTx_Rollback_Fail(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB("")
+		mock := gsorm.OpenMock()
 		mocktx := mock.ExpectBegin()
 		mocktx.ExpectCommit()
 
@@ -218,7 +207,7 @@ func TestMockTx_CompareWith(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB("")
+		mock := gsorm.OpenMock()
 		_ = mock.ExpectBegin()
 
 		// Actual process.
@@ -241,7 +230,7 @@ func TestMockTx_CompareWith(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB("")
+		mock := gsorm.OpenMock()
 		mocktx := mock.ExpectBegin()
 		mocktx.ExpectCommit()
 
@@ -265,7 +254,7 @@ func TestMockTx_CompareWith(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB("")
+		mock := gsorm.OpenMock()
 		mocktx := mock.ExpectBegin()
 		mocktx.ExpectRollback()
 
@@ -292,7 +281,7 @@ func TestMockTx_CompareWith_Fail(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB("")
+		mock := gsorm.OpenMock()
 		mocktx := mock.ExpectBegin()
 		mocktx.Expect(gsorm.Insert(nil, "table1", "column1").Values(10))
 
@@ -310,7 +299,7 @@ func TestMockTx_CompareWith_Fail(t *testing.T) {
 		expectedErr := database.ErrInvalidMockExpectation
 
 		// Test phase.
-		mock := database.NewMockDB("")
+		mock := gsorm.OpenMock()
 		mocktx := mock.ExpectBegin()
 		mocktx.Expect(gsorm.Insert(nil, "table1", "column1").Values(10))
 

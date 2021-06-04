@@ -1,7 +1,6 @@
 package database
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/champon1020/gsorm/interfaces/domain"
@@ -24,19 +23,8 @@ type mockDB struct {
 }
 
 // NewMockDB creates MockDB instance.
-func NewMockDB(drv string) domain.MockDB {
-	if drv == "mysql" {
-		return &mockDB{driver: MysqlDriver}
-	}
-	if drv == "psql" {
-		return &mockDB{driver: PsqlDriver}
-	}
+func NewMockDB() domain.MockDB {
 	return &mockDB{}
-}
-
-// GetDriver returns sql driver.
-func (m *mockDB) GetDriver() domain.SQLDriver {
-	return m.driver
 }
 
 // Ping is dummy function.
@@ -45,12 +33,12 @@ func (m *mockDB) Ping() error {
 }
 
 // Exec is dummy function.
-func (m *mockDB) Exec(string, ...interface{}) (sql.Result, error) {
+func (m *mockDB) Exec(string, ...interface{}) (domain.Result, error) {
 	return nil, nil
 }
 
 // Query is dummy function.
-func (m *mockDB) Query(string, ...interface{}) (*sql.Rows, error) {
+func (m *mockDB) Query(string, ...interface{}) (domain.Rows, error) {
 	return nil, nil
 }
 

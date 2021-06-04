@@ -20,11 +20,42 @@ type sqlDB interface {
 	Begin() (*sql.Tx, error)
 }
 
+type rows struct {
+	rows *sql.Rows
+}
+
+func (r *rows) Next() bool {
+	return r.rows.Next()
+}
+
+func (r *rows) Scan(args ...interface{}) error {
+	return r.rows.Scan(args)
+}
+
+func (r *rows) Close() error {
+	return r.rows.Close()
+}
+
+func (r *rows) ColumnTypes() ([]*sql.ColumnType, error) {
+	return r.rows.ColumnTypes()
+}
+
+type result struct {
+	result sql.Result
+}
+
+func (r *result) LastInsertId() (int64, error) {
+	return r.result.LastInsertId()
+}
+
+func (r *result) RowsAffected() (int64, error) {
+	return r.result.RowsAffected()
+}
+
 // db is a database handle representing a pool of zero or more underlying connections.
 // It's safe for concurrent use by multiple goroutines.
 type db struct {
-	conn   sqlDB
-	driver domain.SQLDriver
+	conn sqlDB
 }
 
 // NewDB creates the DB instance.
@@ -33,15 +64,7 @@ func NewDB(dn, dsn string) (domain.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	if dn == "psql" {
-		return &db{conn: d, driver: PsqlDriver}, nil
-	}
-	return &db{conn: d, driver: MysqlDriver}, nil
-}
-
-// GetDriver returns sql driver.
-func (d *db) GetDriver() domain.SQLDriver {
-	return d.driver
+	return &db{conn: d}, nil
 }
 
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.
@@ -53,19 +76,27 @@ func (d *db) Ping() error {
 }
 
 // Exec executes a query that doesn't return rows. For example: an INSERT and UPDATE.
-func (d *db) Exec(query string, args ...interface{}) (sql.Result, error) {
+func (d *db) Exec(query string, args ...interface{}) (domain.Result, error) {
 	if d.conn == nil {
 		return nil, failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 	}
-	return d.conn.Exec(query, args...)
+	r, err := d.conn.Exec(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return &result{result: r}, nil
 }
 
 // Query executes a query that returns rows, typically a SELECT.
-func (d *db) Query(query string, args ...interface{}) (*sql.Rows, error) {
+func (d *db) Query(query string, args ...interface{}) (domain.Rows, error) {
 	if d.conn == nil {
 		return nil, failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
 	}
-	return d.conn.Query(query, args...)
+	r, err := d.conn.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return &rows{rows: r}, nil
 }
 
 // SetConnMaxLifetime sets the maximum amount of time a connection may be reused.

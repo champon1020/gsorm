@@ -5,16 +5,10 @@ import (
 	"reflect"
 	"strconv"
 
+	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/champon1020/gsorm/internal"
 	"github.com/morikuni/failure"
 )
-
-// Rows is interface for *sql.Rows.
-type Rows interface {
-	//	ColumnTypes() ([]*sql.ColumnType, error)
-	Next() bool
-	Scan(...interface{}) error
-}
 
 // ColumnType is interface for *sql.ColumnType.
 type ColumnType interface {
@@ -25,7 +19,7 @@ type ColumnType interface {
 // RowsParser is parser for sql.Rows.
 type RowsParser struct {
 	// SQL rows.
-	Rows Rows
+	Rows domain.Rows
 
 	// Number of columns.
 	NumOfColumns int
@@ -44,7 +38,7 @@ type RowsParser struct {
 }
 
 // NewRowsParser creates RowsParser instance.
-func NewRowsParser(r Rows, ct []ColumnType, m interface{}) (*RowsParser, error) {
+func NewRowsParser(r domain.Rows, ct []ColumnType, m interface{}) (*RowsParser, error) {
 	mt := reflect.TypeOf(m)
 	if mt.Kind() != reflect.Ptr {
 		err := failure.New(errInvalidValue, failure.Message("model must be a pointer"))

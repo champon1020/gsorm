@@ -12,13 +12,13 @@ import (
 // RawStmt is raw string statement.
 type RawStmt struct {
 	stmt
-	conn domain.Conn
-	cmd  *syntax.RawClause
+	cmd *syntax.RawClause
 }
 
 // NewRawStmt creates RawStmt instance.
 func NewRawStmt(conn domain.Conn, rs string, v ...interface{}) *RawStmt {
-	s := &RawStmt{conn: conn, cmd: &syntax.RawClause{RawStr: rs, Values: v}}
+	s := &RawStmt{cmd: &syntax.RawClause{RawStr: rs, Values: v}}
+	s.conn = conn
 	return s
 }
 

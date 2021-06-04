@@ -1,14 +1,14 @@
 package parser
 
 import (
-	"database/sql"
 	"reflect"
 
+	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/morikuni/failure"
 )
 
 // MapRowsToModel executes query and sets rows to model structure.
-func MapRowsToModel(r *sql.Rows, model interface{}) error {
+func MapRowsToModel(r domain.Rows, model interface{}) error {
 	ct, err := r.ColumnTypes()
 	if err != nil {
 		return failure.Wrap(err)
