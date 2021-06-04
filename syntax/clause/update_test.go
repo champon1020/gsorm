@@ -16,11 +16,11 @@ func TestUpdate_String(t *testing.T) {
 	}{
 		{
 			&clause.Update{Table: syntax.Table{Name: "table"}},
-			`UPDATE("table")`,
+			`Update("table")`,
 		},
 		{
 			&clause.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
-			`UPDATE("table AS t")`,
+			`Update("table AS t")`,
 		},
 	}
 

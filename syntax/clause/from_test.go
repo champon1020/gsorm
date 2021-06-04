@@ -16,15 +16,15 @@ func TestFrom_String(t *testing.T) {
 	}{
 		{
 			&clause.From{Tables: []syntax.Table{{Name: "table"}}},
-			`FROM("table")`,
+			`From("table")`,
 		},
 		{
 			&clause.From{Tables: []syntax.Table{{Name: "table", Alias: "t"}}},
-			`FROM("table AS t")`,
+			`From("table AS t")`,
 		},
 		{
 			&clause.From{Tables: []syntax.Table{{Name: "table1", Alias: "t1"}, {Name: "table2", Alias: "t2"}}},
-			`FROM("table1 AS t1", "table2 AS t2")`,
+			`From("table1 AS t1", "table2 AS t2")`,
 		},
 	}
 

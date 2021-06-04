@@ -1,4 +1,4 @@
-package database_test
+package gsorm_test
 
 import (
 	"database/sql"

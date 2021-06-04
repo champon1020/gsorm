@@ -11,7 +11,7 @@ import (
 
 func TestDelete_String(t *testing.T) {
 	d := new(clause.Delete)
-	assert.Equal(t, "DELETE()", d.String())
+	assert.Equal(t, "Delete()", d.String())
 }
 
 func TestDelete_Build(t *testing.T) {

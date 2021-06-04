@@ -16,18 +16,18 @@ func TestSelect_String(t *testing.T) {
 	}{
 		{
 			&clause.Select{Columns: []syntax.Column{{Name: "column"}}},
-			`SELECT("column")`,
+			`Select("column")`,
 		},
 		{
 			&clause.Select{Columns: []syntax.Column{{Name: "column", Alias: "c"}}},
-			`SELECT("column AS c")`,
+			`Select("column AS c")`,
 		},
 		{
 			&clause.Select{Columns: []syntax.Column{
 				{Name: "column1", Alias: "c1"},
 				{Name: "column2", Alias: "c2"},
 			}},
-			`SELECT("column1 AS c1", "column2 AS c2")`,
+			`Select("column1 AS c1", "column2 AS c2")`,
 		},
 	}
 

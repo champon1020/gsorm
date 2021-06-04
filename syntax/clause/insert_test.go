@@ -16,32 +16,32 @@ func TestInsert_String(t *testing.T) {
 	}{
 		{
 			&clause.Insert{Table: syntax.Table{Name: "table"}},
-			`INSERT INTO("table")`,
+			`Insert("table")`,
 		},
 		{
 			&clause.Insert{Table: syntax.Table{Name: "table", Alias: "t"}},
-			`INSERT INTO("table AS t")`,
+			`Insert("table AS t")`,
 		},
 		{
 			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column"}},
 			},
-			`INSERT INTO("table AS t", "column")`,
+			`Insert("table AS t", "column")`,
 		},
 		{
 			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column", Alias: "c"}},
 			},
-			`INSERT INTO("table AS t", "column AS c")`,
+			`Insert("table AS t", "column AS c")`,
 		},
 		{
 			&clause.Insert{
 				Table:   syntax.Table{Name: "table", Alias: "t"},
 				Columns: []syntax.Column{{Name: "column1", Alias: "c1"}, {Name: "column2", Alias: "c2"}},
 			},
-			`INSERT INTO("table AS t", "column1 AS c1", "column2 AS c2")`,
+			`Insert("table AS t", "column1 AS c1", "column2 AS c2")`,
 		},
 	}
 	for _, testCase := range testCases {

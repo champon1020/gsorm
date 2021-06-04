@@ -16,15 +16,15 @@ func TestHaving_String(t *testing.T) {
 	}{
 		{
 			&clause.Having{Expr: "lhs = rhs"},
-			`HAVING("lhs = rhs")`,
+			`Having("lhs = rhs")`,
 		},
 		{
 			&clause.Having{Expr: "lhs = ?", Values: []interface{}{10}},
-			`HAVING("lhs = ?", 10)`,
+			`Having("lhs = ?", 10)`,
 		},
 		{
 			&clause.Having{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			`HAVING("lhs1 = ? AND lhs2 = ?", 10, 'str')`,
+			`Having("lhs1 = ? AND lhs2 = ?", 10, "str")`,
 		},
 	}
 

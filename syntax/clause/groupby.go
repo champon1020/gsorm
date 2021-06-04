@@ -12,11 +12,6 @@ type GroupBy struct {
 	Columns []syntax.Column
 }
 
-// Keyword returns clause keyword.
-func (g *GroupBy) Keyword() string {
-	return "GROUP BY"
-}
-
 // AddColumn appends column to GroupBy.
 func (g *GroupBy) AddColumn(col string) {
 	g.Columns = append(g.Columns, *syntax.NewColumn(col))
@@ -31,13 +26,13 @@ func (g *GroupBy) String() string {
 		}
 		s += fmt.Sprintf("%q", c.Build())
 	}
-	return fmt.Sprintf("%s(%s)", g.Keyword(), s)
+	return fmt.Sprintf("GroupBy(%s)", s)
 }
 
 // Build makes GROUP BY clause with syntax.StmtSet.
 func (g *GroupBy) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(g.Keyword())
+	ss.WriteKeyword("GROUP BY")
 	for i, c := range g.Columns {
 		if i != 0 {
 			ss.WriteValue(",")

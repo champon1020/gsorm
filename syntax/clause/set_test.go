@@ -16,7 +16,7 @@ func TestSet_String(t *testing.T) {
 	}{
 		{
 			&clause.Set{Column: "col", Value: 10},
-			`SET(col, 10)`,
+			`Set(col, 10)`,
 		},
 	}
 

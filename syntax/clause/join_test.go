@@ -16,19 +16,15 @@ func TestJoin_String(t *testing.T) {
 	}{
 		{
 			&clause.Join{Table: syntax.Table{Name: "table"}, Type: clause.InnerJoin},
-			`INNER JOIN("table")`,
+			`Join("table")`,
 		},
 		{
 			&clause.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: clause.LeftJoin},
-			`LEFT JOIN("table AS t")`,
+			`LeftJoin("table AS t")`,
 		},
 		{
 			&clause.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: clause.RightJoin},
-			`RIGHT JOIN("table AS t")`,
-		},
-		{
-			&clause.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: clause.FullJoin},
-			`FULL OUTER JOIN("table AS t")`,
+			`RightJoin("table AS t")`,
 		},
 	}
 

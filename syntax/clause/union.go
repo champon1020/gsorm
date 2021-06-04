@@ -24,7 +24,11 @@ func (u *Union) Keyword() string {
 
 // String returns function call with string.
 func (u *Union) String() string {
-	return fmt.Sprintf("%s(%q)", u.Keyword(), u.Stmt)
+	keyword := "Union"
+	if u.All {
+		keyword += "All"
+	}
+	return fmt.Sprintf("%s(%q)", keyword, u.Stmt)
 }
 
 // Build makes UNION clause with syntax.StmtSet.

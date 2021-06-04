@@ -16,18 +16,18 @@ func TestGroupBy_String(t *testing.T) {
 	}{
 		{
 			&clause.GroupBy{Columns: []syntax.Column{{Name: "column"}}},
-			`GROUP BY("column")`,
+			`GroupBy("column")`,
 		},
 		{
 			&clause.GroupBy{Columns: []syntax.Column{{Name: "column", Alias: "c"}}},
-			`GROUP BY("column AS c")`,
+			`GroupBy("column AS c")`,
 		},
 		{
 			&clause.GroupBy{Columns: []syntax.Column{
 				{Name: "column1", Alias: "c1"},
 				{Name: "column2", Alias: "c2"},
 			}},
-			`GROUP BY("column1 AS c1", "column2 AS c2")`,
+			`GroupBy("column1 AS c1", "column2 AS c2")`,
 		},
 	}
 

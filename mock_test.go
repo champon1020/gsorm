@@ -1,14 +1,12 @@
-package database_test
+package gsorm_test
 
 import (
 	"testing"
 
 	"github.com/champon1020/gsorm"
-	"github.com/champon1020/gsorm/database"
 	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/google/go-cmp/cmp"
-	"github.com/morikuni/failure"
-	"gotest.tools/v3/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMock_Expectation(t *testing.T) {
@@ -24,7 +22,7 @@ func TestMock_Expectation(t *testing.T) {
 		t.Errorf("Error was occurred: %+v", err)
 		return
 	}
-	model := new([]int)
+	model := &[]int{}
 	if err := gsorm.Select(mock, "column1").From("table").Query(model); err != nil {
 		t.Errorf("Error was occurred: %+v", err)
 		return
@@ -62,26 +60,22 @@ func TestMockDB_DummyFunctions(t *testing.T) {
 
 func TestMockDB_Begin_Fail(t *testing.T) {
 	{
-		expectedErr := database.ErrInvalidMockExpectation
+		expectedErr := "gsorm.mockDB.Begin is not expected"
 
 		// Test phase.
-		mock := new(database.ExportedMockDB)
+		mock := &gsorm.ExportedMockDB{}
 
 		// Actual process.
 		_, err := mock.Begin()
 
 		// Validate if the expected error was occurred.
-		if !failure.Is(err, expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %+v", expectedErr)
-			t.Errorf("  Actual:   %+v", err)
-		}
+		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		expectedErr := database.ErrInvalidMockExpectation
+		expectedErr := "gsorm.mockDB.Begin is not expected"
 
 		// Test phase.
-		mock := new(database.ExportedMockDB)
+		mock := &gsorm.ExportedMockDB{}
 		mock.Expect(gsorm.Select(nil, "column1").From("table"))
 		_ = mock.ExpectBegin()
 
@@ -89,16 +83,12 @@ func TestMockDB_Begin_Fail(t *testing.T) {
 		_, err := mock.Begin()
 
 		// Validate if the expected error was occurred.
-		if !failure.Is(err, expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %+v", expectedErr)
-			t.Errorf("  Actual:   %+v", err)
-		}
+		assert.EqualError(t, err, expectedErr)
 	}
 }
 
 func TestMockDB_Complete_Fail(t *testing.T) {
-	expectedErr := database.ErrInvalidMockExpectation
+	expectedErr := `Insert("table2", "column1", "column2").Values(10, "str") is expected but not executed`
 
 	// Test phase.
 	mock := gsorm.OpenMock()
@@ -115,15 +105,11 @@ func TestMockDB_Complete_Fail(t *testing.T) {
 	err := mock.Complete()
 
 	// Validate if the expected error was occurred.
-	if !failure.Is(err, expectedErr) {
-		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %+v", expectedErr)
-		t.Errorf("  Actual:   %+v", err)
-	}
+	assert.EqualError(t, err, expectedErr)
 }
 
 func TestMockDB_Complete_Transaction_Fail(t *testing.T) {
-	expectedErr := database.ErrInvalidMockExpectation
+	expectedErr := `Insert("table2", "column1", "column2").Values(10, "str") is expected but not executed`
 
 	// Test phase.
 	mock := gsorm.OpenMock()
@@ -146,54 +132,44 @@ func TestMockDB_Complete_Transaction_Fail(t *testing.T) {
 	err = mock.Complete()
 
 	// Validate if the expected error was occurred.
-	if !failure.Is(err, expectedErr) {
-		t.Errorf("Different error was occurred")
-		t.Errorf("  Expected: %+v", expectedErr)
-		t.Errorf("  Actual:   %+v", err)
-	}
+	assert.EqualError(t, err, expectedErr)
 }
 
 func TestMockDB_CompareWith(t *testing.T) {
 	{
-		expectedErr := database.ErrInvalidMockExpectation
+		expectedErr := `Select("column1").From("table") is not expected but executed`
 
 		// Test phase.
 		mock := gsorm.OpenMock()
 
 		// Actual process.
-		model := new([]int)
+		model := &[]int{}
 		err := gsorm.Select(mock, "column1").From("table").Query(model)
 
 		// Validate if the expected error was occurred.
-		if !failure.Is(err, expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %+v", expectedErr)
-			t.Errorf("  Actual:   %+v", err)
-		}
+		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		expectedErr := database.ErrInvalidMockExpectation
+		//		expectedErr := "gsorm.mockDB.Begin is not expected"
+		expectedErr := "statements comparison was failed:\nexpected: gsorm.MockDB.Begin\nactual:   Select(\"column1\").From(\"table\")\n"
 
 		// Test phase.
 		mock := gsorm.OpenMock()
 		_ = mock.ExpectBegin()
 
 		// Actual process.
-		model := new([]int)
+		model := &[]int{}
 		err := gsorm.Select(mock, "column1").From("table").Query(model)
 
 		// Validate if the expected error was occurred.
-		if !failure.Is(err, expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %+v", expectedErr)
-			t.Errorf("  Actual:   %+v", err)
-		}
+		assert.EqualError(t, err, expectedErr)
 	}
 }
 
 func TestMockDB_CompareWith_Fail(t *testing.T) {
 	{
-		expectedErr := database.ErrInvalidMockExpectation
+		//		expectedErr := "gsorm.mockDB.Begin is not expected"
+		expectedErr := "statements comparison was failed:\nexpected: Insert(\"table1\", \"column1\").Values(10)\nactual:   Insert(\"table2\", \"column2\").Values(10)\n"
 
 		// Test phase.
 		mock := gsorm.OpenMock()
@@ -203,27 +179,19 @@ func TestMockDB_CompareWith_Fail(t *testing.T) {
 		err := gsorm.Insert(mock, "table2", "column2").Values(10).Exec()
 
 		// Validate if the expected error was occurred.
-		if !failure.Is(err, expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %+v", expectedErr)
-			t.Errorf("  Actual:   %+v", err)
-		}
+		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		expectedErr := database.ErrInvalidMockExpectation
+		expectedErr := "statements comparison was failed:\nexpected: Insert(\"table1\", \"column1\").Values(10)\nactual:   Insert(\"table1\", \"column1\").Values(10).Values(100)\n"
 
 		// Test phase.
 		mock := gsorm.OpenMock()
 		mock.Expect(gsorm.Insert(nil, "table1", "column1").Values(10))
 
 		// Actual process.
-		err := gsorm.Insert(mock, "table2", "column2").Values(10).Values(100).Exec()
+		err := gsorm.Insert(mock, "table1", "column1").Values(10).Values(100).Exec()
 
 		// Validate if the expected error was occurred.
-		if !failure.Is(err, expectedErr) {
-			t.Errorf("Different error was occurred")
-			t.Errorf("  Expected: %+v", expectedErr)
-			t.Errorf("  Actual:   %+v", err)
-		}
+		assert.EqualError(t, err, expectedErr)
 	}
 }

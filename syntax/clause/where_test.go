@@ -16,15 +16,15 @@ func TestWhere_String(t *testing.T) {
 	}{
 		{
 			&clause.Where{Expr: "lhs = rhs"},
-			`WHERE("lhs = rhs")`,
+			`Where("lhs = rhs")`,
 		},
 		{
 			&clause.Where{Expr: "lhs = ?", Values: []interface{}{10}},
-			`WHERE("lhs = ?", 10)`,
+			`Where("lhs = ?", 10)`,
 		},
 		{
 			&clause.Where{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			`WHERE("lhs1 = ? AND lhs2 = ?", 10, 'str')`,
+			`Where("lhs1 = ? AND lhs2 = ?", 10, "str")`,
 		},
 	}
 

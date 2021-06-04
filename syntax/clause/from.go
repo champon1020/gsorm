@@ -12,11 +12,6 @@ type From struct {
 	Tables []syntax.Table
 }
 
-// Keyword returns clause keyword.
-func (f *From) Keyword() string {
-	return "FROM"
-}
-
 // AddTable appends table to From.
 func (f *From) AddTable(table string) {
 	t := syntax.NewTable(table)
@@ -32,13 +27,13 @@ func (f *From) String() string {
 		}
 		s += fmt.Sprintf("%q", t.Build())
 	}
-	return fmt.Sprintf("%s(%s)", f.Keyword(), s)
+	return fmt.Sprintf("From(%s)", s)
 }
 
 // Build makes FROM clause with syntax.StmtSet.
 func (f *From) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(f.Keyword())
+	ss.WriteKeyword("FROM")
 	for i, t := range f.Tables {
 		if i != 0 {
 			ss.WriteValue(",")

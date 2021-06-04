@@ -16,15 +16,15 @@ func TestOn_String(t *testing.T) {
 	}{
 		{
 			&clause.On{Expr: "table1.column = table2.column"},
-			`ON("table1.column = table2.column")`,
+			`On("table1.column = table2.column")`,
 		},
 		{
 			&clause.On{Expr: "table1.column = ?", Values: []interface{}{"table2.column"}},
-			`ON("table1.column = ?", 'table2.column')`,
+			`On("table1.column = ?", "table2.column")`,
 		},
 		{
 			&clause.On{Expr: "table1.column = ? AND table2.column = ?", Values: []interface{}{"table3.column", "table4.column"}},
-			`ON("table1.column = ? AND table2.column = ?", 'table3.column', 'table4.column')`,
+			`On("table1.column = ? AND table2.column = ?", "table3.column", "table4.column")`,
 		},
 	}
 

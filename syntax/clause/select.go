@@ -12,11 +12,6 @@ type Select struct {
 	Columns []syntax.Column
 }
 
-// Keyword returns clause keyword.
-func (s *Select) Keyword() string {
-	return "SELECT"
-}
-
 // AddColumns appends column to Select.
 func (s *Select) AddColumns(cols ...string) {
 	for _, c := range cols {
@@ -34,13 +29,13 @@ func (s *Select) String() string {
 		}
 		str += fmt.Sprintf("%q", c.Build())
 	}
-	return fmt.Sprintf("%s(%s)", s.Keyword(), str)
+	return fmt.Sprintf("Select(%s)", str)
 }
 
 // Build makes SELECT clause with syntax.StmtSet.
 func (s *Select) Build() (domain.StmtSet, error) {
 	ss := &syntax.StmtSet{}
-	ss.WriteKeyword(s.Keyword())
+	ss.WriteKeyword("SELECT")
 	for i, c := range s.Columns {
 		if i != 0 {
 			ss.WriteValue(",")

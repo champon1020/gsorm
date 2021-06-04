@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/champon1020/gsorm"
-	"github.com/champon1020/gsorm/statement/migration"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,12 +20,12 @@ func TestCreateTableModelParser(t *testing.T) {
 	db := gsorm.OpenMock()
 
 	testCases := []struct {
-		Stmt     *migration.CreateTableStmt
+		Stmt     *gsorm.CreateTableStmt
 		Expected string
 	}{
 		{
 			gsorm.CreateTable(db, "person").
-				Model(&model).(*migration.CreateTableStmt),
+				Model(&model).(*gsorm.CreateTableStmt),
 			`CREATE TABLE person (` +
 				`id INT NOT NULL, ` +
 				`country_code CHAR(3) NOT NULL DEFAULT '0', ` +

@@ -14,19 +14,14 @@ type Or struct {
 	Values []interface{}
 }
 
-// Keyword returns clause keyword.
-func (o *Or) Keyword() string {
-	return "OR"
-}
-
 // String returns function call with string.
 func (o *Or) String() string {
 	s := fmt.Sprintf("%q", o.Expr)
 	if len(o.Values) > 0 {
 		s += ", "
-		s += internal.ToString(o.Values, nil)
+		s += internal.ToString(o.Values, &internal.ToStringOpt{DoubleQuotes: true})
 	}
-	return fmt.Sprintf("%s(%s)", o.Keyword(), s)
+	return fmt.Sprintf("Or(%s)", s)
 }
 
 // Build makes OR clause with syntax.StmtSet.
@@ -36,7 +31,7 @@ func (o *Or) Build() (domain.StmtSet, error) {
 		return nil, err
 	}
 	ss := &syntax.StmtSet{Value: s}
-	ss.WriteKeyword(o.Keyword())
+	ss.WriteKeyword("OR")
 	ss.Parens = true
 	return ss, nil
 }

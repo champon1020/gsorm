@@ -1,11 +1,11 @@
-package database
+package gsorm
 
 import (
 	"database/sql"
 	"time"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/morikuni/failure"
+	"golang.org/x/xerrors"
 )
 
 // sqlDB is interface for sql.DB.
@@ -58,27 +58,18 @@ type db struct {
 	conn sqlDB
 }
 
-// NewDB creates the DB instance.
-func NewDB(dn, dsn string) (domain.DB, error) {
-	d, err := sql.Open(dn, dsn)
-	if err != nil {
-		return nil, err
-	}
-	return &db{conn: d}, nil
-}
-
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.
 func (d *db) Ping() error {
 	if d.conn == nil {
-		return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
+		return xerrors.New("gsorm.db.conn is nil")
 	}
 	return d.conn.Ping()
 }
 
 // Exec executes a query that doesn't return rows. For example: an INSERT and UPDATE.
-func (d *db) Exec(query string, args ...interface{}) (domain.Result, error) {
+func (d *db) Exec(query string, args ...interface{}) (Result, error) {
 	if d.conn == nil {
-		return nil, failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
+		return nil, xerrors.New("gsorm.db.conn is nil")
 	}
 	r, err := d.conn.Exec(query, args...)
 	if err != nil {
@@ -88,9 +79,9 @@ func (d *db) Exec(query string, args ...interface{}) (domain.Result, error) {
 }
 
 // Query executes a query that returns rows, typically a SELECT.
-func (d *db) Query(query string, args ...interface{}) (domain.Rows, error) {
+func (d *db) Query(query string, args ...interface{}) (Rows, error) {
 	if d.conn == nil {
-		return nil, failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
+		return nil, xerrors.New("gsorm.db.conn is nil")
 	}
 	r, err := d.conn.Query(query, args...)
 	if err != nil {
@@ -102,7 +93,7 @@ func (d *db) Query(query string, args ...interface{}) (domain.Rows, error) {
 // SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
 func (d *db) SetConnMaxLifetime(n time.Duration) error {
 	if d.conn == nil {
-		return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
+		return xerrors.New("gsorm.db.conn is nil")
 	}
 	d.conn.SetConnMaxLifetime(n)
 	return nil
@@ -111,7 +102,7 @@ func (d *db) SetConnMaxLifetime(n time.Duration) error {
 // SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
 func (d *db) SetMaxIdleConns(n int) error {
 	if d.conn == nil {
-		return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
+		return xerrors.New("gsorm.db.conn is nil")
 	}
 	d.conn.SetMaxIdleConns(n)
 	return nil
@@ -120,7 +111,7 @@ func (d *db) SetMaxIdleConns(n int) error {
 // SetMaxOpenConns sets the maximum number of open connections to the database.
 func (d *db) SetMaxOpenConns(n int) error {
 	if d.conn == nil {
-		return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
+		return xerrors.New("gsorm.db.conn is nil")
 	}
 	d.conn.SetMaxOpenConns(n)
 	return nil
@@ -130,19 +121,81 @@ func (d *db) SetMaxOpenConns(n int) error {
 // Close then waits for all queries that have started processing on the server to finish.
 func (d *db) Close() error {
 	if d.conn == nil {
-		return failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
+		return xerrors.New("gsorm.db.conn is nil")
 	}
 	return d.conn.Close()
 }
 
 // Begin starts a transaction. The default isolation level is dependent on the driver.
-func (d *db) Begin() (domain.Tx, error) {
+func (d *db) Begin() (Tx, error) {
 	if d.conn == nil {
-		return nil, failure.New(errFailedDBConnection, failure.Message("gsorm.db.conn is nil"))
+		return nil, xerrors.New("gsorm.db.conn is nil")
 	}
 	t, err := d.conn.Begin()
 	if err != nil {
 		return nil, failure.Wrap(err)
 	}
 	return &tx{db: d, conn: t}, nil
+}
+
+// sqlTx is interface for sql.Tx.
+type sqlTx interface {
+	Query(string, ...interface{}) (*sql.Rows, error)
+	Exec(string, ...interface{}) (sql.Result, error)
+	Commit() error
+	Rollback() error
+}
+
+// tx is an in-progress database transaction.
+type tx struct {
+	db   DB
+	conn sqlTx
+}
+
+// Ping verifies a connection to the database is still alive, establishing a connection if necessary.
+func (t *tx) Ping() error {
+	if t.db == nil {
+		return xerrors.New("gsorm.tx.conn is nil")
+	}
+	return t.db.Ping()
+}
+
+// Exec executes a query that doesn't return rows. For example: an INSERT and UPDATE.
+func (t *tx) Exec(query string, args ...interface{}) (Result, error) {
+	if t.conn == nil {
+		return nil, xerrors.New("gsorm.tx.conn is nil")
+	}
+	r, err := t.conn.Exec(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return &result{result: r}, nil
+}
+
+// Query executes a query that returns rows, typically a SELECT.
+func (t *tx) Query(query string, args ...interface{}) (Rows, error) {
+	if t.conn == nil {
+		return nil, xerrors.New("gsorm.tx.conn is nil")
+	}
+	r, err := t.conn.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return &rows{rows: r}, nil
+}
+
+// Commit commits the transaction.
+func (t *tx) Commit() error {
+	if t.conn == nil {
+		return xerrors.New("gsorm.tx.conn is nil")
+	}
+	return t.conn.Commit()
+}
+
+// Rollback aborts the transaction.
+func (t *tx) Rollback() error {
+	if t.conn == nil {
+		return xerrors.New("gsorm.tx.conn is nil")
+	}
+	return t.conn.Rollback()
 }

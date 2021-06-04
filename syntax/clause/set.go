@@ -14,21 +14,15 @@ type Set struct {
 	Value  interface{}
 }
 
-// Keyword returns clause keyword.
-func (s *Set) Keyword() string {
-	return "SET"
-}
-
 // String returns function call with string.
 func (s *Set) String() string {
-	return fmt.Sprintf("%s(%s, %v)", s.Keyword(), s.Column, s.Value)
+	return fmt.Sprintf("Set(%s, %v)", s.Column, s.Value)
 }
 
 // Build makes SET clause with syntax.StmtSet.
 func (s *Set) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(s.Keyword())
-
+	ss.WriteKeyword("SET")
 	v := internal.ToString(s.Value, nil)
 	ss.WriteValue(fmt.Sprintf("%s = %s", s.Column, v))
 	return ss, nil

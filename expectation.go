@@ -1,4 +1,4 @@
-package database
+package gsorm
 
 import "github.com/champon1020/gsorm/interfaces/domain"
 

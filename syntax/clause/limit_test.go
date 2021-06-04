@@ -16,7 +16,7 @@ func TestLimit_String(t *testing.T) {
 	}{
 		{
 			&clause.Limit{Num: 10},
-			`LIMIT(10)`,
+			`Limit(10)`,
 		},
 	}
 

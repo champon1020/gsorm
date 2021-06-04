@@ -2,7 +2,7 @@ package domain
 
 // Clause is interface for SQL clauses.
 type Clause interface {
-	Keyword() string
+	//Keyword() string
 	String() string
 	Build() (StmtSet, error)
 }

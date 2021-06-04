@@ -12,20 +12,15 @@ type OrderBy struct {
 	Columns []string
 }
 
-// Keyword returns clause keyword.
-func (o *OrderBy) Keyword() string {
-	return "ORDER BY"
-}
-
 // String returns function call with string.
 func (o *OrderBy) String() string {
-	return fmt.Sprintf("%s(%q)", o.Keyword(), o.Columns)
+	return fmt.Sprintf("OrderBy(%q)", o.Columns)
 }
 
 // Build makes ORDER BY clause with sytnax.StmtSet.
 func (o *OrderBy) Build() (domain.StmtSet, error) {
 	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(o.Keyword())
+	ss.WriteKeyword("ORDER BY")
 	for i, c := range o.Columns {
 		if i > 0 {
 			ss.WriteValue(",")

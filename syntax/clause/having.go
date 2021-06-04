@@ -14,19 +14,14 @@ type Having struct {
 	Values []interface{}
 }
 
-// Keyword returns clause keyword.
-func (h *Having) Keyword() string {
-	return "HAVING"
-}
-
 // String returns function call with string.
 func (h *Having) String() string {
 	s := fmt.Sprintf("%q", h.Expr)
 	if len(h.Values) > 0 {
 		s += ", "
-		s += internal.ToString(h.Values, nil)
+		s += internal.ToString(h.Values, &internal.ToStringOpt{DoubleQuotes: true})
 	}
-	return fmt.Sprintf("%s(%s)", h.Keyword(), s)
+	return fmt.Sprintf("Having(%s)", s)
 }
 
 // Build makes HAVING clause with syntax.StmtSet.
@@ -36,6 +31,6 @@ func (h *Having) Build() (domain.StmtSet, error) {
 		return nil, err
 	}
 	ss := &syntax.StmtSet{Value: s}
-	ss.WriteKeyword(h.Keyword())
+	ss.WriteKeyword("HAVING")
 	return ss, nil
 }

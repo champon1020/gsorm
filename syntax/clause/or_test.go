@@ -16,15 +16,15 @@ func TestOr_String(t *testing.T) {
 	}{
 		{
 			&clause.Or{Expr: "lhs = rhs"},
-			`OR("lhs = rhs")`,
+			`Or("lhs = rhs")`,
 		},
 		{
 			&clause.Or{Expr: "lhs = ?", Values: []interface{}{10}},
-			`OR("lhs = ?", 10)`,
+			`Or("lhs = ?", 10)`,
 		},
 		{
 			&clause.Or{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			`OR("lhs1 = ? AND lhs2 = ?", 10, 'str')`,
+			`Or("lhs1 = ? AND lhs2 = ?", 10, "str")`,
 		},
 	}
 

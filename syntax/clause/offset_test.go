@@ -16,7 +16,7 @@ func TestOffset_String(t *testing.T) {
 	}{
 		{
 			&clause.Offset{Num: 10},
-			`OFFSET(10)`,
+			`Offset(10)`,
 		},
 	}
 

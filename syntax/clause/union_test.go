@@ -17,11 +17,11 @@ func TestUnion_String(t *testing.T) {
 	}{
 		{
 			&clause.Union{Stmt: gsorm.Select(nil, "*").From("table")},
-			`UNION("SELECT * FROM table")`,
+			`Union("SELECT * FROM table")`,
 		},
 		{
 			&clause.Union{Stmt: gsorm.Select(nil, "*").From("table"), All: true},
-			`UNION ALL("SELECT * FROM table")`,
+			`UnionAll("SELECT * FROM table")`,
 		},
 	}
 

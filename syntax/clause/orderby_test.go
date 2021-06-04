@@ -16,11 +16,11 @@ func TestOrderBy_String(t *testing.T) {
 	}{
 		{
 			&clause.OrderBy{Columns: []string{"column"}},
-			`ORDER BY(["column"])`,
+			`OrderBy(["column"])`,
 		},
 		{
 			&clause.OrderBy{Columns: []string{"column1", "column2 DESC"}},
-			`ORDER BY(["column1" "column2 DESC"])`,
+			`OrderBy(["column1" "column2 DESC"])`,
 		},
 	}
 
