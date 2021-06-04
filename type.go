@@ -7,28 +7,28 @@ import (
 	"github.com/champon1020/gsorm/interfaces/domain"
 )
 
-// Conn is database connection like DB or Tx. This is also implemented by MockDB and MockTx.
-type Conn interface {
+// conn is database connection like DB or Tx. This is also implemented by MockDB and MockTx.
+type conn interface {
 	Ping() error
-	Query(query string, args ...interface{}) (Rows, error)
-	Exec(query string, args ...interface{}) (Result, error)
+	Query(query string, args ...interface{}) (irows, error)
+	Exec(query string, args ...interface{}) (iresult, error)
 }
 
-type Rows interface {
+type irows interface {
 	Next() bool
 	Scan(args ...interface{}) error
 	ColumnTypes() ([]*sql.ColumnType, error)
 	Close() error
 }
 
-type Result interface {
+type iresult interface {
 	LastInsertId() (int64, error)
 	RowsAffected() (int64, error)
 }
 
 // DB is the interface of database.
 type DB interface {
-	Conn
+	conn
 	SetConnMaxLifetime(n time.Duration) error
 	SetMaxIdleConns(n int) error
 	SetMaxOpenConns(n int) error
@@ -38,14 +38,14 @@ type DB interface {
 
 // Tx is the interface of database transaction.
 type Tx interface {
-	Conn
+	conn
 	Commit() error
 	Rollback() error
 }
 
 // Mock is mock database conneciton pool.
 type Mock interface {
-	Conn
+	conn
 	Complete() error
 	CompareWith(domain.Stmt) (interface{}, error)
 	Expect(s domain.Stmt)

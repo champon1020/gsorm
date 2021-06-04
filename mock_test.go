@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/champon1020/gsorm"
-	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
@@ -53,7 +52,7 @@ func TestMockDB_DummyFunctions(t *testing.T) {
 	assert.Equal(t, nil, e)
 
 	r2, e2 := mock.Query("")
-	var rexpected domain.Rows
+	var rexpected gsorm.ExportedIRows
 	assert.Equal(t, rexpected, r2)
 	assert.Equal(t, nil, e2)
 }

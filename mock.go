@@ -26,12 +26,12 @@ func (m *mockDB) Ping() error {
 }
 
 // Exec is dummy function.
-func (m *mockDB) Exec(string, ...interface{}) (Result, error) {
+func (m *mockDB) Exec(string, ...interface{}) (iresult, error) {
 	return nil, nil
 }
 
 // Query is dummy function.
-func (m *mockDB) Query(string, ...interface{}) (Rows, error) {
+func (m *mockDB) Query(string, ...interface{}) (irows, error) {
 	return nil, nil
 }
 
@@ -156,12 +156,12 @@ func (m *mockTx) Ping() error {
 }
 
 // Exec is dummy function.
-func (m *mockTx) Exec(string, ...interface{}) (Result, error) {
+func (m *mockTx) Exec(string, ...interface{}) (iresult, error) {
 	return nil, nil
 }
 
 // Query is dummy function.
-func (m *mockTx) Query(string, ...interface{}) (Rows, error) {
+func (m *mockTx) Query(string, ...interface{}) (irows, error) {
 	return nil, nil
 }
 

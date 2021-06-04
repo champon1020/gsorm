@@ -5,6 +5,7 @@ type (
 	ExportedDB      = db
 	ExportedTx      = tx
 	ExportedMockDB  = mockDB
+	ExportedIRows   = irows
 )
 
 // Exported values which is declared in db.go.

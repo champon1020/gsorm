@@ -12,7 +12,6 @@ import (
 	"github.com/champon1020/gsorm/interfaces/idropdb"
 	"github.com/champon1020/gsorm/interfaces/idroptable"
 	"github.com/champon1020/gsorm/internal"
-	"github.com/champon1020/gsorm/internal/parser"
 	"github.com/champon1020/gsorm/syntax"
 	"github.com/champon1020/gsorm/syntax/mig"
 	"github.com/morikuni/failure"
@@ -21,7 +20,7 @@ import (
 
 // migStmt stores information about database migration query.
 type migStmt struct {
-	conn   Conn
+	conn   conn
 	called []domain.Clause
 	errors []error
 }
@@ -181,7 +180,7 @@ type AlterTableStmt struct {
 }
 
 // newAlterTableStmt creates AlterTableStmt instance.
-func newAlterTableStmt(conn Conn, table string) *AlterTableStmt {
+func newAlterTableStmt(conn conn, table string) *AlterTableStmt {
 	stmt := &AlterTableStmt{cmd: &mig.AlterTable{Table: table}}
 	stmt.conn = conn
 	return stmt
@@ -327,7 +326,7 @@ type CreateDBStmt struct {
 }
 
 // newCreateDBStmt creates CreateDBStmt instance.
-func newCreateDBStmt(conn Conn, dbName string) *CreateDBStmt {
+func newCreateDBStmt(conn conn, dbName string) *CreateDBStmt {
 	stmt := &CreateDBStmt{cmd: &mig.CreateDB{DBName: dbName}}
 	stmt.conn = conn
 	return stmt
@@ -384,7 +383,7 @@ type CreateIndexStmt struct {
 }
 
 // newCreateIndexStmt creates CreateIndexStmt instance.
-func newCreateIndexStmt(conn Conn, idx string) *CreateIndexStmt {
+func newCreateIndexStmt(conn conn, idx string) *CreateIndexStmt {
 	stmt := &CreateIndexStmt{cmd: &mig.CreateIndex{IdxName: idx}}
 	stmt.conn = conn
 	return stmt
@@ -449,7 +448,7 @@ type CreateTableStmt struct {
 }
 
 // newCreateTableStmt creates CreateTableStmt instance.
-func newCreateTableStmt(conn Conn, table string) *CreateTableStmt {
+func newCreateTableStmt(conn conn, table string) *CreateTableStmt {
 	stmt := &CreateTableStmt{cmd: &mig.CreateTable{Table: table}}
 	stmt.conn = conn
 	return stmt
@@ -529,7 +528,7 @@ func (s *CreateTableStmt) buildSQLWithClauses(sql *internal.SQL) error {
 }
 
 func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
-	p, err := parser.NewCreateTableModelParser(s.model)
+	p, err := newCreateTableModelParser(s.model)
 	if err != nil {
 		return err
 	}
@@ -610,7 +609,7 @@ type DropDBStmt struct {
 }
 
 // newDropDBStmt creates DropDBStmt instance.
-func newDropDBStmt(conn Conn, dbName string) *DropDBStmt {
+func newDropDBStmt(conn conn, dbName string) *DropDBStmt {
 	stmt := &DropDBStmt{cmd: &mig.DropDB{DBName: dbName}}
 	stmt.conn = conn
 	return stmt
@@ -667,7 +666,7 @@ type DropTableStmt struct {
 }
 
 // newDropTableStmt creates DropTableStmt instance.
-func newDropTableStmt(conn Conn, table string) *DropTableStmt {
+func newDropTableStmt(conn conn, table string) *DropTableStmt {
 	stmt := &DropTableStmt{cmd: &mig.DropTable{Table: table}}
 	stmt.conn = conn
 	return stmt

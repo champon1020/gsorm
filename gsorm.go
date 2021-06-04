@@ -32,32 +32,32 @@ func OpenMock() MockDB {
 }
 
 // RawStmt calls raw string statement.
-func RawStmt(conn Conn, raw string, values ...interface{}) iraw.Stmt {
+func RawStmt(conn conn, raw string, values ...interface{}) iraw.Stmt {
 	return newRawStmt(conn, raw, values...)
 }
 
 // Select calls SELECT command.
-func Select(conn Conn, columns ...string) iselect.Stmt {
+func Select(conn conn, columns ...string) iselect.Stmt {
 	return newSelectStmt(conn, columns...)
 }
 
 // Insert calls INSERT command.
-func Insert(conn Conn, table string, columns ...string) iinsert.Stmt {
+func Insert(conn conn, table string, columns ...string) iinsert.Stmt {
 	return newInsertStmt(conn, table, columns...)
 }
 
 // Update calls UPDATE command.
-func Update(conn Conn, table string) iupdate.Stmt {
+func Update(conn conn, table string) iupdate.Stmt {
 	return newUpdateStmt(conn, table)
 }
 
 // Delete calls DELETE command.
-func Delete(conn Conn) idelete.Stmt {
+func Delete(conn conn) idelete.Stmt {
 	return newDeleteStmt(conn)
 }
 
 // Count calls COUNT function.
-func Count(conn Conn, column string, alias ...string) iselect.Stmt {
+func Count(conn conn, column string, alias ...string) iselect.Stmt {
 	c := fmt.Sprintf("COUNT(%s)", column)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -66,7 +66,7 @@ func Count(conn Conn, column string, alias ...string) iselect.Stmt {
 }
 
 // Avg calls AVG function.
-func Avg(conn Conn, column string, alias ...string) iselect.Stmt {
+func Avg(conn conn, column string, alias ...string) iselect.Stmt {
 	c := fmt.Sprintf("AVG(%s)", column)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -75,7 +75,7 @@ func Avg(conn Conn, column string, alias ...string) iselect.Stmt {
 }
 
 // Sum calls SUM function.
-func Sum(conn Conn, column string, alias ...string) iselect.Stmt {
+func Sum(conn conn, column string, alias ...string) iselect.Stmt {
 	c := fmt.Sprintf("SUM(%s)", column)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -84,7 +84,7 @@ func Sum(conn Conn, column string, alias ...string) iselect.Stmt {
 }
 
 // Min calls MIN function.
-func Min(conn Conn, column string, alias ...string) iselect.Stmt {
+func Min(conn conn, column string, alias ...string) iselect.Stmt {
 	c := fmt.Sprintf("MIN(%s)", column)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -93,7 +93,7 @@ func Min(conn Conn, column string, alias ...string) iselect.Stmt {
 }
 
 // Max calls MAX function.
-func Max(conn Conn, column string, alias ...string) iselect.Stmt {
+func Max(conn conn, column string, alias ...string) iselect.Stmt {
 	c := fmt.Sprintf("MAX(%s)", column)
 	if len(alias) > 0 {
 		c = fmt.Sprintf("%s AS %s", c, alias[0])
@@ -102,31 +102,31 @@ func Max(conn Conn, column string, alias ...string) iselect.Stmt {
 }
 
 // AlterTable calls ALTER TABLE command.
-func AlterTable(conn Conn, table string) ialtertable.Stmt {
+func AlterTable(conn conn, table string) ialtertable.Stmt {
 	return newAlterTableStmt(conn, table)
 }
 
 // CreateDB calls CREATE DATABASE command.
-func CreateDB(conn Conn, dbName string) icreatedb.Stmt {
+func CreateDB(conn conn, dbName string) icreatedb.Stmt {
 	return newCreateDBStmt(conn, dbName)
 }
 
 // CreateIndex calls CREATE INDEX command.
-func CreateIndex(conn Conn, idx string) icreateindex.Stmt {
+func CreateIndex(conn conn, idx string) icreateindex.Stmt {
 	return newCreateIndexStmt(conn, idx)
 }
 
 // CreateTable calls CREATE TABLE command.
-func CreateTable(conn Conn, table string) icreatetable.Stmt {
+func CreateTable(conn conn, table string) icreatetable.Stmt {
 	return newCreateTableStmt(conn, table)
 }
 
 // DropDB calls DROP DATABASE command.
-func DropDB(conn Conn, dbName string) idropdb.Stmt {
+func DropDB(conn conn, dbName string) idropdb.Stmt {
 	return newDropDBStmt(conn, dbName)
 }
 
 // DropTable calls DROP TABLE command.
-func DropTable(conn Conn, table string) idroptable.Stmt {
+func DropTable(conn conn, table string) idroptable.Stmt {
 	return newDropTableStmt(conn, table)
 }

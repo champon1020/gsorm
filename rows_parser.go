@@ -1,88 +1,95 @@
-package parser
+package gsorm
 
 import (
 	"database/sql"
 	"reflect"
-	"strconv"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/champon1020/gsorm/internal"
-	"github.com/morikuni/failure"
+	"golang.org/x/xerrors"
 )
 
-// ColumnType is interface for *sql.ColumnType.
-type ColumnType interface {
+// columnType is interface for *sql.ColumnType.
+type columnType interface {
 	Name() string
 	ScanType() reflect.Type
 }
 
-// RowsParser is parser for sql.Rows.
-type RowsParser struct {
+// rowsParser is parser for sql.Rows.
+type rowsParser struct {
 	// SQL rows.
-	Rows domain.Rows
+	rows irows
 
 	// Number of columns.
-	NumOfColumns int
+	numOfColumns int
 
 	// Column types
-	ColumnTypes []ColumnType
+	columnTypes []columnType
 
 	// Pointers of the scanning values.
-	ItemPtr []interface{}
+	itemPtr []interface{}
 
 	// Type of the model.
-	ModelType reflect.Type
+	modelType reflect.Type
 
 	// Error.
-	Error error
+	err error
 }
 
-// NewRowsParser creates RowsParser instance.
-func NewRowsParser(r domain.Rows, ct []ColumnType, m interface{}) (*RowsParser, error) {
+// newRowsParser creates rowsParser instance.
+func newRowsParser(r irows, m interface{}) (*rowsParser, error) {
+	ct, err := r.ColumnTypes()
+	if err != nil {
+		return nil, err
+	}
+
+	cti := make([]columnType, len(ct))
+	for i := 0; i < len(ct); i++ {
+		cti[i] = ct[i]
+	}
+
 	mt := reflect.TypeOf(m)
 	if mt.Kind() != reflect.Ptr {
-		err := failure.New(errInvalidValue, failure.Message("model must be a pointer"))
-		return nil, err
+		return nil, xerrors.New("model must be a pointer")
 	}
 	mt = mt.Elem()
 
 	ptrs := make([]interface{}, len(ct))
 
-	p := &RowsParser{
-		Rows:         r,
-		NumOfColumns: len(ct),
-		ColumnTypes:  ct,
-		ItemPtr:      ptrs,
-		ModelType:    mt,
+	p := &rowsParser{
+		rows:         r,
+		numOfColumns: len(cti),
+		columnTypes:  cti,
+		itemPtr:      ptrs,
+		modelType:    mt,
 	}
 
 	return p, nil
 }
 
 // Next advances to next rows.
-func (p *RowsParser) Next() bool {
-	if !p.Rows.Next() {
+func (p *rowsParser) Next() bool {
+	if !p.rows.Next() {
 		return false
 	}
-	if err := p.Rows.Scan(p.ItemPtr...); err != nil {
-		p.Error = err
+	if err := p.rows.Scan(p.itemPtr...); err != nil {
+		p.err = err
 		return false
 	}
 	return true
 }
 
 // Parse converts sql.Rows to reflect.Value.
-func (p *RowsParser) Parse() (*reflect.Value, error) {
-	switch p.ModelType.Kind() {
+func (p *rowsParser) Parse() (*reflect.Value, error) {
+	switch p.modelType.Kind() {
 	case reflect.Slice,
 		reflect.Array:
 		// If the type of item is struct.
-		if p.ModelType.Elem().Kind() == reflect.Struct {
+		if p.modelType.Elem().Kind() == reflect.Struct {
 			return p.ParseStructSlice()
 		}
 
 		// If the type of item is map.
-		if p.ModelType.Elem().Kind() == reflect.Map {
+		if p.modelType.Elem().Kind() == reflect.Map {
 			return p.ParseMapSlice()
 		}
 
@@ -109,32 +116,29 @@ func (p *RowsParser) Parse() (*reflect.Value, error) {
 		return p.ParseVar()
 	}
 
-	err := failure.New(errInvalidType,
-		failure.Context{"type": p.ModelType.Kind().String()},
-		failure.Message("invalid type for internal.InsertModelParser.Parse"))
-	return nil, err
+	return nil, xerrors.Errorf("%s is invalid type for rowsParser.Parse", p.modelType.Kind().String())
 }
 
 // ParseMapSlice converts slice or array of map to reflect.Value.
-func (p *RowsParser) ParseMapSlice() (*reflect.Value, error) {
-	item := make([]reflect.Value, p.NumOfColumns)
-	for i := 0; i < p.NumOfColumns; i++ {
-		item[i] = generateValue(p.ColumnTypes[i].ScanType())
-		p.ItemPtr[i] = item[i].Addr().Interface()
+func (p *rowsParser) ParseMapSlice() (*reflect.Value, error) {
+	item := make([]reflect.Value, p.numOfColumns)
+	for i := 0; i < p.numOfColumns; i++ {
+		item[i] = generateValue(p.columnTypes[i].ScanType())
+		p.itemPtr[i] = item[i].Addr().Interface()
 	}
 
-	sl := reflect.New(p.ModelType).Elem()
+	sl := reflect.New(p.modelType).Elem()
 	for p.Next() {
-		mp := reflect.MakeMap(p.ModelType.Elem())
-		for i := 0; i < p.NumOfColumns; i++ {
-			k := reflect.ValueOf(p.ColumnTypes[i].Name())
+		mp := reflect.MakeMap(p.modelType.Elem())
+		for i := 0; i < p.numOfColumns; i++ {
+			k := reflect.ValueOf(p.columnTypes[i].Name())
 			mp.SetMapIndex(k, item[i])
 		}
 		sl = reflect.Append(sl, mp)
 	}
 
-	if p.Error != nil {
-		return nil, p.Error
+	if p.err != nil {
+		return nil, p.err
 	}
 
 	return &sl, nil
@@ -142,20 +146,20 @@ func (p *RowsParser) ParseMapSlice() (*reflect.Value, error) {
 
 // ParseStructSlice converts the slice or array of struct to reflect.Value.
 // dest is the destination type. In this case, underlying type of dest is struct.
-func (p *RowsParser) ParseStructSlice() (*reflect.Value, error) {
-	item := reflect.New(p.ModelType.Elem()).Elem()
-	cf := p.columnsAndFields(p.ModelType.Elem())
-	for i := 0; i < p.NumOfColumns; i++ {
-		p.ItemPtr[i] = item.Field(cf[i]).Addr().Interface()
+func (p *rowsParser) ParseStructSlice() (*reflect.Value, error) {
+	item := reflect.New(p.modelType.Elem()).Elem()
+	cf := p.columnsAndFields(p.modelType.Elem())
+	for i := 0; i < p.numOfColumns; i++ {
+		p.itemPtr[i] = item.Field(cf[i]).Addr().Interface()
 	}
 
-	sl := reflect.New(p.ModelType).Elem()
+	sl := reflect.New(p.modelType).Elem()
 	for p.Next() {
 		sl = reflect.Append(sl, item)
 	}
 
-	if p.Error != nil {
-		return nil, p.Error
+	if p.err != nil {
+		return nil, p.err
 	}
 
 	return &sl, nil
@@ -163,74 +167,68 @@ func (p *RowsParser) ParseStructSlice() (*reflect.Value, error) {
 
 // ParseSlice converts slice or array to reflect.Value.
 // If the type of elements of slice or array is struct or map, ParseStructSlice or ParseMapSlice should be used.
-func (p *RowsParser) ParseSlice() (*reflect.Value, error) {
-	if p.NumOfColumns != 1 {
-		err := failure.New(errInvalidSyntax,
-			failure.Context{"numColumns": strconv.Itoa(p.NumOfColumns)},
-			failure.Message("invalid number of columns"))
-		return nil, err
+func (p *rowsParser) ParseSlice() (*reflect.Value, error) {
+	if p.numOfColumns != 1 {
+		return nil, xerrors.Errorf("number of columns must be 1, not %d", p.numOfColumns)
 	}
 
-	item := reflect.New(p.ModelType.Elem()).Elem()
-	p.ItemPtr[0] = item.Addr().Interface()
+	item := reflect.New(p.modelType.Elem()).Elem()
+	p.itemPtr[0] = item.Addr().Interface()
 
-	sl := reflect.New(p.ModelType).Elem()
+	sl := reflect.New(p.modelType).Elem()
 	for p.Next() {
 		sl = reflect.Append(sl, item)
 	}
 
-	if p.Error != nil {
-		return nil, p.Error
+	if p.err != nil {
+		return nil, p.err
 	}
 
 	return &sl, nil
 }
 
 // ParseMap converts map to reflect.Value.
-func (p *RowsParser) ParseMap() (*reflect.Value, error) {
-	item := make([]reflect.Value, p.NumOfColumns)
-	for i := 0; i < p.NumOfColumns; i++ {
-		item[i] = generateValue(p.ColumnTypes[i].ScanType())
-		p.ItemPtr[i] = item[i].Addr().Interface()
+func (p *rowsParser) ParseMap() (*reflect.Value, error) {
+	item := make([]reflect.Value, p.numOfColumns)
+	for i := 0; i < p.numOfColumns; i++ {
+		item[i] = generateValue(p.columnTypes[i].ScanType())
+		p.itemPtr[i] = item[i].Addr().Interface()
 	}
 	p.Next()
-	mp := reflect.MakeMap(p.ModelType)
-	for i := 0; i < p.NumOfColumns; i++ {
-		k := reflect.ValueOf(p.ColumnTypes[i].Name())
+	mp := reflect.MakeMap(p.modelType)
+	for i := 0; i < p.numOfColumns; i++ {
+		k := reflect.ValueOf(p.columnTypes[i].Name())
 		mp.SetMapIndex(k, item[i])
 	}
 	return &mp, nil
 }
 
 // ParseStruct converts struct to reflect.Value.
-func (p *RowsParser) ParseStruct() (*reflect.Value, error) {
-	item := reflect.New(p.ModelType).Elem()
-	cf := p.columnsAndFields(p.ModelType)
-	for i := 0; i < p.NumOfColumns; i++ {
-		p.ItemPtr[i] = item.Field(cf[i]).Addr().Interface()
+func (p *rowsParser) ParseStruct() (*reflect.Value, error) {
+	item := reflect.New(p.modelType).Elem()
+	cf := p.columnsAndFields(p.modelType)
+	for i := 0; i < p.numOfColumns; i++ {
+		p.itemPtr[i] = item.Field(cf[i]).Addr().Interface()
 	}
 	p.Next()
 	return &item, nil
 }
 
 // ParseVar converts variable to reflect.Value.
-func (p *RowsParser) ParseVar() (*reflect.Value, error) {
-	if p.NumOfColumns != 1 {
-		err := failure.New(errInvalidSyntax,
-			failure.Context{"numColumns": strconv.Itoa(p.NumOfColumns)},
-			failure.Message("invalid number of columns"))
-		return nil, err
+func (p *rowsParser) ParseVar() (*reflect.Value, error) {
+	if p.numOfColumns != 1 {
+		return nil, xerrors.Errorf("number of columns must be 1, not %d", p.numOfColumns)
 	}
 
-	item := reflect.New(p.ModelType).Elem()
-	p.ItemPtr[0] = item.Addr().Interface()
+	item := reflect.New(p.modelType).Elem()
+	p.itemPtr[0] = item.Addr().Interface()
 	p.Next()
 	return &item, nil
 }
 
-func (p *RowsParser) columnsAndFields(dest reflect.Type) map[int]int {
+func (p *rowsParser) columnsAndFields(dest reflect.Type) map[int]int {
 	cf := make(map[int]int)
-	for i, ct := range p.ColumnTypes {
+	for i, ct := range p.columnTypes {
 		for j := 0; j < dest.NumField(); j++ {
 			c := internal.ExtractTag(dest.Field(j)).Column
 			if c == "" {

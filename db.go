@@ -67,7 +67,7 @@ func (d *db) Ping() error {
 }
 
 // Exec executes a query that doesn't return rows. For example: an INSERT and UPDATE.
-func (d *db) Exec(query string, args ...interface{}) (Result, error) {
+func (d *db) Exec(query string, args ...interface{}) (iresult, error) {
 	if d.conn == nil {
 		return nil, xerrors.New("gsorm.db.conn is nil")
 	}
@@ -79,7 +79,7 @@ func (d *db) Exec(query string, args ...interface{}) (Result, error) {
 }
 
 // Query executes a query that returns rows, typically a SELECT.
-func (d *db) Query(query string, args ...interface{}) (Rows, error) {
+func (d *db) Query(query string, args ...interface{}) (irows, error) {
 	if d.conn == nil {
 		return nil, xerrors.New("gsorm.db.conn is nil")
 	}
@@ -161,7 +161,7 @@ func (t *tx) Ping() error {
 }
 
 // Exec executes a query that doesn't return rows. For example: an INSERT and UPDATE.
-func (t *tx) Exec(query string, args ...interface{}) (Result, error) {
+func (t *tx) Exec(query string, args ...interface{}) (iresult, error) {
 	if t.conn == nil {
 		return nil, xerrors.New("gsorm.tx.conn is nil")
 	}
@@ -173,7 +173,7 @@ func (t *tx) Exec(query string, args ...interface{}) (Result, error) {
 }
 
 // Query executes a query that returns rows, typically a SELECT.
-func (t *tx) Query(query string, args ...interface{}) (Rows, error) {
+func (t *tx) Query(query string, args ...interface{}) (irows, error) {
 	if t.conn == nil {
 		return nil, xerrors.New("gsorm.tx.conn is nil")
 	}

@@ -10,7 +10,6 @@ import (
 	"github.com/champon1020/gsorm/interfaces/iselect"
 	"github.com/champon1020/gsorm/interfaces/iupdate"
 	"github.com/champon1020/gsorm/internal"
-	"github.com/champon1020/gsorm/internal/parser"
 	"github.com/champon1020/gsorm/syntax"
 	"github.com/champon1020/gsorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
@@ -20,7 +19,7 @@ import (
 
 // stmt stores information about query.
 type stmt struct {
-	conn   Conn
+	conn   conn
 	called []domain.Clause
 	errors []error
 }
@@ -111,11 +110,20 @@ func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt domain.Stmt, model
 		if err != nil {
 			return failure.Wrap(err)
 		}
-
 		defer rows.Close()
-		if err := parser.MapRowsToModel(rows, model); err != nil {
+
+		p, err := newRowsParser(rows, model)
+		if err != nil {
 			return err
 		}
+
+		v, err := p.Parse()
+		if err != nil {
+			return err
+		}
+
+		ref := reflect.ValueOf(model).Elem()
+		ref.Set(*v)
 		return nil
 	}
 
@@ -155,7 +163,7 @@ type DeleteStmt struct {
 }
 
 // newDeleteStmt creates DeleteStmt instance.
-func newDeleteStmt(conn Conn) *DeleteStmt {
+func newDeleteStmt(conn conn) *DeleteStmt {
 	stmt := &DeleteStmt{cmd: &clause.Delete{}}
 	stmt.conn = conn
 	return stmt
@@ -258,7 +266,7 @@ type InsertStmt struct {
 }
 
 // newInsertStmt creates InsertStmt instance.
-func newInsertStmt(conn Conn, table string, cols ...string) *InsertStmt {
+func newInsertStmt(conn conn, table string, cols ...string) *InsertStmt {
 	i := new(clause.Insert)
 	i.AddTable(table)
 	i.AddColumns(cols...)
@@ -361,7 +369,7 @@ func (s *InsertStmt) buildSQLWithClauses(sql *internal.SQL) error {
 // buildSQLWithModel builds SQL statement from model.
 func (s *InsertStmt) buildSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
 	sql.Write("VALUES")
-	p, err := parser.NewInsertModelParser(cols, model)
+	p, err := newInsertModelParser(cols, model)
 	if err != nil {
 		return err
 	}
@@ -410,7 +418,7 @@ type SelectStmt struct {
 }
 
 // newSelectStmt creates SelectStmt instance.
-func newSelectStmt(conn Conn, cols ...string) *SelectStmt {
+func newSelectStmt(conn conn, cols ...string) *SelectStmt {
 	sel := new(clause.Select)
 	if len(cols) == 0 {
 		sel.AddColumns("*")
@@ -605,7 +613,7 @@ type UpdateStmt struct {
 }
 
 // newUpdateStmt creates UpdateStmt instance.
-func newUpdateStmt(conn Conn, table string) *UpdateStmt {
+func newUpdateStmt(conn conn, table string) *UpdateStmt {
 	u := new(clause.Update)
 	u.AddTable(table)
 	stmt := &UpdateStmt{cmd: u}
@@ -698,7 +706,7 @@ func (s *UpdateStmt) buildSQLWithClauses(sql *internal.SQL) error {
 // buildSQLWithModel builds SQL statement from model.
 func (s *UpdateStmt) buildSQLWithModel(cols []string, model interface{}, sql *internal.SQL) error {
 	sql.Write("SET")
-	p, err := parser.NewUpdateModelParser(cols, model)
+	p, err := newUpdateModelParser(cols, model)
 	if err != nil {
 		return err
 	}
@@ -756,7 +764,7 @@ type rawStmt struct {
 }
 
 // newRawStmt creates rawStmt instance.
-func newRawStmt(conn Conn, rs string, v ...interface{}) *rawStmt {
+func newRawStmt(conn conn, rs string, v ...interface{}) *rawStmt {
 	s := &rawStmt{cmd: &syntax.RawClause{RawStr: rs, Values: v}}
 	s.conn = conn
 	return s
