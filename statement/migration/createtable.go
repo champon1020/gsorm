@@ -104,7 +104,7 @@ func (s *CreateTableStmt) buildSQLWithClauses(sql *internal.SQL) error {
 }
 
 func (s *CreateTableStmt) buildSQLWithModel(sql *internal.SQL) error {
-	p, err := parser.NewCreateTableModelParser(s.model, s.conn.GetDriver())
+	p, err := parser.NewCreateTableModelParser(s.model)
 	if err != nil {
 		return failure.Translate(err, errFailedParse)
 	}

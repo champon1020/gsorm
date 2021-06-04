@@ -24,15 +24,6 @@ func TestDB_Ping(t *testing.T) {
 	assert.Equal(t, true, sdb.calledPing)
 }
 
-func TestDB_GetDriver(t *testing.T) {
-	expected := database.MysqlDriver
-
-	db := new(database.ExportedDB)
-	db.ExportedSetDriver(expected)
-
-	assert.Equal(t, expected, db.GetDriver())
-}
-
 func TestDB_Ping_Fail(t *testing.T) {
 	expectedError := database.ErrFailedDBConnection
 

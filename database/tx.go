@@ -21,11 +21,6 @@ type tx struct {
 	conn sqlTx
 }
 
-// GetDriver returns sql driver.
-func (t *tx) GetDriver() domain.SQLDriver {
-	return t.db.GetDriver()
-}
-
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.
 func (t *tx) Ping() error {
 	if t.db == nil {

@@ -70,7 +70,7 @@ func TestRawStmt_QueryWithMock(t *testing.T) {
 	model := []Employee{}
 	expectedReturn := []Employee{{1001, "Taro"}, {1002, "Jiro"}}
 
-	mock := gsorm.OpenMock("mysql")
+	mock := gsorm.OpenMock()
 	mock.ExpectWithReturn(gsorm.RawStmt(nil, "SELECT emp_no, first_name FROM employees"), expectedReturn)
 
 	if err := gsorm.RawStmt(mock, "SELECT emp_no, first_name FROM employees").Query(&model); err != nil {
@@ -87,7 +87,7 @@ func TestRawStmt_QueryWithMock(t *testing.T) {
 }
 
 func TestRawStmt_ExecWithMock(t *testing.T) {
-	mock := gsorm.OpenMock("mysql")
+	mock := gsorm.OpenMock()
 	mock.Expect(gsorm.RawStmt(mock, `INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`))
 
 	if err := gsorm.RawStmt(mock, `INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`).Exec(); err != nil {

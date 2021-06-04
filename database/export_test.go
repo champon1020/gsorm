@@ -1,7 +1,5 @@
 package database
 
-import "github.com/champon1020/gsorm/interfaces/domain"
-
 const (
 	ErrInvalidMockExpectation = errInvalidMockExpectation
 	ErrFailedDBConnection     = errFailedDBConnection
@@ -17,18 +15,10 @@ func (d *db) ExportedSetConn(conn sqlDB) {
 	d.conn = conn
 }
 
-func (d *db) ExportedSetDriver(driver domain.SQLDriver) {
-	d.driver = driver
-}
-
 func (t *tx) ExportedSetConn(conn sqlTx) {
 	t.conn = conn
 }
 
 func (t *tx) ExportedSetDB(db *db) {
 	t.db = db
-}
-
-func (d *mockDB) ExportedSetDriver(driver domain.SQLDriver) {
-	d.driver = driver
 }

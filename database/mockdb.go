@@ -23,19 +23,8 @@ type mockDB struct {
 }
 
 // NewMockDB creates MockDB instance.
-func NewMockDB(drv string) domain.MockDB {
-	if drv == "mysql" {
-		return &mockDB{driver: MysqlDriver}
-	}
-	if drv == "psql" {
-		return &mockDB{driver: PsqlDriver}
-	}
+func NewMockDB() domain.MockDB {
 	return &mockDB{}
-}
-
-// GetDriver returns sql driver.
-func (m *mockDB) GetDriver() domain.SQLDriver {
-	return m.driver
 }
 
 // Ping is dummy function.

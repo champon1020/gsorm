@@ -40,8 +40,8 @@ func Open(driver, dsn string) (DB, error) {
 }
 
 // OpenMock opens the mock database connection.
-func OpenMock(driver string) MockDB {
-	return database.NewMockDB(driver)
+func OpenMock() MockDB {
+	return database.NewMockDB()
 }
 
 // RawStmt calls raw string statement.

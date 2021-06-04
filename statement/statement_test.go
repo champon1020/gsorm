@@ -14,7 +14,7 @@ func TestStatement_QueryWithMock(t *testing.T) {
 	}
 	model := []Employee{}
 
-	mock := gsorm.OpenMock("mysql")
+	mock := gsorm.OpenMock()
 	expectedReturn := []Employee{
 		{EmpNo: 1001, FirstName: "Taro"}, {EmpNo: 1002, FirstName: "Jiro"},
 	}
@@ -35,7 +35,7 @@ func TestStatement_QueryWithMock(t *testing.T) {
 }
 
 func TestStatement_ExecWithMock(t *testing.T) {
-	mock := gsorm.OpenMock("mysql")
+	mock := gsorm.OpenMock()
 	mock.Expect(gsorm.Insert(nil, "employees", "emp_no", "first_name").Values(1001, "Taro"))
 
 	err := gsorm.Insert(mock, "employees", "emp_no", "first_name").Values(1001, "Taro").Exec()

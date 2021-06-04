@@ -14,11 +14,6 @@ type mockTx struct {
 	expected []expectation
 }
 
-// GetDriver returns sql driver.
-func (m *mockTx) GetDriver() domain.SQLDriver {
-	return m.db.GetDriver()
-}
-
 // Ping is dummy function.
 func (m *mockTx) Ping() error {
 	return nil

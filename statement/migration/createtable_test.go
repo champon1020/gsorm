@@ -5,21 +5,20 @@ import (
 	"time"
 
 	"github.com/champon1020/gsorm"
-	"github.com/champon1020/gsorm/database"
 	"github.com/champon1020/gsorm/statement/migration"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateTable_String(t *testing.T) {
 	type Model struct {
-		ID          int       `gsorm:"notnull=t,pk=PK_id"`
+		ID          int       `gsorm:"typ=INT,notnull=t,pk=PK_id"`
 		CountryCode string    `gsorm:"typ=CHAR(3),notnull=t,default='0',fk=FK_country_code:country (code)"`
 		Name        string    `gsorm:"typ=VARCHAR(16),notnull=t,default='anonymous',uc=UC_name"`
 		Nickname    string    `gsorm:"typ=VARCHAR(32),uc=UC_name"`
-		BirthDate   time.Time `gsorm:"notnull=t"`
+		BirthDate   time.Time `gsorm:"typ=DATE,notnull=t"`
 	}
 	model := new(Model)
-	db := database.NewMockDB("mysql")
+	db := gsorm.OpenMock()
 
 	testCases := []struct {
 		Stmt     *migration.CreateTableStmt

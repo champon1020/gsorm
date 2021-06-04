@@ -55,8 +55,7 @@ func (r *result) RowsAffected() (int64, error) {
 // db is a database handle representing a pool of zero or more underlying connections.
 // It's safe for concurrent use by multiple goroutines.
 type db struct {
-	conn   sqlDB
-	driver domain.SQLDriver
+	conn sqlDB
 }
 
 // NewDB creates the DB instance.
@@ -65,15 +64,7 @@ func NewDB(dn, dsn string) (domain.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	if dn == "psql" {
-		return &db{conn: d, driver: PsqlDriver}, nil
-	}
-	return &db{conn: d, driver: MysqlDriver}, nil
-}
-
-// GetDriver returns sql driver.
-func (d *db) GetDriver() domain.SQLDriver {
-	return d.driver
+	return &db{conn: d}, nil
 }
 
 // Ping verifies a connection to the database is still alive, establishing a connection if necessary.

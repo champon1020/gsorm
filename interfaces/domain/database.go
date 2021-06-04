@@ -13,7 +13,6 @@ type SQLDriver interface {
 
 // Conn is database connection like DB or Tx. This is also implemented by MockDB and MockTx.
 type Conn interface {
-	GetDriver() SQLDriver
 	Ping() error
 	Query(query string, args ...interface{}) (Rows, error)
 	Exec(query string, args ...interface{}) (Result, error)

@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/champon1020/gsorm/internal"
 	"github.com/morikuni/failure"
 )
@@ -14,7 +13,6 @@ import (
 type CreateTableModelParser struct {
 	model     reflect.Value
 	modelType reflect.Type
-	dbDriver  domain.SQLDriver
 
 	f   reflect.StructField
 	tag *internal.Tag
@@ -25,7 +23,7 @@ type CreateTableModelParser struct {
 }
 
 // NewCreateTableModelParser creates CreateTableModelParser instance.
-func NewCreateTableModelParser(model interface{}, driver domain.SQLDriver) (*CreateTableModelParser, error) {
+func NewCreateTableModelParser(model interface{}) (*CreateTableModelParser, error) {
 	mt := reflect.TypeOf(model)
 	if mt.Kind() != reflect.Ptr {
 		err := failure.New(errInvalidValue, failure.Message("model must be a pointer"))
@@ -38,7 +36,6 @@ func NewCreateTableModelParser(model interface{}, driver domain.SQLDriver) (*Cre
 	parser := &CreateTableModelParser{
 		model:     m,
 		modelType: mt,
-		dbDriver:  driver,
 		uc:        make(map[string][]string),
 		pk:        make(map[string][]string),
 		fk:        make(map[string][]string),
@@ -124,16 +121,8 @@ func (p *CreateTableModelParser) ParseType(sql *internal.SQL) error {
 		return nil
 	}
 
-	t := p.dbDriver.LookupDefaultType(p.f.Type)
-	if t == "" {
-		return failure.New(errInvalidType,
-			failure.Context{"type": p.f.Type.String()},
-			failure.Message("invalid type for database column"))
-
-	}
-
-	sql.Write(t)
-	return nil
+	return failure.New(errInvalidType,
+		failure.Message("typ is required"))
 }
 
 // ParseNotNull parses the not null property from field tag.
