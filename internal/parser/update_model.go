@@ -10,8 +10,8 @@ import (
 
 // UpdateModelParser is the model parser for update statement.
 type UpdateModelParser struct {
-	Model       reflect.Value
-	ModelType   reflect.Type
+	model       reflect.Value
+	modelType   reflect.Type
 	Cols        []string
 	ColumnField map[int]int
 }
@@ -25,8 +25,8 @@ func NewUpdateModelParser(cols []string, model interface{}) (*UpdateModelParser,
 	}
 
 	parser := &UpdateModelParser{
-		Model:     reflect.ValueOf(model).Elem(),
-		ModelType: mTyp.Elem(),
+		model:     reflect.ValueOf(model).Elem(),
+		modelType: mTyp.Elem(),
 		Cols:      cols,
 	}
 	return parser, nil
@@ -36,19 +36,19 @@ func NewUpdateModelParser(cols []string, model interface{}) (*UpdateModelParser,
 func (p *UpdateModelParser) Parse() (*internal.SQL, error) {
 	var sql internal.SQL
 
-	switch p.ModelType.Kind() {
+	switch p.modelType.Kind() {
 	case reflect.Struct:
-		p.ParseStruct(&sql, p.Model)
+		p.ParseStruct(&sql, p.model)
 		return &sql, nil
 	case reflect.Map:
-		if err := p.ParseMap(&sql, p.Model); err != nil {
+		if err := p.ParseMap(&sql, p.model); err != nil {
 			return nil, err
 		}
 		return &sql, nil
 	}
 
 	err := failure.New(errInvalidType,
-		failure.Context{"type": p.ModelType.Kind().String()},
+		failure.Context{"type": p.modelType.Kind().String()},
 		failure.Message("invalid type for internal.InsertModelParser.Parse"))
 	return nil, err
 }

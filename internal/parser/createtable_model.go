@@ -12,9 +12,9 @@ import (
 
 // CreateTableModelParser is the model parser for create table statement.
 type CreateTableModelParser struct {
-	Model     reflect.Value
-	ModelType reflect.Type
-	DBDriver  domain.SQLDriver
+	model     reflect.Value
+	modelType reflect.Type
+	dbDriver  domain.SQLDriver
 
 	f   reflect.StructField
 	tag *internal.Tag
@@ -36,9 +36,9 @@ func NewCreateTableModelParser(model interface{}, driver domain.SQLDriver) (*Cre
 	m := reflect.ValueOf(model).Elem()
 
 	parser := &CreateTableModelParser{
-		Model:     m,
-		ModelType: mt,
-		DBDriver:  driver,
+		model:     m,
+		modelType: mt,
+		dbDriver:  driver,
 		uc:        make(map[string][]string),
 		pk:        make(map[string][]string),
 		fk:        make(map[string][]string),
@@ -52,20 +52,20 @@ func NewCreateTableModelParser(model interface{}, driver domain.SQLDriver) (*Cre
 func (p *CreateTableModelParser) Parse() (*internal.SQL, error) {
 	var sql internal.SQL
 
-	if p.ModelType.Kind() != reflect.Struct {
+	if p.modelType.Kind() != reflect.Struct {
 		err := failure.New(errInvalidValue,
-			failure.Context{"type": p.ModelType.Kind().String()},
+			failure.Context{"type": p.modelType.Kind().String()},
 			failure.Message("invalid type for parser.CreateTableModelParser"))
 		return nil, err
 	}
 
 	sql.Write("(")
-	for i := 0; i < p.ModelType.NumField(); i++ {
+	for i := 0; i < p.modelType.NumField(); i++ {
 		if i > 0 {
 			sql.Write(",")
 		}
 
-		p.f = p.ModelType.Field(i)
+		p.f = p.modelType.Field(i)
 		p.tag = internal.ExtractTag(p.f)
 
 		column := p.ParseColumn(&sql)
@@ -124,7 +124,7 @@ func (p *CreateTableModelParser) ParseType(sql *internal.SQL) error {
 		return nil
 	}
 
-	t := p.DBDriver.LookupDefaultType(p.f.Type)
+	t := p.dbDriver.LookupDefaultType(p.f.Type)
 	if t == "" {
 		return failure.New(errInvalidType,
 			failure.Context{"type": p.f.Type.String()},

@@ -9,8 +9,8 @@ import (
 
 // InsertModelParser is the model parser for insert statement.
 type InsertModelParser struct {
-	Model       reflect.Value
-	ModelType   reflect.Type
+	model       reflect.Value
+	modelType   reflect.Type
 	Cols        []string
 	ColumnField map[int]int
 }
@@ -24,8 +24,8 @@ func NewInsertModelParser(cols []string, model interface{}) (*InsertModelParser,
 	}
 
 	parser := &InsertModelParser{
-		Model:     reflect.ValueOf(model).Elem(),
-		ModelType: mTyp.Elem(),
+		model:     reflect.ValueOf(model).Elem(),
+		modelType: mTyp.Elem(),
 		Cols:      cols,
 	}
 	return parser, nil
@@ -35,30 +35,30 @@ func NewInsertModelParser(cols []string, model interface{}) (*InsertModelParser,
 func (p *InsertModelParser) Parse() (*internal.SQL, error) {
 	var sql internal.SQL
 
-	switch p.ModelType.Kind() {
+	switch p.modelType.Kind() {
 	case reflect.Slice, reflect.Array:
-		if p.ModelType.Elem().Kind() == reflect.Struct {
-			p.ParseStructSlice(&sql, p.Model)
+		if p.modelType.Elem().Kind() == reflect.Struct {
+			p.ParseStructSlice(&sql, p.model)
 			return &sql, nil
 		}
-		if p.ModelType.Elem().Kind() == reflect.Map {
-			if err := p.ParseMapSlice(&sql, p.Model); err != nil {
+		if p.modelType.Elem().Kind() == reflect.Map {
+			if err := p.ParseMapSlice(&sql, p.model); err != nil {
 				return nil, err
 			}
 			return &sql, nil
 		}
 	case reflect.Struct:
-		p.ParseStruct(&sql, p.Model)
+		p.ParseStruct(&sql, p.model)
 		return &sql, nil
 	case reflect.Map:
-		if err := p.ParseMap(&sql, p.Model); err != nil {
+		if err := p.ParseMap(&sql, p.model); err != nil {
 			return nil, err
 		}
 		return &sql, nil
 	}
 
 	err := failure.New(errInvalidType,
-		failure.Context{"type": p.ModelType.Kind().String()},
+		failure.Context{"type": p.modelType.Kind().String()},
 		failure.Message("invalid type for internal.InsertModelParser.Parse"))
 	return nil, err
 }
