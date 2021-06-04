@@ -1,8 +1,6 @@
 package database
 
 import (
-	"database/sql"
-
 	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/morikuni/failure"
 )
@@ -27,12 +25,12 @@ func (m *mockTx) Ping() error {
 }
 
 // Exec is dummy function.
-func (m *mockTx) Exec(string, ...interface{}) (sql.Result, error) {
+func (m *mockTx) Exec(string, ...interface{}) (domain.Result, error) {
 	return nil, nil
 }
 
 // Query is dummy function.
-func (m *mockTx) Query(string, ...interface{}) (*sql.Rows, error) {
+func (m *mockTx) Query(string, ...interface{}) (domain.Rows, error) {
 	return nil, nil
 }
 

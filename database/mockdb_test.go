@@ -1,11 +1,11 @@
 package database_test
 
 import (
-	"database/sql"
 	"testing"
 
 	"github.com/champon1020/gsorm"
 	"github.com/champon1020/gsorm/database"
+	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/google/go-cmp/cmp"
 	"github.com/morikuni/failure"
 	"gotest.tools/v3/assert"
@@ -70,7 +70,7 @@ func TestMockDB_DummyFunctions(t *testing.T) {
 	assert.Equal(t, nil, e)
 
 	r2, e2 := mock.Query("")
-	var rexpected *sql.Rows
+	var rexpected domain.Rows
 	assert.Equal(t, rexpected, r2)
 	assert.Equal(t, nil, e2)
 }

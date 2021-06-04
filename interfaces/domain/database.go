@@ -15,8 +15,20 @@ type SQLDriver interface {
 type Conn interface {
 	GetDriver() SQLDriver
 	Ping() error
-	Query(query string, args ...interface{}) (*sql.Rows, error)
-	Exec(query string, args ...interface{}) (sql.Result, error)
+	Query(query string, args ...interface{}) (Rows, error)
+	Exec(query string, args ...interface{}) (Result, error)
+}
+
+type Rows interface {
+	Next() bool
+	Scan(args ...interface{}) error
+	ColumnTypes() ([]*sql.ColumnType, error)
+	Close() error
+}
+
+type Result interface {
+	LastInsertId() (int64, error)
+	RowsAffected() (int64, error)
 }
 
 // DB is the interface of database.

@@ -1,7 +1,6 @@
 package database
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/champon1020/gsorm/interfaces/domain"
@@ -45,12 +44,12 @@ func (m *mockDB) Ping() error {
 }
 
 // Exec is dummy function.
-func (m *mockDB) Exec(string, ...interface{}) (sql.Result, error) {
+func (m *mockDB) Exec(string, ...interface{}) (domain.Result, error) {
 	return nil, nil
 }
 
 // Query is dummy function.
-func (m *mockDB) Query(string, ...interface{}) (*sql.Rows, error) {
+func (m *mockDB) Query(string, ...interface{}) (domain.Rows, error) {
 	return nil, nil
 }
 

@@ -35,19 +35,27 @@ func (t *tx) Ping() error {
 }
 
 // Exec executes a query that doesn't return rows. For example: an INSERT and UPDATE.
-func (t *tx) Exec(query string, args ...interface{}) (sql.Result, error) {
+func (t *tx) Exec(query string, args ...interface{}) (domain.Result, error) {
 	if t.conn == nil {
 		return nil, failure.New(errFailedTxConnection, failure.Message("gsorm.tx.db is nil"))
 	}
-	return t.conn.Exec(query, args...)
+	r, err := t.conn.Exec(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return &result{result: r}, nil
 }
 
 // Query executes a query that returns rows, typically a SELECT.
-func (t *tx) Query(query string, args ...interface{}) (*sql.Rows, error) {
+func (t *tx) Query(query string, args ...interface{}) (domain.Rows, error) {
 	if t.conn == nil {
 		return nil, failure.New(errFailedTxConnection, failure.Message("gsorm.tx.db is nil"))
 	}
-	return t.conn.Query(query, args...)
+	r, err := t.conn.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return &rows{rows: r}, nil
 }
 
 // Commit commits the transaction.
