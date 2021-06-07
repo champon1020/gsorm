@@ -123,7 +123,7 @@ func TestAlterTableStmt_RawClause(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -145,7 +145,7 @@ func TestAlterTableStmt_Rename(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -197,7 +197,7 @@ func TestAlterTableStmt_AddColumn(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -219,7 +219,7 @@ func TestAlterTableStmt_DropColumn(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -241,7 +241,7 @@ func TestAlterTableStmt_RenameColumn(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -299,7 +299,7 @@ func TestAlterTableStmt_AddCons(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -321,7 +321,7 @@ func TestCreateDB_String(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -343,7 +343,7 @@ func TestCreateDB_RawClause(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -371,7 +371,7 @@ func TestCreateIndex_String(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -401,7 +401,7 @@ func TestCreateIndex_RawClause(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -464,7 +464,7 @@ func TestCreateTable_String(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -568,7 +568,7 @@ func TestCreateTable_RawClause(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -597,7 +597,7 @@ func TestCreateTable_Column(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -626,7 +626,7 @@ func TestCreateTable_NotNull(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -665,7 +665,7 @@ func TestCreateTable_Default(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -708,7 +708,7 @@ func TestCreateTable_Cons(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -744,7 +744,7 @@ func TestCreateTable_Unique(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -780,7 +780,7 @@ func TestCreateTable_Primary(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -818,7 +818,7 @@ func TestCreateTable_Foreign(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -840,7 +840,7 @@ func TestDropDB_String(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -862,7 +862,7 @@ func TestDropDB_RawClause(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -884,7 +884,7 @@ func TestDropTable_String(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %v", errs[0])
@@ -906,7 +906,7 @@ func TestDropTable_RawClause(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])

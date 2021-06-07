@@ -48,7 +48,7 @@ func (s *migStmt) advanceClause() {
 	s.called = s.called[1:]
 }
 
-func (s *migStmt) string(buildSQL func(*internal.SQL) error) string {
+func (s *migStmt) sql(buildSQL func(*internal.SQL) error) string {
 	var sql internal.SQL
 	if err := buildSQL(&sql); err != nil {
 		s.throw(err)
@@ -186,8 +186,9 @@ func newAlterTableStmt(conn conn, table string) *AlterTableStmt {
 	return stmt
 }
 
-func (s *AlterTableStmt) String() string {
-	return s.string(s.buildSQL)
+// SQL returns the built SQL string.
+func (s *AlterTableStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Migrate executes database migration.
@@ -332,8 +333,9 @@ func newCreateDBStmt(conn conn, dbName string) *CreateDBStmt {
 	return stmt
 }
 
-func (s *CreateDBStmt) String() string {
-	return s.string(s.buildSQL)
+// SQL returns the built SQL string.
+func (s *CreateDBStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Migrate executes database migration.
@@ -389,8 +391,9 @@ func newCreateIndexStmt(conn conn, idx string) *CreateIndexStmt {
 	return stmt
 }
 
-func (s *CreateIndexStmt) String() string {
-	return s.string(s.buildSQL)
+// SQL returns the built SQL string.
+func (s *CreateIndexStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Migrate executes database migration.
@@ -454,8 +457,9 @@ func newCreateTableStmt(conn conn, table string) *CreateTableStmt {
 	return stmt
 }
 
-func (s *CreateTableStmt) String() string {
-	return s.string(s.buildSQL)
+// SQL returns the built SQL string.
+func (s *CreateTableStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Migrate executes database migration.
@@ -615,8 +619,9 @@ func newDropDBStmt(conn conn, dbName string) *DropDBStmt {
 	return stmt
 }
 
-func (s *DropDBStmt) String() string {
-	return s.string(s.buildSQL)
+// SQL returns the built SQL string.
+func (s *DropDBStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Migrate executes database migration.
@@ -672,8 +677,9 @@ func newDropTableStmt(conn conn, table string) *DropTableStmt {
 	return stmt
 }
 
-func (s *DropTableStmt) String() string {
-	return s.string(s.buildSQL)
+// SQL returns the built SQL string.
+func (s *DropTableStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Migrate executes database migration.

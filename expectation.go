@@ -1,6 +1,6 @@
 package gsorm
 
-import "github.com/champon1020/gsorm/interfaces/domain"
+import "github.com/champon1020/gsorm/interfaces"
 
 // expectation can be implemented by expected operation.
 type expectation interface {
@@ -9,12 +9,12 @@ type expectation interface {
 
 // expectedQuery is expectation of executing query.
 type expectedQuery struct {
-	stmt       domain.Stmt
+	stmt       interfaces.Stmt
 	willReturn interface{}
 }
 
 func (e *expectedQuery) String() string {
-	return e.stmt.FuncString()
+	return e.stmt.String()
 }
 
 // expectedBegin is expectation of beginning transaction.

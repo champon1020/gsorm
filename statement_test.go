@@ -103,7 +103,7 @@ func TestDeleteStmt_RawClause(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -133,7 +133,7 @@ func TestDeleteStmt_From(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -196,7 +196,7 @@ func TestDeleteStmt_Where(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -275,7 +275,7 @@ func TestDeleteStmt_And(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -354,7 +354,7 @@ func TestDeleteStmt_Or(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -391,7 +391,7 @@ func TestInsertStmt_RawClause(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -425,7 +425,7 @@ func TestInsertStmt_Values(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -447,7 +447,7 @@ func TestInsertStmt_Select(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -493,7 +493,7 @@ func TestInsertStmt_Model(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -676,7 +676,7 @@ func TestSelectStmt_RawClause(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -710,7 +710,7 @@ func TestSelectStmt_From(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -745,7 +745,7 @@ func TestSelectStmt_Join(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -779,7 +779,7 @@ func TestSelectStmt_LeftJoin(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -813,7 +813,7 @@ func TestSelectStmt_RightJoin(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -875,7 +875,7 @@ func TestSelectStmt_Where(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -954,7 +954,7 @@ func TestSelectStmt_And(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1033,7 +1033,7 @@ func TestSelectStmt_Or(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1056,7 +1056,7 @@ func TestSelectStmt_GroupBy(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1135,7 +1135,7 @@ func TestSelectStmt_Having(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1159,7 +1159,7 @@ func TestSelectStmt_Union(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1183,7 +1183,7 @@ func TestSelectStmt_UnionAll(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1222,7 +1222,7 @@ func TestSelectStmt_OrderBy(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1248,7 +1248,7 @@ func TestSelectStmt_Limit(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1327,7 +1327,7 @@ func TestUpdateStmt_RawClause(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1356,7 +1356,7 @@ func TestUpdateStmt_Set(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1437,7 +1437,7 @@ func TestUpdateStmt_Where(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1547,7 +1547,7 @@ func TestUpdateStmt_And(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1657,7 +1657,7 @@ func TestUpdateStmt_Or(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1690,7 +1690,7 @@ func TestUpdateStmt_Model(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])
@@ -1742,7 +1742,7 @@ func TestRawStmt_String(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		errs := testCase.Stmt.ExportedGetErrors()
 		if len(errs) > 0 {
 			t.Errorf("Error was occurred: %+v", errs[0])

@@ -100,7 +100,7 @@ func ToString(v interface{}, opt *ToStringOpt) string {
 		return s
 	}
 
-	return reflect.TypeOf(v).String()
+	return fmt.Sprintf("%s", v)
 }
 
 // ColumnsAndFields generates map of column index and field index.

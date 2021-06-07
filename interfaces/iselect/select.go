@@ -2,7 +2,6 @@ package iselect
 
 import (
 	"github.com/champon1020/gsorm/interfaces"
-	"github.com/champon1020/gsorm/interfaces/domain"
 )
 
 // Stmt is interface which is returned by gsorm.Select.
@@ -26,8 +25,8 @@ type RawClause interface {
 	OrderBy(columns ...string) OrderBy
 	Limit(limit int) Limit
 	Offset(offset int) Offset
-	Union(stmt domain.Stmt) Union
-	UnionAll(stmt domain.Stmt) Union
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -42,8 +41,8 @@ type From interface {
 	Having(expr string, values ...interface{}) Having
 	OrderBy(colums ...string) OrderBy
 	Limit(limit int) Limit
-	Union(stmt domain.Stmt) Union
-	UnionAll(stmt domain.Stmt) Union
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -64,8 +63,8 @@ type On interface {
 	Having(expr string, values ...interface{}) Having
 	OrderBy(columns ...string) OrderBy
 	Limit(limit int) Limit
-	Union(stmt domain.Stmt) Union
-	UnionAll(stmt domain.Stmt) Union
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -78,8 +77,8 @@ type Where interface {
 	Having(expr string, values ...interface{}) Having
 	OrderBy(columns ...string) OrderBy
 	Limit(limit int) Limit
-	Union(stmt domain.Stmt) Union
-	UnionAll(stmt domain.Stmt) Union
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -92,8 +91,8 @@ type And interface {
 	Having(expr string, values ...interface{}) Having
 	OrderBy(columns ...string) OrderBy
 	Limit(limit int) Limit
-	Union(stmt domain.Stmt) Union
-	UnionAll(stmt domain.Stmt) Union
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -106,8 +105,8 @@ type Or interface {
 	Having(expr string, values ...interface{}) Having
 	OrderBy(columns ...string) OrderBy
 	Limit(limit int) Limit
-	Union(stmt domain.Stmt) Union
-	UnionAll(stmt domain.Stmt) Union
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -117,8 +116,8 @@ type GroupBy interface {
 	Having(expr string, values ...interface{}) Having
 	OrderBy(columns ...string) OrderBy
 	Limit(limit int) Limit
-	Union(stmt domain.Stmt) Union
-	UnionAll(stmt domain.Stmt) Union
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -127,8 +126,8 @@ type Having interface {
 	RawClause(raw string, values ...interface{}) RawClause
 	OrderBy(columns ...string) OrderBy
 	Limit(limit int) Limit
-	Union(stmt domain.Stmt) Union
-	UnionAll(stmt domain.Stmt) Union
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -158,7 +157,7 @@ type Union interface {
 	RawClause(raw string, values ...interface{}) RawClause
 	OrderBy(columns ...string) OrderBy
 	Limit(limit int) Limit
-	Union(stmt domain.Stmt) Union
-	UnionAll(stmt domain.Stmt) Union
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }

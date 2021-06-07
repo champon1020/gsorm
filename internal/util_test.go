@@ -69,7 +69,7 @@ func TestToStringWithQuotes(t *testing.T) {
 		},
 		{
 			map[string]string{"key": "value"},
-			`map[string]string`,
+			`map[key:value]`,
 		},
 		{
 			nil,

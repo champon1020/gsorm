@@ -2,14 +2,13 @@ package iinsert
 
 import (
 	"github.com/champon1020/gsorm/interfaces"
-	"github.com/champon1020/gsorm/interfaces/domain"
 )
 
 // Stmt is interface which is returned by gsorm.Insert.
 type Stmt interface {
 	RawClause(raw string, values ...interface{}) RawClause
 	Model(model interface{}) Model
-	Select(stmt domain.Stmt) Select
+	Select(stmt interfaces.Stmt) Select
 	Values(values ...interface{}) Values
 }
 

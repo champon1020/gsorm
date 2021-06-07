@@ -3,7 +3,7 @@ package gsorm
 import (
 	"time"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"golang.org/x/xerrors"
 )
 
@@ -92,12 +92,12 @@ func (m *mockDB) ExpectBegin() MockTx {
 }
 
 // Expect appends expected statement.
-func (m *mockDB) Expect(s domain.Stmt) {
+func (m *mockDB) Expect(s interfaces.Stmt) {
 	m.expected = append(m.expected, &expectedQuery{stmt: s})
 }
 
 // ExpectWithReturn appends expected statement with value which is to be returned with query.
-func (m *mockDB) ExpectWithReturn(s domain.Stmt, v interface{}) {
+func (m *mockDB) ExpectWithReturn(s interfaces.Stmt, v interface{}) {
 	m.expected = append(m.expected, &expectedQuery{stmt: s, willReturn: v})
 }
 
@@ -114,16 +114,16 @@ func (m *mockDB) Complete() error {
 	return nil
 }
 
-// CompareWith compares expected statement with executed statement.
-func (m *mockDB) CompareWith(s domain.Stmt) (interface{}, error) {
+// compareWith compares expected statement with executed statement.
+func (m *mockDB) compareWith(s interfaces.Stmt) (interface{}, error) {
 	expected := m.popExpected()
 	if expected == nil {
-		return nil, xerrors.Errorf("%s is not expected but executed", s.FuncString())
+		return nil, xerrors.Errorf("%s is not expected but executed", s.String())
 	}
 	eq, ok := expected.(*expectedQuery)
 	if !ok {
 		return nil, xerrors.Errorf("statements comparison was failed:\nexpected: %s\nactual:   %s\n",
-			expected.String(), s.FuncString())
+			expected.String(), s.String())
 	}
 	if err := eq.stmt.CompareWith(s); err != nil {
 		return nil, err
@@ -210,12 +210,12 @@ func (m *mockTx) ExpectRollback() {
 }
 
 // Expect appends expected statement.
-func (m *mockTx) Expect(s domain.Stmt) {
+func (m *mockTx) Expect(s interfaces.Stmt) {
 	m.expected = append(m.expected, &expectedQuery{stmt: s})
 }
 
 // ExpectWithReturn appends expected statement with value which is to be returned with query.
-func (m *mockTx) ExpectWithReturn(s domain.Stmt, v interface{}) {
+func (m *mockTx) ExpectWithReturn(s interfaces.Stmt, v interface{}) {
 	m.expected = append(m.expected, &expectedQuery{stmt: s, willReturn: v})
 }
 
@@ -227,16 +227,16 @@ func (m *mockTx) Complete() error {
 	return nil
 }
 
-// CompareWith compares expected statement with executed statement.
-func (m *mockTx) CompareWith(s domain.Stmt) (interface{}, error) {
+// compareWith compares expected statement with executed statement.
+func (m *mockTx) compareWith(s interfaces.Stmt) (interface{}, error) {
 	expected := m.popExpected()
 	if expected == nil {
-		return nil, xerrors.Errorf("%s is not expected but executed", s.FuncString())
+		return nil, xerrors.Errorf("%s is not expected but executed", s.String())
 	}
 	eq, ok := expected.(*expectedQuery)
 	if !ok {
 		return nil, xerrors.Errorf("statements comparison was failed:\nexpected: %s\nactual:   %s\n",
-			expected.String(), s.FuncString())
+			expected.String(), s.String())
 	}
 	if err := eq.stmt.CompareWith(s); err != nil {
 		return nil, err

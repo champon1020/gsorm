@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/champon1020/gsorm/interfaces/idelete"
 	"github.com/champon1020/gsorm/interfaces/iinsert"
@@ -20,6 +21,7 @@ import (
 // stmt stores information about query.
 type stmt struct {
 	conn   conn
+	cmd    domain.Clause
 	called []domain.Clause
 	errors []error
 }
@@ -34,12 +36,17 @@ func (s *stmt) throw(err error) {
 	s.errors = append(s.errors, err)
 }
 
-// Called returns called clauses.
-func (s *stmt) Called() []domain.Clause {
+// Cmd returns the command clause.
+func (s *stmt) Cmd() domain.Clause {
+	return s.cmd
+}
+
+// Clauses returns the called clauses.
+func (s *stmt) Clauses() []domain.Clause {
 	return s.called
 }
 
-func (s *stmt) string(buildSQL func(*internal.SQL) error) string {
+func (s *stmt) sql(buildSQL func(*internal.SQL) error) string {
 	var sql internal.SQL
 	if err := buildSQL(&sql); err != nil {
 		s.throw(err)
@@ -48,43 +55,46 @@ func (s *stmt) string(buildSQL func(*internal.SQL) error) string {
 	return sql.String()
 }
 
-func (s *stmt) funcString(cmd domain.Clause) string {
-	str := cmd.String()
+// String returns the method calls as string.
+func (s *stmt) String() string {
+	str := s.cmd.String()
 	for _, e := range s.called {
 		str += fmt.Sprintf(".%s", e.String())
 	}
 	return str
 }
 
-func (s *stmt) compareWith(cmd domain.Clause, targetStmt domain.Stmt) error {
-	if diff := cmp.Diff(cmd, targetStmt.Cmd()); diff != "" {
+// CompareWith compares the statements and returns error if the statements is not same.
+// In this case, same means that stmt.cmd and stmt.called is corresponding.
+func (s *stmt) CompareWith(targetStmt interfaces.Stmt) error {
+	if diff := cmp.Diff(s.cmd, targetStmt.Cmd()); diff != "" {
 		return xerrors.Errorf("statements comparison was failed:\nexpected: %s\nactual:   %s\n",
-			s.funcString(cmd), targetStmt.FuncString())
+			s.String(), targetStmt.String())
 	}
 
-	expected := s.Called()
-	actual := targetStmt.Called()
+	expected := s.called
+	actual := targetStmt.Clauses()
 	if len(expected) != len(actual) {
 		return xerrors.Errorf("statements comparison was failed:\nexpected: %s\nactual:   %s\n",
-			s.funcString(cmd), targetStmt.FuncString())
+			s.String(), targetStmt.String())
 	}
 	for i, e := range expected {
 		if diff := cmp.Diff(actual[i], e); diff != "" {
 			return xerrors.Errorf("statements comparison was failed:\nexpected: %s\nactual:   %s\n",
-				s.funcString(cmd), targetStmt.FuncString())
+				s.String(), targetStmt.String())
 		}
 	}
 	return nil
 }
 
-func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt domain.Stmt, model interface{}) error {
+func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt interfaces.Stmt, model interface{}) error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
 	}
 
 	switch conn := s.conn.(type) {
 	case Mock:
-		returned, err := conn.CompareWith(stmt)
+		returned, err := conn.compareWith(stmt)
 		if err != nil || returned == nil {
 			return err
 		}
@@ -130,14 +140,14 @@ func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt domain.Stmt, model
 	return xerrors.Errorf("database connection should not be %s", reflect.TypeOf(s.conn).String())
 }
 
-func (s *stmt) exec(buildSQL func(*internal.SQL) error, stmt domain.Stmt) error {
+func (s *stmt) exec(buildSQL func(*internal.SQL) error, stmt interfaces.Stmt) error {
 	if len(s.errors) > 0 {
 		return s.errors[0]
 	}
 
 	switch conn := s.conn.(type) {
 	case Mock:
-		_, err := conn.CompareWith(stmt)
+		_, err := conn.compareWith(stmt)
 		if err != nil {
 			return err
 		}
@@ -159,35 +169,19 @@ func (s *stmt) exec(buildSQL func(*internal.SQL) error, stmt domain.Stmt) error 
 // DeleteStmt is DELETE statement.
 type DeleteStmt struct {
 	stmt
-	cmd *clause.Delete
 }
 
 // newDeleteStmt creates DeleteStmt instance.
 func newDeleteStmt(conn conn) *DeleteStmt {
-	stmt := &DeleteStmt{cmd: &clause.Delete{}}
-	stmt.conn = conn
-	return stmt
+	s := &DeleteStmt{}
+	s.conn = conn
+	s.cmd = &clause.Delete{}
+	return s
 }
 
-// String returns SQL statement with string.
-func (s *DeleteStmt) String() string {
-	return s.string(s.buildSQL)
-}
-
-// FuncString returns function call as string.
-func (s *DeleteStmt) FuncString() string {
-	return s.funcString(s.cmd)
-}
-
-// Cmd returns cmd clause.
-func (s *DeleteStmt) Cmd() domain.Clause {
-	return s.cmd
-}
-
-// CompareWith compares the statements and returns error if the statements is not same.
-// In this case, same means that stmt.cmd and stmt.called is corresponding.
-func (s *DeleteStmt) CompareWith(targetStmt domain.Stmt) error {
-	return s.compareWith(s.Cmd(), targetStmt)
+// SQL returns the built SQL string.
+func (s *DeleteStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Exec executed SQL statement without mapping to model.
@@ -261,39 +255,23 @@ func (s *DeleteStmt) Or(expr string, values ...interface{}) idelete.Or {
 type InsertStmt struct {
 	stmt
 	model interface{}
-	cmd   *clause.Insert
-	sel   domain.Stmt
+	sel   interfaces.Stmt
 }
 
 // newInsertStmt creates InsertStmt instance.
 func newInsertStmt(conn conn, table string, cols ...string) *InsertStmt {
-	i := new(clause.Insert)
+	i := &clause.Insert{}
 	i.AddTable(table)
 	i.AddColumns(cols...)
-	stmt := &InsertStmt{cmd: i}
-	stmt.conn = conn
-	return stmt
+	s := &InsertStmt{}
+	s.conn = conn
+	s.cmd = i
+	return s
 }
 
-// String returns SQL statement with string.
-func (s *InsertStmt) String() string {
-	return s.string(s.buildSQL)
-}
-
-// FuncString returns function call as string.
-func (s *InsertStmt) FuncString() string {
-	return s.funcString(s.cmd)
-}
-
-// Cmd returns cmd clause.
-func (s *InsertStmt) Cmd() domain.Clause {
-	return s.cmd
-}
-
-// CompareWith compares the statements and returns error if the statements is not same.
-// In this case, same means that stmt.cmd and stmt.called is corresponding.
-func (s *InsertStmt) CompareWith(targetStmt domain.Stmt) error {
-	return s.compareWith(s.Cmd(), targetStmt)
+// SQL returns the built SQL string.
+func (s *InsertStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Exec executed SQL statement without mapping to model.
@@ -311,8 +289,12 @@ func (s *InsertStmt) buildSQL(sql *internal.SQL) error {
 	sql.Write(ss.Build())
 
 	if s.model != nil {
-		cols := []string{}
-		for _, c := range s.cmd.Columns {
+		insertCmd, ok := s.cmd.(*clause.Insert)
+		if !ok {
+			return xerrors.New("command must be clause.Insert")
+		}
+		var cols []string
+		for _, c := range insertCmd.Columns {
 			if c.Alias != "" {
 				cols = append(cols, c.Alias)
 				continue
@@ -326,7 +308,7 @@ func (s *InsertStmt) buildSQL(sql *internal.SQL) error {
 	}
 
 	if s.sel != nil {
-		sql.Write(s.sel.String())
+		sql.Write(s.sel.SQL())
 		return nil
 	}
 
@@ -396,7 +378,7 @@ func (s *InsertStmt) Model(model interface{}) iinsert.Model {
 }
 
 // Select calls SELECT statement.
-func (s *InsertStmt) Select(stmt domain.Stmt) iinsert.Select {
+func (s *InsertStmt) Select(stmt interfaces.Stmt) iinsert.Select {
 	s.sel = stmt
 	return s
 }
@@ -414,41 +396,25 @@ func (s *InsertStmt) Values(values ...interface{}) iinsert.Values {
 // SelectStmt is SELECT statement.
 type SelectStmt struct {
 	stmt
-	cmd *clause.Select
 }
 
 // newSelectStmt creates SelectStmt instance.
 func newSelectStmt(conn conn, cols ...string) *SelectStmt {
-	sel := new(clause.Select)
+	sel := &clause.Select{}
 	if len(cols) == 0 {
 		sel.AddColumns("*")
 	} else {
 		sel.AddColumns(cols...)
 	}
-	stmt := &SelectStmt{cmd: sel}
-	stmt.conn = conn
-	return stmt
+	s := &SelectStmt{}
+	s.conn = conn
+	s.cmd = sel
+	return s
 }
 
-// String returns SQL statement with string.
-func (s *SelectStmt) String() string {
-	return s.string(s.buildSQL)
-}
-
-// FuncString returns function call as string.
-func (s *SelectStmt) FuncString() string {
-	return s.funcString(s.cmd)
-}
-
-// Cmd returns cmd clause.
-func (s *SelectStmt) Cmd() domain.Clause {
-	return s.cmd
-}
-
-// CompareWith compares the statements and returns error if the statements is not same.
-// In this case, same means that stmt.cmd and stmt.called is corresponding.
-func (s *SelectStmt) CompareWith(targetStmt domain.Stmt) error {
-	return s.compareWith(s.Cmd(), targetStmt)
+// SQL returns the built SQL string.
+func (s *SelectStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Query executes SQL statement with mapping to model.
@@ -577,13 +543,13 @@ func (s *SelectStmt) On(expr string, values ...interface{}) iselect.On {
 }
 
 // Union calls UNION clause.
-func (s *SelectStmt) Union(stmt domain.Stmt) iselect.Union {
+func (s *SelectStmt) Union(stmt interfaces.Stmt) iselect.Union {
 	s.call(&clause.Union{Stmt: stmt, All: false})
 	return s
 }
 
 // UnionAll calls UNION ALL clause.
-func (s *SelectStmt) UnionAll(stmt domain.Stmt) iselect.Union {
+func (s *SelectStmt) UnionAll(stmt interfaces.Stmt) iselect.Union {
 	s.call(&clause.Union{Stmt: stmt, All: true})
 	return s
 }
@@ -609,37 +575,21 @@ type UpdateStmt struct {
 	stmt
 	model     interface{}
 	modelCols []string
-	cmd       *clause.Update
 }
 
 // newUpdateStmt creates UpdateStmt instance.
 func newUpdateStmt(conn conn, table string) *UpdateStmt {
-	u := new(clause.Update)
+	u := &clause.Update{}
 	u.AddTable(table)
-	stmt := &UpdateStmt{cmd: u}
-	stmt.conn = conn
-	return stmt
+	s := &UpdateStmt{}
+	s.conn = conn
+	s.cmd = u
+	return s
 }
 
-// String returns SQL statement with string.
-func (s *UpdateStmt) String() string {
-	return s.string(s.buildSQL)
-}
-
-// FuncString returns function call as string.
-func (s *UpdateStmt) FuncString() string {
-	return s.funcString(s.cmd)
-}
-
-// Cmd returns cmd clause.
-func (s *UpdateStmt) Cmd() domain.Clause {
-	return s.cmd
-}
-
-// CompareWith compares the statements and returns error if the statements is not same.
-// In this case, same means that stmt.cmd and stmt.called is corresponding.
-func (s *UpdateStmt) CompareWith(targetStmt domain.Stmt) error {
-	return s.compareWith(s.Cmd(), targetStmt)
+// SQL returns the built SQL string.
+func (s *UpdateStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Exec executes SQL statement without mapping to model.
@@ -760,34 +710,19 @@ func (s *UpdateStmt) Or(expr string, values ...interface{}) iupdate.Or {
 // rawStmt is raw string statement.
 type rawStmt struct {
 	stmt
-	cmd *syntax.RawClause
 }
 
 // newRawStmt creates rawStmt instance.
 func newRawStmt(conn conn, rs string, v ...interface{}) *rawStmt {
-	s := &rawStmt{cmd: &syntax.RawClause{RawStr: rs, Values: v}}
+	s := &rawStmt{}
 	s.conn = conn
+	s.cmd = &syntax.RawClause{RawStr: rs, Values: v}
 	return s
 }
 
-func (s *rawStmt) String() string {
-	return s.string(s.buildSQL)
-}
-
-// FuncString returns function call as string.
-func (s *rawStmt) FuncString() string {
-	return s.funcString(s.cmd)
-}
-
-// Cmd returns cmd clause.
-func (s *rawStmt) Cmd() domain.Clause {
-	return s.cmd
-}
-
-// CompareWith compares the statements and returns error if the statements is not same.
-// In this case, same means that stmt.cmd and stmt.called is corresponding.
-func (s *rawStmt) CompareWith(stmt domain.Stmt) error {
-	return s.compareWith(s.Cmd(), stmt)
+// SQL returns the built SQL string.
+func (s *rawStmt) SQL() string {
+	return s.sql(s.buildSQL)
 }
 
 // Query executes SQL statement with mapping to model.

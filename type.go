@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 )
 
 // conn is database connection like DB or Tx. This is also implemented by MockDB and MockTx.
@@ -46,10 +46,10 @@ type Tx interface {
 // Mock is mock database conneciton pool.
 type Mock interface {
 	conn
+	compareWith(s interfaces.Stmt) (interface{}, error)
 	Complete() error
-	CompareWith(domain.Stmt) (interface{}, error)
-	Expect(s domain.Stmt)
-	ExpectWithReturn(s domain.Stmt, v interface{})
+	Expect(s interfaces.Stmt)
+	ExpectWithReturn(s interfaces.Stmt, v interface{})
 }
 
 // MockDB is interface of mock database.

@@ -40,7 +40,7 @@ func TestCreateTableModelParser(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		actual := testCase.Stmt.String()
+		actual := testCase.Stmt.SQL()
 		assert.Equal(t, testCase.Expected, actual)
 	}
 }
@@ -53,7 +53,7 @@ func TestInsertModelParser_ParseStruct2(t *testing.T) {
 
 	model := Employee{ID: 1001, FirstName: "Taro"}
 
-	actual := gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&model).String()
+	actual := gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&model).SQL()
 	expected := `INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`
 
 	assert.Equal(t, expected, actual)
@@ -67,7 +67,7 @@ func TestInsertModelParser_ParseStructSlice(t *testing.T) {
 
 	model := []Employee{{ID: 1001, FirstName: "Taro"}, {ID: 1002, FirstName: "Jiro"}}
 
-	actual := gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&model).String()
+	actual := gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&model).SQL()
 	expected := `INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro'), (1002, 'Jiro')`
 
 	assert.Equal(t, expected, actual)
@@ -76,7 +76,7 @@ func TestInsertModelParser_ParseStructSlice(t *testing.T) {
 func TestInsertModelParser_ParseMap(t *testing.T) {
 	model := map[string]interface{}{"emp_no": 1001, "first_name": "Taro"}
 
-	actual := gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&model).String()
+	actual := gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&model).SQL()
 	expected := `INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro')`
 
 	assert.Equal(t, expected, actual)
@@ -88,7 +88,7 @@ func TestInsertModelParser_ParseMapSlice(t *testing.T) {
 		{"emp_no": 1002, "first_name": "Jiro"},
 	}
 
-	actual := gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&model).String()
+	actual := gsorm.Insert(nil, "employees", "emp_no", "first_name").Model(&model).SQL()
 	expected := `INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro'), (1002, 'Jiro')`
 
 	assert.Equal(t, expected, actual)
@@ -102,7 +102,7 @@ func TestUpdateModelParser_ParseStruct(t *testing.T) {
 
 	model := Employee{ID: 1001, FirstName: "Taro"}
 
-	actual := gsorm.Update(nil, "employees").Model(&model, "emp_no", "first_name").String()
+	actual := gsorm.Update(nil, "employees").Model(&model, "emp_no", "first_name").SQL()
 	expected := `UPDATE employees SET emp_no = 1001, first_name = 'Taro'`
 
 	assert.Equal(t, expected, actual)
@@ -111,7 +111,7 @@ func TestUpdateModelParser_ParseStruct(t *testing.T) {
 func TestUpdateModelParser_ParseMap(t *testing.T) {
 	model := map[string]interface{}{"emp_no": 1001, "first_name": "Taro"}
 
-	actual := gsorm.Update(nil, "employees").Model(&model, "emp_no", "first_name").String()
+	actual := gsorm.Update(nil, "employees").Model(&model, "emp_no", "first_name").SQL()
 	expected := `UPDATE employees SET emp_no = 1001, first_name = 'Taro'`
 
 	assert.Equal(t, expected, actual)
