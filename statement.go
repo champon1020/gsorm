@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/champon1020/gsorm/interfaces"
-	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/champon1020/gsorm/interfaces/idelete"
 	"github.com/champon1020/gsorm/interfaces/iinsert"
 	"github.com/champon1020/gsorm/interfaces/iselect"
@@ -21,13 +20,13 @@ import (
 // stmt stores information about query.
 type stmt struct {
 	conn   conn
-	cmd    domain.Clause
-	called []domain.Clause
+	cmd    interfaces.Clause
+	called []interfaces.Clause
 	errors []error
 }
 
 // call appends called clause.
-func (s *stmt) call(e domain.Clause) {
+func (s *stmt) call(e interfaces.Clause) {
 	s.called = append(s.called, e)
 }
 
@@ -37,12 +36,12 @@ func (s *stmt) throw(err error) {
 }
 
 // Cmd returns the command clause.
-func (s *stmt) Cmd() domain.Clause {
+func (s *stmt) Cmd() interfaces.Clause {
 	return s.cmd
 }
 
 // Clauses returns the called clauses.
-func (s *stmt) Clauses() []domain.Clause {
+func (s *stmt) Clauses() []interfaces.Clause {
 	return s.called
 }
 

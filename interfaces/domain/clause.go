@@ -1,5 +1,6 @@
 package domain
 
+/*
 // Clause is interface for SQL clauses.
 type Clause interface {
 	//Keyword() string
@@ -12,3 +13,4 @@ type StmtSet interface {
 	Build() string
 	BuildValue() string
 }
+*/

@@ -13,7 +13,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a // indirect
-	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 	gopkg.in/yaml.v2 v2.2.7 // indirect
 	gorm.io/driver/mysql v1.1.0
 	gorm.io/gorm v1.21.10

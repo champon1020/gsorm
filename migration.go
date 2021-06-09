@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/interfaces/ialtertable"
 	"github.com/champon1020/gsorm/interfaces/icreatedb"
 	"github.com/champon1020/gsorm/interfaces/icreateindex"
@@ -21,12 +21,12 @@ import (
 // migStmt stores information about database migration query.
 type migStmt struct {
 	conn   conn
-	called []domain.Clause
+	called []interfaces.Clause
 	errors []error
 }
 
 // call appends called clause.
-func (s *migStmt) call(e domain.Clause) {
+func (s *migStmt) call(e interfaces.Clause) {
 	s.called = append(s.called, e)
 }
 
@@ -36,7 +36,7 @@ func (s *migStmt) throw(e error) {
 }
 
 // headClause returns first element of called.
-func (s *migStmt) headClause() domain.Clause {
+func (s *migStmt) headClause() interfaces.Clause {
 	if len(s.called) == 0 {
 		return nil
 	}
