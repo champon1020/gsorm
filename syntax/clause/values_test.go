@@ -33,15 +33,15 @@ func TestValues_String(t *testing.T) {
 func TestValues_Build(t *testing.T) {
 	testCases := []struct {
 		Values *clause.Values
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Values{Values: []interface{}{"column"}},
-			&syntax.StmtSet{Keyword: "VALUES", Value: `('column')`},
+			&syntax.ClauseSet{Keyword: "VALUES", Value: `('column')`},
 		},
 		{
 			&clause.Values{Values: []interface{}{"column", 2, true}},
-			&syntax.StmtSet{Keyword: "VALUES", Value: `('column', 2, 1)`},
+			&syntax.ClauseSet{Keyword: "VALUES", Value: `('column', 2, 1)`},
 		},
 	}
 

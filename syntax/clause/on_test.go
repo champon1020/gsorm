@@ -37,15 +37,15 @@ func TestOn_String(t *testing.T) {
 func TestOn_Build(t *testing.T) {
 	testCases := []struct {
 		On     *clause.On
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.On{Expr: "table1.column = table2.column"},
-			&syntax.StmtSet{Keyword: "ON", Value: "table1.column = table2.column"},
+			&syntax.ClauseSet{Keyword: "ON", Value: "table1.column = table2.column"},
 		},
 		{
 			&clause.On{Expr: "table1.column = ?", Values: []interface{}{"table2.column"}},
-			&syntax.StmtSet{Keyword: "ON", Value: `table1.column = table2.column`},
+			&syntax.ClauseSet{Keyword: "ON", Value: `table1.column = table2.column`},
 		},
 	}
 

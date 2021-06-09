@@ -9,6 +9,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestJoin_AddTable(t *testing.T) {
+	{
+		j := &clause.Join{}
+		table := "table"
+		j.AddTable(table)
+
+		assert.Equal(t, j.Table, syntax.Table{Name: "table"})
+	}
+	{
+		j := &clause.Join{}
+		table := "table as t"
+		j.AddTable(table)
+
+		assert.Equal(t, j.Table, syntax.Table{Name: "table", Alias: "t"})
+	}
+}
+
 func TestJoin_String(t *testing.T) {
 	testCases := []struct {
 		Join   *clause.Join
@@ -37,15 +54,15 @@ func TestJoin_String(t *testing.T) {
 func TestJoin_Build(t *testing.T) {
 	testCases := []struct {
 		Join   *clause.Join
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Join{Table: syntax.Table{Name: "table"}, Type: clause.InnerJoin},
-			&syntax.StmtSet{Keyword: "INNER JOIN", Value: "table"},
+			&syntax.ClauseSet{Keyword: "INNER JOIN", Value: "table"},
 		},
 		{
 			&clause.Join{Table: syntax.Table{Name: "table", Alias: "t"}, Type: clause.LeftJoin},
-			&syntax.StmtSet{Keyword: "LEFT JOIN", Value: "table AS t"},
+			&syntax.ClauseSet{Keyword: "LEFT JOIN", Value: "table AS t"},
 		},
 	}
 
@@ -58,22 +75,5 @@ func TestJoin_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Result, res); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestJoin_AddTable(t *testing.T) {
-	{
-		j := &clause.Join{}
-		table := "table"
-		j.AddTable(table)
-
-		assert.Equal(t, j.Table, syntax.Table{Name: "table"})
-	}
-	{
-		j := &clause.Join{}
-		table := "table as t"
-		j.AddTable(table)
-
-		assert.Equal(t, j.Table, syntax.Table{Name: "table", Alias: "t"})
 	}
 }

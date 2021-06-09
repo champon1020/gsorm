@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/champon1020/gsorm/interfaces"
-	"github.com/champon1020/gsorm/interfaces/domain"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -23,7 +22,7 @@ func (u *Union) Keyword() string {
 	return n
 }
 
-// String returns function call with string.
+// String returns function call as string.
 func (u *Union) String() string {
 	keyword := "Union"
 	if u.All {
@@ -32,10 +31,10 @@ func (u *Union) String() string {
 	return fmt.Sprintf("%s(%q)", keyword, u.Stmt.SQL())
 }
 
-// Build makes UNION clause with syntax.StmtSet.
-func (u *Union) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(u.Keyword())
-	ss.WriteValue(fmt.Sprintf("(%s)", u.Stmt.SQL()))
-	return ss, nil
+// Build creates the structure of UNION clause that implements interfaces.ClauseSet.
+func (u *Union) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword(u.Keyword())
+	cs.WriteValue(fmt.Sprintf("(%s)", u.Stmt.SQL()))
+	return cs, nil
 }

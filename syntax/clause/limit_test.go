@@ -29,11 +29,11 @@ func TestLimit_String(t *testing.T) {
 func TestLimit_Build(t *testing.T) {
 	testCases := []struct {
 		Limit  *clause.Limit
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Limit{Num: 5},
-			&syntax.StmtSet{Keyword: "LIMIT", Value: "5"},
+			&syntax.ClauseSet{Keyword: "LIMIT", Value: "5"},
 		},
 	}
 

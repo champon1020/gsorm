@@ -33,15 +33,15 @@ func TestUpdate_String(t *testing.T) {
 func TestUpdate_Build(t *testing.T) {
 	testCases := []struct {
 		Update *clause.Update
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Update{Table: syntax.Table{Name: "table"}},
-			&syntax.StmtSet{Keyword: "UPDATE", Value: "table"},
+			&syntax.ClauseSet{Keyword: "UPDATE", Value: "table"},
 		},
 		{
 			&clause.Update{Table: syntax.Table{Name: "table", Alias: "t"}},
-			&syntax.StmtSet{Keyword: "UPDATE", Value: "table AS t"},
+			&syntax.ClauseSet{Keyword: "UPDATE", Value: "table AS t"},
 		},
 	}
 

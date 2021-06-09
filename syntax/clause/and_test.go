@@ -37,11 +37,11 @@ func TestAnd_String(t *testing.T) {
 func TestAnd_Build(t *testing.T) {
 	testCases := []struct {
 		And    *clause.And
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.And{Expr: "lhs = ?", Values: []interface{}{10}},
-			&syntax.StmtSet{Keyword: "AND", Value: "lhs = 10", Parens: true},
+			&syntax.ClauseSet{Keyword: "AND", Value: "lhs = 10", Parens: true},
 		},
 	}
 

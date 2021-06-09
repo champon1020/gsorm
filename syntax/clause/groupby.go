@@ -3,7 +3,7 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,12 +12,12 @@ type GroupBy struct {
 	Columns []syntax.Column
 }
 
-// AddColumn appends column to GroupBy.
+// AddColumn appends the column to GroupBy.Columns.
 func (g *GroupBy) AddColumn(col string) {
 	g.Columns = append(g.Columns, *syntax.NewColumn(col))
 }
 
-// String returns function call wtih string.
+// String returns function call as string.
 func (g *GroupBy) String() string {
 	var s string
 	for i, c := range g.Columns {
@@ -29,15 +29,15 @@ func (g *GroupBy) String() string {
 	return fmt.Sprintf("GroupBy(%s)", s)
 }
 
-// Build makes GROUP BY clause with syntax.StmtSet.
-func (g *GroupBy) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword("GROUP BY")
+// Build creates the structure of GROUP BY clause that implements interfaces.ClauseSet.
+func (g *GroupBy) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("GROUP BY")
 	for i, c := range g.Columns {
 		if i != 0 {
-			ss.WriteValue(",")
+			cs.WriteValue(",")
 		}
-		ss.WriteValue(c.Build())
+		cs.WriteValue(c.Build())
 	}
-	return ss, nil
+	return cs, nil
 }

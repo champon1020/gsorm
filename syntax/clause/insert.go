@@ -3,7 +3,7 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -13,12 +13,12 @@ type Insert struct {
 	Columns []syntax.Column
 }
 
-// AddTable appends table to Insert.
+// AddTable assigns the table to Insert.Table.
 func (i *Insert) AddTable(table string) {
 	i.Table = *syntax.NewTable(table)
 }
 
-// AddColumns appends columns to Insert.
+// AddColumns appends the columns to Insert.Columns.
 func (i *Insert) AddColumns(cols ...string) {
 	for _, c := range cols {
 		col := syntax.NewColumn(c)
@@ -26,7 +26,7 @@ func (i *Insert) AddColumns(cols ...string) {
 	}
 }
 
-// String returns function call with string.
+// String returns function call as string.
 func (i *Insert) String() string {
 	s := fmt.Sprintf("%q", i.Table.Build())
 	for _, c := range i.Columns {
@@ -35,20 +35,20 @@ func (i *Insert) String() string {
 	return fmt.Sprintf("Insert(%s)", s)
 }
 
-// Build makes INSERT clause with sytnax.StmtSet.
-func (i *Insert) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword("INSERT INTO")
-	ss.WriteValue(i.Table.Build())
+// Build creates the structure of INSERT clause that implements interfaces.ClauseSet.
+func (i *Insert) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("INSERT INTO")
+	cs.WriteValue(i.Table.Build())
 	if len(i.Columns) > 0 {
-		ss.WriteValue("(")
+		cs.WriteValue("(")
 		for j, c := range i.Columns {
 			if j != 0 {
-				ss.WriteValue(",")
+				cs.WriteValue(",")
 			}
-			ss.WriteValue(c.Build())
+			cs.WriteValue(c.Build())
 		}
-		ss.WriteValue(")")
+		cs.WriteValue(")")
 	}
-	return ss, nil
+	return cs, nil
 }

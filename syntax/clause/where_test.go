@@ -37,15 +37,15 @@ func TestWhere_String(t *testing.T) {
 func TestWhere_Build(t *testing.T) {
 	testCases := []struct {
 		Where  *clause.Where
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Where{Expr: "lhs = ?", Values: []interface{}{10}},
-			&syntax.StmtSet{Keyword: "WHERE", Value: "lhs = 10"},
+			&syntax.ClauseSet{Keyword: "WHERE", Value: "lhs = 10"},
 		},
 		{
 			&clause.Where{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			&syntax.StmtSet{Keyword: "WHERE", Value: `lhs1 = 10 AND lhs2 = 'str'`},
+			&syntax.ClauseSet{Keyword: "WHERE", Value: `lhs1 = 10 AND lhs2 = 'str'`},
 		},
 	}
 

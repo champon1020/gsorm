@@ -37,11 +37,11 @@ func TestOr_String(t *testing.T) {
 func TestOr_Build(t *testing.T) {
 	testCases := []struct {
 		Or     *clause.Or
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Or{Expr: "lhs = ?", Values: []interface{}{10}},
-			&syntax.StmtSet{Keyword: "OR", Value: "lhs = 10", Parens: true},
+			&syntax.ClauseSet{Keyword: "OR", Value: "lhs = 10", Parens: true},
 		},
 	}
 

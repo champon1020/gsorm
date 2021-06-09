@@ -3,7 +3,7 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,7 +12,7 @@ type Select struct {
 	Columns []syntax.Column
 }
 
-// AddColumns appends column to Select.
+// AddColumns appends the columns to Select.Columns.
 func (s *Select) AddColumns(cols ...string) {
 	for _, c := range cols {
 		col := syntax.NewColumn(c)
@@ -20,7 +20,7 @@ func (s *Select) AddColumns(cols ...string) {
 	}
 }
 
-// String returns function call with string.
+// String returns function call as string.
 func (s *Select) String() string {
 	var str string
 	for i, c := range s.Columns {
@@ -32,15 +32,15 @@ func (s *Select) String() string {
 	return fmt.Sprintf("Select(%s)", str)
 }
 
-// Build makes SELECT clause with syntax.StmtSet.
-func (s *Select) Build() (domain.StmtSet, error) {
-	ss := &syntax.StmtSet{}
-	ss.WriteKeyword("SELECT")
+// Build creates the structure of SELECT clause that implements interfaces.ClauseSet.
+func (s *Select) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("SELECT")
 	for i, c := range s.Columns {
 		if i != 0 {
-			ss.WriteValue(",")
+			cs.WriteValue(",")
 		}
-		ss.WriteValue(c.Build())
+		cs.WriteValue(c.Build())
 	}
-	return ss, nil
+	return cs, nil
 }

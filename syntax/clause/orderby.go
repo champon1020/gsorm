@@ -3,7 +3,7 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,20 +12,20 @@ type OrderBy struct {
 	Columns []string
 }
 
-// String returns function call with string.
+// String returns function call as string.
 func (o *OrderBy) String() string {
 	return fmt.Sprintf("OrderBy(%q)", o.Columns)
 }
 
-// Build makes ORDER BY clause with sytnax.StmtSet.
-func (o *OrderBy) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword("ORDER BY")
+// Build creates the structure of ORDER BY clause that implements interfaces.ClauseSet.
+func (o *OrderBy) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("ORDER BY")
 	for i, c := range o.Columns {
 		if i > 0 {
-			ss.WriteValue(",")
+			cs.WriteValue(",")
 		}
-		ss.WriteValue(c)
+		cs.WriteValue(c)
 	}
-	return ss, nil
+	return cs, nil
 }

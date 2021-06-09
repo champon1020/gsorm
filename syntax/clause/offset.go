@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -13,15 +13,15 @@ type Offset struct {
 	Num int
 }
 
-// String returns function call with string.
+// String returns function call as string.
 func (o *Offset) String() string {
 	return fmt.Sprintf("Offset(%v)", o.Num)
 }
 
-// Build makes OFFSET clause with sytnax.StmtSet.
-func (o *Offset) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword("OFFSET")
-	ss.WriteValue(strconv.Itoa(o.Num))
-	return ss, nil
+// Build creates the structure of OFFSET clause that implements interfaces.ClauseSet.
+func (o *Offset) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("OFFSET")
+	cs.WriteValue(strconv.Itoa(o.Num))
+	return cs, nil
 }

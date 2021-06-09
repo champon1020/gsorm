@@ -3,7 +3,7 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -23,12 +23,12 @@ type Join struct {
 	Type  JoinType
 }
 
-// AddTable appends table to Join.
+// AddTable assigns the table to Join.Table.
 func (j *Join) AddTable(table string) {
 	j.Table = *syntax.NewTable(table)
 }
 
-// String returns function call with string.
+// String returns function call as string.
 func (j *Join) String() string {
 	var keyword string
 	if j.Type == InnerJoin {
@@ -43,10 +43,10 @@ func (j *Join) String() string {
 	return fmt.Sprintf("%s(%q)", keyword, j.Table.Build())
 }
 
-// Build makes JOIN clause with syntax.StmtSet.
-func (j *Join) Build() (domain.StmtSet, error) {
-	ss := &syntax.StmtSet{}
-	ss.WriteKeyword(string(j.Type))
-	ss.WriteValue(j.Table.Build())
-	return ss, nil
+// Build creates the structure of JOIN clause that implements interfaces.ClauseSet.
+func (j *Join) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword(string(j.Type))
+	cs.WriteValue(j.Table.Build())
+	return cs, nil
 }
