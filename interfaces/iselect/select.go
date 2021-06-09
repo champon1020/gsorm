@@ -12,6 +12,7 @@ type Stmt interface {
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
+	RawClause(raw string, values ...interface{}) RawClause
 	From(tables ...string) From
 	Join(table string) Join
 	LeftJoin(table string) Join
@@ -22,11 +23,11 @@ type RawClause interface {
 	Or(expr string, values ...interface{}) Or
 	GroupBy(columns ...string) GroupBy
 	Having(expr string, values ...interface{}) Having
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
 	OrderBy(columns ...string) OrderBy
 	Limit(limit int) Limit
 	Offset(offset int) Offset
-	Union(stmt interfaces.Stmt) Union
-	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }
 
@@ -36,13 +37,7 @@ type From interface {
 	Join(table string) Join
 	LeftJoin(table string) Join
 	RightJoin(table string) Join
-	Where(expr string, values ...interface{}) Where
-	GroupBy(columns ...string) GroupBy
-	Having(expr string, values ...interface{}) Having
-	OrderBy(colums ...string) OrderBy
-	Limit(limit int) Limit
-	Union(stmt interfaces.Stmt) Union
-	UnionAll(stmt interfaces.Stmt) Union
+	On
 	interfaces.QueryCallable
 }
 
@@ -59,12 +54,7 @@ type On interface {
 	LeftJoin(table string) Join
 	RightJoin(table string) Join
 	Where(expr string, values ...interface{}) Where
-	GroupBy(columns ...string) GroupBy
-	Having(expr string, values ...interface{}) Having
-	OrderBy(columns ...string) OrderBy
-	Limit(limit int) Limit
-	Union(stmt interfaces.Stmt) Union
-	UnionAll(stmt interfaces.Stmt) Union
+	Where
 	interfaces.QueryCallable
 }
 
@@ -73,12 +63,7 @@ type Where interface {
 	RawClause(raw string, values ...interface{}) RawClause
 	And(expr string, values ...interface{}) And
 	Or(expr string, values ...interface{}) Or
-	GroupBy(columns ...string) GroupBy
-	Having(expr string, values ...interface{}) Having
-	OrderBy(columns ...string) OrderBy
-	Limit(limit int) Limit
-	Union(stmt interfaces.Stmt) Union
-	UnionAll(stmt interfaces.Stmt) Union
+	And
 	interfaces.QueryCallable
 }
 
@@ -86,27 +71,17 @@ type Where interface {
 type And interface {
 	RawClause(raw string, values ...interface{}) RawClause
 	And(expr string, values ...interface{}) And
-	Or(expr string, values ...interface{}) Or
 	GroupBy(columns ...string) GroupBy
-	Having(expr string, values ...interface{}) Having
-	OrderBy(columns ...string) OrderBy
-	Limit(limit int) Limit
-	Union(stmt interfaces.Stmt) Union
-	UnionAll(stmt interfaces.Stmt) Union
+	GroupBy
 	interfaces.QueryCallable
 }
 
 // Or is interface which is returned by (*SelectStmt).Or.
 type Or interface {
 	RawClause(raw string, values ...interface{}) RawClause
-	And(expr string, values ...interface{}) And
 	Or(expr string, values ...interface{}) Or
 	GroupBy(columns ...string) GroupBy
-	Having(expr string, values ...interface{}) Having
-	OrderBy(columns ...string) OrderBy
-	Limit(limit int) Limit
-	Union(stmt interfaces.Stmt) Union
-	UnionAll(stmt interfaces.Stmt) Union
+	GroupBy
 	interfaces.QueryCallable
 }
 
@@ -114,20 +89,26 @@ type Or interface {
 type GroupBy interface {
 	RawClause(raw string, values ...interface{}) RawClause
 	Having(expr string, values ...interface{}) Having
-	OrderBy(columns ...string) OrderBy
-	Limit(limit int) Limit
-	Union(stmt interfaces.Stmt) Union
-	UnionAll(stmt interfaces.Stmt) Union
+	Having
 	interfaces.QueryCallable
 }
 
 // Having is interface which is returned by (*SelectStmt).Having.
 type Having interface {
 	RawClause(raw string, values ...interface{}) RawClause
-	OrderBy(columns ...string) OrderBy
-	Limit(limit int) Limit
 	Union(stmt interfaces.Stmt) Union
 	UnionAll(stmt interfaces.Stmt) Union
+	Union
+	interfaces.QueryCallable
+}
+
+// Union is interface which is returned by (*SelectStmt).Union.
+type Union interface {
+	RawClause(raw string, values ...interface{}) RawClause
+	Union(stmt interfaces.Stmt) Union
+	UnionAll(stmt interfaces.Stmt) Union
+	OrderBy(columns ...string) OrderBy
+	OrderBy
 	interfaces.QueryCallable
 }
 
@@ -149,15 +130,5 @@ type Limit interface {
 // Offset is interface which is returned by (*SelectStmt).Offset.
 type Offset interface {
 	RawClause(raw string, values ...interface{}) RawClause
-	interfaces.QueryCallable
-}
-
-// Union is interface which is returned by (*SelectStmt).Union.
-type Union interface {
-	RawClause(raw string, values ...interface{}) RawClause
-	OrderBy(columns ...string) OrderBy
-	Limit(limit int) Limit
-	Union(stmt interfaces.Stmt) Union
-	UnionAll(stmt interfaces.Stmt) Union
 	interfaces.QueryCallable
 }

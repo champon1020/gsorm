@@ -13,6 +13,7 @@ type Stmt interface {
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
+	RawClause(raw string, values ...interface{}) RawClause
 	Set(column string, value interface{}) Set
 	Where(expr string, values ...interface{}) Where
 	And(expr string, values ...interface{}) And
@@ -45,14 +46,12 @@ type Where interface {
 type And interface {
 	RawClause(raw string, values ...interface{}) RawClause
 	And(expr string, values ...interface{}) And
-	Or(expr string, values ...interface{}) Or
 	interfaces.ExecCallable
 }
 
 // Or is interface which is returned by (*UpdateStmt).Or.
 type Or interface {
 	RawClause(raw string, values ...interface{}) RawClause
-	And(expr string, values ...interface{}) And
 	Or(expr string, values ...interface{}) Or
 	interfaces.ExecCallable
 }

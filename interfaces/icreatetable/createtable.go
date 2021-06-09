@@ -11,6 +11,7 @@ type Stmt interface {
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
+	RawClause(raw string, values ...interface{}) RawClause
 	Column(column, typ string) Column
 	NotNull() NotNull
 	Default(value interface{}) Default

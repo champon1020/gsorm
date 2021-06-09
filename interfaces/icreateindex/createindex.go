@@ -10,6 +10,7 @@ type Stmt interface {
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
+	RawClause(raw string, values ...interface{}) RawClause
 	On(table string, columns ...string) On
 	interfaces.MigrateCallable
 }
