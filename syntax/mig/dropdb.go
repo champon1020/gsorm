@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,19 +12,15 @@ type DropDB struct {
 	DBName string
 }
 
-// Keyword returns clause keyword.
-func (d *DropDB) Keyword() string {
-	return "DROP DATABASE"
-}
-
+// String returns function call as string.
 func (d *DropDB) String() string {
-	return fmt.Sprintf("%s(%s)", d.Keyword(), d.DBName)
+	return fmt.Sprintf("DropDB(%s)", d.DBName)
 }
 
-// Build makes DROP DATABASE clause with syntax.StmtSet.
-func (d *DropDB) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(d.Keyword())
-	ss.WriteValue(d.DBName)
-	return ss, nil
+// Build creates the structure of DROP DATABASE clause that implements interfaces.ClauseSet.
+func (d *DropDB) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("DROP DATABASE")
+	cs.WriteValue(d.DBName)
+	return cs, nil
 }

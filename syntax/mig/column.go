@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -13,19 +13,15 @@ type Column struct {
 	Type string
 }
 
-// Keyword returns column name.
-func (c *Column) Keyword() string {
-	return c.Col
-}
-
+// String returns function call as string.
 func (c *Column) String() string {
-	return fmt.Sprintf("COLUMN(%s, %s)", c.Col, c.Type)
+	return fmt.Sprintf("Column(%s, %s)", c.Col, c.Type)
 }
 
-// Build makes database column definition with syntax.StmtSet.
-func (c *Column) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(c.Keyword())
-	ss.WriteValue(c.Type)
-	return ss, nil
+// Build creates the structure of column definition that implements interfaces.ClauseSet.
+func (c *Column) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword(c.Col)
+	cs.WriteValue(c.Type)
+	return cs, nil
 }

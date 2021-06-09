@@ -9,14 +9,31 @@ import (
 	"gotest.tools/v3/assert"
 )
 
+func TestCons_String(t *testing.T) {
+	testCases := []struct {
+		Cons     *mig.Cons
+		Expected string
+	}{
+		{
+			&mig.Cons{Key: "key"},
+			`Cons(key)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Cons.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
 func TestCons_Build(t *testing.T) {
 	testCases := []struct {
 		Cons     *mig.Cons
-		Expected *syntax.StmtSet
+		Expected *syntax.ClauseSet
 	}{
 		{
 			&mig.Cons{Key: "key_name"},
-			&syntax.StmtSet{Keyword: "CONSTRAINT", Value: "key_name"},
+			&syntax.ClauseSet{Keyword: "CONSTRAINT", Value: "key_name"},
 		},
 	}
 
@@ -29,22 +46,5 @@ func TestCons_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestCons_String(t *testing.T) {
-	testCases := []struct {
-		Cons     *mig.Cons
-		Expected string
-	}{
-		{
-			&mig.Cons{Key: "key"},
-			`CONSTRAINT(key)`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.Cons.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

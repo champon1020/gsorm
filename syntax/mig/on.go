@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -13,29 +13,25 @@ type On struct {
 	Columns []string
 }
 
-// Keyword returns clause keyword.
-func (o *On) Keyword() string {
-	return "ON"
-}
-
+// String returns function call as string.
 func (o *On) String() string {
-	return fmt.Sprintf("%s(%s, %v)", o.Keyword(), o.Table, o.Columns)
+	return fmt.Sprintf("On(%s, %v)", o.Table, o.Columns)
 }
 
-// Build makes ON clause with syntax.StmtSet.
-func (o *On) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(o.Keyword())
-	ss.WriteValue(o.Table)
+// Build creates the structure of ON clause that implements interfaces.ClauseSet.
+func (o *On) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("ON")
+	cs.WriteValue(o.Table)
 	if len(o.Columns) > 0 {
-		ss.WriteValue("(")
+		cs.WriteValue("(")
 		for i, c := range o.Columns {
 			if i > 0 {
-				ss.WriteValue(",")
+				cs.WriteValue(",")
 			}
-			ss.WriteValue(c)
+			cs.WriteValue(c)
 		}
-		ss.WriteValue(")")
+		cs.WriteValue(")")
 	}
-	return ss, nil
+	return cs, nil
 }

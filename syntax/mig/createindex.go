@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,19 +12,15 @@ type CreateIndex struct {
 	IdxName string
 }
 
-// Keyword returns clause keyword.
-func (c *CreateIndex) Keyword() string {
-	return "CREATE INDEX"
-}
-
+// String returns function call as string.
 func (c *CreateIndex) String() string {
-	return fmt.Sprintf("%s(%s)", c.Keyword(), c.IdxName)
+	return fmt.Sprintf("CreateIndex(%s)", c.IdxName)
 }
 
-// Build makes CREATE INDEX clause with syntax.StmtSet.
-func (c *CreateIndex) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(c.Keyword())
-	ss.WriteValue(c.IdxName)
-	return ss, nil
+// Build creates the structure of CREATE INDEX clause that implements interfaces.ClauseSet.
+func (c *CreateIndex) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("CREATE INDEX")
+	cs.WriteValue(c.IdxName)
+	return cs, nil
 }

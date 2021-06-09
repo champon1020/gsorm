@@ -9,14 +9,31 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestCreateIndex_Build(t *testing.T) {
+func TestCreateIndex_String(t *testing.T) {
 	testCases := []struct {
 		CreateIndex *mig.CreateIndex
-		Expected    *syntax.StmtSet
+		Expected    string
 	}{
 		{
 			&mig.CreateIndex{IdxName: "idx"},
-			&syntax.StmtSet{Keyword: "CREATE INDEX", Value: "idx"},
+			`CreateIndex(idx)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.CreateIndex.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestCreateIndex_Build(t *testing.T) {
+	testCases := []struct {
+		CreateIndex *mig.CreateIndex
+		Expected    *syntax.ClauseSet
+	}{
+		{
+			&mig.CreateIndex{IdxName: "idx"},
+			&syntax.ClauseSet{Keyword: "CREATE INDEX", Value: "idx"},
 		},
 	}
 
@@ -29,22 +46,5 @@ func TestCreateIndex_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestCreateIndex_String(t *testing.T) {
-	testCases := []struct {
-		CreateIndex *mig.CreateIndex
-		Expected    string
-	}{
-		{
-			&mig.CreateIndex{IdxName: "idx"},
-			`CREATE INDEX(idx)`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.CreateIndex.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

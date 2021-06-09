@@ -9,14 +9,31 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestAlterTable_Build(t *testing.T) {
+func TestAlterTable_String(t *testing.T) {
 	testCases := []struct {
 		AlterTable *mig.AlterTable
-		Expected   *syntax.StmtSet
+		Expected   string
 	}{
 		{
 			&mig.AlterTable{Table: "table"},
-			&syntax.StmtSet{Keyword: "ALTER TABLE", Value: "table"},
+			`AlterTable(table)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.AlterTable.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestAlterTable_Build(t *testing.T) {
+	testCases := []struct {
+		AlterTable *mig.AlterTable
+		Expected   *syntax.ClauseSet
+	}{
+		{
+			&mig.AlterTable{Table: "table"},
+			&syntax.ClauseSet{Keyword: "ALTER TABLE", Value: "table"},
 		},
 	}
 
@@ -29,22 +46,5 @@ func TestAlterTable_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestAlterTable_String(t *testing.T) {
-	testCases := []struct {
-		AlterTable *mig.AlterTable
-		Expected   string
-	}{
-		{
-			&mig.AlterTable{Table: "table"},
-			`ALTER TABLE(table)`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.AlterTable.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

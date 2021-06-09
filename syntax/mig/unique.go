@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,26 +12,22 @@ type Unique struct {
 	Columns []string
 }
 
-// Keyword returns clause keyword.
-func (u *Unique) Keyword() string {
-	return "UNIQUE"
-}
-
+// String returns function call as string.
 func (u *Unique) String() string {
-	return fmt.Sprintf("%s(%v)", u.Keyword(), u.Columns)
+	return fmt.Sprintf("Unique(%v)", u.Columns)
 }
 
-// Build makes UNIQUE clause with syntax.StmtSet.
-func (u *Unique) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(u.Keyword())
-	ss.WriteValue("(")
+// Build creates the structure of UNIQUE clause that implements interfaces.ClauseSet.
+func (u *Unique) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("UNIQUE")
+	cs.WriteValue("(")
 	for i, c := range u.Columns {
 		if i > 0 {
-			ss.WriteValue(",")
+			cs.WriteValue(",")
 		}
-		ss.WriteValue(c)
+		cs.WriteValue(c)
 	}
-	ss.WriteValue(")")
-	return ss, nil
+	cs.WriteValue(")")
+	return cs, nil
 }

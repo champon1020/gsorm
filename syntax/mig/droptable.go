@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,19 +12,15 @@ type DropTable struct {
 	Table string
 }
 
-// Keyword returns clause keyword.
-func (d *DropTable) Keyword() string {
-	return "DROP TABLE"
-}
-
+// String returns function call as string.
 func (d *DropTable) String() string {
-	return fmt.Sprintf("%s(%s)", d.Keyword(), d.Table)
+	return fmt.Sprintf("DropTable(%s)", d.Table)
 }
 
-// Build makes DROP TABLE clause with syntax.StmtSet.
-func (d *DropTable) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(d.Keyword())
-	ss.WriteValue(d.Table)
-	return ss, nil
+// Build creates the structure of DROP TABLE clause that implements interfaces.ClauseSet.
+func (d *DropTable) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("DROP TABLE")
+	cs.WriteValue(d.Table)
+	return cs, nil
 }

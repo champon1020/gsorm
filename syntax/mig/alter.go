@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,19 +12,15 @@ type AlterTable struct {
 	Table string
 }
 
-// Keyword returns clause keyword.
-func (a *AlterTable) Keyword() string {
-	return "ALTER TABLE"
-}
-
+// String returns function call as string.
 func (a *AlterTable) String() string {
-	return fmt.Sprintf("%s(%s)", a.Keyword(), a.Table)
+	return fmt.Sprintf("AlterTable(%s)", a.Table)
 }
 
-// Build makes ALTER TABLE clause with syntax.StmtSet.
-func (a *AlterTable) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(a.Keyword())
-	ss.WriteValue(a.Table)
-	return ss, nil
+// Build creates the structure of ALTER TABLE clause that implements interfaces.ClauseSet.
+func (a *AlterTable) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("ALTER TABLE")
+	cs.WriteValue(a.Table)
+	return cs, nil
 }
