@@ -3,7 +3,7 @@ package syntax
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/internal"
 )
 
@@ -11,11 +11,6 @@ import (
 type RawClause struct {
 	RawStr string
 	Values []interface{}
-}
-
-// Keyword returns the raw string.
-func (r *RawClause) Keyword() string {
-	return r.RawStr
 }
 
 func (r *RawClause) String() string {
@@ -27,12 +22,12 @@ func (r *RawClause) String() string {
 	return fmt.Sprintf("RAW CLAUSE(%s)", s)
 }
 
-// Build creates the pair of clause and value as syntax.StmtSet.
-func (r *RawClause) Build() (domain.StmtSet, error) {
+// Build creates the pair of clause and value as ClauseSet.
+func (r *RawClause) Build() (interfaces.ClauseSet, error) {
 	s, err := BuildExpr(r.RawStr, r.Values...)
 	if err != nil {
 		return nil, err
 	}
-	ss := &StmtSet{Keyword: s}
+	ss := &ClauseSet{Keyword: s}
 	return ss, nil
 }
