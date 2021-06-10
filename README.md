@@ -24,7 +24,6 @@ As a result, gsorm is faster than other libraries when mapping the multi rows.
 
 The result are as follows:
 
-#### Select All
 | ORM | (ns/op) |
 | ---- | ---- |
 | standard | 0.40952 |
@@ -32,15 +31,6 @@ The result are as follows:
 | sqlx | 0.49695 |
 | gorp | 0.56168 |
 | **gsorm** | **0.38252** |
-
-#### Select One
-| ORM | (ns/op) |
-| ---- | ---- |
-| standard | 0.00053297 |
-| gorm | 0.00024275 |
-| sqlx | 0.00015573 |
-| gorp | 0.00051207 |
-| gsorm | 0.00050992 |
 
 If you want to run the benchmark on your machine, follow the steps below.
 
@@ -62,6 +52,120 @@ Benchmark codes are written under `benchmark` directory.
 ## Installation
 ```
 go get github.com/champon1020/gsorm
+```
+
+
+## Features
+### SQL-Like Implementation
+You can implement the database query intuitaively like writing SQL.
+
+```go
+err := gsorm.Select(db, "emp_no", "first_name").From("employees").
+    Where("emp_no > ?", 1002).
+    Query(&model)
+// SELECT emp_no, first_name FROM employees WHERE emp_no > 1002;
+
+err := gsorm.Insert(db, "employees", "emp_no", "first_name").
+    Values(1001, "Taro").
+    Values(1002, "Jiro").
+    Exec()
+// INSERT INTO employees (emp_no, first_name) VALUES (1001, 'Taro'), (1002, 'Jiro');
+```
+
+
+### Flexible Implementation
+gsorm provides `RawStmt` and `RawClause` methods.
+
+Using them, it is possible to implement the database query more flexible.
+
+```go
+err := gsorm.Select(db).
+    RawClause("INTO new_employees").
+    From("employees").
+    Where("emp_no > ?", 1002).
+    Query(interface{}{})
+// SELECT * INTO new_employees FROM employees WHERE emp_no > 1002;
+
+err := gsorm.AlterTable(db, "employees").
+    RawClause("MODIFY COLUMN emp_no INT(24)").NotNull().
+    Migrate()
+// ALTER TABLE employees MODIFY COLUMN emp_no INT(24) NOT NULL;
+
+err := gsorm.RawStmt(db, "REPLACE INTO employees VALUES (?, ?)", 1003, "Saburo").Exec()
+// REPLACE INTO employees VALUES (1003, 'Saburo');
+```
+
+
+### Test with Mock
+gsorm provides own Mock structure.
+
+You can implement testing code with mock easily.
+
+```go
+type Employee struct {
+    EmpNo     int
+    Firstname string
+}
+
+func TestWithMock(t *testing.T) {
+    mock := gsorm.OpenMock()
+    mock.Expect(gsorm.Insert(nil, "employees", "emp_no", "first_name").
+        Values(1001, "Taro").
+        Values(1002, "Jiro"))
+    mock.ExpectWithReturn(gsorm.Select(nil, "emp_no", "first_name").From("employees"), []Employee{
+        {ID: 1001, FirstName: "Taro"},
+        {ID: 1002, FirstName: "Jiro"},
+    })
+
+    actualProcess := func(db gsorm.DB) error {
+        model := []Employee{}
+
+        if err := gsorm.Insert(nil, "employees", "emp_no", "first_name").
+            Values(1001, "Taro").
+            Values(1002, "Jiro").Exec(); err != nil {
+            return err
+        }
+
+        if err := gsorm.Select(nil, "emp_no", "first_name").From("employees").Query(&model); err != nil {
+            return err
+        }
+
+        return nil
+    }
+
+    if err := actualProcess(mock); err != nil {
+        t.Error(err)
+    }
+
+    // Check if all expected statements was executed.
+    if err := mock.Complete(); err != nil {
+        t.Error(err)
+    }
+}
+```
+
+
+### Smart Migration
+Implementation of database migration tends to be complicated and high cost.
+
+Using gsorm, it is possible to map the Go structure into SQL.
+
+You can determine the properties of database columns using the field tag of the Go structure.
+
+```go
+type Employee struct {
+	EmpNo     int       `gsorm:"emp_no,pk=PK_emp_no,notnull=t"`
+	Name      string    `gsorm:"first_name,typ=VARCHAR(14),notnull=t"`
+	BirthDate time.Time `gsorm:"notnull=t"`
+}
+
+err := gsorm.CreateTable(db, "employees").Model(&Employee{}).Migrate()
+	// CREATE TABLE employees (
+	//      emp_no      INT         NOT NULL,
+	//      first_name  VARCHAR(14) NOT NULL,
+	//      birth_date  DATETIME    NOT NULL,
+	//      CONSTRAINT PK_emp_no PRIMARY KEY (emp_no)
+	// );
 ```
 
 
