@@ -436,7 +436,9 @@ func TestMockTx_CompareWith(t *testing.T) {
 		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		expectedErr := "statements comparison was failed:\nexpected: Insert(\"table1\", \"column1\").Values(10)\nactual:   Insert(\"table2\", \"column2\").Values(10)\n"
+		expectedErr := "statements comparison was failed:\n" +
+			"expected: Insert(\"table1\", \"column1\").Values(10)\n" +
+			"actual:   Insert(\"table2\", \"column2\").Values(10)\n"
 
 		// Test phase.
 		mock := gsorm.OpenMock()
@@ -450,7 +452,9 @@ func TestMockTx_CompareWith(t *testing.T) {
 		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		expectedErr := "statements comparison was failed:\nexpected: Insert(\"table1\", \"column1\").Values(10)\nactual:   Insert(\"table1\", \"column1\").Values(10).Values(100)\n"
+		expectedErr := "statements comparison was failed:\n" +
+			"expected: Insert(\"table1\", \"column1\").Values(10)\n" +
+			"actual:   Insert(\"table1\", \"column1\").Values(10).Values(100)\n"
 
 		// Test phase.
 		mock := gsorm.OpenMock()

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/morikuni/failure"
 	"golang.org/x/xerrors"
 )
 
@@ -141,7 +140,7 @@ func (d *db) Begin() (Tx, error) {
 	}
 	t, err := d.conn.Begin()
 	if err != nil {
-		return nil, failure.Wrap(err)
+		return nil, err
 	}
 	return &tx{db: d, conn: t}, nil
 }
