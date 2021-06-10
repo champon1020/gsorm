@@ -1,4 +1,5 @@
 # gsorm
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm.svg)](https://pkg.go.dev/github.com/champon1020/gsorm)
 [![Go Report Card](https://goreportcard.com/badge/github.com/champon1020/gsorm)](https://goreportcard.com/report/github.com/champon1020/gsorm)
 [![codecov](https://codecov.io/gh/champon1020/gsorm/branch/main/graph/badge.svg?token=7FCUS2VZMV)](https://codecov.io/gh/champon1020/gsorm)
 
@@ -10,6 +11,7 @@ Major features of gsorm are as follows:
 - SQL-like implementation
 - Provide the gsorm's own mock
 - Mapping into struct, map, variable or their slice with high performance
+- Smart database migration using field tags of Go structure
 
 You can see the usage in [Quick Start](https://github.com/champon1020/gsorm#quick-start) or [Documents](https://github.com/champon1020/gsorm/blob/main/docs/README.md)
 
