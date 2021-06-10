@@ -149,7 +149,6 @@ func TestMockDB_CompareWith(t *testing.T) {
 		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		//		expectedErr := "gsorm.mockDB.Begin is not expected"
 		expectedErr := "statements comparison was failed:\nexpected: gsorm.MockDB.Begin\nactual:   Select(\"column1\").From(\"table\")\n"
 
 		// Test phase.
@@ -163,11 +162,7 @@ func TestMockDB_CompareWith(t *testing.T) {
 		// Validate if the expected error was occurred.
 		assert.EqualError(t, err, expectedErr)
 	}
-}
-
-func TestMockDB_CompareWith_Fail(t *testing.T) {
 	{
-		//		expectedErr := "gsorm.mockDB.Begin is not expected"
 		expectedErr := "statements comparison was failed:\nexpected: Insert(\"table1\", \"column1\").Values(10)\nactual:   Insert(\"table2\", \"column2\").Values(10)\n"
 
 		// Test phase.
@@ -189,6 +184,271 @@ func TestMockDB_CompareWith_Fail(t *testing.T) {
 
 		// Actual process.
 		err := gsorm.Insert(mock, "table1", "column1").Values(10).Values(100).Exec()
+
+		// Validate if the expected error was occurred.
+		assert.EqualError(t, err, expectedErr)
+	}
+}
+
+func TestMockTx_DummyFunctions(t *testing.T) {
+	mock := gsorm.OpenMock()
+	mock.ExpectBegin()
+
+	mocktx, err := mock.Begin()
+	if err != nil {
+		t.Errorf("error was occurred: %v", err)
+	}
+
+	assert.Equal(t, nil, mocktx.Ping())
+
+	r, e := mocktx.Exec("")
+	assert.Equal(t, nil, r)
+	assert.Equal(t, nil, e)
+
+	r2, e2 := mocktx.Query("")
+	var rexpected gsorm.ExportedIRows
+	assert.Equal(t, rexpected, r2)
+	assert.Equal(t, nil, e2)
+}
+
+func TestMock_TransactionExpectation(t *testing.T) {
+	expectedReturn1 := []int{10, 20, 30}
+	expectedReturn2 := []string{"hello", "world", "!"}
+
+	// Test phase.
+	mock := gsorm.OpenMock()
+	mocktx1 := mock.ExpectBegin()
+	mocktx2 := mock.ExpectBegin()
+
+	mocktx1.Expect(gsorm.Insert(nil, "table1", "column1", "column2").Values(10, "str"))
+	mocktx1.ExpectWithReturn(gsorm.Select(nil, "column1").From("table1"), expectedReturn1)
+	mocktx1.ExpectCommit()
+	mocktx2.Expect(gsorm.Insert(nil, "table2", "column1", "column2").Values(10, "str"))
+	mocktx2.ExpectWithReturn(gsorm.Select(nil, "column2").From("table2"), expectedReturn2)
+	mocktx2.ExpectRollback()
+
+	// Actual process.
+	tx1, err := mock.Begin()
+	if err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
+	tx2, err := mock.Begin()
+	if err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
+
+	if err := gsorm.Insert(tx1, "table1", "column1", "column2").Values(10, "str").Exec(); err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
+	model1 := new([]int)
+	if err := gsorm.Select(tx1, "column1").From("table1").Query(model1); err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
+
+	if err := tx1.Commit(); err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
+
+	if err := gsorm.Insert(tx2, "table2", "column1", "column2").Values(10, "str").Exec(); err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
+
+	model2 := new([]string)
+	if err := gsorm.Select(tx2, "column2").From("table2").Query(model2); err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
+
+	if err := tx2.Rollback(); err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
+
+	// Test phase.
+	if err := mock.Complete(); err != nil {
+		t.Errorf("Error was occurred: %+v", err)
+		return
+	}
+
+	// Validate model values.
+	if diff := cmp.Diff(*model1, expectedReturn1); diff != "" {
+		t.Errorf("Differs: (-want +got)\n%s", diff)
+	}
+	if diff := cmp.Diff(*model2, expectedReturn2); diff != "" {
+		t.Errorf("Differs: (-want +got)\n%s", diff)
+	}
+}
+
+func TestMockTx_Commit_Fail(t *testing.T) {
+	{
+		expectedErr := `gsorm.mockTx.Commit is not expected`
+
+		// Test phase.
+		mock := gsorm.OpenMock()
+		_ = mock.ExpectBegin()
+
+		// Actual process.
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occured: %+v", err)
+			return
+		}
+		err = tx.Commit()
+
+		// Validate if the expected error was occurred.
+		assert.EqualError(t, err, expectedErr)
+	}
+	{
+		expectedErr := `gsorm.mockTx.Commit is not expected`
+
+		// Test phase.
+		mock := gsorm.OpenMock()
+		mocktx := mock.ExpectBegin()
+		mocktx.ExpectRollback()
+
+		// Actual process.
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occured: %+v", err)
+			return
+		}
+		err = tx.Commit()
+
+		// Validate if the expected error was occurred.
+		assert.EqualError(t, err, expectedErr)
+	}
+}
+
+func TestMockTx_Rollback_Fail(t *testing.T) {
+	{
+		expectedErr := `gsorm.mockTx.Rollback is not expected`
+
+		// Test phase.
+		mock := gsorm.OpenMock()
+		_ = mock.ExpectBegin()
+
+		// Actual process.
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occured: %+v", err)
+			return
+		}
+		err = tx.Rollback()
+
+		// Validate if the expected error was occurred.
+		assert.EqualError(t, err, expectedErr)
+	}
+	{
+		expectedErr := `gsorm.mockTx.Rollback is not expected`
+
+		// Test phase.
+		mock := gsorm.OpenMock()
+		mocktx := mock.ExpectBegin()
+		mocktx.ExpectCommit()
+
+		// Actual process.
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occured: %+v", err)
+			return
+		}
+		err = tx.Rollback()
+
+		// Validate if the expected error was occurred.
+		assert.EqualError(t, err, expectedErr)
+	}
+}
+
+func TestMockTx_CompareWith(t *testing.T) {
+	{
+		expectedErr := `Select("column1").From("table") is not expected but executed`
+
+		// Test phase.
+		mock := gsorm.OpenMock()
+		_ = mock.ExpectBegin()
+
+		// Actual process.
+		model := new([]int)
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occurred: %+v", err)
+			return
+		}
+		err = gsorm.Select(tx, "column1").From("table").Query(model)
+
+		// Validate if the expected error was occurred.
+		assert.EqualError(t, err, expectedErr)
+	}
+	{
+		expectedErr := "statements comparison was failed:\nexpected: gsorm.MockTx.Commit\nactual:   Select(\"column1\").From(\"table\")\n"
+
+		// Test phase.
+		mock := gsorm.OpenMock()
+		mocktx := mock.ExpectBegin()
+		mocktx.ExpectCommit()
+
+		// Actual process.
+		model := new([]int)
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occurred: %+v", err)
+			return
+		}
+		err = gsorm.Select(tx, "column1").From("table").Query(model)
+
+		// Validate if the expected error was occurred.
+		assert.EqualError(t, err, expectedErr)
+	}
+	{
+		expectedErr := "statements comparison was failed:\nexpected: gsorm.MockTx.Rollback\nactual:   Select(\"column1\").From(\"table\")\n"
+
+		// Test phase.
+		mock := gsorm.OpenMock()
+		mocktx := mock.ExpectBegin()
+		mocktx.ExpectRollback()
+
+		// Actual process.
+		model := new([]int)
+		tx, err := mock.Begin()
+		if err != nil {
+			t.Errorf("Error was occurred: %+v", err)
+			return
+		}
+		err = gsorm.Select(tx, "column1").From("table").Query(model)
+
+		// Validate if the expected error was occurred.
+		assert.EqualError(t, err, expectedErr)
+	}
+	{
+		expectedErr := "statements comparison was failed:\nexpected: Insert(\"table1\", \"column1\").Values(10)\nactual:   Insert(\"table2\", \"column2\").Values(10)\n"
+
+		// Test phase.
+		mock := gsorm.OpenMock()
+		mocktx := mock.ExpectBegin()
+		mocktx.Expect(gsorm.Insert(nil, "table1", "column1").Values(10))
+
+		// Actual process.
+		err := gsorm.Insert(mocktx, "table2", "column2").Values(10).Exec()
+
+		// Validate if the expected error was occurred.
+		assert.EqualError(t, err, expectedErr)
+	}
+	{
+		expectedErr := "statements comparison was failed:\nexpected: Insert(\"table1\", \"column1\").Values(10)\nactual:   Insert(\"table1\", \"column1\").Values(10).Values(100)\n"
+
+		// Test phase.
+		mock := gsorm.OpenMock()
+		mocktx := mock.ExpectBegin()
+		mocktx.Expect(gsorm.Insert(nil, "table1", "column1").Values(10))
+
+		// Actual process.
+		err := gsorm.Insert(mocktx, "table1", "column1").Values(10).Values(100).Exec()
 
 		// Validate if the expected error was occurred.
 		assert.EqualError(t, err, expectedErr)

@@ -181,10 +181,10 @@ func (m *mockTx) Commit() error {
 func (m *mockTx) Rollback() error {
 	expected := m.popExpected()
 	if expected == nil {
-		return xerrors.New("gsorm.mockTx.Rollbakc is not expected")
+		return xerrors.New("gsorm.mockTx.Rollback is not expected")
 	}
 	if _, ok := expected.(*expectedRollback); !ok {
-		return xerrors.New("gsorm.mockTx.Rollbakc is not expected")
+		return xerrors.New("gsorm.mockTx.Rollback is not expected")
 	}
 	return nil
 }
