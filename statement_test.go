@@ -1700,6 +1700,156 @@ func TestUpdateStmt_Model(t *testing.T) {
 	}
 }
 
+func TestFunction_Count(t *testing.T) {
+	testCases := []struct {
+		Stmt     *gsorm.SelectStmt
+		Expected string
+	}{
+		{
+			gsorm.Count(nil, "emp_no").From("employees").(*gsorm.SelectStmt),
+			`SELECT COUNT(emp_no) FROM employees`,
+		},
+		{
+			gsorm.Count(nil, "emp_no", "CASE WHEN birth_date < '1960-01-01' THEN 1 END").From("employees").(*gsorm.SelectStmt),
+			`SELECT COUNT(emp_no), COUNT(CASE WHEN birth_date < '1960-01-01' THEN 1 END) FROM employees`,
+		},
+		{
+			gsorm.Count(nil).From("employees").(*gsorm.SelectStmt),
+			`SELECT * FROM employees`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.SQL()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestFunction_Sum(t *testing.T) {
+	testCases := []struct {
+		Stmt     *gsorm.SelectStmt
+		Expected string
+	}{
+		{
+			gsorm.Sum(nil, "salary").From("salaries").(*gsorm.SelectStmt),
+			`SELECT SUM(salary) FROM salaries`,
+		},
+		{
+			gsorm.Sum(nil, "salary", "CASE WHEN from_date < '1990-01-01' THEN salary END").From("salaries").(*gsorm.SelectStmt),
+			`SELECT SUM(salary), SUM(CASE WHEN from_date < '1990-01-01' THEN salary END) FROM salaries`,
+		},
+		{
+			gsorm.Sum(nil).From("salaries").(*gsorm.SelectStmt),
+			`SELECT * FROM salaries`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.SQL()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestFunction_Avg(t *testing.T) {
+	testCases := []struct {
+		Stmt     *gsorm.SelectStmt
+		Expected string
+	}{
+		{
+			gsorm.Avg(nil, "salary").From("salaries").(*gsorm.SelectStmt),
+			`SELECT AVG(salary) FROM salaries`,
+		},
+		{
+			gsorm.Avg(nil, "salary", "CASE WHEN from_date < '1990-01-01' THEN salary END").From("salaries").(*gsorm.SelectStmt),
+			`SELECT AVG(salary), AVG(CASE WHEN from_date < '1990-01-01' THEN salary END) FROM salaries`,
+		},
+		{
+			gsorm.Avg(nil).From("salaries").(*gsorm.SelectStmt),
+			`SELECT * FROM salaries`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.SQL()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestFunction_Max(t *testing.T) {
+	testCases := []struct {
+		Stmt     *gsorm.SelectStmt
+		Expected string
+	}{
+		{
+			gsorm.Max(nil, "salary").From("salaries").(*gsorm.SelectStmt),
+			`SELECT MAX(salary) FROM salaries`,
+		},
+		{
+			gsorm.Max(nil, "salary", "CASE WHEN from_date < '1990-01-01' THEN salary END").From("salaries").(*gsorm.SelectStmt),
+			`SELECT MAX(salary), MAX(CASE WHEN from_date < '1990-01-01' THEN salary END) FROM salaries`,
+		},
+		{
+			gsorm.Max(nil).From("salaries").(*gsorm.SelectStmt),
+			`SELECT * FROM salaries`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.SQL()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestFunction_Min(t *testing.T) {
+	testCases := []struct {
+		Stmt     *gsorm.SelectStmt
+		Expected string
+	}{
+		{
+			gsorm.Min(nil, "salary").From("salaries").(*gsorm.SelectStmt),
+			`SELECT MIN(salary) FROM salaries`,
+		},
+		{
+			gsorm.Min(nil, "salary", "CASE WHEN from_date < '1990-01-01' THEN salary END").From("salaries").(*gsorm.SelectStmt),
+			`SELECT MIN(salary), MIN(CASE WHEN from_date < '1990-01-01' THEN salary END) FROM salaries`,
+		},
+		{
+			gsorm.Min(nil).From("salaries").(*gsorm.SelectStmt),
+			`SELECT * FROM salaries`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Stmt.SQL()
+		errs := testCase.Stmt.ExportedGetErrors()
+		if len(errs) > 0 {
+			t.Errorf("Error was occurred: %+v", errs[0])
+			continue
+		}
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
 func TestRawStmt_String(t *testing.T) {
 	testCases := []struct {
 		Stmt     *gsorm.ExportedRawStmt

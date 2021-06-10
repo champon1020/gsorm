@@ -57,48 +57,78 @@ func Delete(conn conn) idelete.Stmt {
 }
 
 // Count calls COUNT function.
-func Count(conn conn, column string, alias ...string) iselect.Stmt {
-	c := fmt.Sprintf("COUNT(%s)", column)
-	if len(alias) > 0 {
-		c = fmt.Sprintf("%s AS %s", c, alias[0])
+func Count(conn conn, columns ...string) iselect.Stmt {
+	if len(columns) > 0 {
+		var cols string
+		for i, c := range columns {
+			if i > 0 {
+				cols += ", "
+			}
+			cols += fmt.Sprintf("COUNT(%s)", c)
+		}
+		return newSelectStmt(conn, cols)
 	}
-	return newSelectStmt(conn, c)
-}
-
-// Avg calls AVG function.
-func Avg(conn conn, column string, alias ...string) iselect.Stmt {
-	c := fmt.Sprintf("AVG(%s)", column)
-	if len(alias) > 0 {
-		c = fmt.Sprintf("%s AS %s", c, alias[0])
-	}
-	return newSelectStmt(conn, c)
+	return newSelectStmt(conn)
 }
 
 // Sum calls SUM function.
-func Sum(conn conn, column string, alias ...string) iselect.Stmt {
-	c := fmt.Sprintf("SUM(%s)", column)
-	if len(alias) > 0 {
-		c = fmt.Sprintf("%s AS %s", c, alias[0])
+func Sum(conn conn, columns ...string) iselect.Stmt {
+	if len(columns) > 0 {
+		var cols string
+		for i, c := range columns {
+			if i > 0 {
+				cols += ", "
+			}
+			cols += fmt.Sprintf("SUM(%s)", c)
+		}
+		return newSelectStmt(conn, cols)
 	}
-	return newSelectStmt(conn, c)
+	return newSelectStmt(conn)
 }
 
-// Min calls MIN function.
-func Min(conn conn, column string, alias ...string) iselect.Stmt {
-	c := fmt.Sprintf("MIN(%s)", column)
-	if len(alias) > 0 {
-		c = fmt.Sprintf("%s AS %s", c, alias[0])
+// Avg calls AVG function.
+func Avg(conn conn, columns ...string) iselect.Stmt {
+	if len(columns) > 0 {
+		var cols string
+		for i, c := range columns {
+			if i > 0 {
+				cols += ", "
+			}
+			cols += fmt.Sprintf("AVG(%s)", c)
+		}
+		return newSelectStmt(conn, cols)
 	}
-	return newSelectStmt(conn, c)
+	return newSelectStmt(conn)
 }
 
 // Max calls MAX function.
-func Max(conn conn, column string, alias ...string) iselect.Stmt {
-	c := fmt.Sprintf("MAX(%s)", column)
-	if len(alias) > 0 {
-		c = fmt.Sprintf("%s AS %s", c, alias[0])
+func Max(conn conn, columns ...string) iselect.Stmt {
+	if len(columns) > 0 {
+		var cols string
+		for i, c := range columns {
+			if i > 0 {
+				cols += ", "
+			}
+			cols += fmt.Sprintf("MAX(%s)", c)
+		}
+		return newSelectStmt(conn, cols)
 	}
-	return newSelectStmt(conn, c)
+	return newSelectStmt(conn)
+}
+
+// Min calls MIN function.
+func Min(conn conn, columns ...string) iselect.Stmt {
+	if len(columns) > 0 {
+		var cols string
+		for i, c := range columns {
+			if i > 0 {
+				cols += ", "
+			}
+			cols += fmt.Sprintf("MIN(%s)", c)
+		}
+		return newSelectStmt(conn, cols)
+	}
+	return newSelectStmt(conn)
 }
 
 // AlterTable calls ALTER TABLE command.
