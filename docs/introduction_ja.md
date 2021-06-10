@@ -17,16 +17,12 @@ err := gsorm.CreateTable(db, "teams").
     Column("name", "VARCHAR(64)").NotNull().Migrate()
 ```
 
-実行可能メソッドやメソッドの呼び出し順序には制限を設けてあります．
-なぜなら，SQLの文法では句の順序が決まっており，SQL-likeなORMライブラリであるgsormもこの性質を受け継いでいるからです．
+gsormは柔軟な実装を可能にする`RawClause`メソッドを提供しているため，メソッドの呼び出し順序には制限を設けてあります．
 
-一見，制約が強くて使いづらいように思えますが，SQLは特にSELECT文において複雑になりやすく，ORMライブラリをシンプルにするほど実際にどのようなSQLが実行されているのかが分かりにくくなります．
+また，メソッドの呼び出し順序を制限することで理解しやすい実装をすることができます．
 
-また，SQL-likeにすることで汎用性を高めることができます．
+もし間違った順序でメソッドを呼び出しても，メソッドの呼び出し順序はinterfaceによって制御されているため，ランタイムエラーではなくコンパイルエラーが起こります．
 
-gsormでは`RawClause`というメソッドを設けているため，ユーザーが自由に句を追加することができます．
-
-さらに，メソッドの制約はinterfaceによって制御されているため，間違った順序でメソッドを呼び出してもコンパイルエラーとして検出されます．
 
 ```
 // コンパイルエラー：OFFSET句はLIMIT句が無いと使用できない．
@@ -42,9 +38,7 @@ err := gsorm.Select(db, "id", "name").From("people").
 
 
 ## Query
-SELECT文を実行するとき，`Query`メソッドを実行することで実際にSQLが実行されます．
-
-`Query`メソッドの引数にはmodelを渡すことができます．
+`Query`はSELECT文を実行し，データを取得します．
 
 #### 例
 ```go
@@ -65,11 +59,9 @@ err := gsorm.Select(db, "id").From("people").Query(&person)
 `FirstName`において`name`が指定されていますが，これはDBのテーブルにおけるカラム名を表しています．
 つまり，`FirstName`は`name`というカラムにマッピングされます．
 
-詳細は[Select](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md)に記載されています．
-
 
 ## Exec
-`Exec`メソッドは，INSERT文，UPDATE文，DELETE文などのSQLを実行するときに使用されるメソッドです．
+`Exec`はINSERT文，UPDATE文，DELETE文を実行します．
 
 #### 例
 ```go
@@ -77,7 +69,7 @@ err := gsorm.Select(db, "id").From("people").Query(&person)
 err := gsorm.Insert(db, "people", "id", "name").Values(1, "Taro").Exec()
 ```
 
-特にINSERT文とUPDATE文では`Model`メソッドを使用することでマッピングをすることができます．
+特にINSERT文とUPDATE文では`Model`メソッドを使用することで，構造体をSQLへマッピングをすることができます．
 
 #### 例
 ```go
@@ -87,11 +79,9 @@ person := Person{ID: 1, FirstName: "Taro"}
 err := gsorm.Insert(db, "people", "id", "name").Model(&person).Exec()
 ```
 
-詳細は[Insert](https://github.com/champon1020/gsorm/tree/main/docs/insert_ja.md)，[Update](https://github.com/champon1020/gsorm/tree/main/docs/update_ja.md)，[Delete](https://github.com/champon1020/gsorm/tree/main/docs/delete_ja.md)に記載されています．
-
 
 ## Migrate
-`Migrate`メソッドは，CREATE TABLE文やALTER TABLE文など，データベーススキーマを変更するようなSQLを実行するときに使用されるメソッドです．
+`Migrate`はCREATE TABLE文やALTER TABLE文などのマイグレーションを実行します．
 
 #### 例
 ```go
@@ -101,7 +91,7 @@ err := gsorm.CreateTable(db, "teams").
     Column("name", "VARCHAR(64)").NotNull().Migrate()
 ```
 
-CREATE TABLE文では`Model`メソッドを使用することで，構造体をマッピングしてテーブルを作成することができます．
+特にCREATE TABLE文では`Model`メソッドを使用することで，構造体をSQLへマッピングすることができます．
 
 #### 例
 ```go
@@ -115,8 +105,6 @@ err := gsorm.CreateTable(db, "teams").Model(&person).Migrate()
 ```
 
 このとき，カラムの属性は構造体のフィールドタグによって指定することができます．
-
-Modelについての詳細は[Model](https://github.com/champon1020/gsorm/tree/main/docs/model_ja.md)に記載されています．
 
 
 ## Mock
@@ -152,13 +140,3 @@ if err != nil{
 [go-sqlmock](https://github.com/DATA-DOG/go-sqlmock)と異なり，生文字列でSQLを書かずに済みます．
 
 詳細は[Mock](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md)に記載されています．
-
-<br>
-
-以上でIntroductionは終了となります！
-
-詳しい使用方法についてはそれぞれ記載してありますのでぜひ読んでみてください！
-
-<br>
-
-**次の項目ヘ進む -> [Select](https://github.com/champon1020/gsorm/tree/main/docs/select_ja.md)**
