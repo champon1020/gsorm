@@ -9,14 +9,31 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestDropDB_Build(t *testing.T) {
+func TestDropDB_String(t *testing.T) {
 	testCases := []struct {
 		DropDB   *mig.DropDB
-		Expected *syntax.StmtSet
+		Expected string
 	}{
 		{
 			&mig.DropDB{DBName: "dbname"},
-			&syntax.StmtSet{Keyword: "DROP DATABASE", Value: "dbname"},
+			`DropDB(dbname)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.DropDB.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestDropDB_Build(t *testing.T) {
+	testCases := []struct {
+		DropDB   *mig.DropDB
+		Expected *syntax.ClauseSet
+	}{
+		{
+			&mig.DropDB{DBName: "dbname"},
+			&syntax.ClauseSet{Keyword: "DROP DATABASE", Value: "dbname"},
 		},
 	}
 
@@ -29,22 +46,5 @@ func TestDropDB_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestDropDB_String(t *testing.T) {
-	testCases := []struct {
-		DropDB   *mig.DropDB
-		Expected string
-	}{
-		{
-			&mig.DropDB{DBName: "dbname"},
-			`DROP DATABASE(dbname)`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.DropDB.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

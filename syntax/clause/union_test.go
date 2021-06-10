@@ -17,11 +17,11 @@ func TestUnion_String(t *testing.T) {
 	}{
 		{
 			&clause.Union{Stmt: gsorm.Select(nil, "*").From("table")},
-			`UNION("SELECT * FROM table")`,
+			`Union("SELECT * FROM table")`,
 		},
 		{
 			&clause.Union{Stmt: gsorm.Select(nil, "*").From("table"), All: true},
-			`UNION ALL("SELECT * FROM table")`,
+			`UnionAll("SELECT * FROM table")`,
 		},
 	}
 
@@ -34,15 +34,15 @@ func TestUnion_String(t *testing.T) {
 func TestUnion_Build(t *testing.T) {
 	testCases := []struct {
 		Union  *clause.Union
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Union{Stmt: gsorm.Select(nil, "*").From("table")},
-			&syntax.StmtSet{Keyword: "UNION", Value: "(SELECT * FROM table)"},
+			&syntax.ClauseSet{Keyword: "UNION", Value: "(SELECT * FROM table)"},
 		},
 		{
 			&clause.Union{Stmt: gsorm.Select(nil, "*").From("table"), All: true},
-			&syntax.StmtSet{Keyword: "UNION ALL", Value: "(SELECT * FROM table)"},
+			&syntax.ClauseSet{Keyword: "UNION ALL", Value: "(SELECT * FROM table)"},
 		},
 	}
 

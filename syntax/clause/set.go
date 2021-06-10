@@ -3,7 +3,7 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/internal"
 	"github.com/champon1020/gsorm/syntax"
 )
@@ -14,22 +14,16 @@ type Set struct {
 	Value  interface{}
 }
 
-// Keyword returns clause keyword.
-func (s *Set) Keyword() string {
-	return "SET"
-}
-
-// String returns function call with string.
+// String returns function call as string.
 func (s *Set) String() string {
-	return fmt.Sprintf("%s(%s, %v)", s.Keyword(), s.Column, s.Value)
+	return fmt.Sprintf("Set(%s, %v)", s.Column, s.Value)
 }
 
-// Build makes SET clause with syntax.StmtSet.
-func (s *Set) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(s.Keyword())
-
+// Build creates the structure of SET clause that implements interfaces.ClauseSet.
+func (s *Set) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("SET")
 	v := internal.ToString(s.Value, nil)
-	ss.WriteValue(fmt.Sprintf("%s = %s", s.Column, v))
-	return ss, nil
+	cs.WriteValue(fmt.Sprintf("%s = %s", s.Column, v))
+	return cs, nil
 }

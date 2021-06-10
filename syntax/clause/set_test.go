@@ -16,7 +16,7 @@ func TestSet_String(t *testing.T) {
 	}{
 		{
 			&clause.Set{Column: "col", Value: 10},
-			`SET(col, 10)`,
+			`Set(col, 10)`,
 		},
 	}
 
@@ -29,15 +29,15 @@ func TestSet_String(t *testing.T) {
 func TestSet_Build(t *testing.T) {
 	testCases := []struct {
 		Set    *clause.Set
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Set{Column: "lhs", Value: "rhs"},
-			&syntax.StmtSet{Keyword: "SET", Value: `lhs = 'rhs'`},
+			&syntax.ClauseSet{Keyword: "SET", Value: `lhs = 'rhs'`},
 		},
 		{
 			&clause.Set{Column: "lhs1", Value: 10},
-			&syntax.StmtSet{Keyword: "SET", Value: `lhs1 = 10`},
+			&syntax.ClauseSet{Keyword: "SET", Value: `lhs1 = 10`},
 		},
 	}
 

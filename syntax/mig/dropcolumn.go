@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,19 +12,15 @@ type DropColumn struct {
 	Column string
 }
 
-// Keyword returns clause keyword.
-func (d *DropColumn) Keyword() string {
-	return "DROP COLUMN"
-}
-
+// String returns function call as string.
 func (d *DropColumn) String() string {
-	return fmt.Sprintf("%s(%s)", d.Keyword(), d.Column)
+	return fmt.Sprintf("DropColumn(%s)", d.Column)
 }
 
-// Build makes DROP COLUMN clause with syntax.StmtSet.
-func (d *DropColumn) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(d.Keyword())
-	ss.WriteValue(d.Column)
-	return ss, nil
+// Build creates the structure of DROP COLUMN clause that implements interfaces.ClauseSet.
+func (d *DropColumn) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("DROP COLUMN")
+	cs.WriteValue(d.Column)
+	return cs, nil
 }

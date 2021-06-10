@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -13,20 +13,15 @@ type Limit struct {
 	Num int
 }
 
-// Keyword returns clause keyword.
-func (l *Limit) Keyword() string {
-	return "LIMIT"
-}
-
-// String returns function call with string.
+// String returns function call as string.
 func (l *Limit) String() string {
-	return fmt.Sprintf("%s(%v)", l.Keyword(), l.Num)
+	return fmt.Sprintf("Limit(%v)", l.Num)
 }
 
-// Build makes LIMIT clause with syntax.StmtSet.
-func (l *Limit) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(l.Keyword())
-	ss.WriteValue(strconv.Itoa(l.Num))
-	return ss, nil
+// Build creates the structure of LIMIT clause that implements interfaces.ClauseSet.
+func (l *Limit) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("LIMIT")
+	cs.WriteValue(strconv.Itoa(l.Num))
+	return cs, nil
 }

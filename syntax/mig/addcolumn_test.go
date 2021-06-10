@@ -9,14 +9,31 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestAddColumn_Build(t *testing.T) {
+func TestAddColumn_String(t *testing.T) {
 	testCases := []struct {
 		AddColumn *mig.AddColumn
-		Expected  *syntax.StmtSet
+		Expected  string
 	}{
 		{
 			&mig.AddColumn{Column: "column", Type: "type"},
-			&syntax.StmtSet{Keyword: "ADD COLUMN", Value: "column type"},
+			`AddColumn(column, type)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.AddColumn.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestAddColumn_Build(t *testing.T) {
+	testCases := []struct {
+		AddColumn *mig.AddColumn
+		Expected  *syntax.ClauseSet
+	}{
+		{
+			&mig.AddColumn{Column: "column", Type: "type"},
+			&syntax.ClauseSet{Keyword: "ADD COLUMN", Value: "column type"},
 		},
 	}
 
@@ -29,22 +46,5 @@ func TestAddColumn_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestAddColumn_String(t *testing.T) {
-	testCases := []struct {
-		AddColumn *mig.AddColumn
-		Expected  string
-	}{
-		{
-			&mig.AddColumn{Column: "column", Type: "type"},
-			`ADD COLUMN(column, type)`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.AddColumn.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,19 +12,15 @@ type CreateTable struct {
 	Table string
 }
 
-// Keyword returns clause keyword.
-func (c *CreateTable) Keyword() string {
-	return "CREATE TABLE"
-}
-
+// String returns function call as string.
 func (c *CreateTable) String() string {
-	return fmt.Sprintf("%s(%s)", c.Keyword(), c.Table)
+	return fmt.Sprintf("CreateTable(%s)", c.Table)
 }
 
-// Build makes CREATE TABLE clause with syntax.StmtSet.
-func (c *CreateTable) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(c.Keyword())
-	ss.WriteValue(c.Table)
-	return ss, nil
+// Build creates the structure of CREATE TABLE clause that implements interfaces.ClauseSet.
+func (c *CreateTable) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("CREATE TABLE")
+	cs.WriteValue(c.Table)
+	return cs, nil
 }

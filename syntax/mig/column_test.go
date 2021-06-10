@@ -9,14 +9,31 @@ import (
 	"gotest.tools/v3/assert"
 )
 
+func TestColumn_String(t *testing.T) {
+	testCases := []struct {
+		Column   *mig.Column
+		Expected string
+	}{
+		{
+			&mig.Column{Col: "column", Type: "type"},
+			`Column(column, type)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Column.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
 func TestColumn_Build(t *testing.T) {
 	testCases := []struct {
 		Column   *mig.Column
-		Expected *syntax.StmtSet
+		Expected *syntax.ClauseSet
 	}{
 		{
 			&mig.Column{Col: "id", Type: "INT"},
-			&syntax.StmtSet{Keyword: "id", Value: "INT"},
+			&syntax.ClauseSet{Keyword: "id", Value: "INT"},
 		},
 	}
 
@@ -29,22 +46,5 @@ func TestColumn_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestColumn_String(t *testing.T) {
-	testCases := []struct {
-		Column   *mig.Column
-		Expected string
-	}{
-		{
-			&mig.Column{Col: "column", Type: "type"},
-			`COLUMN(column, type)`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.Column.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

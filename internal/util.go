@@ -27,7 +27,8 @@ func SnakeCase(s string) string {
 
 // ToStringOpt is the option of ToString.
 type ToStringOpt struct {
-	Quotes bool
+	Quotes       bool
+	DoubleQuotes bool
 }
 
 // ToString converts the type of value to string.
@@ -53,6 +54,9 @@ func ToString(v interface{}, opt *ToStringOpt) string {
 		if opt.Quotes {
 			return fmt.Sprintf("'%s'", v)
 		}
+		if opt.DoubleQuotes {
+			return fmt.Sprintf(`"%s"`, v)
+		}
 		return v
 	case int,
 		int8,
@@ -77,6 +81,9 @@ func ToString(v interface{}, opt *ToStringOpt) string {
 		if opt.Quotes {
 			return fmt.Sprintf("'%s'", t)
 		}
+		if opt.DoubleQuotes {
+			return fmt.Sprintf(`"%s"`, t)
+		}
 		return t
 	}
 
@@ -93,7 +100,7 @@ func ToString(v interface{}, opt *ToStringOpt) string {
 		return s
 	}
 
-	return reflect.TypeOf(v).String()
+	return fmt.Sprintf("%s", v)
 }
 
 // ColumnsAndFields generates map of column index and field index.

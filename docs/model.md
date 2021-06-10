@@ -86,6 +86,8 @@ type Employee struct {
 ### typ
 Defines the type of database column.
 
+`typ` is required for `gsorm.CreateTable.Model`.
+
 #### Example
 ```go
 type Employee struct {

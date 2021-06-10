@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,19 +12,15 @@ type AddCons struct {
 	Key string
 }
 
-// Keyword returns clause keyword.
-func (a *AddCons) Keyword() string {
-	return "ADD CONSTRAINT"
-}
-
+// String returns function call as string.
 func (a *AddCons) String() string {
-	return fmt.Sprintf("%s(%s)", a.Keyword(), a.Key)
+	return fmt.Sprintf("AddCons(%s)", a.Key)
 }
 
-// Build makes ADD CONSTRAINT clause with syntax.StmtSet.
-func (a *AddCons) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(a.Keyword())
-	ss.WriteValue(a.Key)
-	return ss, nil
+// Build creates the structure of ADD CONSTRAINT clause that implements interfaces.ClauseSet.
+func (a *AddCons) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("ADD CONSTRAINT")
+	cs.WriteValue(a.Key)
+	return cs, nil
 }

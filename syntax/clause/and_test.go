@@ -16,15 +16,15 @@ func TestAnd_String(t *testing.T) {
 	}{
 		{
 			&clause.And{Expr: "lhs = rhs"},
-			`AND("lhs = rhs")`,
+			`And("lhs = rhs")`,
 		},
 		{
 			&clause.And{Expr: "lhs = ?", Values: []interface{}{10}},
-			`AND("lhs = ?", 10)`,
+			`And("lhs = ?", 10)`,
 		},
 		{
 			&clause.And{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			`AND("lhs1 = ? AND lhs2 = ?", 10, 'str')`,
+			`And("lhs1 = ? AND lhs2 = ?", 10, "str")`,
 		},
 	}
 
@@ -37,11 +37,11 @@ func TestAnd_String(t *testing.T) {
 func TestAnd_Build(t *testing.T) {
 	testCases := []struct {
 		And    *clause.And
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.And{Expr: "lhs = ?", Values: []interface{}{10}},
-			&syntax.StmtSet{Keyword: "AND", Value: "lhs = 10", Parens: true},
+			&syntax.ClauseSet{Keyword: "AND", Value: "lhs = 10", Parens: true},
 		},
 	}
 

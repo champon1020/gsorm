@@ -3,6 +3,7 @@ package clause_test
 import (
 	"testing"
 
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 	"github.com/champon1020/gsorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
@@ -16,15 +17,15 @@ func TestFrom_String(t *testing.T) {
 	}{
 		{
 			&clause.From{Tables: []syntax.Table{{Name: "table"}}},
-			`FROM("table")`,
+			`From("table")`,
 		},
 		{
 			&clause.From{Tables: []syntax.Table{{Name: "table", Alias: "t"}}},
-			`FROM("table AS t")`,
+			`From("table AS t")`,
 		},
 		{
 			&clause.From{Tables: []syntax.Table{{Name: "table1", Alias: "t1"}, {Name: "table2", Alias: "t2"}}},
-			`FROM("table1 AS t1", "table2 AS t2")`,
+			`From("table1 AS t1", "table2 AS t2")`,
 		},
 	}
 
@@ -37,19 +38,19 @@ func TestFrom_String(t *testing.T) {
 func TestFrom_Build(t *testing.T) {
 	testCases := []struct {
 		From   *clause.From
-		Result *syntax.StmtSet
+		Result interfaces.ClauseSet
 	}{
 		{
 			&clause.From{Tables: []syntax.Table{{Name: "table"}}},
-			&syntax.StmtSet{Keyword: "FROM", Value: "table"},
+			&syntax.ClauseSet{Keyword: "FROM", Value: "table"},
 		},
 		{
 			&clause.From{Tables: []syntax.Table{{Name: "table", Alias: "t"}}},
-			&syntax.StmtSet{Keyword: "FROM", Value: "table AS t"},
+			&syntax.ClauseSet{Keyword: "FROM", Value: "table AS t"},
 		},
 		{
 			&clause.From{Tables: []syntax.Table{{Name: "table1", Alias: "t1"}, {Name: "table2", Alias: "t2"}}},
-			&syntax.StmtSet{Keyword: "FROM", Value: "table1 AS t1, table2 AS t2"},
+			&syntax.ClauseSet{Keyword: "FROM", Value: "table1 AS t1, table2 AS t2"},
 		},
 	}
 

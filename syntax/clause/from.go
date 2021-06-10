@@ -3,7 +3,7 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,18 +12,13 @@ type From struct {
 	Tables []syntax.Table
 }
 
-// Keyword returns clause keyword.
-func (f *From) Keyword() string {
-	return "FROM"
-}
-
-// AddTable appends table to From.
+// AddTable appends the table to From.Tables.
 func (f *From) AddTable(table string) {
 	t := syntax.NewTable(table)
 	f.Tables = append(f.Tables, *t)
 }
 
-// String returns function call with string.
+// String returns function call as string.
 func (f *From) String() string {
 	var s string
 	for i, t := range f.Tables {
@@ -32,18 +27,18 @@ func (f *From) String() string {
 		}
 		s += fmt.Sprintf("%q", t.Build())
 	}
-	return fmt.Sprintf("%s(%s)", f.Keyword(), s)
+	return fmt.Sprintf("From(%s)", s)
 }
 
-// Build makes FROM clause with syntax.StmtSet.
-func (f *From) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(f.Keyword())
+// Build creates the structure of FROM clause that implements interfaces.ClauseSet.
+func (f *From) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("FROM")
 	for i, t := range f.Tables {
 		if i != 0 {
-			ss.WriteValue(",")
+			cs.WriteValue(",")
 		}
-		ss.WriteValue(t.Build())
+		cs.WriteValue(t.Build())
 	}
-	return ss, nil
+	return cs, nil
 }

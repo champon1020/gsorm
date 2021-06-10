@@ -16,11 +16,11 @@ func TestOrderBy_String(t *testing.T) {
 	}{
 		{
 			&clause.OrderBy{Columns: []string{"column"}},
-			`ORDER BY(["column"])`,
+			`OrderBy(["column"])`,
 		},
 		{
 			&clause.OrderBy{Columns: []string{"column1", "column2 DESC"}},
-			`ORDER BY(["column1" "column2 DESC"])`,
+			`OrderBy(["column1" "column2 DESC"])`,
 		},
 	}
 
@@ -33,15 +33,15 @@ func TestOrderBy_String(t *testing.T) {
 func TestOrderBy_Build(t *testing.T) {
 	testCases := []struct {
 		OrderBy *clause.OrderBy
-		Result  *syntax.StmtSet
+		Result  *syntax.ClauseSet
 	}{
 		{
 			&clause.OrderBy{Columns: []string{"column"}},
-			&syntax.StmtSet{Keyword: "ORDER BY", Value: "column"},
+			&syntax.ClauseSet{Keyword: "ORDER BY", Value: "column"},
 		},
 		{
 			&clause.OrderBy{Columns: []string{"column1", "column2 DESC"}},
-			&syntax.StmtSet{Keyword: "ORDER BY", Value: "column1, column2 DESC"},
+			&syntax.ClauseSet{Keyword: "ORDER BY", Value: "column1, column2 DESC"},
 		},
 	}
 

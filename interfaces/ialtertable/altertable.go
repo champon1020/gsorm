@@ -14,6 +14,7 @@ type Stmt interface {
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
+	RawClause(raw string, values ...interface{}) RawClause
 	Rename(table string) Rename
 	AddColumn(column string, typ string) AddColumn
 	NotNull() NotNull
@@ -35,9 +36,10 @@ type Rename interface {
 
 // AddColumn is interface which is returned by (*AlterTableStmt).AddColumn.
 type AddColumn interface {
-	Stmt
 	NotNull() NotNull
 	Default(value interface{}) Default
+	Stmt
+	interfaces.MigrateCallable
 }
 
 // DropColumn is interface which is returned by (*AlterTableStmt).DropColumn.
@@ -54,14 +56,16 @@ type RenameColumn interface {
 
 // NotNull is interface which is returned by (*AlterTableStmt).NotNull.
 type NotNull interface {
-	Stmt
 	Default(value interface{}) Default
+	Stmt
+	interfaces.MigrateCallable
 }
 
 // Default is interface which is returned by (*AlterTableStmt).Default.
 type Default interface {
-	Stmt
 	NotNull() NotNull
+	Stmt
+	interfaces.MigrateCallable
 }
 
 // AddCons is interface which is returned by (*AlterTableStmt).AddCons.

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/champon1020/gsorm/internal"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,7 +27,7 @@ func TestSnakeCase(t *testing.T) {
 	}
 }
 
-func TestToStringWithQuotes(t *testing.T) {
+func TestToString_Quotes(t *testing.T) {
 	var (
 		i   int     = 1
 		i8  int8    = 2
@@ -69,7 +68,7 @@ func TestToStringWithQuotes(t *testing.T) {
 		},
 		{
 			map[string]string{"key": "value"},
-			`map[string]string`,
+			`map[key:value]`,
 		},
 		{
 			nil,
@@ -83,6 +82,124 @@ func TestToStringWithQuotes(t *testing.T) {
 
 	for _, testCase := range testCases {
 		res := internal.ToString(testCase.Value, nil)
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
+func TestToString_DoubleQuotes(t *testing.T) {
+	var (
+		i   int     = 1
+		i8  int8    = 2
+		i16 int16   = 3
+		i32 int32   = 4
+		i64 int64   = 5
+		u   uint    = 6
+		u8  uint8   = 7
+		u16 uint16  = 8
+		u32 uint32  = 9
+		u64 uint64  = 10
+		f32 float32 = 10.1
+		f64 float64 = 100.1
+	)
+
+	testCases := []struct {
+		Value  interface{}
+		Result string
+	}{
+		{"rhs", `"rhs"`},
+		{i, "1"},
+		{i8, "2"},
+		{i16, "3"},
+		{i32, "4"},
+		{i64, "5"},
+		{u, "6"},
+		{u8, "7"},
+		{u16, "8"},
+		{u32, "9"},
+		{u64, "10"},
+		{true, "1"},
+		{false, "0"},
+		{f32, "10.1"},
+		{f64, "100.1"},
+		{
+			[]interface{}{10, "str", true},
+			`10, "str", 1`,
+		},
+		{
+			map[string]string{"key": "value"},
+			`map[key:value]`,
+		},
+		{
+			nil,
+			`nil`,
+		},
+		{
+			time.Date(2006, time.January, 2, 15, 4, 5, 0, time.UTC),
+			`"2006-01-02 15:04:05"`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := internal.ToString(testCase.Value, &internal.ToStringOpt{DoubleQuotes: true})
+		assert.Equal(t, testCase.Result, res)
+	}
+}
+
+func TestToString_NoOpt(t *testing.T) {
+	var (
+		i   int     = 1
+		i8  int8    = 2
+		i16 int16   = 3
+		i32 int32   = 4
+		i64 int64   = 5
+		u   uint    = 6
+		u8  uint8   = 7
+		u16 uint16  = 8
+		u32 uint32  = 9
+		u64 uint64  = 10
+		f32 float32 = 10.1
+		f64 float64 = 100.1
+	)
+
+	testCases := []struct {
+		Value  interface{}
+		Result string
+	}{
+		{"rhs", `rhs`},
+		{i, "1"},
+		{i8, "2"},
+		{i16, "3"},
+		{i32, "4"},
+		{i64, "5"},
+		{u, "6"},
+		{u8, "7"},
+		{u16, "8"},
+		{u32, "9"},
+		{u64, "10"},
+		{true, "1"},
+		{false, "0"},
+		{f32, "10.1"},
+		{f64, "100.1"},
+		{
+			[]interface{}{10, "str", true},
+			`10, str, 1`,
+		},
+		{
+			map[string]string{"key": "value"},
+			`map[key:value]`,
+		},
+		{
+			nil,
+			`nil`,
+		},
+		{
+			time.Date(2006, time.January, 2, 15, 4, 5, 0, time.UTC),
+			`2006-01-02 15:04:05`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		res := internal.ToString(testCase.Value, &internal.ToStringOpt{})
 		assert.Equal(t, testCase.Result, res)
 	}
 }

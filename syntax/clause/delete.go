@@ -1,28 +1,21 @@
 package clause
 
 import (
-	"fmt"
-
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
 // Delete is DELETE clause.
 type Delete struct{}
 
-// Keyword returns clause keyword.
-func (d *Delete) Keyword() string {
-	return "DELETE"
-}
-
-// String returns function call with string.
+// String returns function call as string.
 func (d *Delete) String() string {
-	return fmt.Sprintf("%s()", d.Keyword())
+	return "Delete()"
 }
 
-// Build makes DELETE clause with syntax.StmtSet.
-func (d *Delete) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(d.Keyword())
-	return ss, nil
+// Build creates the structure of DELETE clause that implements interfaces.ClauseSet.
+func (d *Delete) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("DELETE")
+	return cs, nil
 }

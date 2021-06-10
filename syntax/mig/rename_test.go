@@ -9,14 +9,31 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestRename_Build(t *testing.T) {
+func TestRename_String(t *testing.T) {
 	testCases := []struct {
 		Rename   *mig.Rename
-		Expected *syntax.StmtSet
+		Expected string
 	}{
 		{
 			&mig.Rename{Table: "table"},
-			&syntax.StmtSet{Keyword: "RENAME TO", Value: "table"},
+			`Rename(table)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Rename.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestRename_Build(t *testing.T) {
+	testCases := []struct {
+		Rename   *mig.Rename
+		Expected *syntax.ClauseSet
+	}{
+		{
+			&mig.Rename{Table: "table"},
+			&syntax.ClauseSet{Keyword: "RENAME TO", Value: "table"},
 		},
 	}
 
@@ -29,22 +46,5 @@ func TestRename_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestRename_String(t *testing.T) {
-	testCases := []struct {
-		Rename   *mig.Rename
-		Expected string
-	}{
-		{
-			&mig.Rename{Table: "table"},
-			`RENAME TO(table)`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.Rename.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

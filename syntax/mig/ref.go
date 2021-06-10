@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -13,27 +13,23 @@ type Ref struct {
 	Columns []string
 }
 
-// Keyword returns clause keyword.
-func (r *Ref) Keyword() string {
-	return "REFERENCES"
-}
-
+// String returns function call as string.
 func (r *Ref) String() string {
-	return fmt.Sprintf("%s(%s, %v)", r.Keyword(), r.Table, r.Columns)
+	return fmt.Sprintf("Ref(%s, %v)", r.Table, r.Columns)
 }
 
-// Build makes REFERENCES clause with syntax.StmtSet.
-func (r *Ref) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(r.Keyword())
-	ss.WriteValue(r.Table)
-	ss.WriteValue("(")
+// Build creates the structure of REFERENCES clause that implements interfaces.ClauseSet.
+func (r *Ref) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("REFERENCES")
+	cs.WriteValue(r.Table)
+	cs.WriteValue("(")
 	for i, c := range r.Columns {
 		if i > 0 {
-			ss.WriteValue(",")
+			cs.WriteValue(",")
 		}
-		ss.WriteValue(c)
+		cs.WriteValue(c)
 	}
-	ss.WriteValue(")")
-	return ss, nil
+	cs.WriteValue(")")
+	return cs, nil
 }

@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,26 +12,22 @@ type Foreign struct {
 	Columns []string
 }
 
-// Keyword returns clause keyword.
-func (f *Foreign) Keyword() string {
-	return "FOREIGN KEY"
-}
-
+// String returns function call as string.
 func (f *Foreign) String() string {
-	return fmt.Sprintf("%s(%v)", f.Keyword(), f.Columns)
+	return fmt.Sprintf("Foreign(%v)", f.Columns)
 }
 
-// Build makes FOREIGN KEY clasue with syntax.StmtSet.
-func (f *Foreign) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(f.Keyword())
-	ss.WriteValue("(")
+// Build creates the structure of FOREIGN KEY clause that implements interfaces.ClauseSet.
+func (f *Foreign) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("FOREIGN KEY")
+	cs.WriteValue("(")
 	for i, c := range f.Columns {
 		if i > 0 {
-			ss.WriteValue(",")
+			cs.WriteValue(",")
 		}
-		ss.WriteValue(c)
+		cs.WriteValue(c)
 	}
-	ss.WriteValue(")")
-	return ss, nil
+	cs.WriteValue(")")
+	return cs, nil
 }

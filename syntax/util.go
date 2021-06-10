@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/internal"
 	"github.com/morikuni/failure"
 )
@@ -34,8 +34,8 @@ func buildExprWithOpt(option *buildExprOpt, expr string, vals ...interface{}) (s
 
 	values := []interface{}{}
 	for _, v := range vals {
-		if stmt, ok := v.(domain.Stmt); ok {
-			values = append(values, stmt.String())
+		if stmt, ok := v.(interfaces.Stmt); ok {
+			values = append(values, stmt.SQL())
 			continue
 		}
 		opt := &internal.ToStringOpt{Quotes: option.quotes}

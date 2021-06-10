@@ -9,14 +9,31 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestAddCons_Build(t *testing.T) {
+func TestAddCons_String(t *testing.T) {
 	testCases := []struct {
 		AddCons  *mig.AddCons
-		Expected *syntax.StmtSet
+		Expected string
 	}{
 		{
 			&mig.AddCons{Key: "key"},
-			&syntax.StmtSet{Keyword: "ADD CONSTRAINT", Value: "key"},
+			`AddCons(key)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.AddCons.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestAddCons_Build(t *testing.T) {
+	testCases := []struct {
+		AddCons  *mig.AddCons
+		Expected *syntax.ClauseSet
+	}{
+		{
+			&mig.AddCons{Key: "key"},
+			&syntax.ClauseSet{Keyword: "ADD CONSTRAINT", Value: "key"},
 		},
 	}
 
@@ -29,22 +46,5 @@ func TestAddCons_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestAddCons_String(t *testing.T) {
-	testCases := []struct {
-		AddCons  *mig.AddCons
-		Expected string
-	}{
-		{
-			&mig.AddCons{Key: "key"},
-			`ADD CONSTRAINT(key)`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.AddCons.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

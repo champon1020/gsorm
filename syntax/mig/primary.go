@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -12,26 +12,22 @@ type Primary struct {
 	Columns []string
 }
 
-// Keyword returns clause keyword.
-func (p *Primary) Keyword() string {
-	return "PRIMARY KEY"
-}
-
+// String returns function call as string.
 func (p *Primary) String() string {
-	return fmt.Sprintf("%s(%v)", p.Keyword(), p.Columns)
+	return fmt.Sprintf("Primary(%v)", p.Columns)
 }
 
-// Build makes PRIMARY KEY clause with syntax.StmtSet.
-func (p *Primary) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(p.Keyword())
-	ss.WriteValue("(")
+// Build creates the structure of PRIMARY KEY clause that implements interfaces.ClauseSet.
+func (p *Primary) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("PRIMARY KEY")
+	cs.WriteValue("(")
 	for i, c := range p.Columns {
 		if i > 0 {
-			ss.WriteValue(",")
+			cs.WriteValue(",")
 		}
-		ss.WriteValue(c)
+		cs.WriteValue(c)
 	}
-	ss.WriteValue(")")
-	return ss, nil
+	cs.WriteValue(")")
+	return cs, nil
 }

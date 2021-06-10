@@ -16,18 +16,18 @@ func TestSelect_String(t *testing.T) {
 	}{
 		{
 			&clause.Select{Columns: []syntax.Column{{Name: "column"}}},
-			`SELECT("column")`,
+			`Select("column")`,
 		},
 		{
 			&clause.Select{Columns: []syntax.Column{{Name: "column", Alias: "c"}}},
-			`SELECT("column AS c")`,
+			`Select("column AS c")`,
 		},
 		{
 			&clause.Select{Columns: []syntax.Column{
 				{Name: "column1", Alias: "c1"},
 				{Name: "column2", Alias: "c2"},
 			}},
-			`SELECT("column1 AS c1", "column2 AS c2")`,
+			`Select("column1 AS c1", "column2 AS c2")`,
 		},
 	}
 
@@ -40,22 +40,22 @@ func TestSelect_String(t *testing.T) {
 func TestSelect_Build(t *testing.T) {
 	testCases := []struct {
 		Select *clause.Select
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Select{Columns: []syntax.Column{{Name: "column"}}},
-			&syntax.StmtSet{Keyword: "SELECT", Value: "column"},
+			&syntax.ClauseSet{Keyword: "SELECT", Value: "column"},
 		},
 		{
 			&clause.Select{Columns: []syntax.Column{{Name: "column", Alias: "c"}}},
-			&syntax.StmtSet{Keyword: "SELECT", Value: "column AS c"},
+			&syntax.ClauseSet{Keyword: "SELECT", Value: "column AS c"},
 		},
 		{
 			&clause.Select{Columns: []syntax.Column{
 				{Name: "column1", Alias: "c1"},
 				{Name: "column2", Alias: "c2"},
 			}},
-			&syntax.StmtSet{Keyword: "SELECT", Value: "column1 AS c1, column2 AS c2"},
+			&syntax.ClauseSet{Keyword: "SELECT", Value: "column1 AS c1, column2 AS c2"},
 		},
 	}
 

@@ -16,7 +16,7 @@ func TestOffset_String(t *testing.T) {
 	}{
 		{
 			&clause.Offset{Num: 10},
-			`OFFSET(10)`,
+			`Offset(10)`,
 		},
 	}
 
@@ -29,11 +29,11 @@ func TestOffset_String(t *testing.T) {
 func TestOffset_Build(t *testing.T) {
 	testCases := []struct {
 		Offset *clause.Offset
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Offset{Num: 5},
-			&syntax.StmtSet{Keyword: "OFFSET", Value: "5"},
+			&syntax.ClauseSet{Keyword: "OFFSET", Value: "5"},
 		},
 	}
 

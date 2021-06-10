@@ -8,12 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRawClause_Keyword(t *testing.T) {
-	key := "key"
-	r := &syntax.RawClause{RawStr: key}
-	assert.Equal(t, key, r.Keyword())
-}
-
 func TestRawClause_String(t *testing.T) {
 	testCases := []struct {
 		RawClause *syntax.RawClause
@@ -38,15 +32,15 @@ func TestRawClause_String(t *testing.T) {
 func TestRawClause_Build(t *testing.T) {
 	testCases := []struct {
 		RawClause *syntax.RawClause
-		Expected  *syntax.StmtSet
+		Expected  *syntax.ClauseSet
 	}{
 		{
 			&syntax.RawClause{RawStr: "AUTO_INCREMENT"},
-			&syntax.StmtSet{Keyword: "AUTO_INCREMENT"},
+			&syntax.ClauseSet{Keyword: "AUTO_INCREMENT"},
 		},
 		{
 			&syntax.RawClause{RawStr: "WHERE lhs = ?", Values: []interface{}{10}},
-			&syntax.StmtSet{Keyword: "WHERE lhs = 10"},
+			&syntax.ClauseSet{Keyword: "WHERE lhs = 10"},
 		},
 	}
 

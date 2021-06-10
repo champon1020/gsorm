@@ -1,27 +1,21 @@
 package mig
 
 import (
-	"fmt"
-
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
 // NotNull is NOT NULL clause.
 type NotNull struct{}
 
-// Keyword returns clause keyword.
-func (n *NotNull) Keyword() string {
-	return "NOT NULL"
-}
-
+// String returns function call as string.
 func (n *NotNull) String() string {
-	return fmt.Sprintf("%s()", n.Keyword())
+	return "NotNull()"
 }
 
-// Build makes NOT NULL clause with syntax.StmtSet.
-func (n *NotNull) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(n.Keyword())
-	return ss, nil
+// Build creates the structure of NOT NULL clause that implements interfaces.ClauseSet.
+func (n *NotNull) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("NOT NULL")
+	return cs, nil
 }

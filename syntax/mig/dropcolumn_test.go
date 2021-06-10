@@ -9,14 +9,31 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestDropColumn_Build(t *testing.T) {
+func TestDropColumn_String(t *testing.T) {
 	testCases := []struct {
 		DropColumn *mig.DropColumn
-		Expected   *syntax.StmtSet
+		Expected   string
 	}{
 		{
 			&mig.DropColumn{Column: "column"},
-			&syntax.StmtSet{Keyword: "DROP COLUMN", Value: "column"},
+			`DropColumn(column)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.DropColumn.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestDropColumn_Build(t *testing.T) {
+	testCases := []struct {
+		DropColumn *mig.DropColumn
+		Expected   *syntax.ClauseSet
+	}{
+		{
+			&mig.DropColumn{Column: "column"},
+			&syntax.ClauseSet{Keyword: "DROP COLUMN", Value: "column"},
 		},
 	}
 
@@ -29,22 +46,5 @@ func TestDropColumn_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestDropColumn_String(t *testing.T) {
-	testCases := []struct {
-		DropColumn *mig.DropColumn
-		Expected   string
-	}{
-		{
-			&mig.DropColumn{Column: "column"},
-			`DROP COLUMN(column)`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.DropColumn.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

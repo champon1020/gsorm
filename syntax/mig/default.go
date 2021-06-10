@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/internal"
 	"github.com/champon1020/gsorm/syntax"
 )
@@ -13,19 +13,15 @@ type Default struct {
 	Value interface{}
 }
 
-// Keyword returns clause keyword.
-func (d *Default) Keyword() string {
-	return "DEFAULT"
-}
-
+// String returns function call as string.
 func (d *Default) String() string {
-	return fmt.Sprintf("%s(%s)", d.Keyword(), d.Value)
+	return fmt.Sprintf("Default(%s)", d.Value)
 }
 
-// Build makes DEFAULT clause with syntax.StmtSet.
-func (d *Default) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(d.Keyword())
+// Build creates the structure of DEFAULT clause that implements interfaces.ClauseSet.
+func (d *Default) Build() (interfaces.ClauseSet, error) {
+	ss := &syntax.ClauseSet{}
+	ss.WriteKeyword("DEFAULT")
 	ss.WriteValue(internal.ToString(d.Value, nil))
 	return ss, nil
 }

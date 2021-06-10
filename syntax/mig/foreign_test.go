@@ -9,18 +9,39 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestForeign_Build(t *testing.T) {
+func TestForeign_String(t *testing.T) {
 	testCases := []struct {
 		Foreign  *mig.Foreign
-		Expected *syntax.StmtSet
+		Expected string
 	}{
 		{
 			&mig.Foreign{Columns: []string{"column"}},
-			&syntax.StmtSet{Keyword: "FOREIGN KEY", Value: "(column)"},
+			`Foreign([column])`,
 		},
 		{
 			&mig.Foreign{Columns: []string{"column1", "column2"}},
-			&syntax.StmtSet{Keyword: "FOREIGN KEY", Value: "(column1, column2)"},
+			`Foreign([column1 column2])`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Foreign.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestForeign_Build(t *testing.T) {
+	testCases := []struct {
+		Foreign  *mig.Foreign
+		Expected *syntax.ClauseSet
+	}{
+		{
+			&mig.Foreign{Columns: []string{"column"}},
+			&syntax.ClauseSet{Keyword: "FOREIGN KEY", Value: "(column)"},
+		},
+		{
+			&mig.Foreign{Columns: []string{"column1", "column2"}},
+			&syntax.ClauseSet{Keyword: "FOREIGN KEY", Value: "(column1, column2)"},
 		},
 	}
 
@@ -33,26 +54,5 @@ func TestForeign_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestForeign_String(t *testing.T) {
-	testCases := []struct {
-		Foreign  *mig.Foreign
-		Expected string
-	}{
-		{
-			&mig.Foreign{Columns: []string{"column"}},
-			`FOREIGN KEY([column])`,
-		},
-		{
-			&mig.Foreign{Columns: []string{"column1", "column2"}},
-			`FOREIGN KEY([column1 column2])`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.Foreign.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

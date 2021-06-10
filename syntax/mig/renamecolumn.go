@@ -3,7 +3,7 @@ package mig
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
 
@@ -13,21 +13,17 @@ type RenameColumn struct {
 	Dest   string
 }
 
-// Keyword returns clause keyword.
-func (r *RenameColumn) Keyword() string {
-	return "RENAME COLUMN"
-}
-
+// String returns function call as string.
 func (r *RenameColumn) String() string {
-	return fmt.Sprintf("%s(%s, %s)", r.Keyword(), r.Column, r.Dest)
+	return fmt.Sprintf("RenameColumn(%s, %s)", r.Column, r.Dest)
 }
 
-// Build makes RENAME COLUMN clause with syntax.StmtSet.
-func (r *RenameColumn) Build() (domain.StmtSet, error) {
-	ss := new(syntax.StmtSet)
-	ss.WriteKeyword(r.Keyword())
-	ss.WriteValue(r.Column)
-	ss.WriteValue("TO")
-	ss.WriteValue(r.Dest)
-	return ss, nil
+// Build creates the structure of RENAME COLUMN clause that implements interfaces.ClauseSet.
+func (r *RenameColumn) Build() (interfaces.ClauseSet, error) {
+	cs := &syntax.ClauseSet{}
+	cs.WriteKeyword("RENAME COLUMN")
+	cs.WriteValue(r.Column)
+	cs.WriteValue("TO")
+	cs.WriteValue(r.Dest)
+	return cs, nil
 }

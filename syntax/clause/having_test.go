@@ -16,15 +16,15 @@ func TestHaving_String(t *testing.T) {
 	}{
 		{
 			&clause.Having{Expr: "lhs = rhs"},
-			`HAVING("lhs = rhs")`,
+			`Having("lhs = rhs")`,
 		},
 		{
 			&clause.Having{Expr: "lhs = ?", Values: []interface{}{10}},
-			`HAVING("lhs = ?", 10)`,
+			`Having("lhs = ?", 10)`,
 		},
 		{
 			&clause.Having{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			`HAVING("lhs1 = ? AND lhs2 = ?", 10, 'str')`,
+			`Having("lhs1 = ? AND lhs2 = ?", 10, "str")`,
 		},
 	}
 
@@ -37,19 +37,19 @@ func TestHaving_String(t *testing.T) {
 func TestHaving_Build(t *testing.T) {
 	testCases := []struct {
 		Having *clause.Having
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
 		{
 			&clause.Having{Expr: "lhs = rhs"},
-			&syntax.StmtSet{Keyword: "HAVING", Value: "lhs = rhs"},
+			&syntax.ClauseSet{Keyword: "HAVING", Value: "lhs = rhs"},
 		},
 		{
 			&clause.Having{Expr: "lhs = ?", Values: []interface{}{10}},
-			&syntax.StmtSet{Keyword: "HAVING", Value: "lhs = 10"},
+			&syntax.ClauseSet{Keyword: "HAVING", Value: "lhs = 10"},
 		},
 		{
 			&clause.Having{Expr: "lhs1 = ? AND lhs2 = ?", Values: []interface{}{10, "str"}},
-			&syntax.StmtSet{Keyword: "HAVING", Value: `lhs1 = 10 AND lhs2 = 'str'`},
+			&syntax.ClauseSet{Keyword: "HAVING", Value: `lhs1 = 10 AND lhs2 = 'str'`},
 		},
 	}
 

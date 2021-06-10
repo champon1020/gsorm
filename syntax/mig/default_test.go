@@ -10,30 +10,47 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestDefault_Build(t *testing.T) {
+func TestDefault_String(t *testing.T) {
 	testCases := []struct {
 		Default  *mig.Default
-		Expected *syntax.StmtSet
+		Expected string
 	}{
 		{
 			&mig.Default{Value: "value"},
-			&syntax.StmtSet{Keyword: "DEFAULT", Value: `'value'`},
+			`Default(value)`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.Default.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestDefault_Build(t *testing.T) {
+	testCases := []struct {
+		Default  *mig.Default
+		Expected *syntax.ClauseSet
+	}{
+		{
+			&mig.Default{Value: "value"},
+			&syntax.ClauseSet{Keyword: "DEFAULT", Value: `'value'`},
 		},
 		{
 			&mig.Default{Value: 10},
-			&syntax.StmtSet{Keyword: "DEFAULT", Value: "10"},
+			&syntax.ClauseSet{Keyword: "DEFAULT", Value: "10"},
 		},
 		{
 			&mig.Default{Value: 10.1},
-			&syntax.StmtSet{Keyword: "DEFAULT", Value: "10.1"},
+			&syntax.ClauseSet{Keyword: "DEFAULT", Value: "10.1"},
 		},
 		{
 			&mig.Default{Value: true},
-			&syntax.StmtSet{Keyword: "DEFAULT", Value: "1"},
+			&syntax.ClauseSet{Keyword: "DEFAULT", Value: "1"},
 		},
 		{
 			&mig.Default{Value: time.Date(2021, time.January, 1, 0, 0, 0, 0, time.UTC)},
-			&syntax.StmtSet{Keyword: "DEFAULT", Value: "'2021-01-01 00:00:00'"},
+			&syntax.ClauseSet{Keyword: "DEFAULT", Value: "'2021-01-01 00:00:00'"},
 		},
 	}
 
@@ -46,22 +63,5 @@ func TestDefault_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestDefault_String(t *testing.T) {
-	testCases := []struct {
-		Default  *mig.Default
-		Expected string
-	}{
-		{
-			&mig.Default{Value: "value"},
-			`DEFAULT(value)`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.Default.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

@@ -9,14 +9,31 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestNotNull_Build(t *testing.T) {
+func TestNotNull_String(t *testing.T) {
 	testCases := []struct {
 		NotNull  *mig.NotNull
-		Expected *syntax.StmtSet
+		Expected string
 	}{
 		{
 			&mig.NotNull{},
-			&syntax.StmtSet{Keyword: "NOT NULL"},
+			`NotNull()`,
+		},
+	}
+
+	for _, testCase := range testCases {
+		actual := testCase.NotNull.String()
+		assert.Equal(t, testCase.Expected, actual)
+	}
+}
+
+func TestNotNull_Build(t *testing.T) {
+	testCases := []struct {
+		NotNull  *mig.NotNull
+		Expected *syntax.ClauseSet
+	}{
+		{
+			&mig.NotNull{},
+			&syntax.ClauseSet{Keyword: "NOT NULL"},
 		},
 	}
 
@@ -29,22 +46,5 @@ func TestNotNull_Build(t *testing.T) {
 		if diff := cmp.Diff(testCase.Expected, actual); diff != "" {
 			t.Errorf("Differs: (-want +got)\n%s", diff)
 		}
-	}
-}
-
-func TestNotNull_String(t *testing.T) {
-	testCases := []struct {
-		NotNull  *mig.NotNull
-		Expected string
-	}{
-		{
-			&mig.NotNull{},
-			`NOT NULL()`,
-		},
-	}
-
-	for _, testCase := range testCases {
-		actual := testCase.NotNull.String()
-		assert.Equal(t, testCase.Expected, actual)
 	}
 }

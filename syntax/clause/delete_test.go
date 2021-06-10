@@ -11,15 +11,15 @@ import (
 
 func TestDelete_String(t *testing.T) {
 	d := new(clause.Delete)
-	assert.Equal(t, "DELETE()", d.String())
+	assert.Equal(t, "Delete()", d.String())
 }
 
 func TestDelete_Build(t *testing.T) {
 	testCases := []struct {
 		Delete *clause.Delete
-		Result *syntax.StmtSet
+		Result *syntax.ClauseSet
 	}{
-		{&clause.Delete{}, &syntax.StmtSet{Keyword: "DELETE"}},
+		{&clause.Delete{}, &syntax.ClauseSet{Keyword: "DELETE"}},
 	}
 
 	for _, testCase := range testCases {

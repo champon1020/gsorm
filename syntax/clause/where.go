@@ -3,7 +3,7 @@ package clause
 import (
 	"fmt"
 
-	"github.com/champon1020/gsorm/interfaces/domain"
+	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/internal"
 	"github.com/champon1020/gsorm/syntax"
 )
@@ -14,28 +14,23 @@ type Where struct {
 	Values []interface{}
 }
 
-// Keyword returns clause keyword.
-func (w *Where) Keyword() string {
-	return "WHERE"
-}
-
-// String returns function call with string.
+// String returns function call as string.
 func (w *Where) String() string {
 	s := fmt.Sprintf("%q", w.Expr)
 	if len(w.Values) > 0 {
 		s += ", "
-		s += internal.ToString(w.Values, nil)
+		s += internal.ToString(w.Values, &internal.ToStringOpt{DoubleQuotes: true})
 	}
-	return fmt.Sprintf("%s(%s)", w.Keyword(), s)
+	return fmt.Sprintf("Where(%s)", s)
 }
 
-// Build makes WHERE clause with syntax.StmtSet.
-func (w *Where) Build() (domain.StmtSet, error) {
+// Build creates the structure of WHERE clause that implements interfaces.ClauseSet.
+func (w *Where) Build() (interfaces.ClauseSet, error) {
 	s, err := syntax.BuildExpr(w.Expr, w.Values...)
 	if err != nil {
 		return nil, err
 	}
-	ss := &syntax.StmtSet{Value: s}
-	ss.WriteKeyword(w.Keyword())
-	return ss, nil
+	cs := &syntax.ClauseSet{Value: s}
+	cs.WriteKeyword("WHERE")
+	return cs, nil
 }

@@ -10,6 +10,7 @@ type Stmt interface {
 
 // RawClause is interface which is returned by (*Stmt).RawClause.
 type RawClause interface {
+	RawClause(raw string, values ...interface{}) RawClause
 	From(tables ...string) From
 	Where(expr string, values ...interface{}) Where
 	And(expr string, values ...interface{}) And
