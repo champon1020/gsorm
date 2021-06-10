@@ -13,7 +13,6 @@ import (
 	"github.com/champon1020/gsorm/syntax"
 	"github.com/champon1020/gsorm/syntax/clause"
 	"github.com/google/go-cmp/cmp"
-	"github.com/morikuni/failure"
 	"golang.org/x/xerrors"
 )
 
@@ -117,7 +116,7 @@ func (s *stmt) query(buildSQL func(*internal.SQL) error, stmt interfaces.Stmt, m
 
 		rows, err := conn.Query(sql.String())
 		if err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 		defer rows.Close()
 
@@ -157,7 +156,7 @@ func (s *stmt) exec(buildSQL func(*internal.SQL) error, stmt interfaces.Stmt) er
 			return err
 		}
 		if _, err := conn.Exec(sql.String()); err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 		return nil
 	}
@@ -752,7 +751,7 @@ func (s *rawStmt) Migrate() error {
 			return err
 		}
 		if _, err := conn.Exec(sql.String()); err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 		return nil
 	}

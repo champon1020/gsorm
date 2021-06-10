@@ -2,12 +2,11 @@ package syntax
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/internal"
-	"github.com/morikuni/failure"
+	"golang.org/x/xerrors"
 )
 
 // BuildExpr assigns the values to '?' of the expression.
@@ -26,10 +25,7 @@ type buildExprOpt struct {
 
 func buildExprWithOpt(option *buildExprOpt, expr string, vals ...interface{}) (string, error) {
 	if strings.Count(expr, "?") != len(vals) {
-		err := failure.New(errInvalidArgument,
-			failure.Context{"expr": fmt.Sprintf("'%s'", expr), "length of values": strconv.Itoa(len(vals))},
-			failure.Message("length of values is not valid"))
-		return "", err
+		return "", xerrors.New("number of values doesn't match the number of '?'")
 	}
 
 	values := []interface{}{}

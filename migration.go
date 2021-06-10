@@ -14,7 +14,6 @@ import (
 	"github.com/champon1020/gsorm/internal"
 	"github.com/champon1020/gsorm/syntax"
 	"github.com/champon1020/gsorm/syntax/mig"
-	"github.com/morikuni/failure"
 	"golang.org/x/xerrors"
 )
 
@@ -71,7 +70,7 @@ func (s *migStmt) migration(buildSQL func(*internal.SQL) error) error {
 			return err
 		}
 		if _, err := conn.Exec(sql.String()); err != nil {
-			return failure.Wrap(err)
+			return err
 		}
 		return nil
 	}

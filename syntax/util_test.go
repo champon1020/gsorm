@@ -5,7 +5,6 @@ import (
 
 	"github.com/champon1020/gsorm"
 	"github.com/champon1020/gsorm/syntax"
-	"github.com/morikuni/failure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -66,29 +65,15 @@ func TestBuildExpr(t *testing.T) {
 }
 
 func TestBuildExpr_Fail(t *testing.T) {
-	testCases := []struct {
-		Expr          string
-		Values        []interface{}
-		ExpectedError failure.StringCode
-	}{
-		{
-			"lhs = ? AND rhs = ?",
-			[]interface{}{10},
-			syntax.ErrInvalidArgument,
-		},
-	}
+	expectedErr := "number of values doesn't match the number of '?'"
+	expr := "lhs = ? AND rhs = ?"
+	vals := []interface{}{10}
 
-	for _, testCase := range testCases {
-		_, err := syntax.BuildExpr(testCase.Expr, testCase.Values...)
-		if err == nil {
-			t.Errorf("Error is not occurred")
-			continue
-		}
-		if !failure.Is(err, syntax.ErrInvalidArgument) {
-			t.Errorf("Different error")
-			continue
-		}
-	}
+	// Actual process.
+	_, err := syntax.BuildExpr(expr, vals)
+
+	// Validate.
+	assert.EqualError(t, err, expectedErr)
 }
 
 func TestBuildExprWithoutQuotes(t *testing.T) {

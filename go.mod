@@ -7,7 +7,6 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/go-cmp v0.4.0
 	github.com/jmoiron/sqlx v1.3.4
-	github.com/morikuni/failure v0.14.0
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/poy/onpar v1.1.2 // indirect
 	github.com/stretchr/testify v1.4.0
