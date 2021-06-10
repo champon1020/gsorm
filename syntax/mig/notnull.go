@@ -1,8 +1,6 @@
 package mig
 
 import (
-	"fmt"
-
 	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
@@ -12,7 +10,7 @@ type NotNull struct{}
 
 // String returns function call as string.
 func (n *NotNull) String() string {
-	return fmt.Sprintf("NotNull()")
+	return "NotNull()"
 }
 
 // Build creates the structure of NOT NULL clause that implements interfaces.ClauseSet.

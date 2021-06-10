@@ -1,8 +1,6 @@
 package clause
 
 import (
-	"fmt"
-
 	"github.com/champon1020/gsorm/interfaces"
 	"github.com/champon1020/gsorm/syntax"
 )
@@ -12,7 +10,7 @@ type Delete struct{}
 
 // String returns function call as string.
 func (d *Delete) String() string {
-	return fmt.Sprintf("Delete()")
+	return "Delete()"
 }
 
 // Build creates the structure of DELETE clause that implements interfaces.ClauseSet.

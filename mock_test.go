@@ -149,7 +149,9 @@ func TestMockDB_CompareWith(t *testing.T) {
 		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		expectedErr := "statements comparison was failed:\nexpected: gsorm.MockDB.Begin\nactual:   Select(\"column1\").From(\"table\")\n"
+		expectedErr := "statements comparison was failed:\n" +
+			"expected: gsorm.MockDB.Begin\n" +
+			"actual:   Select(\"column1\").From(\"table\")\n"
 
 		// Test phase.
 		mock := gsorm.OpenMock()
@@ -163,7 +165,9 @@ func TestMockDB_CompareWith(t *testing.T) {
 		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		expectedErr := "statements comparison was failed:\nexpected: Insert(\"table1\", \"column1\").Values(10)\nactual:   Insert(\"table2\", \"column2\").Values(10)\n"
+		expectedErr := "statements comparison was failed:\n" +
+			"expected: Insert(\"table1\", \"column1\").Values(10)\n" +
+			"actual:   Insert(\"table2\", \"column2\").Values(10)\n"
 
 		// Test phase.
 		mock := gsorm.OpenMock()
@@ -176,7 +180,9 @@ func TestMockDB_CompareWith(t *testing.T) {
 		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		expectedErr := "statements comparison was failed:\nexpected: Insert(\"table1\", \"column1\").Values(10)\nactual:   Insert(\"table1\", \"column1\").Values(10).Values(100)\n"
+		expectedErr := "statements comparison was failed:\n" +
+			"expected: Insert(\"table1\", \"column1\").Values(10)\n" +
+			"actual:   Insert(\"table1\", \"column1\").Values(10).Values(100)\n"
 
 		// Test phase.
 		mock := gsorm.OpenMock()
@@ -386,7 +392,9 @@ func TestMockTx_CompareWith(t *testing.T) {
 		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		expectedErr := "statements comparison was failed:\nexpected: gsorm.MockTx.Commit\nactual:   Select(\"column1\").From(\"table\")\n"
+		expectedErr := "statements comparison was failed:\n" +
+			"expected: gsorm.MockTx.Commit\n" +
+			"actual:   Select(\"column1\").From(\"table\")\n"
 
 		// Test phase.
 		mock := gsorm.OpenMock()
@@ -406,7 +414,9 @@ func TestMockTx_CompareWith(t *testing.T) {
 		assert.EqualError(t, err, expectedErr)
 	}
 	{
-		expectedErr := "statements comparison was failed:\nexpected: gsorm.MockTx.Rollback\nactual:   Select(\"column1\").From(\"table\")\n"
+		expectedErr := "statements comparison was failed:\n" +
+			"expected: gsorm.MockTx.Rollback\n" +
+			"actual:   Select(\"column1\").From(\"table\")\n"
 
 		// Test phase.
 		mock := gsorm.OpenMock()
