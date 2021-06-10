@@ -79,7 +79,7 @@ err := gsorm.Select(db).
 ## From
 `From` calls FROM clause.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.From)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.From)
 
 #### Example
 ```go
@@ -102,7 +102,7 @@ err := gsorm.Select(db, "emp_no", "dept_no").From("employees", "departments").Qu
 
 `Join`, `LeftJoin` and `RightJoin` can be called multiple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Join)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Join)
 
 #### Example
 ```go
@@ -129,7 +129,7 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 
 `Join`, `LeftJoin` and `RightJoin` can be called multiple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.LeftJoin)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.LeftJoin)
 
 #### Example
 ```go
@@ -156,7 +156,7 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 
 `Join`, `LeftJoin` and `RightJoin` can be called multiple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.RightJoin)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.RightJoin)
 
 #### Example
 ```go
@@ -189,7 +189,7 @@ Assignment rules are as follows:
 - If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
 - If the above conditions are not met, the value is assigned as is
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Where)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Where)
 
 #### Example
 ```go
@@ -255,7 +255,7 @@ Assignment rules are as follows:
 
 `And` can be called mutliple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.And)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.And)
 
 #### Example
 ```go
@@ -346,7 +346,7 @@ Assignment rules are as follows:
 
 `Or` can be called mutliple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Or)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Or)
 
 #### Example
 ```go
@@ -427,7 +427,7 @@ err := gsorm.Select(db).From("employees").
 ## GroupBy
 `GroupBy` calls GROUP BY clause.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.GroupBy)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.GroupBy)
 
 #### Example
 ```go
@@ -449,7 +449,7 @@ Assignment rules are as follows:
 - If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
 - If the above conditions are not met, the value is assigned as is
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Having)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Having)
 
 #### Example
 ```go
@@ -513,7 +513,7 @@ err := gsorm.Select(db).From("employees").
 ## Union
 `Union` calls UNION clause.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Union)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Union)
 
 #### Example
 ```go
@@ -527,7 +527,7 @@ gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 ## UnionAll
 `UnionAll` calls UNION ALL clause.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.UnionAll)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.UnionAll)
 
 #### Example
 ```go
@@ -541,7 +541,7 @@ gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 ## OrderBy
 `OrderBy` calls ORDER BY clause.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.OrderBy)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.OrderBy)
 
 #### Example
 ```go
@@ -572,7 +572,7 @@ err := gsorm.Select(db).From("employees").
 ## Limit
 `Limit` calls LIMIT clause.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Limit)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Limit)
 
 #### Example
 ```go
@@ -588,7 +588,7 @@ err := gsorm.Select(db).From("employees").
 
 `Offset` is called after `Limit`.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Offset)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Offset)
 
 #### Example
 ```go
@@ -617,7 +617,7 @@ The correspondance of the field names and the database column names are determin
 - If the field is tagged both `gsorm` and `json`, `gsorm` rule is applied
 - If the field isn't tagged `gsorm` nor `json`, the snake case of the field name is used
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Query)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Query)
 
 #### Example
 ```go

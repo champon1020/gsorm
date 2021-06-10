@@ -95,7 +95,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Column`は複数回び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Column)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateTableStmt.Column)
 
 #### 例
 ```go
@@ -121,7 +121,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `NotNull`と`Default`は併用できます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.NotNull)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateTableStmt.NotNull)
 
 #### 例
 ```go
@@ -148,7 +148,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Default`と`NotNull`は併用できます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Default)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateTableStmt.Default)
 
 #### 例
 ```go
@@ -185,7 +185,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Cons`に続けて`Unique`，`Primary`，`Foreign`のいずれかを呼び出す必要があります．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Cons)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateTableStmt.Cons)
 
 #### 例
 ```go
@@ -220,7 +220,7 @@ err := gsorm.CreateTable(db, "dept_emp").
 
 `Unique`は`Cons`に続けて呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Unique)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateTableStmt.Unique)
 
 #### 例
 ```go
@@ -248,7 +248,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Primary`は`Cons`に続けて呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Primary)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateTableStmt.Primary)
 
 #### 例
 ```go
@@ -278,7 +278,7 @@ err := gsorm.CreateTable(db, "employees").
 
 `Foreign`に続けて`Ref`を呼び出す必要があります．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Foreign)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateTableStmt.Foreign)
 
 
 ### Cons.Foreign.Ref
@@ -314,7 +314,7 @@ err := gsorm.CreateTable(db, "dept_emp").
 
 Modelについての詳細は[Model](https://github.com/champon1020/gsorm/tree/main/docs/model_ja.md)に記載されています．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement/migration#CreateTableStmt.Model)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTable.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateTableStmt.Model)
 
 #### 例
 ```go

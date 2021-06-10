@@ -66,7 +66,7 @@ err := gsorm.Update(db, "employees", "emp_no", "first_name").
 
 `Set`は複数回呼び出すことが可能です．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Set)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.Set)
 
 #### 例
 ```go
@@ -96,7 +96,7 @@ err := gsorm.Update(db, "employees").
 - 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
 - 以上の条件に該当しない値はそのまま展開される．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Where)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.Where)
 
 #### 例
 ```go
@@ -181,7 +181,7 @@ err := gsorm.Update(db).From("employees").
 
 `And`は複数回呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.And)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.And)
 
 #### 例
 ```go
@@ -294,7 +294,7 @@ err := gsorm.Update(db).From("employees").
 
 `Or`は複数回呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Or)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.Or)
 
 #### 例
 ```go
@@ -397,7 +397,7 @@ err := gsorm.Update(db).From("employees").
 
 Modelについての詳細は[Model](https://github.com/champon1020/gsorm/blob/main/docs/model_ja.md)に記載されています．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Model)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.Model)
 
 #### 例
 ```go

@@ -66,7 +66,7 @@ err := gsorm.Update(db, "employees", "emp_no", "first_name").
 
 `Set` can be called multiple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Set)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.Set)
 
 #### Example
 ```go
@@ -95,7 +95,7 @@ Assignment rules are as follows:
 - If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
 - If the above conditions are not met, the value is assigned as is
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Where)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.Where)
 
 #### Example
 ```go
@@ -179,7 +179,7 @@ Assignment rules are as follows:
 
 `And` can be called mutliple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.And)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.And)
 
 #### Example
 ```go
@@ -290,7 +290,7 @@ Assignment rules are as follows:
 
 `Or` can be called mutliple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Or)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.Or)
 
 #### Example
 ```go
@@ -393,7 +393,7 @@ err := gsorm.Update(db).From("employees").
 
 Details are given in [Model](https://github.com/champon1020/gsorm/blob/main/docs/model.md).
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#UpdateStmt.Model)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Update.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.Model)
 
 #### Example
 ```go

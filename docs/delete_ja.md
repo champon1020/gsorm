@@ -51,7 +51,7 @@ err := gsorm.Delete(db).
 ## From
 `From`はFROM句を呼び出します．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.From)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DeleteStmt.From)
 
 #### 例
 ```go
@@ -78,7 +78,7 @@ err := gsorm.Delete(db).From("employees AS e").Exec()
 - 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
 - 以上の条件に該当しない値はそのまま展開される．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.Where)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DeleteStmt.Where)
 
 #### 例
 ```go
@@ -145,7 +145,7 @@ err := gsorm.Delete(db).From("employees").
 
 `And`は複数回呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.And)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DeleteStmt.And)
 
 #### 例
 ```go
@@ -239,7 +239,7 @@ err := gsorm.Delete(db).From("employees").
 
 `Or`は複数回呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.Or)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DeleteStmt.Or)
 
 #### 例
 ```go

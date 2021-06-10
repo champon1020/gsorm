@@ -56,7 +56,7 @@ err := gsorm.Insert(db).
 
 `Values` can be called mutiple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#InsertStmt.Values)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#InsertStmt.Values)
 
 #### Example
 ```go
@@ -76,7 +76,7 @@ err := gsorm.Insert(db, "employees", "emp_no", "first_name").
 ## Select
 `Select` calls INSERT INTO ... SELECT statement.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#InsertStmt.Select)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#InsertStmt.Select)
 
 #### Example
 ```go
@@ -92,7 +92,7 @@ err := gsorm.Insert(db, "dept_manager").
 
 Details are given in[Model](https://github.com/champon1020/gsorm/blob/main/docs/model.md).
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#InsertStmt.Model)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#InsertStmt.Model)
 
 #### Example
 ```go

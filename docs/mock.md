@@ -43,9 +43,13 @@ if err := mock.Complete(); err != nil {
 - [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mockdbcomplete)
 - [ExpectBegin](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mockdbexpectbegin)
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#MockDB.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#MockDB)
+
 
 ## (MockDB).Expect
 `Expect` expects the SQL statement without return value.
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Mock.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Mock)
 
 #### Example
 ```go
@@ -55,6 +59,8 @@ mock.Expect(gsorm.Insert(nil, "employees", "emp_no", "first_name").Values(1001, 
 
 ## (MockDB).ExpectWithReturn
 `ExpectWithReturn` expects the SQL statement with specifing return value.
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Mock.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Mock)
 
 #### Exmample
 ```go
@@ -71,6 +77,8 @@ If there are the statements that are not executed but expected, `Complete` retur
 
 `Complete` should be executed at last when the testing with mock.
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Mock.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Mock)
+
 #### Example
 ```go
 if err := gsorm.Complete(); err != nil {
@@ -86,6 +94,8 @@ if err := gsorm.Complete(); err != nil {
 
 Details of `gsorm.MockTx` is in [MockTx](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mocktx).
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#MockDB.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#MockDB)
+
 #### Example
 ```go
 mocktx := mock.ExpectBegin()
@@ -99,9 +109,13 @@ mocktx := mock.ExpectBegin()
 - [ExpectCommit](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mocktxexpectcommit)
 - [ExpectRollback](https://github.com/champon1020/gsorm/tree/main/docs/mock.md#mocktxexpectrollback)
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#MockTx.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#MockTx)
+
 
 ## (MockTx).Expect
 `Expect` expects the SQL statement without return value.
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Mock.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Mock)
 
 #### Example
 ```go
@@ -111,6 +125,8 @@ mocktx.Expect(gsorm.Insert(nil, "employees", "emp_no", "first_name").Values(1001
 
 ## (MockTx).ExpectWithReturn
 `ExpectWithReturn` expects the SQL statement with specifing return value.
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Mock.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Mock)
 
 #### Example
 ```go
@@ -123,6 +139,8 @@ mocktx.ExpectWithReturn(
 ## (MockTx).ExpectCommit
 `ExpectCommit` expects the transaction commit.
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#MockTx.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#MockTx)
+
 #### Example
 ```go
 mocktx.ExpectCommit()
@@ -131,6 +149,8 @@ mocktx.ExpectCommit()
 
 ## (MockTx).ExpectRollback
 `ExpectRollback` expects the transaction rollback.
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#MockTx.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#MockTx)
 
 #### Example
 ```go

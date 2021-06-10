@@ -52,7 +52,7 @@ err := gsorm.Delete(db).
 ## From
 `From` calls FROM clause.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.From)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DeleteStmt.From)
 
 #### Example
 ```go
@@ -78,7 +78,7 @@ Assignment rules are as follows:
 - If the type of value is `gsorm.Stmt`, `gsorm.Stmt` is built
 - If the above conditions are not met, the value is assigned as is
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.Where)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DeleteStmt.Where)
 
 #### Example
 ```go
@@ -144,7 +144,7 @@ Assignment rules are as follows:
 
 `And` can be called mutliple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.And)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DeleteStmt.And)
 
 #### Example
 ```go
@@ -235,7 +235,7 @@ Assignment rules are as follows:
 
 `Or` can be called mutliple times.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#DeleteStmt.Or)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Delete.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#DeleteStmt.Or)
 
 #### Example
 ```go

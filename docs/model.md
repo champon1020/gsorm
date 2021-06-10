@@ -26,12 +26,18 @@ err := gsorm.Insert(db, "employees", "emp_no", "first_name").
 - []map[string]interface{}
 - []struct{}
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#InsertStmt.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#InsertStmt.Model)
+
 ### Update
 - map[string]interface{}
 - struct{}
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#UpdateStmt.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#UpdateStmt.Model)
+
 ### CreateTable
 - struct{}
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#CreateTableStmt.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#CreateTableStmt.Model)
 
 Type of struct field or map element should be below.
 

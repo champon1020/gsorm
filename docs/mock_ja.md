@@ -43,9 +43,13 @@ if err := mock.Complete(); err != nil {
 - [Complete](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mockdbcomplete)
 - [ExpectBegin](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mockdbexpectbegin)
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#MockDB.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#MockDB)
+
 
 ## (MockDB).Expect
 `Expect`は返り値がない文が実行されることを予期します．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Mock.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Mock)
 
 #### 例
 ```go
@@ -55,6 +59,8 @@ mock.Expect(gsorm.Insert(nil, "employees", "emp_no", "first_name").Values(1001, 
 
 ## (MockDB).ExpectWithReturn
 `ExpectWithReturn`は返り値がある文が実行されることを予期します．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Mock.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Mock)
 
 #### 例
 ```go
@@ -71,6 +77,8 @@ mock.ExpectWithReturn(
 
 mockを用いたテストを行う場合は，必ずこちらの関数を呼び出す必要があります．
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Mock.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Mock)
+
 #### 例
 ```go
 if err := gsorm.Complete(); err != nil {
@@ -86,6 +94,8 @@ if err := gsorm.Complete(); err != nil {
 
 `gsorm.MockTx`についての詳細は[MockTx](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktx)に記載されています．
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#MockDB.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#MockDB)
+
 #### 例
 ```go
 mocktx := mock.ExpectBegin()
@@ -99,8 +109,12 @@ mocktx := mock.ExpectBegin()
 - [ExpectCommit](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxexpectcommit)
 - [ExpectRollback](https://github.com/champon1020/gsorm/tree/main/docs/mock_ja.md#mocktxexpectrollback)
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#MockTx.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#MockTx)
+
 ## (MockTx).Expect
 `Expect`は返り値がない文が実行されることを予期します．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Mock.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Mock)
 
 #### 例
 ```go
@@ -110,6 +124,8 @@ mocktx.Expect(gsorm.Insert(nil, "employees", "emp_no", "first_name").Values(1001
 
 ## (MockTx).ExpectWithReturn
 `ExpectWithReturn`は返り値がある文が実行されることを予期します．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Mock.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#Mock)
 
 #### 例
 ```go
@@ -122,6 +138,8 @@ mocktx.ExpectWithReturn(
 ## (MockTx).ExpectCommit
 `ExpectCommit`はトランザクションのCommitを予期します．
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#MockTx.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#MockTx)
+
 #### 例
 ```go
 mocktx.ExpectCommit()
@@ -130,6 +148,8 @@ mocktx.ExpectCommit()
 
 ## (MockTx).ExpectRollback
 `ExpectRollback`はトランザクションのRollbackを予期します．
+
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#MockTx.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#MockTx)
 
 #### 例
 ```go

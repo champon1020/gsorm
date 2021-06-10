@@ -79,7 +79,7 @@ err := gsorm.Select(db).
 ## From
 `From`はFROM句を呼び出します．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.From)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.From)
 
 #### 例
 ```go
@@ -102,7 +102,7 @@ err := gsorm.Select(db, "emp_no", "dept_no").From("employees", "departments").Qu
 
 `Join`，`LeftJoin`，`RightJoin`は複数回呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Join)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Join)
 
 #### 例
 ```go
@@ -129,7 +129,7 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 
 `Join`，`LeftJoin`，`RightJoin`は複数回呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.LeftJoin)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.LeftJoin)
 
 #### 例
 ```go
@@ -156,7 +156,7 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 
 `Join`，`LeftJoin`，`RightJoin`は複数回呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.RightJoin)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.RightJoin)
 
 #### 例
 ```go
@@ -190,7 +190,7 @@ err := gsorm.Select(db, "e.emp_no", "d.dept_no", "s.salary").
 - 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
 - 以上の条件に該当しない値はそのまま展開される．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Where)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Where)
 
 #### 例
 ```go
@@ -257,7 +257,7 @@ err := gsorm.Select(db).From("employees").
 
 `And`は複数回呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.And)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.And)
 
 #### 例
 ```go
@@ -351,7 +351,7 @@ err := gsorm.Select(db).From("employees").
 
 `Or`は複数回呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Or)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Or)
 
 #### 例
 ```go
@@ -432,7 +432,7 @@ err := gsorm.Select(db).From("employees").
 ## GroupBy
 `GroupBy`はGROUP BY句を呼び出します．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.GroupBy)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.GroupBy)
 
 #### 例
 ```go
@@ -455,7 +455,7 @@ err := gsorm.Select(db, "emp_no", "AVG(salary)").From("salaries").
 - 値が`gsorm.Stmt`型の場合，`gsorm.Stmt`は展開されます．
 - 以上の条件に該当しない値はそのまま展開される．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Having)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Having)
 
 #### 例
 ```go
@@ -519,7 +519,7 @@ err := gsorm.Select(db).From("employees").
 ## Union
 `Union`はUNION句を呼び出します．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Union)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Union)
 
 #### 例
 ```go
@@ -533,7 +533,7 @@ gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 ## UnionAll
 `UnionAll`はUNION ALL句を呼び出します．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.UnionAll)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.UnionAll)
 
 #### 例
 ```go
@@ -547,7 +547,7 @@ gsorm.Select(db, "emp_no", "dept_no").From("dept_manager").
 ## OrderBy
 `OrderBy`はORDER BY句を呼び出します．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.OrderBy)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.OrderBy)
 
 #### 例
 ```go
@@ -578,7 +578,7 @@ err := gsorm.Select(db).From("employees").
 ## Limit
 `Limit`はLIMIT句を呼び出します．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Limit)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Limit)
 
 #### 例
 ```go
@@ -594,7 +594,7 @@ err := gsorm.Select(db).From("employees").
 
 `Offset`は`Limit`に続けて呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Offset)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Offset)
 
 #### 例
 ```go
@@ -623,7 +623,7 @@ modelには[sql.Rows.Scan](https://golang.org/pkg/database/sql/#Rows.Scan)に使
 - `gsorm`と`json`の両方が付いているとき，`gsorm`の規則が優先されます
 - `gsorm`と`json`の両方とも付いていないとき，フィールド名のスネークケースが使用されます
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#SelectStmt.Query)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Select.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#SelectStmt.Query)
 
 #### 例
 ```go
