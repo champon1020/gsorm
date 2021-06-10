@@ -108,7 +108,10 @@ type Employee struct {
 }
 
 func TestWithMock(t *testing.T) {
+    // Open the connection to mock database.
     mock := gsorm.OpenMock()
+
+    // Expect statements that will be executed.
     mock.Expect(gsorm.Insert(nil, "employees", "emp_no", "first_name").
         Values(1001, "Taro").
         Values(1002, "Jiro"))
