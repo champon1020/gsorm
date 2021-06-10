@@ -199,7 +199,7 @@ func TestToString_NoOpt(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		res := internal.ToString(testCase.Value, &internal.ToString{})
+		res := internal.ToString(testCase.Value, &internal.ToStringOpt{})
 		assert.Equal(t, testCase.Result, res)
 	}
 }
