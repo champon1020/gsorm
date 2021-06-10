@@ -48,7 +48,7 @@ type Tx interface {
 	Rollback() error
 }
 
-// Mock is mock database conneciton pool.
+// Mock is mock database connection pool.
 type Mock interface {
 	conn
 	compareWith(s interfaces.Stmt) (interface{}, error)

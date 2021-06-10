@@ -119,7 +119,7 @@ func TestMockDB_Complete_Transaction_Fail(t *testing.T) {
 	// Actual process.
 	tx, err := mock.Begin()
 	if err != nil {
-		t.Errorf("Error was occured: %+v", err)
+		t.Errorf("Error was occurred: %+v", err)
 		return
 	}
 	if err = gsorm.Insert(tx, "table1", "column1", "column2").Values(10, "str").Exec(); err != nil {
@@ -302,7 +302,7 @@ func TestMockTx_Commit_Fail(t *testing.T) {
 		// Actual process.
 		tx, err := mock.Begin()
 		if err != nil {
-			t.Errorf("Error was occured: %+v", err)
+			t.Errorf("Error was occurred: %+v", err)
 			return
 		}
 		err = tx.Commit()
@@ -321,7 +321,7 @@ func TestMockTx_Commit_Fail(t *testing.T) {
 		// Actual process.
 		tx, err := mock.Begin()
 		if err != nil {
-			t.Errorf("Error was occured: %+v", err)
+			t.Errorf("Error was occurred: %+v", err)
 			return
 		}
 		err = tx.Commit()
@@ -342,7 +342,7 @@ func TestMockTx_Rollback_Fail(t *testing.T) {
 		// Actual process.
 		tx, err := mock.Begin()
 		if err != nil {
-			t.Errorf("Error was occured: %+v", err)
+			t.Errorf("Error was occurred: %+v", err)
 			return
 		}
 		err = tx.Rollback()
@@ -361,7 +361,7 @@ func TestMockTx_Rollback_Fail(t *testing.T) {
 		// Actual process.
 		tx, err := mock.Begin()
 		if err != nil {
-			t.Errorf("Error was occured: %+v", err)
+			t.Errorf("Error was occurred: %+v", err)
 			return
 		}
 		err = tx.Rollback()
