@@ -28,7 +28,7 @@ func (r *rows) Next() bool {
 }
 
 func (r *rows) Scan(args ...interface{}) error {
-	return r.rows.Scan(args)
+	return r.rows.Scan(args...)
 }
 
 func (r *rows) Close() error {

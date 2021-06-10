@@ -56,7 +56,7 @@ err := gsorm.Insert(db).
 
 `Values`は複数回呼び出すことができます．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#InsertStmt.Values)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#InsertStmt.Values)
 
 #### 例
 ```go
@@ -76,7 +76,7 @@ err := gsorm.Insert(db, "employees", "emp_no", "first_name").
 ## Select
 `Select`はINSERT INTO ... SELECT文を呼び出します．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#InsertStmt.Select)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#InsertStmt.Select)
 
 #### 例
 ```go
@@ -92,7 +92,7 @@ err := gsorm.Insert(db, "dept_manager").
 
 Modelについての詳細は[Model](https://github.com/champon1020/gsorm/blob/main/docs/model_ja.md)に記載されています．
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm/statement#InsertStmt.Model)
+[![Go Reference](https://pkg.go.dev/badge/github.com/champon1020/gsorm#Insert.svg)](https://pkg.go.dev/github.com/champon1020/gsorm#InsertStmt.Model)
 
 #### 例
 ```go

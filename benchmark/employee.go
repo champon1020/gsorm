@@ -2,6 +2,7 @@ package benchmark
 
 import "time"
 
+// Employee is sample model structure.
 type Employee struct {
 	EmpNo     int       `db:"emp_no"`
 	BirthDate time.Time `db:"birth_date"`

@@ -249,7 +249,7 @@ func TestTx_Ping(t *testing.T) {
 
 	err := tx.Ping()
 	if err != nil {
-		t.Errorf("error was occured: %v", err)
+		t.Errorf("error was occurred: %v", err)
 	}
 
 	assert.Equal(t, true, sdb.calledPing)
