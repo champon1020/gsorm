@@ -36,8 +36,16 @@ func (r *rows) Close() error {
 	return r.rows.Close()
 }
 
-func (r *rows) ColumnTypes() ([]*sql.ColumnType, error) {
-	return r.rows.ColumnTypes()
+func (r *rows) ColumnTypes() ([]icolumnType, error) {
+	ct, err := r.rows.ColumnTypes()
+	if err != nil {
+		return nil, err
+	}
+	ict := make([]icolumnType, len(ct))
+	for i, c := range ct {
+		ict[i] = c
+	}
+	return ict, nil
 }
 
 type result struct {

@@ -45,7 +45,7 @@ func TestCreateTableModelParser(t *testing.T) {
 	}
 }
 
-func TestInsertModelParser_ParseStruct2(t *testing.T) {
+func TestInsertModelParser_ParseStruct(t *testing.T) {
 	type Employee struct {
 		ID        int `gsorm:"emp_no"`
 		FirstName string

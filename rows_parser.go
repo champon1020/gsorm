@@ -8,12 +8,6 @@ import (
 	"golang.org/x/xerrors"
 )
 
-// columnType is interface for *sql.ColumnType.
-type columnType interface {
-	Name() string
-	ScanType() reflect.Type
-}
-
 // rowsParser is parser for sql.Rows.
 type rowsParser struct {
 	// SQL rows.
@@ -23,7 +17,7 @@ type rowsParser struct {
 	numOfColumns int
 
 	// Column types
-	columnTypes []columnType
+	columnTypes []icolumnType
 
 	// Pointers of the scanning values.
 	itemPtr []interface{}
@@ -42,7 +36,7 @@ func newRowsParser(r irows, m interface{}) (*rowsParser, error) {
 		return nil, err
 	}
 
-	cti := make([]columnType, len(ct))
+	cti := make([]icolumnType, len(ct))
 	for i := 0; i < len(ct); i++ {
 		cti[i] = ct[i]
 	}

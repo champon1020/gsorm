@@ -1,11 +1,13 @@
 package gsorm
 
 type (
-	ExportedRawStmt = rawStmt
-	ExportedDB      = db
-	ExportedTx      = tx
-	ExportedMockDB  = mockDB
-	ExportedIRows   = irows
+	ExportedRawStmt     = rawStmt
+	ExportedDB          = db
+	ExportedTx          = tx
+	ExportedMockDB      = mockDB
+	ExportedIRows       = irows
+	ExportedIResult     = iresult
+	ExportedIColumnType = icolumnType
 )
 
 // Exported values which is declared in db.go.

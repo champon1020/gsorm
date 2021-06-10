@@ -1,7 +1,7 @@
 package gsorm
 
 import (
-	"database/sql"
+	"reflect"
 	"time"
 
 	"github.com/champon1020/gsorm/interfaces"
@@ -14,10 +14,15 @@ type conn interface {
 	Exec(query string, args ...interface{}) (iresult, error)
 }
 
+type icolumnType interface {
+	Name() string
+	ScanType() reflect.Type
+}
+
 type irows interface {
 	Next() bool
 	Scan(args ...interface{}) error
-	ColumnTypes() ([]*sql.ColumnType, error)
+	ColumnTypes() ([]icolumnType, error)
 	Close() error
 }
 
