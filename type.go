@@ -55,6 +55,7 @@ type Mock interface {
 	Complete() error
 	Expect(s interfaces.Stmt)
 	ExpectWithReturn(s interfaces.Stmt, v interface{})
+	ExpectParallel(e []ParallelExpectation)
 }
 
 // MockDB is interface of mock database.

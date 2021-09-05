@@ -2,6 +2,7 @@ package gsorm_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/champon1020/gsorm"
 	"github.com/google/go-cmp/cmp"
@@ -37,6 +38,48 @@ func TestMock_Expectation(t *testing.T) {
 	if diff := cmp.Diff(*model, expectedReturn); diff != "" {
 		t.Errorf("Differs: (-want +got)\n%s", diff)
 	}
+}
+
+func TestMockDB_ExpectParallel(t *testing.T) {
+	expectedReturn := []int{10, 20, 30}
+
+	// Test phase.
+	mock := gsorm.OpenMock()
+	mock.ExpectParallel([]gsorm.ParallelExpectation{
+		{
+			Stmt:       gsorm.Insert(nil, "table", "column1", "column2").Values(10, "str"),
+			WillReturn: nil,
+		},
+		{
+			Stmt:       gsorm.Select(nil, "column1").From("table"),
+			WillReturn: expectedReturn,
+		},
+	})
+
+	// Actual process.
+	go func() {
+		time.Sleep(time.Second)
+		if err := gsorm.Insert(mock, "table", "column1", "column2").Values(10, "str").Exec(); err != nil {
+			t.Fatalf("error occurred: %v", err)
+		}
+	}()
+
+	gotModel := []int{}
+	go func() {
+		if err := gsorm.Select(mock, "column1").From("table").Query(&gotModel); err != nil {
+			t.Fatalf("error occurred: %v", err)
+		}
+	}()
+
+	time.Sleep(2 * time.Second)
+
+	// Test phase.
+	if err := mock.Complete(); err != nil {
+		t.Fatalf("error occurred: %v", err)
+	}
+
+	// Validate model values.
+	assert.Equal(t, expectedReturn, gotModel)
 }
 
 func TestMockDB_DummyFunctions(t *testing.T) {
@@ -289,6 +332,54 @@ func TestMock_TransactionExpectation(t *testing.T) {
 	if diff := cmp.Diff(*model2, expectedReturn2); diff != "" {
 		t.Errorf("Differs: (-want +got)\n%s", diff)
 	}
+}
+
+func TestMockTx_ExpectParallel(t *testing.T) {
+	expectedReturn := []int{10, 20, 30}
+
+	// Test phase.
+	mock := gsorm.OpenMock()
+	mockTx := mock.ExpectBegin()
+	mockTx.ExpectParallel([]gsorm.ParallelExpectation{
+		{
+			Stmt:       gsorm.Insert(nil, "table", "column1", "column2").Values(10, "str"),
+			WillReturn: nil,
+		},
+		{
+			Stmt:       gsorm.Select(nil, "column1").From("table"),
+			WillReturn: expectedReturn,
+		},
+	})
+
+	tx, err := mock.Begin()
+	if err != nil {
+		t.Fatalf("failed to begin transaction: %v", err)
+	}
+
+	// Actual process.
+	go func() {
+		time.Sleep(time.Second)
+		if err := gsorm.Insert(tx, "table", "column1", "column2").Values(10, "str").Exec(); err != nil {
+			t.Fatalf("error occurred: %v", err)
+		}
+	}()
+
+	gotModel := []int{}
+	go func() {
+		if err := gsorm.Select(mockTx, "column1").From("table").Query(&gotModel); err != nil {
+			t.Fatalf("error occurred: %v", err)
+		}
+	}()
+
+	time.Sleep(2 * time.Second)
+
+	// Test phase.
+	if err := mock.Complete(); err != nil {
+		t.Fatalf("error occurred: %v", err)
+	}
+
+	// Validate model values.
+	assert.Equal(t, expectedReturn, gotModel)
 }
 
 func TestMockTx_Commit_Fail(t *testing.T) {

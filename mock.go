@@ -7,6 +7,16 @@ import (
 	"golang.org/x/xerrors"
 )
 
+// ParallelExpectation represents a pair of expected statement and
+// its returned value which will be executed with parallel.
+type ParallelExpectation struct {
+	// Expected statement.
+	Stmt interfaces.Stmt
+
+	// Expected returned value.
+	WillReturn interface{}
+}
+
 // mockDB is mock databse connection pool.
 // This structure stores mainly what query will be executed and what value will be returned.
 type mockDB struct {
@@ -101,6 +111,11 @@ func (m *mockDB) ExpectWithReturn(s interfaces.Stmt, v interface{}) {
 	m.expected = append(m.expected, &expectedQuery{stmt: s, willReturn: v})
 }
 
+// ExpectParallel appends the expected statements which will be executed with parallel.
+func (m *mockDB) ExpectParallel(e []ParallelExpectation) {
+	m.expected = append(m.expected, &expectedParallel{stmts: e})
+}
+
 // Complete checks whether all of expected statements was executed or not.
 func (m *mockDB) Complete() error {
 	if len(m.expected) != 0 {
@@ -120,15 +135,30 @@ func (m *mockDB) compareWith(s interfaces.Stmt) (interface{}, error) {
 	if expected == nil {
 		return nil, xerrors.Errorf("%s is not expected but executed", s.String())
 	}
-	eq, ok := expected.(*expectedQuery)
-	if !ok {
-		return nil, xerrors.Errorf("statements comparison was failed:\nexpected: %s\nactual:   %s\n",
-			expected.String(), s.String())
+
+	switch eq := expected.(type) {
+	case *expectedQuery:
+		if err := eq.stmt.CompareWith(s); err != nil {
+			return nil, err
+		}
+		return eq.willReturn, nil
+	case *expectedParallel:
+		for i, pe := range eq.stmts {
+			if err := pe.Stmt.CompareWith(s); err != nil {
+				continue
+			}
+			if len(eq.stmts) > 1 {
+				eq.stmts = append(eq.stmts[:i], eq.stmts[i+1:]...)
+				m.expected = append(m.expected, eq)
+			}
+			return pe.WillReturn, nil
+		}
+		return nil, xerrors.Errorf("statements comparison was failed: executed statement is not include in parallel expectation")
+	default:
 	}
-	if err := eq.stmt.CompareWith(s); err != nil {
-		return nil, err
-	}
-	return eq.willReturn, nil
+
+	return nil, xerrors.Errorf("statements comparison was failed:\nexpected: %s\nactual:   %s\n",
+		expected.String(), s.String())
 }
 
 // popExpected pops expected operation.
@@ -219,6 +249,11 @@ func (m *mockTx) ExpectWithReturn(s interfaces.Stmt, v interface{}) {
 	m.expected = append(m.expected, &expectedQuery{stmt: s, willReturn: v})
 }
 
+// ExpectParallel appends the expected statements which will be executed with parallel.
+func (m *mockTx) ExpectParallel(e []ParallelExpectation) {
+	m.expected = append(m.expected, &expectedParallel{stmts: e})
+}
+
 // Complete checks whether all of expected statements was executed or not.
 func (m *mockTx) Complete() error {
 	if len(m.expected) != 0 {
@@ -233,13 +268,28 @@ func (m *mockTx) compareWith(s interfaces.Stmt) (interface{}, error) {
 	if expected == nil {
 		return nil, xerrors.Errorf("%s is not expected but executed", s.String())
 	}
-	eq, ok := expected.(*expectedQuery)
-	if !ok {
-		return nil, xerrors.Errorf("statements comparison was failed:\nexpected: %s\nactual:   %s\n",
-			expected.String(), s.String())
+
+	switch eq := expected.(type) {
+	case *expectedQuery:
+		if err := eq.stmt.CompareWith(s); err != nil {
+			return nil, err
+		}
+		return eq.willReturn, nil
+	case *expectedParallel:
+		for i, pe := range eq.stmts {
+			if err := pe.Stmt.CompareWith(s); err != nil {
+				continue
+			}
+			if len(eq.stmts) > 1 {
+				eq.stmts = append(eq.stmts[:i], eq.stmts[i+1:]...)
+				m.expected = append(m.expected, eq)
+			}
+			return pe.WillReturn, nil
+		}
+		return nil, xerrors.Errorf("statements comparison was failed: executed statement is not include in parallel expectation")
+	default:
 	}
-	if err := eq.stmt.CompareWith(s); err != nil {
-		return nil, err
-	}
-	return eq.willReturn, nil
+
+	return nil, xerrors.Errorf("statements comparison was failed:\nexpected: %s\nactual:   %s\n",
+		expected.String(), s.String())
 }

@@ -37,3 +37,12 @@ type expectedRollback struct{}
 func (e *expectedRollback) String() string {
 	return "gsorm.MockTx.Rollback"
 }
+
+// expectedParallel is expectation of query executed with parallel.
+type expectedParallel struct {
+	stmts []ParallelExpectation
+}
+
+func (e *expectedParallel) String() string {
+	return "gsorm.ParallelExpectation"
+}
